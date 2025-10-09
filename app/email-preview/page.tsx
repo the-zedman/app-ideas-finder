@@ -1,11 +1,11 @@
 export default function EmailPreview() {
   return (
     <div style={{ fontFamily: 'Arial, sans-serif', lineHeight: 1.6, color: '#333', margin: 0, padding: 0, backgroundColor: '#ffffff' }}>
-      <table width="100%" cellPadding="0" cellSpacing="0" border="0" style={{ backgroundColor: '#ffffff' }}>
+      <table width="100%" cellPadding={0} cellSpacing={0} border={0} style={{ backgroundColor: '#ffffff' }}>
         <tbody>
           <tr>
             <td align="center" style={{ padding: '20px' }}>
-              <table width="600" cellPadding="0" cellSpacing="0" border="0" style={{ maxWidth: '600px' }}>
+              <table width="600" cellPadding={0} cellSpacing={0} border={0} style={{ maxWidth: '600px' }}>
                 {/* Header with Logo and App Name */}
                 <tr>
                   <td style={{ textAlign: 'center', padding: '20px 0', borderBottom: '3px solid #f78937' }}>
