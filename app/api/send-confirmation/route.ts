@@ -36,6 +36,8 @@ export async function POST(request: NextRequest) {
               <html>
                 <head>
                   <meta charset="utf-8">
+                  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                  <meta http-equiv="X-UA-Compatible" content="IE=edge">
                   <title>Welcome to App Ideas Finder</title>
                   <!--[if mso]>
                   <noscript>
@@ -46,38 +48,42 @@ export async function POST(request: NextRequest) {
                     </xml>
                   </noscript>
                   <![endif]-->
+                  <style>
+                    @media only screen and (max-width: 600px) {
+                      .mobile-padding { padding: 15px !important; }
+                      .mobile-text { font-size: 16px !important; }
+                      .mobile-header { font-size: 20px !important; }
+                      .mobile-button { padding: 12px 20px !important; font-size: 14px !important; }
+                      .mobile-table { width: 100% !important; max-width: 100% !important; }
+                    }
+                  </style>
                 </head>
                 <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; background-color: #ffffff;">
                   <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #ffffff;">
                     <tr>
                       <td align="center" style="padding: 20px;">
-                        <table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width: 600px;">
+                        <table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width: 600px;" class="mobile-table">
                           <!-- Header with Logo and App Name -->
                           <tr>
-                            <td style="text-align: center; padding: 20px 0; border-bottom: 3px solid #f78937;">
-                              <!--[if !mso]><!-->
+                            <td style="text-align: center; padding: 20px 0; border-bottom: 3px solid #f78937;" class="mobile-padding">
                               <img src="https://appideasfinder.com/App%20Ideas%20Finder%20-%20logo%20-%20200x200.png" alt="App Ideas Finder Logo" width="80" height="80" style="display: block; margin: 0 auto 15px auto; border: 0; outline: none; max-width: 80px; height: auto;">
-                              <!--<![endif]-->
-                              <!--[if mso]>
-                              <img src="https://appideasfinder.com/App%20Ideas%20Finder%20-%20logo%20-%20200x200.png" alt="App Ideas Finder Logo" width="80" height="80" style="display: block; margin: 0 auto 15px auto; border: 0; outline: none;">
-                              <![endif]-->
-                              <h1 style="color: #0a3a5f; margin: 0; font-size: 24px; font-weight: bold;">App Ideas Finder</h1>
+                              <h1 style="color: #0a3a5f; margin: 0; font-size: 24px; font-weight: bold;" class="mobile-header">App Ideas Finder</h1>
                             </td>
                           </tr>
                           
                           <!-- Main Content -->
                           <tr>
-                            <td style="text-align: center; padding: 30px 20px;">
-                              <h2 style="color: #0a3a5f; margin: 0 0 10px 0; font-size: 28px;">Thanks for joining our waitlist!</h2>
-                              <p style="color: #f78937; font-size: 18px; font-weight: bold; margin: 0;">You're confirmed for early access</p>
+                            <td style="text-align: center; padding: 30px 20px;" class="mobile-padding">
+                              <h2 style="color: #0a3a5f; margin: 0 0 10px 0; font-size: 28px;" class="mobile-header">Thanks for joining our waitlist!</h2>
+                              <p style="color: #f78937; font-size: 18px; font-weight: bold; margin: 0;" class="mobile-text">You're confirmed for early access</p>
                             </td>
                           </tr>
                           
                           <!-- Info Box -->
                           <tr>
-                            <td style="background-color: #f8f9fa; padding: 20px; border: 1px solid #e9ecef;">
-                              <h3 style="color: #0a3a5f; margin: 0 0 15px 0; font-size: 20px;">What happens next?</h3>
-                              <ol style="color: #666; margin: 0; padding-left: 25px; list-style-type: decimal; list-style-position: outside;">
+                            <td style="background-color: #f8f9fa; padding: 20px; border: 1px solid #e9ecef;" class="mobile-padding">
+                              <h3 style="color: #0a3a5f; margin: 0 0 15px 0; font-size: 20px;" class="mobile-header">What happens next?</h3>
+                              <ol style="color: #666; margin: 0; padding-left: 25px; list-style-type: decimal; list-style-position: outside;" class="mobile-text">
                                 <li style="margin-bottom: 8px; display: list-item;">We'll notify you as soon as early access opens</li>
                                 <li style="margin-bottom: 8px; display: list-item;">You'll be among the first to experience our AI-powered app idea generator</li>
                                 <li style="margin-bottom: 0; display: list-item;">Get exclusive access to features before public launch</li>
@@ -87,8 +93,8 @@ export async function POST(request: NextRequest) {
                           
                           <!-- Footer -->
                           <tr>
-                            <td style="text-align: center; padding: 30px 20px;">
-                              <p style="color: #666; font-size: 14px; margin: 0 0 20px 0;">
+                            <td style="text-align: center; padding: 30px 20px;" class="mobile-padding">
+                              <p style="color: #666; font-size: 14px; margin: 0 0 20px 0;" class="mobile-text">
                                 Please consider joining our community of innovative developers here ...
                               </p>
                               
@@ -96,18 +102,13 @@ export async function POST(request: NextRequest) {
                               <table cellpadding="0" cellspacing="0" border="0" align="center" style="margin: 20px auto;">
                                 <tr>
                                   <td style="padding: 0 10px;">
-                                    <a href="https://x.com/appideasfinder" style="display: inline-block; background-color: #000000; color: #ffffff; padding: 10px 20px; text-decoration: none; border-radius: 4px; font-size: 14px; font-weight: bold;">
+                                    <a href="https://x.com/appideasfinder" style="display: inline-block; background-color: #000000; color: #ffffff; padding: 10px 20px; text-decoration: none; border-radius: 4px; font-size: 14px; font-weight: bold;" class="mobile-button">
                                       𝕏 Follow us on X
                                     </a>
                                   </td>
                                   <td style="padding: 0 10px;">
-                                    <a href="https://discord.gg/nK2fNbe7" style="display: inline-block; background-color: #f78937; color: #ffffff; padding: 10px 20px; text-decoration: none; border-radius: 4px; font-size: 14px; font-weight: bold;">
-                                      <!--[if !mso]><!-->
+                                    <a href="https://discord.gg/nK2fNbe7" style="display: inline-block; background-color: #f78937; color: #ffffff; padding: 10px 20px; text-decoration: none; border-radius: 4px; font-size: 14px; font-weight: bold;" class="mobile-button">
                                       <img src="https://appideasfinder.com/discord-white-logo.png" alt="Discord" width="20" height="20" style="display: inline-block; vertical-align: middle; margin-right: 8px; border: 0; outline: none; max-width: 20px; height: auto;">
-                                      <!--<![endif]-->
-                                      <!--[if mso]>
-                                      <img src="https://appideasfinder.com/discord-white-logo.png" alt="Discord" width="20" height="20" style="display: inline-block; vertical-align: middle; margin-right: 8px; border: 0; outline: none;">
-                                      <![endif]-->
                                       Join us on Discord
                                     </a>
                                   </td>
