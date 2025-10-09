@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
 
     // Email template
     const emailParams = {
-      Source: 'info@appideasfinder.com',
+      Source: 'App Ideas Finder <info@appideasfinder.com>',
       Destination: {
         ToAddresses: [email],
       },
