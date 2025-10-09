@@ -55,7 +55,12 @@ export async function POST(request: NextRequest) {
                           <!-- Header with Logo and App Name -->
                           <tr>
                             <td style="text-align: center; padding: 20px 0; border-bottom: 3px solid #f78937;">
-                              <img src="https://appideasfinder.com/App%20Ideas%20Finder%20-%20logo%20-%20200x200.png" alt="App Ideas Finder Logo" width="80" height="80" style="display: block; margin: 0 auto 15px auto; border: 0; outline: none;" loading="eager" decoding="async">
+                              <!--[if !mso]><!-->
+                              <img src="https://appideasfinder.com/App%20Ideas%20Finder%20-%20logo%20-%20200x200.png" alt="App Ideas Finder Logo" width="80" height="80" style="display: block; margin: 0 auto 15px auto; border: 0; outline: none; max-width: 80px; height: auto;">
+                              <!--<![endif]-->
+                              <!--[if mso]>
+                              <img src="https://appideasfinder.com/App%20Ideas%20Finder%20-%20logo%20-%20200x200.png" alt="App Ideas Finder Logo" width="80" height="80" style="display: block; margin: 0 auto 15px auto; border: 0; outline: none;">
+                              <![endif]-->
                               <h1 style="color: #0a3a5f; margin: 0; font-size: 24px; font-weight: bold;">App Ideas Finder</h1>
                             </td>
                           </tr>
@@ -97,7 +102,12 @@ export async function POST(request: NextRequest) {
                                   </td>
                                   <td style="padding: 0 10px;">
                                     <a href="https://discord.gg/nK2fNbe7" style="display: inline-block; background-color: #f78937; color: #ffffff; padding: 10px 20px; text-decoration: none; border-radius: 4px; font-size: 14px; font-weight: bold;">
-                                      <span style="font-size: 16px; margin-right: 8px;">💬</span>
+                                      <!--[if !mso]><!-->
+                                      <img src="https://appideasfinder.com/discord-white-logo.png" alt="Discord" width="20" height="20" style="display: inline-block; vertical-align: middle; margin-right: 8px; border: 0; outline: none; max-width: 20px; height: auto;">
+                                      <!--<![endif]-->
+                                      <!--[if mso]>
+                                      <img src="https://appideasfinder.com/discord-white-logo.png" alt="Discord" width="20" height="20" style="display: inline-block; vertical-align: middle; margin-right: 8px; border: 0; outline: none;">
+                                      <![endif]-->
                                       Join us on Discord
                                     </a>
                                   </td>
