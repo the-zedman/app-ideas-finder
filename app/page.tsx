@@ -1,28 +1,77 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
+import { supabase } from '@/lib/supabase';
 
 export default function Home() {
   const [email, setEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState('');
-  // This will be fetched from Supabase later
-  const [waitlistCount, setWaitlistCount] = useState(127);
+  const [waitlistCount, setWaitlistCount] = useState(0);
+
+  // Fetch the real waitlist count from Supabase
+  useEffect(() => {
+    const fetchWaitlistCount = async () => {
+      try {
+        const { count, error } = await supabase
+          .from('waitlist')
+          .select('*', { count: 'exact', head: true });
+
+        if (!error && count !== null) {
+          setWaitlistCount(count);
+        }
+      } catch (err) {
+        console.error('Error fetching waitlist count:', err);
+      }
+    };
+
+    fetchWaitlistCount();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     setMessage('');
 
-    // TODO: Connect to Supabase in Phase 2
-    // For now, just show a success message
-    setTimeout(() => {
-      setMessage('Thanks for joining! We\'ll be in touch soon.');
-      setEmail('');
+    try {
+      // Insert email into Supabase
+      const { data, error } = await supabase
+        .from('waitlist')
+        .insert([{ email: email }])
+        .select();
+
+      if (error) {
+        if (error.code === '23505') {
+          // Duplicate email error
+          setMessage('This email is already on the waitlist!');
+        } else {
+          setMessage('Something went wrong. Please try again.');
+        }
+      } else {
+        // Send confirmation email
+        try {
+          await fetch('/api/send-confirmation', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ email }),
+          });
+        } catch (emailError) {
+          console.error('Error sending confirmation email:', emailError);
+          // Don't fail the whole process if email fails
+        }
+
+        setMessage('Thanks for joining! Check your email for confirmation.');
+        setEmail('');
+        setWaitlistCount(prev => prev + 1);
+      }
+    } catch (err) {
+      setMessage('Something went wrong. Please try again.');
+    } finally {
       setIsSubmitting(false);
-      setWaitlistCount(prev => prev + 1);
-    }, 1000);
+    }
   };
 
   return (
