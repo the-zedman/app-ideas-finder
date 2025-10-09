@@ -96,11 +96,26 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { email, unsubscribeToken } = await request.json();
+    const { email, unsubscribeToken, recaptchaToken } = await request.json();
 
     // Input validation
-    if (!email || !unsubscribeToken) {
-      return NextResponse.json({ error: 'Email and unsubscribe token are required' }, { status: 400 });
+    if (!email || !unsubscribeToken || !recaptchaToken) {
+      return NextResponse.json({ error: 'Email, unsubscribe token, and reCAPTCHA verification are required' }, { status: 400 });
+    }
+
+    // Verify reCAPTCHA
+    const recaptchaResponse = await fetch('https://www.google.com/recaptcha/api/siteverify', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: `secret=${process.env.RECAPTCHA_SECRET_KEY}&response=${recaptchaToken}`,
+    });
+
+    const recaptchaData = await recaptchaResponse.json();
+    
+    if (!recaptchaData.success || recaptchaData.score < 0.5) {
+      return NextResponse.json({ error: 'reCAPTCHA verification failed' }, { status: 400 });
     }
 
     // Email format validation

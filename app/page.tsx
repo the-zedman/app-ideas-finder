@@ -1,14 +1,16 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { supabase } from '@/lib/supabase';
+import ReCAPTCHA from 'react-google-recaptcha';
 
 export default function Home() {
   const [email, setEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState('');
   const [waitlistCount, setWaitlistCount] = useState(0);
+  const recaptchaRef = useRef<ReCAPTCHA>(null);
 
   // Fetch the real waitlist count from Supabase
   useEffect(() => {
@@ -35,6 +37,15 @@ export default function Home() {
     setMessage('');
 
     try {
+      // Execute reCAPTCHA
+      const recaptchaToken = await recaptchaRef.current?.executeAsync();
+      
+      if (!recaptchaToken) {
+        setMessage('reCAPTCHA verification failed. Please try again.');
+        setIsSubmitting(false);
+        return;
+      }
+
       // Generate unique unsubscribe token
       const unsubscribeToken = crypto.randomUUID()
 
@@ -59,7 +70,7 @@ export default function Home() {
             headers: {
               'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ email, unsubscribeToken }),
+            body: JSON.stringify({ email, unsubscribeToken, recaptchaToken }),
           });
         } catch (emailError) {
           console.error('Error sending confirmation email:', emailError);
@@ -145,6 +156,13 @@ export default function Home() {
                 {isSubmitting ? 'Joining...' : 'Join the Waitlist'}
               </button>
             </form>
+            
+            {/* Invisible reCAPTCHA */}
+            <ReCAPTCHA
+              ref={recaptchaRef}
+              sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!}
+              size="invisible"
+            />
 
             {/* Success Message */}
             {message && (
