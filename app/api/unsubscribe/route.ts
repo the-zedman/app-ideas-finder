@@ -3,17 +3,17 @@ import { supabase } from '@/lib/supabase'
 
 export async function POST(request: Request) {
   try {
-    const { email } = await request.json()
+    const { token } = await request.json()
 
-    if (!email) {
-      return NextResponse.json({ error: 'Email is required' }, { status: 400 })
+    if (!token) {
+      return NextResponse.json({ error: 'Unsubscribe token is required' }, { status: 400 })
     }
 
-    // Delete the email from the waitlist table
+    // Delete the email from the waitlist table using the token
     const { error } = await supabase
       .from('waitlist')
       .delete()
-      .eq('email', email)
+      .eq('unsubscribe_token', token)
 
     if (error) {
       console.error('Supabase error:', error)
