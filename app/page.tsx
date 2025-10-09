@@ -120,7 +120,7 @@ export default function Home() {
             Discover innovative app ideas using the power of AI.
           </p>
           <p className="text-base md:text-lg text-cream/80 mb-6 max-w-2xl mx-auto">
-            Be among the first to experience an easier way to find app ideas by joining our early access beta group that will be opening to developers like you very soon.
+            Be among the first to experience an easier way to find app ideas by joining our early access beta group that will be opening to developers, like you, very soon.
           </p>
 
           {/* Email Form */}
