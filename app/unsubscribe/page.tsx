@@ -10,9 +10,9 @@ function UnsubscribeContent() {
   const [message, setMessage] = useState('')
 
   useEffect(() => {
-    const email = searchParams.get('email')
+    const token = searchParams.get('token')
     
-    if (!email) {
+    if (!token) {
       setStatus('error')
       setMessage('Invalid unsubscribe link')
       return
@@ -24,7 +24,7 @@ function UnsubscribeContent() {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ email }),
+      body: JSON.stringify({ token }),
     })
       .then(res => res.json())
       .then(data => {

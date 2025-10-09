@@ -35,10 +35,13 @@ export default function Home() {
     setMessage('');
 
     try {
+      // Generate unique unsubscribe token
+      const unsubscribeToken = crypto.randomUUID()
+
       // Insert email into Supabase
       const { data, error } = await supabase
         .from('waitlist')
-        .insert([{ email: email }])
+        .insert([{ email: email, unsubscribe_token: unsubscribeToken }])
         .select();
 
       if (error) {
@@ -56,7 +59,7 @@ export default function Home() {
             headers: {
               'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ email }),
+            body: JSON.stringify({ email, unsubscribeToken }),
           });
         } catch (emailError) {
           console.error('Error sending confirmation email:', emailError);

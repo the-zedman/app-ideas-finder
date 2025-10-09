@@ -12,7 +12,7 @@ const sesClient = new SESClient({
 
 export async function POST(request: NextRequest) {
   try {
-    const { email } = await request.json();
+    const { email, unsubscribeToken } = await request.json();
 
     if (!email) {
       return NextResponse.json({ error: 'Email is required' }, { status: 400 });
@@ -111,7 +111,7 @@ export async function POST(request: NextRequest) {
                               
                               <!-- Unsubscribe Link -->
                               <div style="text-align: center; margin-top: 10px;">
-                                <a href="https://appideasfinder.com/unsubscribe?email=${encodeURIComponent(email)}" style="color: #999; font-size: 10px; text-decoration: underline;">Unsubscribe</a>
+                                <a href="https://appideasfinder.com/unsubscribe?token=${unsubscribeToken}" style="color: #999; font-size: 10px; text-decoration: underline;">Unsubscribe</a>
                               </div>
                               
                               <!-- Footer -->
