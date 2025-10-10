@@ -28,3 +28,12 @@ body {
 .recharts-pie-sector {
   fill: inherit !important;
 }
+
+/* Target the actual pie segments */
+.recharts-pie-sector path {
+  fill: inherit !important;
+}
+
+.recharts-pie-sector > path {
+  fill: inherit !important;
+}

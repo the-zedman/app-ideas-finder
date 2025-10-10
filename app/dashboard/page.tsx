@@ -398,6 +398,7 @@ export default function Dashboard() {
                   cy="50%"
                   labelLine={false}
                   label={({ domain, percentage }) => `${domain} (${percentage}%)`}
+                  labelStyle={{ fill: '#ffedd4' }}
                   outerRadius={80}
                   dataKey="count"
                   style={{ fontSize: '12px', fontWeight: 'bold' }}
@@ -409,9 +410,8 @@ export default function Dashboard() {
                       <Cell 
                         key={`cell-${index}-${entry.domain}`} 
                         fill={color}
-                        className="pie-chart-cell"
                         style={{ 
-                          fill: `${color} !important`,
+                          fill: color,
                           stroke: 'none'
                         }}
                       />
