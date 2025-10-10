@@ -60,7 +60,7 @@ interface DashboardStats {
   }>;
 }
 
-const COLORS = ['#3366CC', '#DC3912', '#FF9900', '#109618', '#990099', '#0099C6', '#DD4477', '#66AA00'];
+const COLORS = ['#FF0000', '#0000FF', '#00FF00', '#FF8000', '#800080', '#00FFFF', '#FF00FF', '#808000'];
 
 export default function Dashboard() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
@@ -391,7 +391,7 @@ export default function Dashboard() {
           <div className="bg-cream/10 backdrop-blur-sm rounded-lg p-6 border border-cream/20">
             <h3 className="text-cream text-lg font-semibold mb-4">Top Email Domains</h3>
             <ResponsiveContainer width="100%" height={300}>
-              <PieChart key={`piechart-${stats.domainBreakdown.length}`}>
+              <PieChart key={`piechart-v2-${stats.domainBreakdown.length}`}>
                 <Pie
                   data={stats.domainBreakdown}
                   cx="50%"
@@ -403,9 +403,11 @@ export default function Dashboard() {
                   dataKey="count"
                   style={{ fontSize: '12px', fill: '#ffedd4', fontWeight: 'bold' }}
                 >
-                  {stats.domainBreakdown.map((entry, index) => (
-                    <Cell key={`cell-${index}-${entry.domain}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
+                  {stats.domainBreakdown.map((entry, index) => {
+                    const color = COLORS[index % COLORS.length];
+                    console.log(`Pie chart segment ${index}: ${entry.domain} = ${color}`);
+                    return <Cell key={`cell-${index}-${entry.domain}`} fill={color} />;
+                  })}
                 </Pie>
                 <Tooltip 
                   contentStyle={{ 
