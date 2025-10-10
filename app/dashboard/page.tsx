@@ -235,36 +235,47 @@ export default function Dashboard() {
             />
             <div>
               <h1 className="text-3xl font-bold text-cream">Waitlist Dashboard</h1>
-              <p className="text-cream/70">Real-time analytics and insights</p>
+              <p className="text-cream">Real-time analytics and insights</p>
             </div>
           </div>
-          <button
-            onClick={() => setAuthenticated(false)}
-            className="px-4 py-2 bg-orange hover:bg-[#ff9f5e] text-cream rounded-lg transition-all"
-          >
-            Logout
-          </button>
+          <div className="flex space-x-3">
+            <button
+              onClick={fetchDashboardData}
+              className="px-4 py-2 bg-navy hover:bg-[#2a4a6f] text-cream rounded-lg transition-all flex items-center space-x-2"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+              <span>Refresh</span>
+            </button>
+            <button
+              onClick={() => setAuthenticated(false)}
+              className="px-4 py-2 bg-orange hover:bg-[#ff9f5e] text-cream rounded-lg transition-all"
+            >
+              Logout
+            </button>
+          </div>
         </div>
 
         {/* Key Metrics */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <div className="bg-cream/10 backdrop-blur-sm rounded-lg p-6 border border-cream/20">
-            <h3 className="text-cream/70 text-sm font-medium mb-2">Total Signups</h3>
+            <h3 className="text-cream text-sm font-medium mb-2">Total Signups</h3>
             <p className="text-3xl font-bold text-cream">{stats.totalSignups.toLocaleString()}</p>
           </div>
           
           <div className="bg-cream/10 backdrop-blur-sm rounded-lg p-6 border border-cream/20">
-            <h3 className="text-cream/70 text-sm font-medium mb-2">Daily Signups</h3>
+            <h3 className="text-cream text-sm font-medium mb-2">Daily Signups</h3>
             <p className="text-3xl font-bold text-cream">{stats.dailySignups}</p>
           </div>
           
           <div className="bg-cream/10 backdrop-blur-sm rounded-lg p-6 border border-cream/20">
-            <h3 className="text-cream/70 text-sm font-medium mb-2">Weekly Signups</h3>
+            <h3 className="text-cream text-sm font-medium mb-2">Weekly Signups</h3>
             <p className="text-3xl font-bold text-cream">{stats.weeklySignups}</p>
           </div>
           
           <div className="bg-cream/10 backdrop-blur-sm rounded-lg p-6 border border-cream/20">
-            <h3 className="text-cream/70 text-sm font-medium mb-2">Monthly Signups</h3>
+            <h3 className="text-cream text-sm font-medium mb-2">Monthly Signups</h3>
             <p className="text-3xl font-bold text-cream">{stats.monthlySignups}</p>
           </div>
         </div>
@@ -277,8 +288,8 @@ export default function Dashboard() {
             <ResponsiveContainer width="100%" height={300}>
               <AreaChart data={stats.signupTrends}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#ffedd4" opacity={0.3} />
-                <XAxis dataKey="date" stroke="#ffedd4" fontSize={12} />
-                <YAxis stroke="#ffedd4" fontSize={12} />
+                <XAxis dataKey="date" stroke="#ffedd4" fontSize={12} tick={{ fill: '#ffedd4' }} />
+                <YAxis stroke="#ffedd4" fontSize={12} tick={{ fill: '#ffedd4' }} />
                 <Tooltip 
                   contentStyle={{ 
                     backgroundColor: '#1e3a5f', 
@@ -312,6 +323,7 @@ export default function Dashboard() {
                   outerRadius={80}
                   fill="#8884d8"
                   dataKey="count"
+                  style={{ fontSize: '12px', fill: '#ffedd4', fontWeight: 'bold' }}
                 >
                   {stats.domainBreakdown.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
