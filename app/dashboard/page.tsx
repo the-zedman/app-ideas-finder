@@ -171,10 +171,11 @@ export default function Dashboard() {
       });
 
       const domainBreakdown = Object.entries(domainCounts)
-        .map(([domain, count]) => ({
+        .map(([domain, count], index) => ({
           domain,
           count,
-          percentage: Number(((count / totalSignups) * 100).toFixed(1))
+          percentage: Number(((count / totalSignups) * 100).toFixed(1)),
+          fill: COLORS[index % COLORS.length]
         }))
         .sort((a, b) => b.count - a.count)
         .slice(0, 10);
@@ -401,22 +402,7 @@ export default function Dashboard() {
                   outerRadius={80}
                   dataKey="count"
                   style={{ fontSize: '12px', fontWeight: 'bold' }}
-                >
-                  {stats.domainBreakdown.map((entry, index) => {
-                    const color = COLORS[index % COLORS.length];
-                    console.log(`Pie chart segment ${index}: ${entry.domain} = ${color}`);
-                    return (
-                      <Cell 
-                        key={`cell-${index}-${entry.domain}`} 
-                        fill={color}
-                        style={{ 
-                          fill: `${color} !important`,
-                          stroke: 'none !important'
-                        }}
-                      />
-                    );
-                  })}
-                </Pie>
+                />
                 <Tooltip 
                   contentStyle={{ 
                     backgroundColor: '#1e3a5f', 
