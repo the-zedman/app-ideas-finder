@@ -391,28 +391,63 @@ export default function Dashboard() {
           {/* Email Domains */}
           <div className="bg-cream/10 backdrop-blur-sm rounded-lg p-6 border border-cream/20">
             <h3 className="text-cream text-lg font-semibold mb-4">Top Email Domains</h3>
-            <ResponsiveContainer width="100%" height={300}>
-              <PieChart key={`piechart-v3-${Date.now()}-${stats.domainBreakdown.length}`}>
-                <Pie
-                  data={stats.domainBreakdown}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  label={({ domain, percentage }) => `${domain} (${percentage}%)`}
-                  outerRadius={80}
-                  dataKey="count"
-                  style={{ fontSize: '12px', fontWeight: 'bold' }}
-                />
-                <Tooltip 
-                  contentStyle={{ 
-                    backgroundColor: '#1e3a5f', 
-                    border: '1px solid #f78937',
-                    borderRadius: '8px',
-                    color: '#ffedd4'
-                  }} 
-                />
-              </PieChart>
-            </ResponsiveContainer>
+            <div className="flex items-center justify-center h-[300px]">
+              <svg width="200" height="200" viewBox="0 0 200 200">
+                {stats.domainBreakdown.map((entry, index) => {
+                  const color = COLORS[index % COLORS.length];
+                  const percentage = entry.percentage;
+                  const angle = (percentage / 100) * 360;
+                  const startAngle = stats.domainBreakdown.slice(0, index).reduce((sum, item) => sum + (item.percentage / 100) * 360, 0);
+                  const endAngle = startAngle + angle;
+                  
+                  const startAngleRad = (startAngle - 90) * Math.PI / 180;
+                  const endAngleRad = (endAngle - 90) * Math.PI / 180;
+                  
+                  const centerX = 100;
+                  const centerY = 100;
+                  const radius = 80;
+                  
+                  const x1 = centerX + radius * Math.cos(startAngleRad);
+                  const y1 = centerY + radius * Math.sin(startAngleRad);
+                  const x2 = centerX + radius * Math.cos(endAngleRad);
+                  const y2 = centerY + radius * Math.sin(endAngleRad);
+                  
+                  const largeArcFlag = angle > 180 ? 1 : 0;
+                  
+                  const pathData = [
+                    `M ${centerX} ${centerY}`,
+                    `L ${x1} ${y1}`,
+                    `A ${radius} ${radius} 0 ${largeArcFlag} 1 ${x2} ${y2}`,
+                    'Z'
+                  ].join(' ');
+                  
+                  return (
+                    <path
+                      key={entry.domain}
+                      d={pathData}
+                      fill={color}
+                      stroke="none"
+                    />
+                  );
+                })}
+              </svg>
+              <div className="ml-6">
+                {stats.domainBreakdown.map((entry, index) => {
+                  const color = COLORS[index % COLORS.length];
+                  return (
+                    <div key={entry.domain} className="flex items-center mb-2">
+                      <div 
+                        className="w-4 h-4 rounded-full mr-3" 
+                        style={{ backgroundColor: color }}
+                      />
+                      <span className="text-cream text-sm">
+                        {entry.domain} ({entry.percentage}%)
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
           </div>
         </div>
 
