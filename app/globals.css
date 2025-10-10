@@ -20,21 +20,18 @@ body {
   padding: 0;
 }
 
-/* Force pie chart colors */
-.pie-chart-cell {
+/* Force pie chart colors - nuclear option */
+.recharts-pie-sector,
+.recharts-pie-sector *,
+.recharts-pie-sector path,
+.recharts-pie-sector > path,
+.recharts-pie-sector > * {
   fill: inherit !important;
 }
 
-.recharts-pie-sector {
-  fill: inherit !important;
-}
-
-/* Target the actual pie segments */
-.recharts-pie-sector path {
-  fill: inherit !important;
-}
-
-.recharts-pie-sector > path {
+/* Target specific pie segments by index */
+.recharts-pie-sector:nth-child(1) path,
+.recharts-pie-sector:nth-child(2) path {
   fill: inherit !important;
 }
 

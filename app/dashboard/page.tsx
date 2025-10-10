@@ -410,8 +410,8 @@ export default function Dashboard() {
                         key={`cell-${index}-${entry.domain}`} 
                         fill={color}
                         style={{ 
-                          fill: color,
-                          stroke: 'none'
+                          fill: `${color} !important`,
+                          stroke: 'none !important'
                         }}
                       />
                     );
