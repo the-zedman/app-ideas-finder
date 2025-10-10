@@ -132,7 +132,7 @@ export default function Dashboard() {
         .map(([domain, count]) => ({
           domain,
           count,
-          percentage: ((count / totalSignups) * 100).toFixed(1)
+          percentage: Number(((count / totalSignups) * 100).toFixed(1))
         }))
         .sort((a, b) => b.count - a.count)
         .slice(0, 10);
