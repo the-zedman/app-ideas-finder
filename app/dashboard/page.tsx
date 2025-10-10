@@ -28,14 +28,26 @@ interface WaitlistData {
   unsubscribe_token: string;
 }
 
+interface UnsubscribeData {
+  email: string;
+  created_at: string;
+  unsubscribe_token: string;
+  ip_address?: string;
+  user_agent?: string;
+}
+
 interface DashboardStats {
   totalSignups: number;
   totalUnsubscribes: number;
   dailySignups: number;
   weeklySignups: number;
   monthlySignups: number;
+  dailyUnsubscribes: number;
+  weeklyUnsubscribes: number;
+  monthlyUnsubscribes: number;
   unsubscribeRate: number;
   recentSignups: WaitlistData[];
+  recentUnsubscribes: UnsubscribeData[];
   signupTrends: Array<{
     date: string;
     signups: number;
@@ -48,7 +60,7 @@ interface DashboardStats {
   }>;
 }
 
-const COLORS = ['#f78937', '#1e3a5f', '#ffedd4', '#ff9f5e', '#0a3a5f'];
+const COLORS = ['#f78937', '#ff9f5e', '#ffedd4', '#1e3a5f', '#2a4a6f', '#4a6fa5', '#6b8cc4', '#8bb3e3'];
 
 export default function Dashboard() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
@@ -78,6 +90,17 @@ export default function Dashboard() {
 
       if (waitlistError) throw waitlistError;
 
+      // Fetch all unsubscribe data
+      const { data: unsubscribeData, error: unsubscribeError } = await supabase
+        .from('unsubscribes')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (unsubscribeError) {
+        console.warn('Could not fetch unsubscribe data:', unsubscribeError);
+        // Continue without unsubscribe data if table doesn't exist yet
+      }
+
       // Calculate stats
       const now = new Date();
       const today = startOfDay(now);
@@ -85,6 +108,8 @@ export default function Dashboard() {
       const monthAgo = startOfDay(subDays(now, 30));
 
       const totalSignups = waitlistData?.length || 0;
+      const totalUnsubscribes = unsubscribeData?.length || 0;
+      
       const dailySignups = waitlistData?.filter(item => 
         new Date(item.created_at) >= today
       ).length || 0;
@@ -97,8 +122,20 @@ export default function Dashboard() {
         new Date(item.created_at) >= monthAgo
       ).length || 0;
 
-      // Calculate unsubscribe rate (simplified - we'd need to track unsubscribes separately)
-      const unsubscribeRate = 0; // TODO: Implement unsubscribe tracking
+      const dailyUnsubscribes = unsubscribeData?.filter(item => 
+        new Date(item.created_at) >= today
+      ).length || 0;
+      
+      const weeklyUnsubscribes = unsubscribeData?.filter(item => 
+        new Date(item.created_at) >= weekAgo
+      ).length || 0;
+      
+      const monthlyUnsubscribes = unsubscribeData?.filter(item => 
+        new Date(item.created_at) >= monthAgo
+      ).length || 0;
+
+      // Calculate unsubscribe rate
+      const unsubscribeRate = totalSignups > 0 ? ((totalUnsubscribes / (totalSignups + totalUnsubscribes)) * 100) : 0;
 
       // Generate signup trends (last 30 days)
       const signupTrends = [];
@@ -112,10 +149,15 @@ export default function Dashboard() {
           return itemDate >= dayStart && itemDate <= dayEnd;
         }).length || 0;
 
+        const dayUnsubscribes = unsubscribeData?.filter(item => {
+          const itemDate = new Date(item.created_at);
+          return itemDate >= dayStart && itemDate <= dayEnd;
+        }).length || 0;
+
         signupTrends.push({
           date: format(date, 'MMM dd'),
           signups: daySignups,
-          unsubscribes: 0 // TODO: Implement unsubscribe tracking
+          unsubscribes: dayUnsubscribes
         });
       }
 
@@ -139,12 +181,16 @@ export default function Dashboard() {
 
       setStats({
         totalSignups,
-        totalUnsubscribes: 0,
+        totalUnsubscribes,
         dailySignups,
         weeklySignups,
         monthlySignups,
+        dailyUnsubscribes,
+        weeklyUnsubscribes,
+        monthlyUnsubscribes,
         unsubscribeRate,
         recentSignups: waitlistData?.slice(0, 10) || [],
+        recentUnsubscribes: unsubscribeData?.slice(0, 10) || [],
         signupTrends,
         domainBreakdown
       });
@@ -280,6 +326,29 @@ export default function Dashboard() {
           </div>
         </div>
 
+        {/* Unsubscribe Metrics */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div className="bg-red-500/10 backdrop-blur-sm rounded-lg p-6 border border-red-500/20">
+            <h3 className="text-cream text-sm font-medium mb-2">Total Unsubscribes</h3>
+            <p className="text-3xl font-bold text-cream">{stats.totalUnsubscribes.toLocaleString()}</p>
+          </div>
+          
+          <div className="bg-red-500/10 backdrop-blur-sm rounded-lg p-6 border border-red-500/20">
+            <h3 className="text-cream text-sm font-medium mb-2">Daily Unsubscribes</h3>
+            <p className="text-3xl font-bold text-cream">{stats.dailyUnsubscribes}</p>
+          </div>
+          
+          <div className="bg-red-500/10 backdrop-blur-sm rounded-lg p-6 border border-red-500/20">
+            <h3 className="text-cream text-sm font-medium mb-2">Weekly Unsubscribes</h3>
+            <p className="text-3xl font-bold text-cream">{stats.weeklyUnsubscribes}</p>
+          </div>
+          
+          <div className="bg-red-500/10 backdrop-blur-sm rounded-lg p-6 border border-red-500/20">
+            <h3 className="text-cream text-sm font-medium mb-2">Unsubscribe Rate</h3>
+            <p className="text-3xl font-bold text-cream">{stats.unsubscribeRate.toFixed(1)}%</p>
+          </div>
+        </div>
+
         {/* Charts */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           {/* Signup Trends */}
@@ -304,6 +373,15 @@ export default function Dashboard() {
                   stroke="#f78937" 
                   fill="#f78937" 
                   fillOpacity={0.3}
+                  name="Signups"
+                />
+                <Area 
+                  type="monotone" 
+                  dataKey="unsubscribes" 
+                  stroke="#ef4444" 
+                  fill="#ef4444" 
+                  fillOpacity={0.3}
+                  name="Unsubscribes"
                 />
               </AreaChart>
             </ResponsiveContainer>
@@ -342,32 +420,72 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Recent Signups */}
-        <div className="bg-cream/10 backdrop-blur-sm rounded-lg p-6 border border-cream/20">
-          <h3 className="text-cream text-lg font-semibold mb-4">Recent Signups</h3>
-          <div className="overflow-x-auto">
-            <table className="w-full text-cream">
-              <thead>
-                <tr className="border-b border-cream/20">
-                  <th className="text-left py-3 px-4">Email</th>
-                  <th className="text-left py-3 px-4">Domain</th>
-                  <th className="text-left py-3 px-4">Signed Up</th>
-                </tr>
-              </thead>
-              <tbody>
-                {stats.recentSignups.map((signup, index) => (
-                  <tr key={signup.unsubscribe_token} className="border-b border-cream/10">
-                    <td className="py-3 px-4">{signup.email}</td>
-                    <td className="py-3 px-4 text-cream/70">
-                      {signup.email.split('@')[1]}
-                    </td>
-                    <td className="py-3 px-4 text-cream/70">
-                      {format(new Date(signup.created_at), 'MMM dd, yyyy HH:mm')}
-                    </td>
+        {/* Recent Activity */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Recent Signups */}
+          <div className="bg-cream/10 backdrop-blur-sm rounded-lg p-6 border border-cream/20">
+            <h3 className="text-cream text-lg font-semibold mb-4">Recent Signups</h3>
+            <div className="overflow-x-auto">
+              <table className="w-full text-cream">
+                <thead>
+                  <tr className="border-b border-cream/20">
+                    <th className="text-left py-3 px-4">Email</th>
+                    <th className="text-left py-3 px-4">Domain</th>
+                    <th className="text-left py-3 px-4">Signed Up</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {stats.recentSignups.map((signup, index) => (
+                    <tr key={signup.unsubscribe_token} className="border-b border-cream/10">
+                      <td className="py-3 px-4">{signup.email}</td>
+                      <td className="py-3 px-4 text-cream/70">
+                        {signup.email.split('@')[1]}
+                      </td>
+                      <td className="py-3 px-4 text-cream/70">
+                        {format(new Date(signup.created_at), 'MMM dd, yyyy HH:mm')}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Recent Unsubscribes */}
+          <div className="bg-red-500/10 backdrop-blur-sm rounded-lg p-6 border border-red-500/20">
+            <h3 className="text-cream text-lg font-semibold mb-4">Recent Unsubscribes</h3>
+            <div className="overflow-x-auto">
+              <table className="w-full text-cream">
+                <thead>
+                  <tr className="border-b border-red-500/20">
+                    <th className="text-left py-3 px-4">Email</th>
+                    <th className="text-left py-3 px-4">Domain</th>
+                    <th className="text-left py-3 px-4">Unsubscribed</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {stats.recentUnsubscribes.length > 0 ? (
+                    stats.recentUnsubscribes.map((unsub, index) => (
+                      <tr key={unsub.unsubscribe_token} className="border-b border-red-500/10">
+                        <td className="py-3 px-4">{unsub.email}</td>
+                        <td className="py-3 px-4 text-cream/70">
+                          {unsub.email.split('@')[1]}
+                        </td>
+                        <td className="py-3 px-4 text-cream/70">
+                          {format(new Date(unsub.created_at), 'MMM dd, yyyy HH:mm')}
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={3} className="py-8 px-4 text-center text-cream/70">
+                        No unsubscribes yet
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
