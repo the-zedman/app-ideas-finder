@@ -37,3 +37,8 @@ body {
 .recharts-pie-sector > path {
   fill: inherit !important;
 }
+
+/* Style pie chart labels */
+.recharts-pie-label-text {
+  fill: #ffedd4 !important;
+}
