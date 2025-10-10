@@ -60,7 +60,7 @@ interface DashboardStats {
   }>;
 }
 
-const COLORS = ['#f78937', '#ff9f5e', '#ffedd4', '#1e3a5f', '#2a4a6f', '#4a6fa5', '#6b8cc4', '#8bb3e3'];
+const COLORS = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#06b6d4', '#84cc16', '#f97316'];
 
 export default function Dashboard() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
