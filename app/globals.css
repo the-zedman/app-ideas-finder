@@ -19,3 +19,12 @@ body {
   margin: 0;
   padding: 0;
 }
+
+/* Force pie chart colors */
+.pie-chart-cell {
+  fill: inherit !important;
+}
+
+.recharts-pie-sector {
+  fill: inherit !important;
+}
