@@ -101,6 +101,33 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid unsubscribe token format' }, { status: 400 })
     }
 
+    // First, get the email before deleting
+    const { data: waitlistEntry, error: fetchError } = await supabase
+      .from('waitlist')
+      .select('email')
+      .eq('unsubscribe_token', token)
+      .single();
+
+    if (fetchError || !waitlistEntry) {
+      console.error('Supabase fetch error:', fetchError);
+      return NextResponse.json({ error: 'Invalid unsubscribe token' }, { status: 400 });
+    }
+
+    // Record the unsubscribe
+    const { error: insertError } = await supabase
+      .from('unsubscribes')
+      .insert([{
+        email: waitlistEntry.email,
+        unsubscribe_token: token,
+        ip_address: ip,
+        user_agent: request.headers.get('user-agent') || 'unknown'
+      }]);
+
+    if (insertError) {
+      console.error('Error recording unsubscribe:', insertError);
+      // Continue with deletion even if tracking fails
+    }
+
     // Delete the email from the waitlist table using the token
     const { error } = await supabase
       .from('waitlist')
