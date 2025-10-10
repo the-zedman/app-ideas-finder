@@ -400,12 +400,22 @@ export default function Dashboard() {
                   label={({ domain, percentage }) => `${domain} (${percentage}%)`}
                   outerRadius={80}
                   dataKey="count"
-                  style={{ fontSize: '12px', fill: '#ffedd4', fontWeight: 'bold' }}
+                  style={{ fontSize: '12px', fontWeight: 'bold' }}
                 >
                   {stats.domainBreakdown.map((entry, index) => {
                     const color = COLORS[index % COLORS.length];
                     console.log(`Pie chart segment ${index}: ${entry.domain} = ${color}`);
-                    return <Cell key={`cell-${index}-${entry.domain}`} fill={color} />;
+                    return (
+                      <Cell 
+                        key={`cell-${index}-${entry.domain}`} 
+                        fill={color}
+                        className="pie-chart-cell"
+                        style={{ 
+                          fill: `${color} !important`,
+                          stroke: 'none'
+                        }}
+                      />
+                    );
                   })}
                 </Pie>
                 <Tooltip 
