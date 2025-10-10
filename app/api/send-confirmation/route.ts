@@ -274,6 +274,53 @@ App Ideas Finder Team`,
     const command = new SendEmailCommand(emailParams);
     const result = await sesClient.send(command);
 
+    // Send notification email to admin
+    try {
+      const notificationParams = {
+        Source: 'App Ideas Finder <info@appideasfinder.com>',
+        Destination: {
+          ToAddresses: ['info@appideasfinder.com'],
+        },
+        Message: {
+          Subject: {
+            Data: 'New Waitlist Signup - App Ideas Finder',
+            Charset: 'UTF-8',
+          },
+          Body: {
+            Html: {
+              Data: `
+                <!DOCTYPE html>
+                <html>
+                  <head>
+                    <meta charset="utf-8">
+                    <title>New Waitlist Signup</title>
+                  </head>
+                  <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+                    <h2 style="color: #0a3a5f;">New Waitlist Signup</h2>
+                    <p><strong>Email:</strong> ${email}</p>
+                    <p><strong>Domain:</strong> ${email.split('@')[1]}</p>
+                    <p><strong>Time:</strong> ${new Date().toLocaleString('en-AU', { timeZone: 'Australia/Sydney' })}</p>
+                    <p><strong>Unsubscribe Token:</strong> ${unsubscribeToken}</p>
+                  </body>
+                </html>
+              `,
+              Charset: 'UTF-8',
+            },
+            Text: {
+              Data: `New Waitlist Signup\n\nEmail: ${email}\nDomain: ${email.split('@')[1]}\nTime: ${new Date().toLocaleString('en-AU', { timeZone: 'Australia/Sydney' })}\nUnsubscribe Token: ${unsubscribeToken}`,
+              Charset: 'UTF-8',
+            },
+          },
+        },
+      };
+
+      const notificationCommand = new SendEmailCommand(notificationParams);
+      await sesClient.send(notificationCommand);
+    } catch (notificationError) {
+      console.error('Error sending notification email:', notificationError);
+      // Don't fail the main request if notification fails
+    }
+
     return NextResponse.json({ 
       success: true, 
       messageId: result.MessageId,
