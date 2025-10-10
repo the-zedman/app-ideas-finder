@@ -399,7 +399,6 @@ export default function Dashboard() {
                   labelLine={false}
                   label={({ domain, percentage }) => `${domain} (${percentage}%)`}
                   outerRadius={80}
-                  fill="#8884d8"
                   dataKey="count"
                   style={{ fontSize: '12px', fill: '#ffedd4', fontWeight: 'bold' }}
                 >
