@@ -391,7 +391,7 @@ export default function Dashboard() {
           <div className="bg-cream/10 backdrop-blur-sm rounded-lg p-6 border border-cream/20">
             <h3 className="text-cream text-lg font-semibold mb-4">Top Email Domains</h3>
             <ResponsiveContainer width="100%" height={300}>
-              <PieChart key={`piechart-v2-${stats.domainBreakdown.length}`}>
+              <PieChart key={`piechart-v3-${Date.now()}-${stats.domainBreakdown.length}`}>
                 <Pie
                   data={stats.domainBreakdown}
                   cx="50%"
