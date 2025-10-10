@@ -126,6 +126,8 @@ export async function POST(request: NextRequest) {
     if (insertError) {
       console.error('Error recording unsubscribe:', insertError);
       // Continue with deletion even if tracking fails
+    } else {
+      console.log('Successfully recorded unsubscribe');
     }
 
     // Delete the email from the waitlist table using the token

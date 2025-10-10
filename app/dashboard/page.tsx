@@ -60,7 +60,7 @@ interface DashboardStats {
   }>;
 }
 
-const COLORS = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#06b6d4', '#84cc16', '#f97316'];
+const COLORS = ['#3366CC', '#DC3912', '#FF9900', '#109618', '#990099', '#0099C6', '#DD4477', '#66AA00'];
 
 export default function Dashboard() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
@@ -391,7 +391,7 @@ export default function Dashboard() {
           <div className="bg-cream/10 backdrop-blur-sm rounded-lg p-6 border border-cream/20">
             <h3 className="text-cream text-lg font-semibold mb-4">Top Email Domains</h3>
             <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
+              <PieChart key={`piechart-${stats.domainBreakdown.length}`}>
                 <Pie
                   data={stats.domainBreakdown}
                   cx="50%"
@@ -404,7 +404,7 @@ export default function Dashboard() {
                   style={{ fontSize: '12px', fill: '#ffedd4', fontWeight: 'bold' }}
                 >
                   {stats.domainBreakdown.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    <Cell key={`cell-${index}-${entry.domain}`} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Pie>
                 <Tooltip 
