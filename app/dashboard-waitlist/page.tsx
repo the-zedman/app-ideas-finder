@@ -212,18 +212,18 @@ export default function Dashboard() {
 
   if (!authenticated) {
     return (
-      <div className="min-h-screen bg-[#0a3a5f] flex items-center justify-center">
-        <div className="bg-cream p-8 rounded-lg shadow-lg max-w-md w-full mx-4">
+      <div className="min-h-screen bg-[#F0EFEB] flex items-center justify-center">
+        <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full mx-4 border-2 border-grey/40">
           <div className="text-center mb-6">
             <Image
               src="/App Ideas Finder - logo - 200x200.png"
               alt="App Ideas Finder"
               width={80}
               height={80}
-              className="mx-auto mb-4"
+              className="mx-auto mb-4 rounded-lg"
             />
-            <h1 className="text-2xl font-bold text-navy mb-2">Admin Dashboard</h1>
-            <p className="text-navy/70">Enter password to access</p>
+            <h1 className="text-2xl font-bold text-[#3D405B] mb-2">Admin Dashboard</h1>
+            <p className="text-[#3D405B]/70">Enter password to access</p>
           </div>
           
           <div className="space-y-4">
@@ -232,12 +232,12 @@ export default function Dashboard() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Enter admin password"
-              className="w-full px-4 py-3 rounded-lg border-2 border-navy/20 bg-cream text-navy placeholder-navy/60 focus:outline-none focus:border-orange"
+              className="w-full px-4 py-3 rounded-lg border-2 border-grey/40 bg-white text-black placeholder-grey focus:outline-none focus:border-[#E07A5F]"
               onKeyPress={(e) => e.key === 'Enter' && handleLogin()}
             />
             <button
               onClick={handleLogin}
-              className="w-full px-6 py-3 bg-orange hover:bg-[#ff9f5e] text-cream font-semibold rounded-lg transition-all transform hover:scale-105"
+              className="w-full px-6 py-3 bg-[#E07A5F] hover:bg-[#E07A5F]/80 text-white font-semibold rounded-lg transition-all transform hover:scale-105"
             >
               Access Dashboard
             </button>
@@ -252,16 +252,16 @@ export default function Dashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#0a3a5f] flex items-center justify-center">
-        <div className="text-cream text-xl">Loading dashboard...</div>
+      <div className="min-h-screen bg-[#F0EFEB] flex items-center justify-center">
+        <div className="text-[#3D405B] text-xl">Loading dashboard...</div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen bg-[#0a3a5f] flex items-center justify-center">
-        <div className="text-cream text-xl">Error: {error}</div>
+      <div className="min-h-screen bg-[#F0EFEB] flex items-center justify-center">
+        <div className="text-[#3D405B] text-xl">Error: {error}</div>
       </div>
     );
   }
@@ -269,7 +269,7 @@ export default function Dashboard() {
   if (!stats) return null;
 
   return (
-    <div className="min-h-screen bg-[#0a3a5f] p-6">
+    <div className="min-h-screen bg-[#F0EFEB] p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
@@ -279,16 +279,17 @@ export default function Dashboard() {
               alt="App Ideas Finder"
               width={60}
               height={60}
+              className="rounded-lg"
             />
             <div>
-              <h1 className="text-3xl font-bold text-cream">Waitlist Dashboard</h1>
-              <p className="text-cream">Real-time analytics and insights</p>
+              <h1 className="text-3xl font-bold text-[#3D405B]">Waitlist Dashboard</h1>
+              <p className="text-[#3D405B]/70">Real-time analytics and insights</p>
             </div>
           </div>
           <div className="flex space-x-3">
             <button
               onClick={fetchDashboardData}
-              className="px-4 py-2 bg-navy hover:bg-[#2a4a6f] text-cream rounded-lg transition-all flex items-center space-x-2"
+              className="px-4 py-2 bg-[#D4D4D4] hover:bg-[#D4D4D4]/80 text-[#3D405B] rounded-lg transition-all flex items-center space-x-2"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -297,7 +298,7 @@ export default function Dashboard() {
             </button>
             <button
               onClick={() => setAuthenticated(false)}
-              className="px-4 py-2 bg-orange hover:bg-[#ff9f5e] text-cream rounded-lg transition-all"
+              className="px-4 py-2 bg-[#E07A5F] hover:bg-[#E07A5F]/80 text-white rounded-lg transition-all"
             >
               Logout
             </button>
@@ -306,73 +307,73 @@ export default function Dashboard() {
 
         {/* Key Metrics */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div className="bg-cream/10 backdrop-blur-sm rounded-lg p-6 border border-cream/20">
-            <h3 className="text-cream text-sm font-medium mb-2">Total Signups</h3>
-            <p className="text-3xl font-bold text-cream">{stats.totalSignups.toLocaleString()}</p>
+          <div className="bg-white backdrop-blur-sm rounded-lg p-6 border-2 border-grey/40">
+            <h3 className="text-[#3D405B] text-sm font-medium mb-2">Total Signups</h3>
+            <p className="text-3xl font-bold text-[#E07A5F]">{stats.totalSignups.toLocaleString()}</p>
           </div>
           
-          <div className="bg-cream/10 backdrop-blur-sm rounded-lg p-6 border border-cream/20">
-            <h3 className="text-cream text-sm font-medium mb-2">Daily Signups</h3>
-            <p className="text-3xl font-bold text-cream">{stats.dailySignups}</p>
+          <div className="bg-white backdrop-blur-sm rounded-lg p-6 border-2 border-grey/40">
+            <h3 className="text-[#3D405B] text-sm font-medium mb-2">Daily Signups</h3>
+            <p className="text-3xl font-bold text-[#E07A5F]">{stats.dailySignups}</p>
           </div>
           
-          <div className="bg-cream/10 backdrop-blur-sm rounded-lg p-6 border border-cream/20">
-            <h3 className="text-cream text-sm font-medium mb-2">Weekly Signups</h3>
-            <p className="text-3xl font-bold text-cream">{stats.weeklySignups}</p>
+          <div className="bg-white backdrop-blur-sm rounded-lg p-6 border-2 border-grey/40">
+            <h3 className="text-[#3D405B] text-sm font-medium mb-2">Weekly Signups</h3>
+            <p className="text-3xl font-bold text-[#E07A5F]">{stats.weeklySignups}</p>
           </div>
           
-          <div className="bg-cream/10 backdrop-blur-sm rounded-lg p-6 border border-cream/20">
-            <h3 className="text-cream text-sm font-medium mb-2">Monthly Signups</h3>
-            <p className="text-3xl font-bold text-cream">{stats.monthlySignups}</p>
+          <div className="bg-white backdrop-blur-sm rounded-lg p-6 border-2 border-grey/40">
+            <h3 className="text-[#3D405B] text-sm font-medium mb-2">Monthly Signups</h3>
+            <p className="text-3xl font-bold text-[#E07A5F]">{stats.monthlySignups}</p>
           </div>
         </div>
 
         {/* Unsubscribe Metrics */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div className="bg-red-500/10 backdrop-blur-sm rounded-lg p-6 border border-red-500/20">
-            <h3 className="text-cream text-sm font-medium mb-2">Total Unsubscribes</h3>
-            <p className="text-3xl font-bold text-cream">{stats.totalUnsubscribes.toLocaleString()}</p>
+          <div className="bg-red-50 backdrop-blur-sm rounded-lg p-6 border-2 border-red-300/40">
+            <h3 className="text-[#3D405B] text-sm font-medium mb-2">Total Unsubscribes</h3>
+            <p className="text-3xl font-bold text-red-600">{stats.totalUnsubscribes.toLocaleString()}</p>
           </div>
           
-          <div className="bg-red-500/10 backdrop-blur-sm rounded-lg p-6 border border-red-500/20">
-            <h3 className="text-cream text-sm font-medium mb-2">Daily Unsubscribes</h3>
-            <p className="text-3xl font-bold text-cream">{stats.dailyUnsubscribes}</p>
+          <div className="bg-red-50 backdrop-blur-sm rounded-lg p-6 border-2 border-red-300/40">
+            <h3 className="text-[#3D405B] text-sm font-medium mb-2">Daily Unsubscribes</h3>
+            <p className="text-3xl font-bold text-red-600">{stats.dailyUnsubscribes}</p>
           </div>
           
-          <div className="bg-red-500/10 backdrop-blur-sm rounded-lg p-6 border border-red-500/20">
-            <h3 className="text-cream text-sm font-medium mb-2">Weekly Unsubscribes</h3>
-            <p className="text-3xl font-bold text-cream">{stats.weeklyUnsubscribes}</p>
+          <div className="bg-red-50 backdrop-blur-sm rounded-lg p-6 border-2 border-red-300/40">
+            <h3 className="text-[#3D405B] text-sm font-medium mb-2">Weekly Unsubscribes</h3>
+            <p className="text-3xl font-bold text-red-600">{stats.weeklyUnsubscribes}</p>
           </div>
           
-          <div className="bg-red-500/10 backdrop-blur-sm rounded-lg p-6 border border-red-500/20">
-            <h3 className="text-cream text-sm font-medium mb-2">Unsubscribe Rate</h3>
-            <p className="text-3xl font-bold text-cream">{stats.unsubscribeRate.toFixed(1)}%</p>
+          <div className="bg-red-50 backdrop-blur-sm rounded-lg p-6 border-2 border-red-300/40">
+            <h3 className="text-[#3D405B] text-sm font-medium mb-2">Unsubscribe Rate</h3>
+            <p className="text-3xl font-bold text-red-600">{stats.unsubscribeRate.toFixed(1)}%</p>
           </div>
         </div>
 
         {/* Charts */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           {/* Signup Trends */}
-          <div className="bg-cream/10 backdrop-blur-sm rounded-lg p-6 border border-cream/20">
-            <h3 className="text-cream text-lg font-semibold mb-4">Signup Trends (30 Days)</h3>
+          <div className="bg-white backdrop-blur-sm rounded-lg p-6 border-2 border-grey/40">
+            <h3 className="text-[#3D405B] text-lg font-semibold mb-4">Signup Trends (30 Days)</h3>
             <ResponsiveContainer width="100%" height={300}>
               <AreaChart data={stats.signupTrends}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#ffedd4" opacity={0.3} />
-                <XAxis dataKey="date" stroke="#ffedd4" fontSize={12} tick={{ fill: '#ffedd4' }} />
-                <YAxis stroke="#ffedd4" fontSize={12} tick={{ fill: '#ffedd4' }} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#cdcdcd" opacity={0.3} />
+                <XAxis dataKey="date" stroke="#3D405B" fontSize={12} tick={{ fill: '#3D405B' }} />
+                <YAxis stroke="#3D405B" fontSize={12} tick={{ fill: '#3D405B' }} />
                 <Tooltip 
                   contentStyle={{ 
-                    backgroundColor: '#1e3a5f', 
-                    border: '1px solid #f78937',
+                    backgroundColor: '#ffffff', 
+                    border: '2px solid #E07A5F',
                     borderRadius: '8px',
-                    color: '#ffedd4'
+                    color: '#3D405B'
                   }} 
                 />
                 <Area 
                   type="monotone" 
                   dataKey="signups" 
-                  stroke="#f78937" 
-                  fill="#f78937" 
+                  stroke="#E07A5F" 
+                  fill="#E07A5F" 
                   fillOpacity={0.3}
                   name="Signups"
                 />
@@ -389,8 +390,8 @@ export default function Dashboard() {
           </div>
 
           {/* Email Domains */}
-          <div className="bg-cream/10 backdrop-blur-sm rounded-lg p-6 border border-cream/20">
-            <h3 className="text-cream text-lg font-semibold mb-4">Top Email Domains</h3>
+          <div className="bg-white backdrop-blur-sm rounded-lg p-6 border-2 border-grey/40">
+            <h3 className="text-[#3D405B] text-lg font-semibold mb-4">Top Email Domains</h3>
             <div className="flex items-center justify-center h-[300px]">
               <svg width="200" height="200" viewBox="0 0 200 200">
                 {stats.domainBreakdown.map((entry, index) => {
@@ -440,8 +441,8 @@ export default function Dashboard() {
                         className="w-4 h-4 rounded-full mr-3" 
                         style={{ backgroundColor: color }}
                       />
-                      <span className="text-cream text-sm">
-                        {entry.domain} ({entry.percentage}%)
+                      <span className="text-[#3D405B] text-sm">
+                        {entry.domain} ({entry.count} - {entry.percentage}%)
                       </span>
                     </div>
                   );
@@ -454,12 +455,12 @@ export default function Dashboard() {
         {/* Recent Activity */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Recent Signups */}
-          <div className="bg-cream/10 backdrop-blur-sm rounded-lg p-6 border border-cream/20">
-            <h3 className="text-cream text-lg font-semibold mb-4">Recent Signups</h3>
+          <div className="bg-white backdrop-blur-sm rounded-lg p-6 border-2 border-grey/40">
+            <h3 className="text-[#3D405B] text-lg font-semibold mb-4">Recent Signups</h3>
             <div className="overflow-x-auto">
-              <table className="w-full text-cream">
+              <table className="w-full text-[#3D405B]">
                 <thead>
-                  <tr className="border-b border-cream/20">
+                  <tr className="border-b-2 border-grey/40">
                     <th className="text-left py-3 px-4">Email</th>
                     <th className="text-left py-3 px-4">Domain</th>
                     <th className="text-left py-3 px-4">Signed Up</th>
@@ -467,12 +468,12 @@ export default function Dashboard() {
                 </thead>
                 <tbody>
                   {stats.recentSignups.map((signup, index) => (
-                    <tr key={signup.unsubscribe_token} className="border-b border-cream/10">
+                    <tr key={signup.unsubscribe_token} className="border-b border-grey/20">
                       <td className="py-3 px-4">{signup.email}</td>
-                      <td className="py-3 px-4 text-cream/70">
+                      <td className="py-3 px-4 text-[#3D405B]/70">
                         {signup.email.split('@')[1]}
                       </td>
-                      <td className="py-3 px-4 text-cream/70">
+                      <td className="py-3 px-4 text-[#3D405B]/70">
                         {format(new Date(signup.created_at), 'MMM dd, yyyy HH:mm')}
                       </td>
                     </tr>
@@ -483,12 +484,12 @@ export default function Dashboard() {
           </div>
 
           {/* Recent Unsubscribes */}
-          <div className="bg-red-500/10 backdrop-blur-sm rounded-lg p-6 border border-red-500/20">
-            <h3 className="text-cream text-lg font-semibold mb-4">Recent Unsubscribes</h3>
+          <div className="bg-red-50 backdrop-blur-sm rounded-lg p-6 border-2 border-red-300/40">
+            <h3 className="text-[#3D405B] text-lg font-semibold mb-4">Recent Unsubscribes</h3>
             <div className="overflow-x-auto">
-              <table className="w-full text-cream">
+              <table className="w-full text-[#3D405B]">
                 <thead>
-                  <tr className="border-b border-red-500/20">
+                  <tr className="border-b-2 border-red-300/40">
                     <th className="text-left py-3 px-4">Email</th>
                     <th className="text-left py-3 px-4">Domain</th>
                     <th className="text-left py-3 px-4">Unsubscribed</th>
@@ -497,19 +498,19 @@ export default function Dashboard() {
                 <tbody>
                   {stats.recentUnsubscribes.length > 0 ? (
                     stats.recentUnsubscribes.map((unsub, index) => (
-                      <tr key={unsub.unsubscribe_token} className="border-b border-red-500/10">
+                      <tr key={unsub.unsubscribe_token} className="border-b border-red-200">
                         <td className="py-3 px-4">{unsub.email}</td>
-                        <td className="py-3 px-4 text-cream/70">
+                        <td className="py-3 px-4 text-[#3D405B]/70">
                           {unsub.email.split('@')[1]}
                         </td>
-                        <td className="py-3 px-4 text-cream/70">
+                        <td className="py-3 px-4 text-[#3D405B]/70">
                           {format(new Date(unsub.created_at), 'MMM dd, yyyy HH:mm')}
                         </td>
                       </tr>
                     ))
                   ) : (
                     <tr>
-                      <td colSpan={3} className="py-8 px-4 text-center text-cream/70">
+                      <td colSpan={3} className="py-8 px-4 text-center text-[#3D405B]/70">
                         No unsubscribes yet
                       </td>
                     </tr>
@@ -523,3 +524,5 @@ export default function Dashboard() {
     </div>
   );
 }
+
+

@@ -1,17 +1,20 @@
 @import "tailwindcss";
 
 :root {
-  --navy: #1e3a5f;
-  --orange: #f78937;
-  --cream: #ffedd4;
+  --black: #000000;
+  --navy: #0a395f;
+  --background: #F0EFEB;
+  --accent: #E07A5F;
+  --grey: #cdcdcd;
 }
 
 @theme inline {
+  --color-black: var(--black);
   --color-navy: var(--navy);
-  --color-orange: var(--orange);
-  --color-cream: var(--cream);
-  --color-brand-blue: var(--navy);
-  --color-brand-orange: var(--orange);
+  --color-white: var(--white);
+  --color-coral: var(--coral);
+  --color-grey: var(--grey);
+  --color-cream: var(--white);
 }
 
 body {
@@ -37,5 +40,5 @@ body {
 
 /* Style pie chart labels */
 .recharts-pie-label-text {
-  fill: #ffedd4 !important;
+  fill: #eeeeee !important;
 }
