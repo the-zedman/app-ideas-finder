@@ -89,7 +89,7 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a3a5f]">
+    <div className="min-h-screen bg-[#F0EFEB]">
       {/* Header */}
       <header className="container mx-auto px-4 py-6 md:py-8">
         <div className="flex items-center justify-center gap-3">
@@ -98,9 +98,9 @@ export default function Home() {
             alt="App Ideas Finder Logo"
             width={60}
             height={60}
-            className="w-12 h-12 md:w-16 md:h-16"
+            className="w-12 h-12 md:w-16 md:h-16 rounded-lg"
           />
-          <h1 className="text-2xl md:text-3xl font-bold text-cream">
+          <h1 className="text-2xl md:text-3xl font-bold text-[#3D405B]">
             App Ideas Finder
           </h1>
         </div>
@@ -111,47 +111,47 @@ export default function Home() {
         <div className="max-w-4xl mx-auto text-center">
           {/* Limited Early Access Badge */}
           <div className="mb-6 inline-block">
-            <span className="px-4 py-2 bg-orange text-cream text-sm font-bold uppercase tracking-wider rounded-full border-2 border-orange shadow-lg">
+            <span className="px-4 py-2 bg-[#E07A5F] text-white text-sm font-bold uppercase tracking-wider rounded-full border-2 border-[#E07A5F] shadow-lg">
               🔥 Limited Early Access
             </span>
           </div>
 
           {/* Headline */}
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-cream mb-6 leading-tight">
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-[#3D405B] mb-6 leading-tight">
             Never Run Out of
-            <span className="block text-orange mt-2">App Ideas Again</span>
+            <span className="block text-[#E07A5F] mt-2">App Ideas Again</span>
           </h2>
 
           {/* Attention-grabbing phrases */}
           <div className="mb-8">
-            <p className="text-xl md:text-2xl text-orange/90 font-semibold italic">
+            <p className="text-xl md:text-2xl text-[#3D405B] font-semibold italic">
               "Steal App Ideas from Your Competitors"
             </p>
           </div>
 
           {/* Subheadline */}
-          <p className="text-lg md:text-xl lg:text-2xl text-cream/90 mb-4 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-lg md:text-xl lg:text-2xl text-black/80 mb-4 max-w-2xl mx-auto leading-relaxed">
             Discover innovative app ideas using the power of AI.
           </p>
-          <p className="text-base md:text-lg text-cream/80 mb-6 max-w-2xl mx-auto">
+          <p className="text-base md:text-lg text-black/60 mb-6 max-w-2xl mx-auto">
             Be among the first to experience an easier way to find app ideas by joining our early access beta group that will be opening to developers, like you, very soon.
           </p>
 
           {/* Email Form */}
           <div className="max-w-2xl mx-auto mb-8">
-            <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3">
+            <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3" suppressHydrationWarning>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter your email"
                 required
-                className="flex-1 px-6 py-4 rounded-lg text-lg border-2 border-cream/20 bg-cream/10 text-cream placeholder-cream/60 focus:outline-none focus:border-orange focus:bg-cream/20 transition-all"
+                className="flex-1 px-6 py-4 rounded-lg text-lg border-2 border-grey bg-white text-black placeholder-black/60 focus:outline-none focus:border-[#E07A5F] focus:bg-white transition-all"
               />
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="px-8 py-4 bg-orange hover:bg-[#ff9f5e] text-cream font-semibold rounded-lg text-lg transition-all transform hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 shadow-lg"
+                className="px-8 py-4 bg-[#E07A5F] hover:bg-[#E07A5F]/80 text-white font-semibold rounded-lg text-lg transition-all transform hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 shadow-lg"
               >
                 {isSubmitting ? 'Joining...' : 'Join the Waitlist'}
               </button>
@@ -166,34 +166,34 @@ export default function Home() {
 
             {/* Success Message */}
             {message && (
-              <div className="mt-4 p-4 bg-orange/20 border border-orange rounded-lg">
-                <p className="text-cream font-medium">{message}</p>
+              <div className="mt-4 p-4 bg-[#E07A5F]/20 border border-[#E07A5F] rounded-lg">
+                <p className="text-black font-medium">{message}</p>
               </div>
             )}
           </div>
 
           {/* Waitlist Counter */}
-          <div className="inline-block px-6 py-3 bg-cream/10 backdrop-blur-sm rounded-full border border-cream/20">
-            <p className="text-cream/80 text-sm md:text-base">
-              <span className="font-bold text-orange text-xl md:text-2xl">{waitlistCount}</span>
+          <div className="inline-block px-6 py-3 bg-black/5 backdrop-blur-sm rounded-full border border-grey/40">
+            <p className="text-black/70 text-sm md:text-base">
+              <span className="font-bold text-[#E07A5F] text-xl md:text-2xl">{waitlistCount}</span>
               {' '}developers already on the waitlist
             </p>
           </div>
 
           {/* Features */}
           <div className="mt-20 grid grid-cols-1 md:grid-cols-2 gap-8 text-left max-w-3xl mx-auto">
-            <div className="bg-cream/5 backdrop-blur-sm p-6 rounded-xl border border-cream/10">
+            <div className="bg-white/50 backdrop-blur-sm p-6 rounded-xl border-2 border-grey">
               <div className="text-4xl mb-4">🔍</div>
-              <h3 className="text-xl font-semibold text-cream mb-2">A Better Way to Be a Creator</h3>
-              <p className="text-cream/70">
+              <h3 className="text-xl font-semibold text-black mb-2">A Better Way to Be a Creator</h3>
+              <p className="text-black/70">
                 Discover what's working in the market and find opportunities your competitors are missing.
               </p>
             </div>
 
-            <div className="bg-cream/5 backdrop-blur-sm p-6 rounded-xl border border-cream/10">
+            <div className="bg-white/50 backdrop-blur-sm p-6 rounded-xl border-2 border-grey">
               <div className="text-4xl mb-4">🚀</div>
-              <h3 className="text-xl font-semibold text-cream mb-2">Start Building</h3>
-              <p className="text-cream/70">
+              <h3 className="text-xl font-semibold text-black mb-2">Start Building</h3>
+              <p className="text-black/70">
                 Get actionable insights and resources to turn your ideas into reality.
               </p>
             </div>
@@ -203,7 +203,7 @@ export default function Home() {
 
       {/* Footer */}
       <footer className="container mx-auto px-4 py-8 mt-2">
-        <div className="text-center text-cream/50 text-sm">
+        <div className="text-center text-black/40 text-sm">
           <p>&copy; {new Date().getFullYear()} App Ideas Finder. All rights reserved.</p>
         </div>
       </footer>
