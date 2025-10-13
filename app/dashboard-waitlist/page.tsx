@@ -212,7 +212,7 @@ export default function Dashboard() {
 
   if (!authenticated) {
     return (
-      <div className="min-h-screen bg-[#F0EFEB] flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full mx-4 border-2 border-grey/40">
           <div className="text-center mb-6">
             <Image
@@ -252,7 +252,7 @@ export default function Dashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#F0EFEB] flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-[#3D405B] text-xl">Loading dashboard...</div>
       </div>
     );
@@ -269,7 +269,7 @@ export default function Dashboard() {
   if (!stats) return null;
 
   return (
-    <div className="min-h-screen bg-[#F0EFEB] p-6">
+    <div className="min-h-screen bg-white p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
