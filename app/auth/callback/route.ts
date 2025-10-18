@@ -9,14 +9,6 @@ export async function GET(request: NextRequest) {
   const type = searchParams.get('type')
   const next = searchParams.get('next') ?? '/homezone'
 
-  // Determine redirect destination based on auth type
-  let redirectDestination = next
-  if (type === 'recovery') {
-    redirectDestination = '/reset-password'
-  } else if (type === 'signup' || type === 'email_change') {
-    redirectDestination = '/homezone'
-  }
-
   if (code) {
     const cookieStore = await cookies()
     const supabase = createServerClient(
@@ -49,11 +41,11 @@ export async function GET(request: NextRequest) {
       const isLocalEnv = process.env.NODE_ENV === 'development'
       
       if (isLocalEnv) {
-        return NextResponse.redirect(`${origin}${redirectDestination}`)
+        return NextResponse.redirect(`${origin}${next}`)
       } else if (forwardedHost) {
-        return NextResponse.redirect(`https://${forwardedHost}${redirectDestination}`)
+        return NextResponse.redirect(`https://${forwardedHost}${next}`)
       } else {
-        return NextResponse.redirect(`${origin}${redirectDestination}`)
+        return NextResponse.redirect(`${origin}${next}`)
       }
     }
   }
