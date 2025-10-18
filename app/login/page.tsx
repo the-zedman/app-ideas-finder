@@ -80,6 +80,36 @@ function LoginContent() {
     }
   };
 
+  const handleForgotPassword = async () => {
+    if (!email) {
+      setMessage('Please enter your email address first');
+      setMessageType('error');
+      return;
+    }
+
+    setLoading(true);
+    setMessage('');
+
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/auth/callback?next=/homezone`,
+      });
+
+      if (error) {
+        setMessage(error.message);
+        setMessageType('error');
+      } else {
+        setMessage('Password reset email sent! Check your inbox.');
+        setMessageType('success');
+      }
+    } catch (err) {
+      setMessage('An unexpected error occurred');
+      setMessageType('error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleOAuthLogin = async (provider: 'github' | 'google') => {
     setLoading(true);
     setMessage('');
@@ -257,6 +287,19 @@ function LoginContent() {
               {loading ? 'Please wait...' : authMode === 'password' ? 'Sign In' : 'Send Magic Link'}
             </button>
           </form>
+
+          {/* Forgot Password Link - Only show for password mode */}
+          {authMode === 'password' && (
+            <div className="text-center mt-4">
+              <button
+                onClick={handleForgotPassword}
+                disabled={loading}
+                className="text-[#E07A5F] text-sm font-medium hover:underline disabled:opacity-50"
+              >
+                Forgot your password?
+              </button>
+            </div>
+          )}
 
           {/* Sign Up Link */}
           <div className="text-center">
