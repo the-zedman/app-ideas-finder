@@ -6,7 +6,16 @@ import type { NextRequest } from 'next/server'
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url)
   const code = searchParams.get('code')
+  const type = searchParams.get('type')
   const next = searchParams.get('next') ?? '/homezone'
+
+  // Determine redirect destination based on auth type
+  let redirectDestination = next
+  if (type === 'recovery') {
+    redirectDestination = '/reset-password'
+  } else if (type === 'signup' || type === 'email_change') {
+    redirectDestination = '/homezone'
+  }
 
   if (code) {
     const cookieStore = await cookies()
@@ -40,11 +49,11 @@ export async function GET(request: NextRequest) {
       const isLocalEnv = process.env.NODE_ENV === 'development'
       
       if (isLocalEnv) {
-        return NextResponse.redirect(`${origin}${next}`)
+        return NextResponse.redirect(`${origin}${redirectDestination}`)
       } else if (forwardedHost) {
-        return NextResponse.redirect(`https://${forwardedHost}${next}`)
+        return NextResponse.redirect(`https://${forwardedHost}${redirectDestination}`)
       } else {
-        return NextResponse.redirect(`${origin}${next}`)
+        return NextResponse.redirect(`${origin}${redirectDestination}`)
       }
     }
   }
