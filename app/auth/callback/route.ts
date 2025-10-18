@@ -34,18 +34,28 @@ export async function GET(request: NextRequest) {
       }
     )
 
-    const { error } = await supabase.auth.exchangeCodeForSession(code)
+    const { data, error } = await supabase.auth.exchangeCodeForSession(code)
     
-    if (!error) {
+    if (!error && data.session) {
+      // Check if this is a password recovery session
+      const isPasswordRecovery = type === 'recovery' || 
+                                 data.session.user.recovery_sent_at !== undefined
+      
+      // Determine redirect destination
+      let redirectDestination = next
+      if (isPasswordRecovery) {
+        redirectDestination = '/reset-password'
+      }
+      
       const forwardedHost = request.headers.get('x-forwarded-host')
       const isLocalEnv = process.env.NODE_ENV === 'development'
       
       if (isLocalEnv) {
-        return NextResponse.redirect(`${origin}${next}`)
+        return NextResponse.redirect(`${origin}${redirectDestination}`)
       } else if (forwardedHost) {
-        return NextResponse.redirect(`https://${forwardedHost}${next}`)
+        return NextResponse.redirect(`https://${forwardedHost}${redirectDestination}`)
       } else {
-        return NextResponse.redirect(`${origin}${next}`)
+        return NextResponse.redirect(`${origin}${redirectDestination}`)
       }
     }
   }
