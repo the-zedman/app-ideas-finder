@@ -39,15 +39,29 @@ function ResetPasswordContent() {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
         setIsValidSession(true);
-      } else {
-        // If no session and no URL params, this is likely a direct access
-        // Redirect to login page
-        router.push('/login');
       }
     };
 
     checkSession();
-  }, [supabase.auth, router]);
+
+    // Listen for auth state changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session) {
+        setIsValidSession(true);
+      } else {
+        // Only redirect if we've been waiting for a while
+        setTimeout(() => {
+          if (!isValidSession) {
+            router.push('/login');
+          }
+        }, 3000);
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [supabase.auth, router, isValidSession]);
 
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
