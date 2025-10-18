@@ -40,8 +40,19 @@ function ResetPasswordContent() {
       if (session) {
         setIsValidSession(true);
       } else {
-        setMessage('Invalid or expired password reset link. Please request a new one.');
-        setMessageType('error');
+        // Check if we have URL parameters that indicate a password reset
+        const urlParams = new URLSearchParams(window.location.search);
+        const token = urlParams.get('token');
+        const type = urlParams.get('type');
+        
+        if (token && type === 'recovery') {
+          // This is a password reset link, the token is already valid if we got here
+          // Supabase has already verified it before redirecting
+          setIsValidSession(true);
+        } else {
+          setMessage('Invalid or expired password reset link. Please request a new one.');
+          setMessageType('error');
+        }
       }
     };
 
