@@ -104,15 +104,15 @@ export default function HomeZone() {
                     <p className="text-sm text-[#3D405B]/60 truncate">{user?.email}</p>
                   </div>
                   <div className="p-2">
-                    <button
-                      onClick={() => {
-                        setShowProfileMenu(false);
-                        // Navigate to profile settings
-                      }}
-                      className="w-full text-left px-4 py-3 rounded-xl hover:bg-black/5 text-[#3D405B] transition-colors"
-                    >
-                      Profile Settings
-                    </button>
+                        <button
+                          onClick={() => {
+                            setShowProfileMenu(false);
+                            router.push('/profile');
+                          }}
+                          className="w-full text-left px-4 py-3 rounded-xl hover:bg-black/5 text-[#3D405B] transition-colors"
+                        >
+                          Profile Settings
+                        </button>
                     <button
                       onClick={() => {
                         setShowProfileMenu(false);
