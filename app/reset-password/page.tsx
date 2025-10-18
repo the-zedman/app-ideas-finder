@@ -40,29 +40,14 @@ function ResetPasswordContent() {
       if (session) {
         setIsValidSession(true);
       } else {
-        // Check if we have URL parameters that indicate a password reset
-        const urlParams = new URLSearchParams(window.location.search);
-        const token = urlParams.get('token');
-        const type = urlParams.get('type');
-        
-        // Debug: log what we're receiving
-        console.log('URL params:', window.location.search);
-        console.log('Token:', token);
-        console.log('Type:', type);
-        
-        if (token && type === 'recovery') {
-          // This is a password reset link, the token is already valid if we got here
-          // Supabase has already verified it before redirecting
-          setIsValidSession(true);
-        } else {
-          setMessage('Invalid or expired password reset link. Please request a new one.');
-          setMessageType('error');
-        }
+        // If no session and no URL params, this is likely a direct access
+        // Redirect to login page
+        router.push('/login');
       }
     };
 
     checkSession();
-  }, [supabase.auth]);
+  }, [supabase.auth, router]);
 
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
