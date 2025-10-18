@@ -59,7 +59,7 @@ function SignupContent() {
         email,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback?next=${redirectTo}`,
+          emailRedirectTo: `${window.location.origin}/auth/callback?next=/homezone`,
         },
       });
 
