@@ -93,6 +93,9 @@ function LoginContent() {
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: `${window.location.origin}/reset-password`,
+        options: {
+          emailRedirectTo: `${window.location.origin}/reset-password`
+        }
       });
 
       if (error) {
