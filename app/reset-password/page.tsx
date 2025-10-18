@@ -34,10 +34,15 @@ function ResetPasswordContent() {
   };
 
   useEffect(() => {
-    // Check if we have a valid password reset session
-    const checkSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
+    // Listen for auth state changes to detect PASSWORD_RECOVERY event
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log('Auth state change:', event, session);
+      
+      if (event === 'PASSWORD_RECOVERY') {
+        // User is in password recovery mode
+        setIsValidSession(true);
+      } else if (session) {
+        // User has a valid session
         setIsValidSession(true);
       } else {
         // Check if we have URL parameters that indicate a password reset
@@ -47,16 +52,27 @@ function ResetPasswordContent() {
         
         if (token && type === 'recovery') {
           // This is a password reset link, the token is already valid if we got here
-          // Supabase has already verified it before redirecting
           setIsValidSession(true);
         } else {
           setMessage('Invalid or expired password reset link. Please request a new one.');
           setMessageType('error');
         }
       }
+    });
+
+    // Also check for existing session
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        setIsValidSession(true);
+      }
     };
 
     checkSession();
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, [supabase.auth]);
 
   const handleResetPassword = async (e: React.FormEvent) => {
@@ -80,60 +96,22 @@ function ResetPasswordContent() {
     }
 
     try {
-      // Check if we have URL parameters for password reset
-      const urlParams = new URLSearchParams(window.location.search);
-      const token = urlParams.get('token');
-      const type = urlParams.get('type');
-      
-      if (token && type === 'recovery') {
-        // Use the token to verify and update password
-        const { data, error } = await supabase.auth.verifyOtp({
-          token_hash: token,
-          type: 'recovery'
-        });
-        
-        if (error) {
-          setMessage('Invalid or expired reset token. Please request a new password reset.');
-          setMessageType('error');
-          setLoading(false);
-          return;
-        }
-        
-        // Now update the password
-        const { error: updateError } = await supabase.auth.updateUser({
-          password: password
-        });
-        
-        if (updateError) {
-          setMessage(updateError.message);
-          setMessageType('error');
-        } else {
-          setMessage('Password updated successfully! Redirecting to your dashboard...');
-          setMessageType('success');
-          
-          // Redirect to homezone after successful password update
-          setTimeout(() => {
-            router.push('/homezone');
-          }, 2000);
-        }
-      } else {
-        // Try regular session-based update
-        const { error } = await supabase.auth.updateUser({
-          password: password
-        });
+      // Update the password - Supabase handles the session automatically
+      const { error } = await supabase.auth.updateUser({
+        password: password
+      });
 
-        if (error) {
-          setMessage(error.message);
-          setMessageType('error');
-        } else {
-          setMessage('Password updated successfully! Redirecting to your dashboard...');
-          setMessageType('success');
-          
-          // Redirect to homezone after successful password update
-          setTimeout(() => {
-            router.push('/homezone');
-          }, 2000);
-        }
+      if (error) {
+        setMessage(error.message);
+        setMessageType('error');
+      } else {
+        setMessage('Password updated successfully! Redirecting to your dashboard...');
+        setMessageType('success');
+        
+        // Redirect to homezone after successful password update
+        setTimeout(() => {
+          router.push('/homezone');
+        }, 2000);
       }
     } catch (err) {
       setMessage('An unexpected error occurred');
