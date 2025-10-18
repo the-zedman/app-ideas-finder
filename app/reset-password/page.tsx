@@ -89,21 +89,70 @@ function ResetPasswordContent() {
     }
 
     try {
-      const { error } = await supabase.auth.updateUser({
-        password: password
-      });
-
-      if (error) {
-        setMessage(error.message);
-        setMessageType('error');
-      } else {
-        setMessage('Password updated successfully! Redirecting to your dashboard...');
-        setMessageType('success');
+      // Check if we have URL parameters for password reset
+      const urlParams = new URLSearchParams(window.location.search);
+      const token = urlParams.get('token');
+      const type = urlParams.get('type');
+      
+      if (token && type === 'recovery') {
+        // Use the token to verify and update password
+        const { data, error } = await supabase.auth.verifyOtp({
+          token_hash: token,
+          type: 'recovery'
+        });
         
-        // Redirect to homezone after successful password update
-        setTimeout(() => {
-          router.push('/homezone');
-        }, 2000);
+        if (error) {
+          setMessage('Invalid or expired reset token. Please request a new password reset.');
+          setMessageType('error');
+          setLoading(false);
+          return;
+        }
+        
+        // Now update the password
+        const { error: updateError } = await supabase.auth.updateUser({
+          password: password
+        });
+        
+        if (updateError) {
+          setMessage(updateError.message);
+          setMessageType('error');
+        } else {
+          setMessage('Password updated successfully! Redirecting to your dashboard...');
+          setMessageType('success');
+          
+          // Redirect to homezone after successful password update
+          setTimeout(() => {
+            router.push('/homezone');
+          }, 2000);
+        }
+      } else {
+        // Try regular session-based update
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        
+        if (sessionError || !session) {
+          setMessage('Auth session missing! Please request a new password reset.');
+          setMessageType('error');
+          setLoading(false);
+          return;
+        }
+
+        // Update the password
+        const { error } = await supabase.auth.updateUser({
+          password: password
+        });
+
+        if (error) {
+          setMessage(error.message);
+          setMessageType('error');
+        } else {
+          setMessage('Password updated successfully! Redirecting to your dashboard...');
+          setMessageType('success');
+          
+          // Redirect to homezone after successful password update
+          setTimeout(() => {
+            router.push('/homezone');
+          }, 2000);
+        }
       }
     } catch (err) {
       setMessage('An unexpected error occurred');
