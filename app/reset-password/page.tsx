@@ -45,6 +45,11 @@ function ResetPasswordContent() {
         const token = urlParams.get('token');
         const type = urlParams.get('type');
         
+        // Debug: log what we're receiving
+        console.log('URL params:', window.location.search);
+        console.log('Token:', token);
+        console.log('Type:', type);
+        
         if (token && type === 'recovery') {
           // This is a password reset link, the token is already valid if we got here
           // Supabase has already verified it before redirecting
