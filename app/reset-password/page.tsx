@@ -37,31 +37,36 @@ function ResetPasswordContent() {
     // Check if we have a valid password reset session
     const checkSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
+      console.log('Session check:', session);
       if (session) {
         setIsValidSession(true);
+      } else {
+        // Check if we came from a password reset flow by checking referrer
+        const referrer = document.referrer;
+        console.log('Referrer:', referrer);
+        
+        // If we came from Supabase auth, assume it's a valid password reset
+        if (referrer.includes('supabase.co') || referrer.includes('auth/callback')) {
+          console.log('Came from auth flow, assuming valid reset');
+          setIsValidSession(true);
+        }
       }
     };
 
     checkSession();
 
     // Listen for auth state changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log('Auth state change:', event, session);
       if (session) {
         setIsValidSession(true);
-      } else {
-        // Only redirect if we've been waiting for a while
-        setTimeout(() => {
-          if (!isValidSession) {
-            router.push('/login');
-          }
-        }, 3000);
       }
     });
 
     return () => {
       subscription.unsubscribe();
     };
-  }, [supabase.auth, router, isValidSession]);
+  }, [supabase.auth]);
 
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
