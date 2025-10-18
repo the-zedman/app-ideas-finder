@@ -36,26 +36,16 @@ export async function GET(request: NextRequest) {
 
     const { data, error } = await supabase.auth.exchangeCodeForSession(code)
     
-    if (!error && data.session) {
-      // Check if this is a password recovery session
-      const isPasswordRecovery = type === 'recovery' || 
-                                 data.session.user.recovery_sent_at !== undefined
-      
-      // Determine redirect destination
-      let redirectDestination = next
-      if (isPasswordRecovery) {
-        redirectDestination = '/reset-password'
-      }
-      
+    if (!error) {
       const forwardedHost = request.headers.get('x-forwarded-host')
       const isLocalEnv = process.env.NODE_ENV === 'development'
       
       if (isLocalEnv) {
-        return NextResponse.redirect(`${origin}${redirectDestination}`)
+        return NextResponse.redirect(`${origin}${next}`)
       } else if (forwardedHost) {
-        return NextResponse.redirect(`https://${forwardedHost}${redirectDestination}`)
+        return NextResponse.redirect(`https://${forwardedHost}${next}`)
       } else {
-        return NextResponse.redirect(`${origin}${redirectDestination}`)
+        return NextResponse.redirect(`${origin}${next}`)
       }
     }
   }
