@@ -307,7 +307,7 @@ export default function ProfilePage() {
                     </svg>
                   </button>
                 </div>
-                <p className="text-xs text-gray-500 mt-1">Primary email is used for account notifications.</p>
+                <p className="text-xs text-gray-500 mt-1">Email is used for account notifications.</p>
               </div>
 
               <div>
