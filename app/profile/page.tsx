@@ -337,7 +337,7 @@ export default function ProfilePage() {
                     </svg>
                   </button>
                 </div>
-                <p className="text-xs text-gray-500 mt-1">Username appears as a display name throughout the dashboard.</p>
+                <p className="text-xs text-gray-500 mt-1">Username appears as a display name throughout this app.</p>
               </div>
             </div>
 
