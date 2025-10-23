@@ -10,11 +10,13 @@ export default function ProfilePage() {
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const [activeSection, setActiveSection] = useState('profile');
+  const [activeTab, setActiveTab] = useState('profile');
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
-    fullName: '',
+    firstName: '',
+    lastName: '',
     email: '',
+    username: '',
     bio: '',
     website: '',
     location: '',
@@ -25,14 +27,22 @@ export default function ProfilePage() {
   
   const supabase = createClient();
 
+  const tabs = [
+    { id: 'profile', name: 'Profile' },
+    { id: 'security', name: 'Security' },
+    { id: 'preferences', name: 'Preferences' }
+  ];
+
   useEffect(() => {
     const getUser = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
         setUser(user);
         setFormData({
-          fullName: user.user_metadata?.full_name || '',
+          firstName: user.user_metadata?.first_name || '',
+          lastName: user.user_metadata?.last_name || '',
           email: user.email || '',
+          username: user.user_metadata?.username || user.email?.split('@')[0] || '',
           bio: user.user_metadata?.bio || '',
           website: user.user_metadata?.website || '',
           location: user.user_metadata?.location || '',
@@ -54,7 +64,9 @@ export default function ProfilePage() {
     try {
       const { error } = await supabase.auth.updateUser({
         data: {
-          full_name: formData.fullName,
+          first_name: formData.firstName,
+          last_name: formData.lastName,
+          username: formData.username,
           bio: formData.bio,
           website: formData.website,
           location: formData.location,
@@ -118,8 +130,6 @@ export default function ProfilePage() {
     setMessage('');
 
     try {
-      // Note: Supabase doesn't have a direct delete user method
-      // You would need to implement this via a database function or API route
       setMessage('Account deletion requires admin assistance. Please contact support.');
       setMessageType('error');
     } catch (err) {
@@ -131,6 +141,9 @@ export default function ProfilePage() {
   };
 
   const getDisplayName = () => {
+    if (user?.user_metadata?.first_name && user?.user_metadata?.last_name) {
+      return `${user.user_metadata.first_name} ${user.user_metadata.last_name}`;
+    }
     if (user?.user_metadata?.full_name) {
       return user.user_metadata.full_name;
     }
@@ -165,8 +178,8 @@ export default function ProfilePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-[#3D405B]">Loading...</div>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-gray-700">Loading...</div>
       </div>
     );
   }
@@ -181,306 +194,304 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-white flex flex-col">
+    <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="bg-white border-b border-grey/30 sticky top-0 z-50 backdrop-blur-lg bg-white/80">
-        <div className="container mx-auto px-4 py-3 flex items-center justify-between h-16">
+      <div className="bg-white border-b border-gray-200 px-4 py-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <button
+              onClick={() => router.back()}
+              className="p-2 -ml-2 rounded-full hover:bg-gray-100 transition-colors"
+            >
+              <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+            <h1 className="text-2xl font-bold text-gray-900">Profile</h1>
+          </div>
           <button
             onClick={() => router.push('/homezone')}
-            className="text-[#E07A5F] font-medium active:scale-95 transition-transform"
+            className="px-4 py-2 bg-[#E07A5F] text-white rounded-lg font-medium hover:bg-[#E07A5F]/90 transition-colors"
           >
-            ← Back to HomeZone
+            Back to HomeZone
           </button>
-          <div className="flex items-center space-x-2">
-            <Image
-              src="/App Ideas Finder - logo - 200x200.png"
-              alt="App Ideas Finder Logo"
-              width={32}
-              height={32}
-              className="rounded-md"
-            />
-            <h1 className="text-lg font-semibold text-[#3D405B]">
-              Profile
-            </h1>
-          </div>
-          <div className="w-16"></div> {/* Spacer for centering */}
         </div>
-      </header>
+      </div>
 
-      {/* Main Content */}
-      <main className="flex-1 overflow-y-auto pb-20">
-        <div className="max-w-2xl mx-auto px-4 py-6">
-          {/* Profile Header */}
-          <div className="bg-gradient-to-br from-[#E07A5F] to-[#E07A5F]/80 rounded-2xl p-6 mb-6 text-white">
-            <div className="flex items-center space-x-4">
-              <div className="w-20 h-20 rounded-full bg-white/20 flex items-center justify-center text-3xl font-bold">
-                {getInitials()}
-              </div>
-              <div>
-                <h2 className="text-2xl font-bold mb-1">{getDisplayName()}</h2>
-                <p className="text-white/90 text-sm">{getEmail()}</p>
-                <div className="flex items-center mt-2">
-                  <span className="text-white/80 text-sm">{getProviderIcon()} {user?.app_metadata?.provider || 'email'}</span>
+      <div className="px-4 py-6">
+        {/* Navigation Tabs */}
+        <div className="flex space-x-1 mb-6 bg-gray-100 rounded-lg p-1">
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex-1 py-3 px-4 rounded-md font-medium transition-colors ${
+                activeTab === tab.id
+                  ? 'bg-white text-gray-900 shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              {tab.name}
+            </button>
+          ))}
+        </div>
+
+        {/* Message */}
+        {message && (
+          <div className={`p-4 rounded-lg mb-6 ${
+            messageType === 'success' 
+              ? 'bg-green-50 border border-green-200 text-green-800' 
+              : 'bg-red-50 border border-red-200 text-red-800'
+          }`}>
+            <p className="text-sm">{message}</p>
+          </div>
+        )}
+
+        {/* Profile Tab */}
+        {activeTab === 'profile' && (
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+            <div className="px-6 py-4 border-b border-gray-200">
+              <h2 className="text-lg font-semibold text-gray-900">Profile Information</h2>
+            </div>
+            
+            <div className="p-6 space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    First name
+                  </label>
+                  <div className="flex">
+                    <input
+                      type="text"
+                      value={formData.firstName}
+                      onChange={(e) => setFormData({...formData, firstName: e.target.value})}
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#E07A5F] focus:border-transparent"
+                      placeholder="Enter first name"
+                    />
+                    <button className="ml-2 p-2 text-gray-400 hover:text-gray-600">
+                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Last name
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.lastName}
+                    onChange={(e) => setFormData({...formData, lastName: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#E07A5F] focus:border-transparent"
+                    placeholder="Enter last name"
+                  />
                 </div>
               </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Primary email
+                </label>
+                <div className="flex">
+                  <input
+                    type="email"
+                    value={formData.email}
+                    disabled
+                    className="flex-1 px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-500"
+                  />
+                  <button className="ml-2 p-2 text-gray-400 hover:text-gray-600">
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                    </svg>
+                  </button>
+                </div>
+                <p className="text-xs text-gray-500 mt-1">Primary email is used for account notifications.</p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Username
+                </label>
+                <div className="flex">
+                  <input
+                    type="text"
+                    value={formData.username}
+                    onChange={(e) => setFormData({...formData, username: e.target.value})}
+                    className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#E07A5F] focus:border-transparent"
+                    placeholder="Enter username"
+                  />
+                  <button className="ml-2 p-2 text-gray-400 hover:text-gray-600">
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
+                    </svg>
+                  </button>
+                </div>
+                <p className="text-xs text-gray-500 mt-1">Username appears as a display name throughout the dashboard.</p>
+              </div>
+            </div>
+
+            <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end">
+              <button
+                onClick={handleSaveProfile}
+                disabled={loading}
+                className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-md transition-colors disabled:opacity-50"
+              >
+                {loading ? 'Saving...' : 'Save'}
+              </button>
             </div>
           </div>
+        )}
 
-          {/* Navigation Tabs */}
-          <div className="flex space-x-1 mb-6 bg-grey/10 rounded-xl p-1">
-            <button
-              onClick={() => setActiveSection('profile')}
-              className={`flex-1 py-3 px-4 rounded-lg text-sm font-medium transition-all ${
-                activeSection === 'profile'
-                  ? 'bg-white text-[#E07A5F] shadow-sm'
-                  : 'text-[#3D405B]/60 hover:text-[#3D405B]'
-              }`}
-            >
-              Profile
-            </button>
-            <button
-              onClick={() => setActiveSection('security')}
-              className={`flex-1 py-3 px-4 rounded-lg text-sm font-medium transition-all ${
-                activeSection === 'security'
-                  ? 'bg-white text-[#E07A5F] shadow-sm'
-                  : 'text-[#3D405B]/60 hover:text-[#3D405B]'
-              }`}
-            >
-              Security
-            </button>
-            <button
-              onClick={() => setActiveSection('preferences')}
-              className={`flex-1 py-3 px-4 rounded-lg text-sm font-medium transition-all ${
-                activeSection === 'preferences'
-                  ? 'bg-white text-[#E07A5F] shadow-sm'
-                  : 'text-[#3D405B]/60 hover:text-[#3D405B]'
-              }`}
-            >
-              Preferences
-            </button>
-          </div>
-
-          {/* Message */}
-          {message && (
-            <div className={`p-4 rounded-xl mb-6 ${
-              messageType === 'success' 
-                ? 'bg-green-50 border border-green-200' 
-                : 'bg-red-50 border border-red-200'
-            }`}>
-              <p className={`text-sm ${
-                messageType === 'success' ? 'text-green-800' : 'text-red-800'
-              }`}>
-                {message}
-              </p>
-            </div>
-          )}
-
-          {/* Profile Section */}
-          {activeSection === 'profile' && (
-            <div className="space-y-6">
-              <div className="bg-white rounded-2xl p-6 border border-grey/30">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-semibold text-[#3D405B]">Personal Information</h3>
+        {/* Security Tab */}
+        {activeTab === 'security' && (
+          <div className="space-y-6">
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+              <div className="px-6 py-4 border-b border-gray-200">
+                <h2 className="text-lg font-semibold text-gray-900">Password & Security</h2>
+              </div>
+              
+              <div className="p-6 space-y-4">
+                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                  <div>
+                    <h4 className="font-medium text-gray-900">Change Password</h4>
+                    <p className="text-sm text-gray-600">Update your account password</p>
+                  </div>
                   <button
-                    onClick={() => setIsEditing(!isEditing)}
-                    className="text-[#E07A5F] font-medium text-sm active:scale-95 transition-transform"
+                    onClick={handleChangePassword}
+                    disabled={loading}
+                    className="px-4 py-2 bg-[#E07A5F] hover:bg-[#E07A5F]/90 text-white font-medium rounded-md transition-colors disabled:opacity-50"
                   >
-                    {isEditing ? 'Cancel' : 'Edit'}
+                    Change
                   </button>
                 </div>
 
-                <div className="space-y-4">
+                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
                   <div>
-                    <label className="block text-sm font-medium text-[#3D405B] mb-2">
-                      Full Name
-                    </label>
-                    <input
-                      type="text"
-                      value={formData.fullName}
-                      onChange={(e) => setFormData({...formData, fullName: e.target.value})}
-                      disabled={!isEditing}
-                      className="w-full px-4 py-3 rounded-xl border-2 border-grey/40 bg-white text-[#3D405B] focus:outline-none focus:border-[#E07A5F] transition-colors disabled:bg-grey/10 disabled:text-[#3D405B]/60"
-                    />
+                    <h4 className="font-medium text-gray-900">Two-Factor Authentication</h4>
+                    <p className="text-sm text-gray-600">Add an extra layer of security</p>
                   </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-[#3D405B] mb-2">
-                      Email
-                    </label>
-                    <input
-                      type="email"
-                      value={formData.email}
-                      disabled
-                      className="w-full px-4 py-3 rounded-xl border-2 border-grey/40 bg-grey/10 text-[#3D405B]/60"
-                    />
-                    <p className="text-xs text-[#3D405B]/60 mt-1">Email cannot be changed</p>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-[#3D405B] mb-2">
-                      Bio
-                    </label>
-                    <textarea
-                      value={formData.bio}
-                      onChange={(e) => setFormData({...formData, bio: e.target.value})}
-                      disabled={!isEditing}
-                      rows={3}
-                      placeholder="Tell us about yourself..."
-                      className="w-full px-4 py-3 rounded-xl border-2 border-grey/40 bg-white text-[#3D405B] focus:outline-none focus:border-[#E07A5F] transition-colors disabled:bg-grey/10 disabled:text-[#3D405B]/60 resize-none"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-[#3D405B] mb-2">
-                      Website
-                    </label>
-                    <input
-                      type="url"
-                      value={formData.website}
-                      onChange={(e) => setFormData({...formData, website: e.target.value})}
-                      disabled={!isEditing}
-                      placeholder="https://yourwebsite.com"
-                      className="w-full px-4 py-3 rounded-xl border-2 border-grey/40 bg-white text-[#3D405B] focus:outline-none focus:border-[#E07A5F] transition-colors disabled:bg-grey/10 disabled:text-[#3D405B]/60"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-[#3D405B] mb-2">
-                      Location
-                    </label>
-                    <input
-                      type="text"
-                      value={formData.location}
-                      onChange={(e) => setFormData({...formData, location: e.target.value})}
-                      disabled={!isEditing}
-                      placeholder="City, Country"
-                      className="w-full px-4 py-3 rounded-xl border-2 border-grey/40 bg-white text-[#3D405B] focus:outline-none focus:border-[#E07A5F] transition-colors disabled:bg-grey/10 disabled:text-[#3D405B]/60"
-                    />
-                  </div>
-
-                  {isEditing && (
-                    <div className="flex space-x-3 pt-4">
-                      <button
-                        onClick={handleSaveProfile}
-                        disabled={loading}
-                        className="flex-1 py-3 bg-[#E07A5F] hover:bg-[#E07A5F]/90 text-white font-semibold rounded-xl transition-all disabled:opacity-50"
-                      >
-                        {loading ? 'Saving...' : 'Save Changes'}
-                      </button>
-                    </div>
-                  )}
+                  <button
+                    disabled
+                    className="px-4 py-2 bg-gray-200 text-gray-500 font-medium rounded-md cursor-not-allowed"
+                  >
+                    Coming Soon
+                  </button>
                 </div>
               </div>
             </div>
-          )}
 
-          {/* Security Section */}
-          {activeSection === 'security' && (
-            <div className="space-y-6">
-              <div className="bg-white rounded-2xl p-6 border border-grey/30">
-                <h3 className="text-lg font-semibold text-[#3D405B] mb-4">Password & Security</h3>
-                
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between p-4 bg-grey/5 rounded-xl">
-                    <div>
-                      <h4 className="font-medium text-[#3D405B]">Change Password</h4>
-                      <p className="text-sm text-[#3D405B]/60">Update your account password</p>
-                    </div>
-                    <button
-                      onClick={handleChangePassword}
-                      disabled={loading}
-                      className="px-4 py-2 bg-[#E07A5F] hover:bg-[#E07A5F]/90 text-white font-medium rounded-lg transition-all disabled:opacity-50"
-                    >
-                      Change
-                    </button>
+            <div className="bg-white rounded-lg shadow-sm border border-red-200">
+              <div className="px-6 py-4 border-b border-red-200 bg-red-50">
+                <h2 className="text-lg font-semibold text-red-900">DANGER ZONE</h2>
+              </div>
+              
+              <div className="p-6">
+                <div className="flex items-start space-x-3 p-4 bg-red-50 border border-red-200 rounded-lg">
+                  <div className="flex-shrink-0">
+                    <svg className="w-5 h-5 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                    </svg>
                   </div>
-
-                  <div className="flex items-center justify-between p-4 bg-grey/5 rounded-xl">
-                    <div>
-                      <h4 className="font-medium text-[#3D405B]">Two-Factor Authentication</h4>
-                      <p className="text-sm text-[#3D405B]/60">Add an extra layer of security</p>
-                    </div>
-                    <button
-                      disabled
-                      className="px-4 py-2 bg-grey/20 text-[#3D405B]/40 font-medium rounded-lg cursor-not-allowed"
-                    >
-                      Coming Soon
-                    </button>
-                  </div>
-
-                  <div className="flex items-center justify-between p-4 bg-red-50 rounded-xl border border-red-200">
-                    <div>
-                      <h4 className="font-medium text-red-800">Delete Account</h4>
-                      <p className="text-sm text-red-600">Permanently delete your account and data</p>
-                    </div>
+                  <div className="flex-1">
+                    <h4 className="font-medium text-red-900">Request for account deletion</h4>
+                    <p className="text-sm text-red-700 mt-1">
+                      Deleting your account is permanent and cannot be undone. Your data will be deleted within 30 days, 
+                      except we may retain some metadata and logs for longer where required or permitted by law.
+                    </p>
                     <button
                       onClick={handleDeleteAccount}
                       disabled={loading}
-                      className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-all disabled:opacity-50"
+                      className="mt-3 px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-md transition-colors disabled:opacity-50"
                     >
-                      Delete
+                      Request to delete account
                     </button>
                   </div>
                 </div>
               </div>
             </div>
-          )}
+          </div>
+        )}
 
-          {/* Preferences Section */}
-          {activeSection === 'preferences' && (
-            <div className="space-y-6">
-              <div className="bg-white rounded-2xl p-6 border border-grey/30">
-                <h3 className="text-lg font-semibold text-[#3D405B] mb-4">App Preferences</h3>
-                
-                <div className="space-y-4">
+        {/* Preferences Tab */}
+        {activeTab === 'preferences' && (
+          <div className="space-y-6">
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+              <div className="px-6 py-4 border-b border-gray-200">
+                <h2 className="text-lg font-semibold text-gray-900">Analytics and Marketing</h2>
+              </div>
+              
+              <div className="p-6">
+                <div className="flex items-center justify-between">
                   <div>
-                    <label className="block text-sm font-medium text-[#3D405B] mb-2">
-                      Timezone
-                    </label>
-                    <select
-                      value={formData.timezone}
-                      onChange={(e) => setFormData({...formData, timezone: e.target.value})}
-                      className="w-full px-4 py-3 rounded-xl border-2 border-grey/40 bg-white text-[#3D405B] focus:outline-none focus:border-[#E07A5F] transition-colors"
-                    >
-                      <option value="UTC">UTC</option>
-                      <option value="America/New_York">Eastern Time</option>
-                      <option value="America/Chicago">Central Time</option>
-                      <option value="America/Denver">Mountain Time</option>
-                      <option value="America/Los_Angeles">Pacific Time</option>
-                      <option value="Europe/London">London</option>
-                      <option value="Europe/Paris">Paris</option>
-                      <option value="Asia/Tokyo">Tokyo</option>
-                      <option value="Australia/Sydney">Sydney</option>
-                    </select>
+                    <h4 className="font-medium text-gray-900">Send telemetry data from Supabase services</h4>
+                    <p className="text-sm text-gray-600 mt-1">
+                      By opting in to sharing telemetry data, Supabase can analyze usage patterns to enhance user experience 
+                      and use it for marketing and advertising purposes.
+                    </p>
                   </div>
-
-                  <div className="flex items-center justify-between p-4 bg-grey/5 rounded-xl">
-                    <div>
-                      <h4 className="font-medium text-[#3D405B]">Email Notifications</h4>
-                      <p className="text-sm text-[#3D405B]/60">Receive updates about new features</p>
-                    </div>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input type="checkbox" className="sr-only peer" defaultChecked />
-                      <div className="w-11 h-6 bg-grey/30 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-[#E07A5F]/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-grey/30 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#E07A5F]"></div>
-                    </label>
-                  </div>
-
-                  <div className="flex items-center justify-between p-4 bg-grey/5 rounded-xl">
-                    <div>
-                      <h4 className="font-medium text-[#3D405B]">Dark Mode</h4>
-                      <p className="text-sm text-[#3D405B]/60">Switch to dark theme</p>
-                    </div>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input type="checkbox" className="sr-only peer" />
-                      <div className="w-11 h-6 bg-grey/30 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-[#E07A5F]/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-grey/30 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#E07A5F]"></div>
-                    </label>
-                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" className="sr-only peer" defaultChecked />
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-[#E07A5F]/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
+                  </label>
                 </div>
               </div>
             </div>
-          )}
-        </div>
-      </main>
+
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+              <div className="px-6 py-4 border-b border-gray-200">
+                <h2 className="text-lg font-semibold text-gray-900">App Preferences</h2>
+              </div>
+              
+              <div className="p-6 space-y-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Timezone
+                  </label>
+                  <select
+                    value={formData.timezone}
+                    onChange={(e) => setFormData({...formData, timezone: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#E07A5F] focus:border-transparent"
+                  >
+                    <option value="UTC">UTC</option>
+                    <option value="America/New_York">Eastern Time</option>
+                    <option value="America/Chicago">Central Time</option>
+                    <option value="America/Denver">Mountain Time</option>
+                    <option value="America/Los_Angeles">Pacific Time</option>
+                    <option value="Europe/London">London</option>
+                    <option value="Europe/Paris">Paris</option>
+                    <option value="Asia/Tokyo">Tokyo</option>
+                    <option value="Australia/Sydney">Sydney</option>
+                  </select>
+                </div>
+
+                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                  <div>
+                    <h4 className="font-medium text-gray-900">Email Notifications</h4>
+                    <p className="text-sm text-gray-600">Receive updates about new features</p>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" className="sr-only peer" defaultChecked />
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-[#E07A5F]/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
+                  </label>
+                </div>
+
+                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                  <div>
+                    <h4 className="font-medium text-gray-900">Dark Mode</h4>
+                    <p className="text-sm text-gray-600">Switch to dark theme</p>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" className="sr-only peer" />
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-[#E07A5F]/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
