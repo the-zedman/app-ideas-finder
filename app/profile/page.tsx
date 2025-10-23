@@ -292,7 +292,7 @@ export default function ProfilePage() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Primary email
+                  Email
                 </label>
                 <div className="flex">
                   <input
