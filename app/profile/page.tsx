@@ -207,7 +207,16 @@ export default function ProfilePage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
             </button>
-            <h1 className="text-2xl font-bold text-gray-900">Profile</h1>
+            <div className="flex items-center space-x-2">
+              <Image
+                src="/App Ideas Finder - logo - 200x200.png"
+                alt="App Ideas Finder Logo"
+                width={32}
+                height={32}
+                className="rounded-md"
+              />
+              <h1 className="text-2xl font-bold text-gray-900">Profile</h1>
+            </div>
           </div>
           <button
             onClick={() => router.push('/homezone')}
@@ -419,28 +428,6 @@ export default function ProfilePage() {
           <div className="space-y-6">
             <div className="bg-white rounded-lg shadow-sm border border-gray-200">
               <div className="px-6 py-4 border-b border-gray-200">
-                <h2 className="text-lg font-semibold text-gray-900">Analytics and Marketing</h2>
-              </div>
-              
-              <div className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h4 className="font-medium text-gray-900">Send telemetry data from Supabase services</h4>
-                    <p className="text-sm text-gray-600 mt-1">
-                      By opting in to sharing telemetry data, Supabase can analyze usage patterns to enhance user experience 
-                      and use it for marketing and advertising purposes.
-                    </p>
-                  </div>
-                  <label className="relative inline-flex items-center cursor-pointer">
-                    <input type="checkbox" className="sr-only peer" defaultChecked />
-                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-[#E07A5F]/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
-                  </label>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-              <div className="px-6 py-4 border-b border-gray-200">
                 <h2 className="text-lg font-semibold text-gray-900">App Preferences</h2>
               </div>
               
@@ -480,11 +467,11 @@ export default function ProfilePage() {
                 <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
                   <div>
                     <h4 className="font-medium text-gray-900">Dark Mode</h4>
-                    <p className="text-sm text-gray-600">Switch to dark theme</p>
+                    <p className="text-sm text-gray-600">Switch to dark theme <span className="text-[#E07A5F] font-medium">(Coming Soon)</span></p>
                   </div>
-                  <label className="relative inline-flex items-center cursor-pointer">
-                    <input type="checkbox" className="sr-only peer" />
-                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-[#E07A5F]/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
+                  <label className="relative inline-flex items-center cursor-not-allowed">
+                    <input type="checkbox" className="sr-only peer" disabled />
+                    <div className="w-11 h-6 bg-gray-200 rounded-full cursor-not-allowed"></div>
                   </label>
                 </div>
               </div>
