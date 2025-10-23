@@ -31,6 +31,11 @@ export async function middleware(request: NextRequest) {
   const isDevelopmentBypass = process.env.NODE_ENV === 'development' && 
                               process.env.NEXT_PUBLIC_DEV_MODE === 'true'
 
+  // Debug logging (remove after testing)
+  if (process.env.NODE_ENV === 'development') {
+    console.log('Dev bypass enabled:', isDevelopmentBypass, 'Path:', request.nextUrl.pathname)
+  }
+
   // Refresh session if expired
   const { data: { user } } = await supabase.auth.getUser()
 
@@ -47,6 +52,7 @@ export async function middleware(request: NextRequest) {
 
   // Skip auth checks in development bypass mode
   if (isDevelopmentBypass) {
+    console.log('✅ Bypassing auth for development')
     return supabaseResponse
   }
 

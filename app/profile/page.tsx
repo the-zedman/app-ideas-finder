@@ -162,7 +162,11 @@ export default function ProfilePage() {
     );
   }
 
-  if (!user) {
+  // In development bypass mode, allow access without user
+  const isDevelopmentBypass = process.env.NODE_ENV === 'development' && 
+                              process.env.NEXT_PUBLIC_DEV_MODE === 'true'
+
+  if (!user && !isDevelopmentBypass) {
     router.push('/login');
     return null;
   }
