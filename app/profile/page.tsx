@@ -79,13 +79,18 @@ export default function ProfilePage() {
   };
 
   const handleChangePassword = async () => {
-    if (!user?.email) return;
+    const email = getEmail();
+    if (!email || email === 'dev@localhost.com') {
+      setMessage('Cannot change password in development mode');
+      setMessageType('error');
+      return;
+    }
 
     setLoading(true);
     setMessage('');
 
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(user.email, {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: `${window.location.origin}/auth/callback?next=/profile`,
       });
 
@@ -132,7 +137,7 @@ export default function ProfilePage() {
     if (user?.email) {
       return user.email.split('@')[0];
     }
-    return 'User';
+    return 'Developer';
   };
 
   const getInitials = () => {
@@ -152,6 +157,10 @@ export default function ProfilePage() {
       default:
         return '👤';
     }
+  };
+
+  const getEmail = () => {
+    return user?.email || 'dev@localhost.com';
   };
 
   if (loading) {
@@ -209,9 +218,9 @@ export default function ProfilePage() {
               </div>
               <div>
                 <h2 className="text-2xl font-bold mb-1">{getDisplayName()}</h2>
-                <p className="text-white/90 text-sm">{user.email}</p>
+                <p className="text-white/90 text-sm">{getEmail()}</p>
                 <div className="flex items-center mt-2">
-                  <span className="text-white/80 text-sm">{getProviderIcon()} {user.app_metadata?.provider || 'email'}</span>
+                  <span className="text-white/80 text-sm">{getProviderIcon()} {user?.app_metadata?.provider || 'email'}</span>
                 </div>
               </div>
             </div>

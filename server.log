@@ -8,82 +8,24 @@
    - Environments: .env.local
 
  ✓ Starting...
- ✓ Compiled middleware in 312ms
- ✓ Ready in 1683ms
-Dev bypass enabled: true Path: /login
-✅ Bypassing auth for development
- ○ Compiling /login ...
-Dev bypass enabled: true Path: /
-✅ Bypassing auth for development
- ✓ Compiled /login in 3.3s
- GET / 200 in 3071ms
+ ✓ Compiled middleware in 268ms
+ ✓ Ready in 1608ms
 Dev bypass enabled: true Path: /profile
 ✅ Bypassing auth for development
- ✓ Compiled /profile in 324ms
- GET /profile 200 in 439ms
-Dev bypass enabled: true Path: /login
-✅ Bypassing auth for development
-Dev bypass enabled: true Path: /login
-✅ Bypassing auth for development
- GET /login 200 in 189ms
- GET /login 200 in 192ms
-Dev bypass enabled: true Path: /
-✅ Bypassing auth for development
- GET / 200 in 159ms
+ ○ Compiling /profile ...
+ ✓ Compiled /profile in 3.2s
+ GET /profile 200 in 3618ms
 Dev bypass enabled: true Path: /profile
 ✅ Bypassing auth for development
- GET /profile 200 in 147ms
-Dev bypass enabled: true Path: /login
-✅ Bypassing auth for development
-Dev bypass enabled: true Path: /login
-✅ Bypassing auth for development
- GET /login 200 in 133ms
- GET /login 200 in 137ms
-Dev bypass enabled: true Path: /
-✅ Bypassing auth for development
- GET / 200 in 136ms
-Dev bypass enabled: true Path: /homezone
-✅ Bypassing auth for development
- ○ Compiling /homezone ...
- ✓ Compiled /homezone in 541ms
- GET /homezone 200 in 671ms
+ GET /profile 200 in 140ms
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
 Dev bypass enabled: true Path: /profile
 ✅ Bypassing auth for development
- GET /profile 200 in 89ms
-Dev bypass enabled: true Path: /login
-✅ Bypassing auth for development
-Dev bypass enabled: true Path: /login
-✅ Bypassing auth for development
- GET /login 200 in 117ms
- GET /login 200 in 118ms
-Dev bypass enabled: true Path: /login
-✅ Bypassing auth for development
-Dev bypass enabled: true Path: /login
-✅ Bypassing auth for development
- GET /login 200 in 135ms
- GET /login 200 in 137ms
-Dev bypass enabled: true Path: /
-✅ Bypassing auth for development
- GET / 200 in 148ms
-Dev bypass enabled: true Path: /homezone
-✅ Bypassing auth for development
- GET /homezone 200 in 129ms
-Dev bypass enabled: true Path: /homezone
-✅ Bypassing auth for development
- GET /homezone 200 in 123ms
-Dev bypass enabled: true Path: /homezone
-✅ Bypassing auth for development
- GET /homezone 200 in 154ms
-Dev bypass enabled: true Path: /
-✅ Bypassing auth for development
- GET / 200 in 123ms
+ ✓ Compiled in 119ms
+ GET /profile 200 in 331ms
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
 Dev bypass enabled: true Path: /profile
 ✅ Bypassing auth for development
- GET /profile 200 in 130ms
-Dev bypass enabled: true Path: /login
-✅ Bypassing auth for development
-Dev bypass enabled: true Path: /login
-✅ Bypassing auth for development
- GET /login 200 in 118ms
- GET /login 200 in 120ms
- ✓ Compiled in 143ms
+ ✓ Compiled in 99ms
+ GET /profile 200 in 307ms
+ ✓ Compiled in 52ms
