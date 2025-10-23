@@ -1,0 +1,23 @@
+
+> app-ideas-finder@0.1.0 dev
+> next dev --turbopack -p 3001 -H 0.0.0.0
+
+   ▲ Next.js 15.5.4 (Turbopack)
+   - Local:        http://localhost:3001
+   - Network:      http://0.0.0.0:3001
+   - Environments: .env.local
+
+ ✓ Starting...
+ ✓ Compiled middleware in 311ms
+ ✓ Ready in 1782ms
+ ○ Compiling / ...
+ ✓ Compiled / in 3.3s
+ GET / 200 in 3770ms
+ ○ Compiling /_not-found/page ...
+ ✓ Compiled /_not-found/page in 592ms
+ GET /apple-touch-icon.png 404 in 754ms
+ GET /apple-touch-icon-precomposed.png 404 in 766ms
+ GET /favicon.ico?favicon.e871b922.ico 200 in 871ms
+ GET /favicon.ico 200 in 881ms
+ ✓ Compiled middleware in 5ms
+ ✓ Compiled in 56ms

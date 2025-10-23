@@ -27,11 +27,15 @@ export async function middleware(request: NextRequest) {
     }
   )
 
+  // Check if in development bypass mode
+  const isDevelopmentBypass = process.env.NODE_ENV === 'development' && 
+                              process.env.NEXT_PUBLIC_DEV_MODE === 'true'
+
   // Refresh session if expired
   const { data: { user } } = await supabase.auth.getUser()
 
   // Protected routes
-  const protectedRoutes = ['/homezone']
+  const protectedRoutes = ['/homezone', '/profile']
   const authRoutes = ['/login', '/signup']
   
   const isProtectedRoute = protectedRoutes.some(route => 
@@ -40,6 +44,11 @@ export async function middleware(request: NextRequest) {
   const isAuthRoute = authRoutes.some(route => 
     request.nextUrl.pathname.startsWith(route)
   )
+
+  // Skip auth checks in development bypass mode
+  if (isDevelopmentBypass) {
+    return supabaseResponse
+  }
 
   // Redirect to login if accessing protected route without authentication
   if (isProtectedRoute && !user) {
