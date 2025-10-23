@@ -47,3 +47,18 @@ Dev bypass enabled: true Path: /profile
  ✓ Compiled in 283ms
  ✓ Compiled /profile in 87ms
  GET /profile 200 in 204ms
+Dev bypass enabled: true Path: /homezone
+✅ Bypassing auth for development
+ ○ Compiling /homezone ...
+ ✓ Compiled /homezone in 1517ms
+ GET /homezone 200 in 1650ms
+Dev bypass enabled: true Path: /profile
+✅ Bypassing auth for development
+ GET /profile 200 in 88ms
+Dev bypass enabled: true Path: /profile
+✅ Bypassing auth for development
+ GET /profile 200 in 154ms
+Dev bypass enabled: true Path: /profile
+✅ Bypassing auth for development
+ GET /profile 200 in 92ms
+ ✓ Compiled in 232ms
