@@ -100,7 +100,8 @@ export default function ProfilePage() {
         .upload(filePath, file);
 
       if (uploadError) {
-        setMessage('Failed to upload avatar');
+        console.error('Avatar upload error:', uploadError);
+        setMessage(`Failed to upload avatar: ${uploadError.message}`);
         setMessageType('error');
         return;
       }
@@ -128,12 +129,14 @@ export default function ProfilePage() {
           });
 
         if (insertError) {
-          setMessage('Failed to create profile with avatar');
+          console.error('Profile insert error:', insertError);
+          setMessage(`Failed to create profile with avatar: ${insertError.message}`);
           setMessageType('error');
           return;
         }
       } else if (updateError) {
-        setMessage('Failed to update avatar');
+        console.error('Profile update error:', updateError);
+        setMessage(`Failed to update avatar: ${updateError.message}`);
         setMessageType('error');
         return;
       }
