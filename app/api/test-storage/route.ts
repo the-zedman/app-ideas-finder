@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
     if (bucketsError) {
       return NextResponse.json({ 
         error: bucketsError.message, 
-        code: bucketsError.statusCode 
+        code: bucketsError.status 
       }, { status: 500 });
     }
 
