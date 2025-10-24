@@ -21,7 +21,12 @@ export default function ProfilePage() {
     website: '',
     location: '',
     timezone: '',
+    avatar_url: '',
+    email_notifications: true,
+    dark_mode: false,
   });
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string>('');
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState<'success' | 'error'>('success');
   
@@ -38,22 +43,112 @@ export default function ProfilePage() {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
         setUser(user);
+        
+        // Fetch profile data from profiles table
+        const { data: profile, error } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', user.id)
+          .single();
+
+        if (error && error.code !== 'PGRST116') {
+          console.error('Error fetching profile:', error);
+        }
+
         setFormData({
-          firstName: user.user_metadata?.first_name || '',
-          lastName: user.user_metadata?.last_name || '',
+          firstName: profile?.first_name || '',
+          lastName: profile?.last_name || '',
           email: user.email || '',
-          username: user.user_metadata?.username || user.email?.split('@')[0] || '',
-          bio: user.user_metadata?.bio || '',
-          website: user.user_metadata?.website || '',
-          location: user.user_metadata?.location || '',
-          timezone: user.user_metadata?.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone,
+          username: profile?.username || user.email?.split('@')[0] || '',
+          bio: profile?.bio || '',
+          website: profile?.website || '',
+          location: profile?.location || '',
+          timezone: profile?.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone,
+          avatar_url: profile?.avatar_url || '',
+          email_notifications: profile?.email_notifications ?? true,
+          dark_mode: profile?.dark_mode ?? false,
         });
+        setAvatarPreview(profile?.avatar_url || '');
       }
       setLoading(false);
     };
 
     getUser();
   }, [supabase.auth]);
+
+  const handleAvatarUpload = async (file: File) => {
+    if (!user) return;
+
+    try {
+      // Upload to Supabase Storage
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${user.id}-${Date.now()}.${fileExt}`;
+      const filePath = `avatars/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, file);
+
+      if (uploadError) {
+        setMessage('Failed to upload avatar');
+        setMessageType('error');
+        return;
+      }
+
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(filePath);
+
+      // Update profiles table
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ avatar_url: publicUrl })
+        .eq('id', user.id);
+
+      if (updateError) {
+        setMessage('Failed to update avatar');
+        setMessageType('error');
+        return;
+      }
+
+      setFormData({...formData, avatar_url: publicUrl});
+      setAvatarPreview(publicUrl);
+      setMessage('Avatar updated successfully!');
+      setMessageType('success');
+    } catch (err) {
+      setMessage('An unexpected error occurred');
+      setMessageType('error');
+    }
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        setMessage('Please select an image file');
+        setMessageType('error');
+        return;
+      }
+
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        setMessage('File size must be less than 5MB');
+        setMessageType('error');
+        return;
+      }
+
+      setAvatarFile(file);
+      
+      // Create preview
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setAvatarPreview(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const handleSaveProfile = async () => {
     if (!user) return;
@@ -62,8 +157,15 @@ export default function ProfilePage() {
     setMessage('');
 
     try {
-      const { error } = await supabase.auth.updateUser({
-        data: {
+      // Upload avatar if new file selected
+      if (avatarFile) {
+        await handleAvatarUpload(avatarFile);
+        if (messageType === 'error') return;
+      }
+
+      const { error } = await supabase
+        .from('profiles')
+        .update({
           first_name: formData.firstName,
           last_name: formData.lastName,
           username: formData.username,
@@ -71,8 +173,11 @@ export default function ProfilePage() {
           website: formData.website,
           location: formData.location,
           timezone: formData.timezone,
-        }
-      });
+          avatar_url: formData.avatar_url,
+          email_notifications: formData.email_notifications,
+          dark_mode: formData.dark_mode,
+        })
+        .eq('id', user.id);
 
       if (error) {
         setMessage(error.message);
@@ -81,6 +186,7 @@ export default function ProfilePage() {
         setMessage('Profile updated successfully!');
         setMessageType('success');
         setIsEditing(false);
+        setAvatarFile(null);
       }
     } catch (err) {
       setMessage('An unexpected error occurred');
@@ -264,6 +370,39 @@ export default function ProfilePage() {
             </div>
             
             <div className="p-6 space-y-6">
+              {/* Avatar Upload Section */}
+              <div className="flex items-center space-x-4">
+                <div className="relative">
+                  {avatarPreview ? (
+                    <img
+                      src={avatarPreview}
+                      alt="Profile"
+                      className="w-20 h-20 rounded-full object-cover border-2 border-gray-200"
+                    />
+                  ) : (
+                    <div className="w-20 h-20 rounded-full bg-gray-200 flex items-center justify-center text-2xl font-bold text-gray-500">
+                      {getInitials()}
+                    </div>
+                  )}
+                  <label className="absolute -bottom-1 -right-1 w-8 h-8 bg-[#E07A5F] rounded-full flex items-center justify-center cursor-pointer hover:bg-[#E07A5F]/90 transition-colors">
+                    <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                    </svg>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleFileChange}
+                      className="hidden"
+                    />
+                  </label>
+                </div>
+                <div>
+                  <h3 className="text-lg font-medium text-gray-900">Profile Photo</h3>
+                  <p className="text-sm text-gray-600">Click the + button to upload a new photo</p>
+                  <p className="text-xs text-gray-500">JPG, PNG or GIF. Max size 5MB.</p>
+                </div>
+              </div>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -459,7 +598,12 @@ export default function ProfilePage() {
                     <p className="text-sm text-gray-600">Receive updates about new features</p>
                   </div>
                   <label className="relative inline-flex items-center cursor-pointer">
-                    <input type="checkbox" className="sr-only peer" defaultChecked />
+                    <input 
+                      type="checkbox" 
+                      className="sr-only peer" 
+                      checked={formData.email_notifications}
+                      onChange={(e) => setFormData({...formData, email_notifications: e.target.checked})}
+                    />
                     <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-[#E07A5F]/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
                   </label>
                 </div>
@@ -470,10 +614,25 @@ export default function ProfilePage() {
                     <p className="text-sm text-gray-600">Switch to dark theme <span className="text-[#E07A5F] font-medium">(Coming Soon)</span></p>
                   </div>
                   <label className="relative inline-flex items-center cursor-not-allowed">
-                    <input type="checkbox" className="sr-only peer" disabled />
+                    <input 
+                      type="checkbox" 
+                      className="sr-only peer" 
+                      disabled 
+                      checked={formData.dark_mode}
+                    />
                     <div className="w-11 h-6 bg-gray-200 rounded-full cursor-not-allowed"></div>
                   </label>
                 </div>
+              </div>
+              
+              <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end">
+                <button
+                  onClick={handleSaveProfile}
+                  disabled={loading}
+                  className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-md transition-colors disabled:opacity-50"
+                >
+                  {loading ? 'Saving...' : 'Save Preferences'}
+                </button>
               </div>
             </div>
           </div>
