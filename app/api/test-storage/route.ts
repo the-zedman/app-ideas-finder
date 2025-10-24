@@ -1,9 +1,9 @@
-import { createClient } from '@/lib/supabase-server';
+import { createClient } from '@/lib/supabase';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(request: NextRequest) {
   try {
-    const supabase = await createClient();
+    const supabase = createClient();
     
     // Test if avatars bucket exists and is accessible
     const { data: buckets, error: bucketsError } = await supabase.storage.listBuckets();
