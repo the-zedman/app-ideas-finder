@@ -74,3 +74,11 @@ Dev bypass enabled: true Path: /profile
  ✓ Compiled in 52ms
  ✓ Compiled in 50ms
  ✓ Compiled in 48ms
+Dev bypass enabled: true Path: /profile
+✅ Bypassing auth for development
+ GET /profile 200 in 817ms
+Dev bypass enabled: true Path: /profile
+✅ Bypassing auth for development
+ GET /profile 200 in 143ms
+ ✓ Compiled in 326ms
+ ✓ Compiled in 69ms
