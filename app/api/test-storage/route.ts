@@ -10,8 +10,7 @@ export async function GET(request: NextRequest) {
 
     if (bucketsError) {
       return NextResponse.json({ 
-        error: bucketsError.message, 
-        code: bucketsError.status 
+        error: bucketsError.message
       }, { status: 500 });
     }
 
