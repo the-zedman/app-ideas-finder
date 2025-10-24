@@ -5,12 +5,13 @@ export async function GET(request: NextRequest) {
   try {
     const supabase = await createClient();
     
-    // Test if avatars bucket exists
+    // Test if avatars bucket exists and is accessible
     const { data: buckets, error: bucketsError } = await supabase.storage.listBuckets();
 
     if (bucketsError) {
       return NextResponse.json({ 
-        error: bucketsError.message
+        error: bucketsError.message,
+        details: 'Failed to list buckets'
       }, { status: 500 });
     }
 
@@ -19,7 +20,7 @@ export async function GET(request: NextRequest) {
     if (!avatarsBucket) {
       return NextResponse.json({ 
         error: 'Avatars bucket does not exist',
-        buckets: buckets?.map(b => ({ id: b.id, name: b.name, public: b.public }))
+        availableBuckets: buckets?.map(b => ({ id: b.id, name: b.name, public: b.public })) || []
       }, { status: 404 });
     }
 
