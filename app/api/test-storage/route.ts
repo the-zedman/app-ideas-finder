@@ -5,40 +5,21 @@ export async function GET(request: NextRequest) {
   try {
     const supabase = createClient();
     
-    // Test if avatars bucket exists and is accessible
-    const { data: buckets, error: bucketsError } = await supabase.storage.listBuckets();
-
-    if (bucketsError) {
-      return NextResponse.json({ 
-        error: bucketsError.message,
-        details: 'Failed to list buckets'
-      }, { status: 500 });
-    }
-
-    const avatarsBucket = buckets?.find(bucket => bucket.id === 'avatars');
-    
-    if (!avatarsBucket) {
-      return NextResponse.json({ 
-        error: 'Avatars bucket does not exist',
-        availableBuckets: buckets?.map(b => ({ id: b.id, name: b.name, public: b.public })) || []
-      }, { status: 404 });
-    }
-
-    // Test listing files in avatars bucket
+    // Test if we can access the avatars bucket directly
     const { data: files, error: filesError } = await supabase.storage
       .from('avatars')
       .list('', { limit: 10 });
 
     if (filesError) {
       return NextResponse.json({ 
-        error: `Cannot list files in avatars bucket: ${filesError.message}`,
-        bucket: avatarsBucket
+        error: `Cannot access avatars bucket: ${filesError.message}`,
+        details: 'Bucket may not exist or you may not have permission'
       }, { status: 500 });
     }
 
     return NextResponse.json({ 
       success: true, 
-      bucket: avatarsBucket,
+      message: 'Avatars bucket is accessible',
       files: files || []
     });
 
