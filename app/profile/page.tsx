@@ -110,13 +110,29 @@ export default function ProfilePage() {
         .from('avatars')
         .getPublicUrl(filePath);
 
-      // Update profiles table
-      const { error: updateError } = await supabase
+      // Update profiles table - try update first, then insert if needed
+      let { error: updateError } = await supabase
         .from('profiles')
         .update({ avatar_url: publicUrl })
         .eq('id', user.id);
 
-      if (updateError) {
+      // If update failed (no existing profile), create one
+      if (updateError && updateError.code === 'PGRST116') {
+        const { error: insertError } = await supabase
+          .from('profiles')
+          .insert({
+            id: user.id,
+            avatar_url: publicUrl,
+            email_notifications: true,
+            dark_mode: false
+          });
+
+        if (insertError) {
+          setMessage('Failed to create profile with avatar');
+          setMessageType('error');
+          return;
+        }
+      } else if (updateError) {
         setMessage('Failed to update avatar');
         setMessageType('error');
         return;
@@ -185,7 +201,8 @@ export default function ProfilePage() {
         if (messageType === 'error') return;
       }
 
-      const { data, error } = await supabase
+      // First, try to update existing profile
+      let { data, error } = await supabase
         .from('profiles')
         .update({
           first_name: formData.firstName,
@@ -201,6 +218,32 @@ export default function ProfilePage() {
         })
         .eq('id', user.id)
         .select();
+
+      // If no rows were updated, create a new profile
+      if (!error && (!data || data.length === 0)) {
+        const { data: insertData, error: insertError } = await supabase
+          .from('profiles')
+          .insert({
+            id: user.id,
+            first_name: formData.firstName,
+            last_name: formData.lastName,
+            username: formData.username,
+            bio: formData.bio,
+            website: formData.website,
+            location: formData.location,
+            timezone: formData.timezone,
+            avatar_url: formData.avatar_url,
+            email_notifications: formData.email_notifications,
+            dark_mode: formData.dark_mode,
+          })
+          .select();
+
+        if (insertError) {
+          error = insertError;
+        } else {
+          data = insertData;
+        }
+      }
 
       if (error) {
         console.error('Profile update error:', error);
