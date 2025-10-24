@@ -92,3 +92,6 @@ Dev bypass enabled: true Path: /profile
  ✓ Compiled in 129ms
  ✓ Compiled in 126ms
  ✓ Compiled in 84ms
+ ✓ Compiled in 142ms
+ ✓ Compiled in 78ms
+ ✓ Compiled middleware in 3ms
