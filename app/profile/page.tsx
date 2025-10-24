@@ -185,7 +185,7 @@ export default function ProfilePage() {
         if (messageType === 'error') return;
       }
 
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('profiles')
         .update({
           first_name: formData.firstName,
@@ -199,12 +199,15 @@ export default function ProfilePage() {
           email_notifications: formData.email_notifications,
           dark_mode: formData.dark_mode,
         })
-        .eq('id', user.id);
+        .eq('id', user.id)
+        .select();
 
       if (error) {
-        setMessage(error.message);
+        console.error('Profile update error:', error);
+        setMessage(`Error: ${error.message} (Code: ${error.code})`);
         setMessageType('error');
       } else {
+        console.log('Profile updated successfully:', data);
         setMessage('Profile updated successfully!');
         setMessageType('success');
         setIsEditing(false);
