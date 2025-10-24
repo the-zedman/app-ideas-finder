@@ -77,6 +77,16 @@ export default function ProfilePage() {
   }, [supabase.auth]);
 
   const handleAvatarUpload = async (file: File) => {
+    // In development bypass mode, just show preview without uploading
+    const isDevelopmentBypass = process.env.NODE_ENV === 'development' && 
+                                process.env.NEXT_PUBLIC_DEV_MODE === 'true'
+
+    if (!user && isDevelopmentBypass) {
+      setMessage('Avatar updated successfully! (Development mode - not saved)');
+      setMessageType('success');
+      return;
+    }
+
     if (!user) return;
 
     try {
@@ -151,6 +161,18 @@ export default function ProfilePage() {
   };
 
   const handleSaveProfile = async () => {
+    // In development bypass mode, show success message without database operations
+    const isDevelopmentBypass = process.env.NODE_ENV === 'development' && 
+                                process.env.NEXT_PUBLIC_DEV_MODE === 'true'
+
+    if (!user && isDevelopmentBypass) {
+      setMessage('Profile updated successfully! (Development mode - changes not saved)');
+      setMessageType('success');
+      setIsEditing(false);
+      setAvatarFile(null);
+      return;
+    }
+
     if (!user) return;
 
     setLoading(true);
