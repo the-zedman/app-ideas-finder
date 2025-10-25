@@ -139,13 +139,18 @@ export default function ProfilePage() {
        console.log('User ID match:', authUser?.id === user.id);
        
        // Update profile directly with Supabase client
-       console.log('Updating profile with avatar_url:', publicUrl);
+       console.log('=== AVATAR UPDATE DEBUG ===');
+       console.log('User ID:', user.id);
+       console.log('Avatar URL:', publicUrl);
        
        const { data: updateData, error: updateError } = await supabase
          .from('profiles')
          .update({ avatar_url: publicUrl })
          .eq('id', user.id)
          .select();
+
+       console.log('Update result:', { updateData, updateError });
+       console.log('Rows affected:', updateData?.length || 0);
 
        if (updateError) {
          console.error('Profile update error:', updateError);
@@ -155,6 +160,7 @@ export default function ProfilePage() {
        }
 
        console.log('Profile updated successfully:', updateData);
+       console.log('=== END DEBUG ===');
       
       // Check if the update actually worked by fetching the profile again
       const { data: checkProfile } = await supabase
