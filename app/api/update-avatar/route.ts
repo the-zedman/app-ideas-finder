@@ -11,6 +11,10 @@ export async function POST(request: NextRequest) {
 
     const supabase = await createClient()
     
+    console.log('=== AVATAR UPDATE DEBUG ===')
+    console.log('User ID:', userId)
+    console.log('Avatar URL:', avatarUrl)
+    
     // Update the profile using service role (bypasses RLS)
     const { data, error } = await supabase
       .from('profiles')
@@ -18,12 +22,25 @@ export async function POST(request: NextRequest) {
       .eq('id', userId)
       .select()
 
+    console.log('Update result:', { data, error })
+    console.log('Rows affected:', data?.length || 0)
+
     if (error) {
       console.error('Database update error:', error)
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
-    return NextResponse.json({ success: true, data })
+    // Verify the update worked
+    const { data: verifyData, error: verifyError } = await supabase
+      .from('profiles')
+      .select('avatar_url')
+      .eq('id', userId)
+      .single()
+
+    console.log('Verification:', { verifyData, verifyError })
+    console.log('=== END DEBUG ===')
+
+    return NextResponse.json({ success: true, data, verification: verifyData })
     
   } catch (error) {
     console.error('API error:', error)
