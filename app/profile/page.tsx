@@ -231,17 +231,7 @@ export default function ProfilePage() {
   // Get Gravatar URL from email
   const getGravatarUrl = (email: string, size: number = 200) => {
     const hash = CryptoJS.MD5(email.toLowerCase().trim()).toString();
-    const url = `https://www.gravatar.com/avatar/${hash}?s=${size}&d=identicon`;
-    console.log('Gravatar URL:', url, 'for email:', email);
-    console.log('MD5 Hash:', hash);
-    
-    // Test with a known Gravatar email to verify the function works
-    const testEmail = 'test@example.com';
-    const testHash = CryptoJS.MD5(testEmail.toLowerCase().trim()).toString();
-    const testUrl = `https://www.gravatar.com/avatar/${testHash}?s=${size}&d=identicon`;
-    console.log('Test Gravatar URL:', testUrl);
-    
-    return url;
+    return `https://www.gravatar.com/avatar/${hash}?s=${size}&d=identicon`;
   };
 
   const getInitials = () => {
@@ -268,10 +258,7 @@ export default function ProfilePage() {
   };
 
   const getEmail = () => {
-    const email = user?.email || 'dev@localhost.com';
-    console.log('User email:', email);
-    console.log('User object:', user);
-    return email;
+    return user?.email || 'dev@localhost.com';
   };
 
   if (loading) {
@@ -371,13 +358,11 @@ export default function ProfilePage() {
                       alt="Profile" 
                       className="w-full h-full object-cover absolute inset-0"
                       onLoad={() => {
-                        console.log('Gravatar loaded successfully');
                         // Hide initials when Gravatar loads
                         const initialsDiv = document.querySelector('.gravatar-initials') as HTMLElement;
                         if (initialsDiv) initialsDiv.style.display = 'none';
                       }}
                       onError={(e) => {
-                        console.log('Gravatar failed to load, showing initials');
                         // If Gravatar fails to load, hide the image to show initials
                         e.currentTarget.style.display = 'none';
                       }}
@@ -392,9 +377,6 @@ export default function ProfilePage() {
                   <p className="text-sm text-gray-600">Shows your Gravatar if available, otherwise your initials</p>
                   <p className="text-xs text-gray-500 mt-1">
                     Set up your Gravatar at <a href="https://gravatar.com" target="_blank" rel="noopener noreferrer" className="text-[#E07A5F] hover:underline">gravatar.com</a>
-                  </p>
-                  <p className="text-xs text-gray-400 mt-2">
-                    Debug: <a href={getGravatarUrl(getEmail(), 80)} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">Test Gravatar URL</a>
                   </p>
                 </div>
               </div>

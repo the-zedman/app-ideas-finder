@@ -120,13 +120,11 @@ export default function HomeZone() {
                 alt="Profile" 
                 className="w-full h-full object-cover absolute inset-0"
                 onLoad={() => {
-                  console.log('Gravatar loaded successfully in homezone');
                   // Hide initials when Gravatar loads
                   const initialsDiv = document.querySelector('.homezone-gravatar-initials') as HTMLElement;
                   if (initialsDiv) initialsDiv.style.display = 'none';
                 }}
                 onError={(e) => {
-                  console.log('Gravatar failed to load in homezone, showing initials');
                   // If Gravatar fails to load, hide the image to show initials
                   e.currentTarget.style.display = 'none';
                 }}
