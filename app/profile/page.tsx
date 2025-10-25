@@ -138,38 +138,12 @@ export default function ProfilePage() {
        console.log('Session error:', sessionError);
        console.log('User ID match:', authUser?.id === user.id);
        
-       // Update the database immediately - same as first name/last name updates
-       const { data: updateData, error: updateError } = await supabase
-         .from('profiles')
-         .update({ avatar_url: publicUrl })
-         .eq('id', user.id)
-         .select();
-
-       if (updateError) {
-         console.error('Database update error:', updateError);
-         setMessage(`Failed to save avatar: ${updateError.message}`);
-         setMessageType('error');
-         return;
-       }
-
-       // Force verification by fetching the updated data
-       const { data: verifyData, error: verifyError } = await supabase
-         .from('profiles')
-         .select('avatar_url')
-         .eq('id', user.id)
-         .single();
-
-       if (verifyError || !verifyData || verifyData.avatar_url !== publicUrl) {
-         console.error('Database verification failed:', verifyError);
-         setMessage('Avatar upload failed - please try again');
-         setMessageType('error');
-         return;
-       }
-
+       // Just update form data - let the save mechanism handle database update
        setFormData({...formData, avatar_url: publicUrl});
        setAvatarPreview(publicUrl);
-       setMessage('Avatar updated successfully!');
-       setMessageType('success');
+       
+       // Trigger the save mechanism that works in v2
+       await handleSaveProfile();
       
       // Check if the update actually worked by fetching the profile again
       const { data: checkProfile } = await supabase
