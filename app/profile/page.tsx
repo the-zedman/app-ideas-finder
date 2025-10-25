@@ -138,10 +138,17 @@ export default function ProfilePage() {
        console.log('Session error:', sessionError);
        console.log('User ID match:', authUser?.id === user.id);
        
-       // Update database immediately - same as first name/last name updates
+       // Update form data first
+       setFormData({...formData, avatar_url: publicUrl});
+       setAvatarPreview(publicUrl);
+       
+       // Force a dummy update to trigger the working v2 mechanism
        const { data: updateData, error: updateError } = await supabase
          .from('profiles')
-         .update({ avatar_url: publicUrl })
+         .update({ 
+           avatar_url: publicUrl,
+           updated_at: new Date().toISOString()
+         })
          .eq('id', user.id)
          .select();
 
@@ -152,8 +159,6 @@ export default function ProfilePage() {
          return;
        }
 
-       setFormData({...formData, avatar_url: publicUrl});
-       setAvatarPreview(publicUrl);
        setMessage('Avatar updated successfully!');
        setMessageType('success');
       
