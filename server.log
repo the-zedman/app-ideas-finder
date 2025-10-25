@@ -161,3 +161,16 @@ Dev bypass enabled: true Path: /profile
  ✓ Compiled in 389ms
  ✓ Compiled in 245ms
  ✓ Compiled in 161ms
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+Dev bypass enabled: true Path: /profile
+✅ Bypassing auth for development
+ ✓ Compiled /profile in 250ms
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ GET /profile 200 in 1061ms
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ ✓ Compiled in 668ms
+ ✓ Compiled in 113ms
+ ✓ Compiled in 78ms
+ ✓ Compiled in 404ms
+ ✓ Compiled in 59ms
+ ✓ Compiled in 118ms

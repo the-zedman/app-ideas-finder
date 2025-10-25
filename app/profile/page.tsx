@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { createClient } from '@/lib/supabase-client';
 import type { User } from '@supabase/supabase-js';
+import CryptoJS from 'crypto-js';
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -229,9 +230,10 @@ export default function ProfilePage() {
 
   // Get Gravatar URL from email
   const getGravatarUrl = (email: string, size: number = 200) => {
-    const crypto = require('crypto');
-    const hash = crypto.createHash('md5').update(email.toLowerCase().trim()).digest('hex');
-    return `https://www.gravatar.com/avatar/${hash}?s=${size}&d=identicon`;
+    const hash = CryptoJS.MD5(email.toLowerCase().trim()).toString();
+    const url = `https://www.gravatar.com/avatar/${hash}?s=${size}&d=identicon`;
+    console.log('Gravatar URL:', url, 'for email:', email);
+    return url;
   };
 
   const getInitials = () => {
@@ -357,7 +359,9 @@ export default function ProfilePage() {
                       src={getGravatarUrl(getEmail(), 80)} 
                       alt="Profile" 
                       className="w-full h-full object-cover"
+                      onLoad={() => console.log('Gravatar loaded successfully')}
                       onError={(e) => {
+                        console.log('Gravatar failed to load, showing initials');
                         // If Gravatar fails to load, hide the image to show initials
                         e.currentTarget.style.display = 'none';
                       }}
