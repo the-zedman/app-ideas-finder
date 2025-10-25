@@ -123,6 +123,15 @@ export default function ProfilePage() {
         .select();
 
       console.log('Update result:', { updateData, updateError });
+      console.log('Updated data:', updateData);
+      
+      // Check if the update actually worked by fetching the profile again
+      const { data: checkProfile } = await supabase
+        .from('profiles')
+        .select('avatar_url')
+        .eq('id', user.id)
+        .single();
+      console.log('Avatar URL after update:', checkProfile?.avatar_url);
 
       // If update failed (no existing profile), create one
       if (updateError && updateError.code === 'PGRST116') {
