@@ -138,12 +138,11 @@ export default function ProfilePage() {
        console.log('Session error:', sessionError);
        console.log('User ID match:', authUser?.id === user.id);
        
-       // Just update form data - let the save mechanism handle database update
+       // Just update form data - don't trigger save automatically
        setFormData({...formData, avatar_url: publicUrl});
        setAvatarPreview(publicUrl);
-       
-       // Trigger the save mechanism that works in v2
-       await handleSaveProfile();
+       setMessage('Avatar uploaded! Click Save to update your profile.');
+       setMessageType('success');
       
       // Check if the update actually worked by fetching the profile again
       const { data: checkProfile } = await supabase
