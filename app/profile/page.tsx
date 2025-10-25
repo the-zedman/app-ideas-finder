@@ -138,27 +138,10 @@ export default function ProfilePage() {
        console.log('Session error:', sessionError);
        console.log('User ID match:', authUser?.id === user.id);
        
-       // Use raw SQL query to bypass Supabase client issues
-       console.log('=== AVATAR UPDATE DEBUG ===');
-       console.log('User ID:', user.id);
-       console.log('Avatar URL:', publicUrl);
-       
-       const { data: updateData, error: updateError } = await supabase.rpc('update_avatar_url', {
-         user_id: user.id,
-         avatar_url: publicUrl
-       });
-
-       console.log('Update result:', { updateData, updateError });
-
-       if (updateError) {
-         console.error('Profile update error:', updateError);
-         setMessage(`Failed to save avatar: ${updateError.message}`);
-         setMessageType('error');
-         return;
-       }
-
-       console.log('Profile updated successfully:', updateData);
-       console.log('=== END DEBUG ===');
+       // Just update the form data - the main save will handle the database update
+       console.log('Setting avatar URL in form data:', publicUrl);
+       setFormData({...formData, avatar_url: publicUrl});
+       setAvatarPreview(publicUrl);
       
       // Check if the update actually worked by fetching the profile again
       const { data: checkProfile } = await supabase
