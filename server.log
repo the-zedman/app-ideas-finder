@@ -117,3 +117,4 @@ Dev bypass enabled: true Path: /profile
  GET /profile 200 in 151ms
  ✓ Compiled in 456ms
  ✓ Compiled in 151ms
+ ✓ Compiled in 470ms

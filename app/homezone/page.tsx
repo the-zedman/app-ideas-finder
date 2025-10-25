@@ -23,11 +23,16 @@ export default function HomeZone() {
       
       if (user) {
         // Fetch profile data
-        const { data: profileData } = await supabase
+        const { data: profileData, error } = await supabase
           .from('profiles')
           .select('*')
           .eq('id', user.id)
           .single();
+        
+        console.log('Profile data:', profileData);
+        console.log('Profile error:', error);
+        console.log('Avatar URL:', profileData?.avatar_url);
+        
         setProfile(profileData);
       }
       

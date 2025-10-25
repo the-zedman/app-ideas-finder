@@ -54,6 +54,9 @@ export default function ProfilePage() {
         if (error && error.code !== 'PGRST116') {
           console.error('Error fetching profile:', error);
         }
+        
+        console.log('Profile data from database:', profile);
+        console.log('Avatar URL from database:', profile?.avatar_url);
 
         setFormData({
           firstName: profile?.first_name || '',
