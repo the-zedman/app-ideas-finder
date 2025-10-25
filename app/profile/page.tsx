@@ -129,13 +129,19 @@ export default function ProfilePage() {
         .from('avatars')
         .getPublicUrl(filePath);
 
-      // Update profiles table - try update first, then insert if needed
-      console.log('Updating profile with avatar_url:', publicUrl);
-      let { data: updateData, error: updateError } = await supabase
-        .from('profiles')
-        .update({ avatar_url: publicUrl })
-        .eq('id', user.id)
-        .select();
+       // Check if user is authenticated in Supabase context
+       const { data: { user: authUser }, error: authError } = await supabase.auth.getUser();
+       console.log('Auth user in context:', authUser?.id);
+       console.log('Auth error:', authError);
+       console.log('User ID match:', authUser?.id === user.id);
+       
+       // Update profiles table - try update first, then insert if needed
+       console.log('Updating profile with avatar_url:', publicUrl);
+       let { data: updateData, error: updateError } = await supabase
+         .from('profiles')
+         .update({ avatar_url: publicUrl })
+         .eq('id', user.id)
+         .select();
 
       console.log('Update result:', { updateData, updateError });
       console.log('Updated data:', updateData);
