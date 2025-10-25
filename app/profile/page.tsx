@@ -372,38 +372,34 @@ export default function ProfilePage() {
                     </div>
                   </div>
                 </div>
-                <div>
+                <div className="flex-1">
                   <h3 className="text-lg font-medium text-gray-900">Profile Display</h3>
                   <p className="text-sm text-gray-600">Shows your Gravatar if available, otherwise your initials</p>
                   <p className="text-xs text-gray-500 mt-1">
                     Set up your Gravatar at <a href="https://gravatar.com" target="_blank" rel="noopener noreferrer" className="text-[#E07A5F] hover:underline">gravatar.com</a>
                   </p>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Custom Initials
-                  </label>
-                  <div className="flex">
+                  
+                  {/* Custom Initials Setting */}
+                  <div className="mt-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Custom Initials
+                    </label>
                     <input
                       type="text"
                       value={formData.customInitials}
                       onChange={(e) => setFormData({...formData, customInitials: e.target.value})}
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#E07A5F] focus:border-transparent"
                       placeholder="e.g., JR"
                       maxLength={3}
+                      className="w-32 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#E07A5F] focus:border-transparent"
                     />
-                    <button className="ml-2 p-2 text-gray-400 hover:text-gray-600">
-                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
-                      </svg>
-                    </button>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Set custom initials to display instead of your name initials (max 3 characters)
+                    </p>
                   </div>
-                  <p className="text-xs text-gray-500 mt-1">Set custom initials (max 3 characters)</p>
                 </div>
+              </div>
 
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     First name
