@@ -138,29 +138,23 @@ export default function ProfilePage() {
        console.log('Session error:', sessionError);
        console.log('User ID match:', authUser?.id === user.id);
        
-       // Use API route to update profile (bypasses RLS issues)
+       // Update profile directly with Supabase client
        console.log('Updating profile with avatar_url:', publicUrl);
        
-       const response = await fetch('/api/update-avatar', {
-         method: 'POST',
-         headers: {
-           'Content-Type': 'application/json',
-         },
-         body: JSON.stringify({
-           userId: user.id,
-           avatarUrl: publicUrl
-         })
-       });
+       const { data: updateData, error: updateError } = await supabase
+         .from('profiles')
+         .update({ avatar_url: publicUrl })
+         .eq('id', user.id)
+         .select();
 
-       const result = await response.json();
-       console.log('API response:', result);
-
-       if (!response.ok) {
-         console.error('API update error:', result.error);
-         setMessage(`Failed to save avatar: ${result.error}`);
+       if (updateError) {
+         console.error('Profile update error:', updateError);
+         setMessage(`Failed to save avatar: ${updateError.message}`);
          setMessageType('error');
          return;
        }
+
+       console.log('Profile updated successfully:', updateData);
       
       // Check if the update actually worked by fetching the profile again
       const { data: checkProfile } = await supabase
