@@ -165,36 +165,6 @@ export default function ProfilePage() {
     }
   };
 
-  const handleChangePassword = async () => {
-    const email = getEmail();
-    if (!email || email === 'dev@localhost.com') {
-      setMessage('Cannot change password in development mode');
-      setMessageType('error');
-      return;
-    }
-
-    setLoading(true);
-    setMessage('');
-
-    try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/auth/callback?next=/profile`,
-      });
-
-      if (error) {
-        setMessage(error.message);
-        setMessageType('error');
-      } else {
-        setMessage('Password reset email sent! Check your inbox.');
-        setMessageType('success');
-      }
-    } catch (err) {
-      setMessage('An unexpected error occurred');
-      setMessageType('error');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleDeleteAccount = async () => {
     if (!confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
@@ -493,22 +463,30 @@ export default function ProfilePage() {
           <div className="space-y-6">
             <div className="bg-white rounded-lg shadow-sm border border-gray-200">
               <div className="px-6 py-4 border-b border-gray-200">
-                <h2 className="text-lg font-semibold text-gray-900">Password & Security</h2>
+                <h2 className="text-lg font-semibold text-gray-900">Account Security</h2>
               </div>
               
               <div className="p-6 space-y-4">
-                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                  <div>
-                    <h4 className="font-medium text-gray-900">Change Password</h4>
-                    <p className="text-sm text-gray-600">Update your account password</p>
+                {/* Login Method Display */}
+                <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                  <div className="flex items-center space-x-3">
+                    <div className="flex-shrink-0">
+                      {getProviderIcon()}
+                    </div>
+                    <div>
+                      <h4 className="font-medium text-blue-900">Login Method</h4>
+                      <p className="text-sm text-blue-700">
+                        You're signed in with {user?.app_metadata?.provider === 'github' ? 'GitHub' : 
+                        user?.app_metadata?.provider === 'google' ? 'Google' : 
+                        user?.app_metadata?.provider === 'email' ? 'Magic Link' : 'OAuth'}
+                      </p>
+                      <p className="text-xs text-blue-600 mt-1">
+                        Your account is secured through {user?.app_metadata?.provider === 'github' ? 'GitHub' : 
+                        user?.app_metadata?.provider === 'google' ? 'Google' : 
+                        user?.app_metadata?.provider === 'email' ? 'Magic Link authentication' : 'OAuth authentication'}
+                      </p>
+                    </div>
                   </div>
-                  <button
-                    onClick={handleChangePassword}
-                    disabled={loading}
-                    className="px-4 py-2 bg-[#E07A5F] hover:bg-[#E07A5F]/90 text-white font-medium rounded-md transition-colors disabled:opacity-50"
-                  >
-                    Change
-                  </button>
                 </div>
 
                 <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
