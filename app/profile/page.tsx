@@ -138,8 +138,23 @@ export default function ProfilePage() {
        console.log('Session error:', sessionError);
        console.log('User ID match:', authUser?.id === user.id);
        
-       // Just update the form data - the main save will handle the database update
-       console.log('Setting avatar URL in form data:', publicUrl);
+       // Update the database immediately
+       console.log('Updating database with avatar URL:', publicUrl);
+       
+       const { data: updateData, error: updateError } = await supabase
+         .from('profiles')
+         .update({ avatar_url: publicUrl })
+         .eq('id', user.id)
+         .select();
+
+       if (updateError) {
+         console.error('Database update error:', updateError);
+         setMessage(`Failed to save avatar: ${updateError.message}`);
+         setMessageType('error');
+         return;
+       }
+
+       console.log('Database updated successfully:', updateData);
        setFormData({...formData, avatar_url: publicUrl});
        setAvatarPreview(publicUrl);
       
