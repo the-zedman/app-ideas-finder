@@ -131,45 +131,36 @@ export default function ProfilePage() {
 
        // Check if user is authenticated in Supabase context
        const { data: { user: authUser }, error: authError } = await supabase.auth.getUser();
+       const { data: { session }, error: sessionError } = await supabase.auth.getSession();
        console.log('Auth user in context:', authUser?.id);
        console.log('Auth error:', authError);
+       console.log('Session exists:', !!session);
+       console.log('Session error:', sessionError);
        console.log('User ID match:', authUser?.id === user.id);
        
-       // Update profiles table - try update first, then insert if needed
+       // Use API route to update profile (bypasses RLS issues)
        console.log('Updating profile with avatar_url:', publicUrl);
-       let { data: updateData, error: updateError } = await supabase
-         .from('profiles')
-         .update({ avatar_url: publicUrl })
-         .eq('id', user.id)
-         .select();
+       
+       const response = await fetch('/api/update-avatar', {
+         method: 'POST',
+         headers: {
+           'Content-Type': 'application/json',
+         },
+         body: JSON.stringify({
+           userId: user.id,
+           avatarUrl: publicUrl
+         })
+       });
 
-      console.log('Update result:', { updateData, updateError });
-      console.log('Updated data:', updateData);
-      
-      // If update failed, try to insert a new profile
-      if (updateError) {
-        console.log('Update failed, trying to insert new profile');
-        const { data: insertData, error: insertError } = await supabase
-          .from('profiles')
-          .insert({
-            id: user.id,
-            avatar_url: publicUrl,
-            email_notifications: true,
-            dark_mode: false
-          })
-          .select();
+       const result = await response.json();
+       console.log('API response:', result);
 
-        if (insertError) {
-          console.error('Profile insert error:', insertError);
-          setMessage(`Failed to save avatar: ${insertError.message}`);
-          setMessageType('error');
-          return;
-        }
-        
-        console.log('Profile inserted successfully:', insertData);
-      } else {
-        console.log('Profile updated successfully:', updateData);
-      }
+       if (!response.ok) {
+         console.error('API update error:', result.error);
+         setMessage(`Failed to save avatar: ${result.error}`);
+         setMessageType('error');
+         return;
+       }
       
       // Check if the update actually worked by fetching the profile again
       const { data: checkProfile } = await supabase
