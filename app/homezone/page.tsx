@@ -66,6 +66,13 @@ export default function HomeZone() {
     return 'User';
   };
 
+  // Get Gravatar URL from email
+  const getGravatarUrl = (email: string, size: number = 200) => {
+    const crypto = require('crypto');
+    const hash = crypto.createHash('md5').update(email.toLowerCase().trim()).digest('hex');
+    return `https://www.gravatar.com/avatar/${hash}?s=${size}&d=identicon`;
+  };
+
   const getInitials = () => {
     if (profile?.custom_initials) return profile.custom_initials.toUpperCase();
     if (profile?.first_name && profile?.last_name) {
@@ -105,10 +112,21 @@ export default function HomeZone() {
           <div className="relative">
             <button 
               onClick={() => setShowProfileMenu(!showProfileMenu)}
-              className="w-11 h-11 rounded-full bg-[#E07A5F] flex items-center justify-center text-white font-semibold active:scale-95 transition-transform overflow-hidden"
+              className="w-11 h-11 rounded-full bg-[#E07A5F] flex items-center justify-center text-white font-semibold active:scale-95 transition-transform overflow-hidden relative"
               aria-label="Profile"
             >
-              {getInitials()}
+              <img 
+                src={getGravatarUrl(user?.email || '', 44)} 
+                alt="Profile" 
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  // If Gravatar fails to load, hide the image to show initials
+                  e.currentTarget.style.display = 'none';
+                }}
+              />
+              <div className="absolute inset-0 flex items-center justify-center bg-[#E07A5F] text-white text-sm font-semibold">
+                {getInitials()}
+              </div>
             </button>
 
             {/* Profile Dropdown Menu */}
