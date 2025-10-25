@@ -152,6 +152,20 @@ export default function ProfilePage() {
          return;
        }
 
+       // Force verification by fetching the updated data
+       const { data: verifyData, error: verifyError } = await supabase
+         .from('profiles')
+         .select('avatar_url')
+         .eq('id', user.id)
+         .single();
+
+       if (verifyError || !verifyData || verifyData.avatar_url !== publicUrl) {
+         console.error('Database verification failed:', verifyError);
+         setMessage('Avatar upload failed - please try again');
+         setMessageType('error');
+         return;
+       }
+
        setFormData({...formData, avatar_url: publicUrl});
        setAvatarPreview(publicUrl);
        setMessage('Avatar updated successfully!');
