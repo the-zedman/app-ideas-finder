@@ -128,3 +128,6 @@ Dev bypass enabled: true Path: /profile
  ✓ Compiled in 503ms
  ✓ Compiled middleware in 25ms
  ✓ Compiled in 159ms
+Dev bypass enabled: true Path: /profile
+✅ Bypassing auth for development
+ GET /profile 200 in 784ms
