@@ -93,6 +93,21 @@ export default function ProfilePage() {
     if (!user) return;
 
     try {
+      // Delete old avatar if it exists
+      if (formData.avatar_url) {
+        try {
+          const oldFileName = formData.avatar_url.split('/').pop();
+          if (oldFileName) {
+            await supabase.storage
+              .from('avatars')
+              .remove([`avatars/${oldFileName}`]);
+            console.log('Deleted old avatar:', oldFileName);
+          }
+        } catch (deleteError) {
+          console.log('No old avatar to delete or delete failed:', deleteError);
+        }
+      }
+
       // Upload to Supabase Storage
       const fileExt = file.name.split('.').pop();
       const fileName = `${user.id}-${Date.now()}.${fileExt}`;
@@ -162,10 +177,19 @@ export default function ProfilePage() {
       setMessage('Avatar updated successfully!');
       setMessageType('success');
       
-      // Refresh user data to update the avatar
-      const { data: { user: updatedUser } } = await supabase.auth.getUser();
-      if (updatedUser) {
-        setUser(updatedUser);
+      // Force refresh the profile data from database
+      const { data: refreshedProfile } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+      
+      if (refreshedProfile) {
+        setFormData({
+          ...formData,
+          avatar_url: refreshedProfile.avatar_url || publicUrl
+        });
+        setAvatarPreview(refreshedProfile.avatar_url || publicUrl);
       }
     } catch (err) {
       setMessage('An unexpected error occurred');
