@@ -143,6 +143,7 @@ export default function ProfilePage() {
        setAvatarPreview(publicUrl);
        
        // First update attempt (often fails silently)
+       console.log('=== FIRST UPDATE ATTEMPT ===');
        const { data: updateData, error: updateError } = await supabase
          .from('profiles')
          .update({ 
@@ -152,6 +153,8 @@ export default function ProfilePage() {
          .eq('id', user.id)
          .select();
 
+       console.log('First update result:', { updateData, updateError });
+
        if (updateError) {
          console.error('Database update error:', updateError);
          setMessage(`Failed to save avatar: ${updateError.message}`);
@@ -160,6 +163,7 @@ export default function ProfilePage() {
        }
 
        // Force second update to ensure it persists (like v2 process)
+       console.log('=== SECOND UPDATE ATTEMPT ===');
        const { data: secondUpdate, error: secondError } = await supabase
          .from('profiles')
          .update({ 
@@ -167,6 +171,8 @@ export default function ProfilePage() {
          })
          .eq('id', user.id)
          .select();
+
+       console.log('Second update result:', { secondUpdate, secondError });
 
        if (secondError) {
          console.error('Second update error:', secondError);
