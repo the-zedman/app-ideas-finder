@@ -31,7 +31,6 @@ export default function HomeZone() {
         
         console.log('Profile data:', profileData);
         console.log('Profile error:', error);
-        console.log('Avatar URL:', profileData?.avatar_url);
         
         setProfile(profileData);
       }
@@ -68,6 +67,10 @@ export default function HomeZone() {
   };
 
   const getInitials = () => {
+    if (profile?.custom_initials) return profile.custom_initials.toUpperCase();
+    if (profile?.first_name && profile?.last_name) {
+      return `${profile.first_name[0]}${profile.last_name[0]}`.toUpperCase();
+    }
     const name = getDisplayName();
     return name.charAt(0).toUpperCase();
   };
@@ -105,15 +108,7 @@ export default function HomeZone() {
               className="w-11 h-11 rounded-full bg-[#E07A5F] flex items-center justify-center text-white font-semibold active:scale-95 transition-transform overflow-hidden"
               aria-label="Profile"
             >
-              {profile?.avatar_url ? (
-                <img 
-                  src={profile.avatar_url} 
-                  alt="Profile" 
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                getInitials()
-              )}
+              {getInitials()}
             </button>
 
             {/* Profile Dropdown Menu */}
