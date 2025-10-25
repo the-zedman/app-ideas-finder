@@ -140,6 +140,31 @@ export default function ProfilePage() {
       console.log('Update result:', { updateData, updateError });
       console.log('Updated data:', updateData);
       
+      // If update failed, try to insert a new profile
+      if (updateError) {
+        console.log('Update failed, trying to insert new profile');
+        const { data: insertData, error: insertError } = await supabase
+          .from('profiles')
+          .insert({
+            id: user.id,
+            avatar_url: publicUrl,
+            email_notifications: true,
+            dark_mode: false
+          })
+          .select();
+
+        if (insertError) {
+          console.error('Profile insert error:', insertError);
+          setMessage(`Failed to save avatar: ${insertError.message}`);
+          setMessageType('error');
+          return;
+        }
+        
+        console.log('Profile inserted successfully:', insertData);
+      } else {
+        console.log('Profile updated successfully:', updateData);
+      }
+      
       // Check if the update actually worked by fetching the profile again
       const { data: checkProfile } = await supabase
         .from('profiles')
@@ -148,29 +173,6 @@ export default function ProfilePage() {
         .single();
       console.log('Avatar URL after update:', checkProfile?.avatar_url);
 
-      // If update failed (no existing profile), create one
-      if (updateError && updateError.code === 'PGRST116') {
-        const { error: insertError } = await supabase
-          .from('profiles')
-          .insert({
-            id: user.id,
-            avatar_url: publicUrl,
-            email_notifications: true,
-            dark_mode: false
-          });
-
-        if (insertError) {
-          console.error('Profile insert error:', insertError);
-          setMessage(`Failed to create profile with avatar: ${insertError.message}`);
-          setMessageType('error');
-          return;
-        }
-      } else if (updateError) {
-        console.error('Profile update error:', updateError);
-        setMessage(`Failed to update avatar: ${updateError.message}`);
-        setMessageType('error');
-        return;
-      }
 
       setFormData({...formData, avatar_url: publicUrl});
       setAvatarPreview(publicUrl);
