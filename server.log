@@ -158,3 +158,4 @@ Dev bypass enabled: true Path: /profile
  ✓ Compiled /favicon.ico in 2.5s
  GET /favicon.ico?favicon.e871b922.ico 200 in 2902ms
  ✓ Compiled in 1261ms
+ ✓ Compiled in 389ms
