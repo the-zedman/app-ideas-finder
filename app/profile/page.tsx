@@ -115,10 +115,14 @@ export default function ProfilePage() {
         .getPublicUrl(filePath);
 
       // Update profiles table - try update first, then insert if needed
-      let { error: updateError } = await supabase
+      console.log('Updating profile with avatar_url:', publicUrl);
+      let { data: updateData, error: updateError } = await supabase
         .from('profiles')
         .update({ avatar_url: publicUrl })
-        .eq('id', user.id);
+        .eq('id', user.id)
+        .select();
+
+      console.log('Update result:', { updateData, updateError });
 
       // If update failed (no existing profile), create one
       if (updateError && updateError.code === 'PGRST116') {
