@@ -145,6 +145,12 @@ export default function ProfilePage() {
       setAvatarPreview(publicUrl);
       setMessage('Avatar updated successfully!');
       setMessageType('success');
+      
+      // Refresh user data to update the avatar
+      const { data: { user: updatedUser } } = await supabase.auth.getUser();
+      if (updatedUser) {
+        setUser(updatedUser);
+      }
     } catch (err) {
       setMessage('An unexpected error occurred');
       setMessageType('error');
