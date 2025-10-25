@@ -10,6 +10,7 @@ export default function HomeZone() {
   const router = useRouter();
   const [selectedTab, setSelectedTab] = useState('discover');
   const [user, setUser] = useState<User | null>(null);
+  const [profile, setProfile] = useState<any>(null);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [loading, setLoading] = useState(true);
   
@@ -19,6 +20,17 @@ export default function HomeZone() {
     const getUser = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       setUser(user);
+      
+      if (user) {
+        // Fetch profile data
+        const { data: profileData } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', user.id)
+          .single();
+        setProfile(profileData);
+      }
+      
       setLoading(false);
     };
 
@@ -85,10 +97,18 @@ export default function HomeZone() {
           <div className="relative">
             <button 
               onClick={() => setShowProfileMenu(!showProfileMenu)}
-              className="w-11 h-11 rounded-full bg-[#E07A5F] flex items-center justify-center text-white font-semibold active:scale-95 transition-transform"
+              className="w-11 h-11 rounded-full bg-[#E07A5F] flex items-center justify-center text-white font-semibold active:scale-95 transition-transform overflow-hidden"
               aria-label="Profile"
             >
-              {getInitials()}
+              {profile?.avatar_url ? (
+                <img 
+                  src={profile.avatar_url} 
+                  alt="Profile" 
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                getInitials()
+              )}
             </button>
 
             {/* Profile Dropdown Menu */}
