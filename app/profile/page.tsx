@@ -142,41 +142,18 @@ export default function ProfilePage() {
        setFormData({...formData, avatar_url: publicUrl});
        setAvatarPreview(publicUrl);
        
-       // First update attempt (often fails silently)
-       console.log('=== FIRST UPDATE ATTEMPT ===');
-       const { data: updateData, error: updateError } = await supabase
-         .from('profiles')
-         .update({ 
-           avatar_url: publicUrl,
-           updated_at: new Date().toISOString()
-         })
-         .eq('id', user.id)
-         .select();
+       // Use raw SQL query instead of .update() method
+       console.log('=== RAW SQL UPDATE ===');
+       const { data: sqlData, error: sqlError } = await supabase.rpc('update_avatar_url', {
+         user_id: user.id,
+         avatar_url: publicUrl
+       });
 
-       console.log('First update result:', { updateData, updateError });
+       console.log('Raw SQL result:', { sqlData, sqlError });
 
-       if (updateError) {
-         console.error('Database update error:', updateError);
-         setMessage(`Failed to save avatar: ${updateError.message}`);
-         setMessageType('error');
-         return;
-       }
-
-       // Force second update to ensure it persists (like v2 process)
-       console.log('=== SECOND UPDATE ATTEMPT ===');
-       const { data: secondUpdate, error: secondError } = await supabase
-         .from('profiles')
-         .update({ 
-           avatar_url: publicUrl
-         })
-         .eq('id', user.id)
-         .select();
-
-       console.log('Second update result:', { secondUpdate, secondError });
-
-       if (secondError) {
-         console.error('Second update error:', secondError);
-         setMessage(`Avatar upload may have failed - please try again`);
+       if (sqlError) {
+         console.error('Raw SQL error:', sqlError);
+         setMessage(`Failed to save avatar: ${sqlError.message}`);
          setMessageType('error');
          return;
        }
