@@ -141,10 +141,10 @@ export default function HomeZone() {
                   className="fixed inset-0 z-40" 
                   onClick={() => setShowProfileMenu(false)}
                 />
-                <div className="absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-lg border border-grey/30 z-50 overflow-hidden">
-                  <div className="p-4 border-b border-grey/30">
-                    <p className="font-semibold text-[#3D405B]">{getDisplayName()}</p>
-                    <p className="text-sm text-[#3D405B]/60 truncate">{user?.email}</p>
+                <div className="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-xl border border-gray-200 z-50 overflow-hidden">
+                  <div className="p-4 border-b border-gray-200">
+                    <p className="font-semibold text-gray-900">{getDisplayName()}</p>
+                    <p className="text-sm text-gray-600 truncate">{user?.email}</p>
                   </div>
                   <div className="p-2">
                         <button
@@ -152,7 +152,7 @@ export default function HomeZone() {
                             setShowProfileMenu(false);
                             router.push('/profile');
                           }}
-                          className="w-full text-left px-4 py-3 rounded-xl hover:bg-black/5 text-[#3D405B] transition-colors"
+                          className="w-full text-left px-4 py-3 rounded-lg hover:bg-gray-50 text-gray-900 transition-colors"
                         >
                           Profile Settings
                         </button>
@@ -161,7 +161,7 @@ export default function HomeZone() {
                         setShowProfileMenu(false);
                         handleLogout();
                       }}
-                      className="w-full text-left px-4 py-3 rounded-xl hover:bg-red-50 text-red-600 transition-colors"
+                      className="w-full text-left px-4 py-3 rounded-lg hover:bg-red-50 text-red-600 transition-colors"
                     >
                       Sign Out
                     </button>
