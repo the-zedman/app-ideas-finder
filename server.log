@@ -148,3 +148,13 @@ Dev bypass enabled: true Path: /profile
  ✓ Compiled in 400ms
  ✓ Compiled in 248ms
  ✓ Compiled in 273ms
+ ✓ Compiled in 1537ms
+ ✓ Compiled in 264ms
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+Dev bypass enabled: true Path: /profile
+✅ Bypassing auth for development
+ GET /profile 200 in 1942ms
+ ○ Compiling /favicon.ico ...
+ ✓ Compiled /favicon.ico in 2.5s
+ GET /favicon.ico?favicon.e871b922.ico 200 in 2902ms
+ ✓ Compiled in 1261ms
