@@ -136,26 +136,33 @@ export default function HomeZone() {
 
             {/* Profile Dropdown Menu */}
             {showProfileMenu && (
-              <>
+              <div className="relative">
                 <div 
                   className="fixed inset-0 z-40" 
                   onClick={() => setShowProfileMenu(false)}
                 />
-                <div className="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-xl border border-gray-200 z-50 overflow-hidden">
+                <div 
+                  className="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-xl border border-gray-200 z-50"
+                  style={{ 
+                    backgroundColor: '#ffffff',
+                    opacity: 1,
+                    zIndex: 9999
+                  }}
+                >
                   <div className="p-4 border-b border-gray-200">
                     <p className="font-semibold text-gray-900">{getDisplayName()}</p>
                     <p className="text-sm text-gray-600 truncate">{user?.email}</p>
                   </div>
                   <div className="p-2">
-                        <button
-                          onClick={() => {
-                            setShowProfileMenu(false);
-                            router.push('/profile');
-                          }}
-                          className="w-full text-left px-4 py-3 rounded-lg hover:bg-gray-50 text-gray-900 transition-colors"
-                        >
-                          Profile Settings
-                        </button>
+                    <button
+                      onClick={() => {
+                        setShowProfileMenu(false);
+                        router.push('/profile');
+                      }}
+                      className="w-full text-left px-4 py-3 rounded-lg hover:bg-gray-50 text-gray-900 transition-colors"
+                    >
+                      Profile Settings
+                    </button>
                     <button
                       onClick={() => {
                         setShowProfileMenu(false);
@@ -167,7 +174,7 @@ export default function HomeZone() {
                     </button>
                   </div>
                 </div>
-              </>
+              </div>
             )}
           </div>
         </div>
