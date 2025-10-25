@@ -365,19 +365,24 @@ export default function ProfilePage() {
               {/* Avatar/Initials Display */}
               <div className="flex items-center space-x-4">
                 <div className="relative">
-                  <div className="w-20 h-20 rounded-full bg-[#E07A5F] flex items-center justify-center text-2xl font-bold text-white overflow-hidden">
+                  <div className="w-20 h-20 rounded-full bg-[#E07A5F] flex items-center justify-center text-2xl font-bold text-white overflow-hidden relative">
                     <img 
                       src={getGravatarUrl(getEmail(), 80)} 
                       alt="Profile" 
-                      className="w-full h-full object-cover"
-                      onLoad={() => console.log('Gravatar loaded successfully')}
+                      className="w-full h-full object-cover absolute inset-0"
+                      onLoad={() => {
+                        console.log('Gravatar loaded successfully');
+                        // Hide initials when Gravatar loads
+                        const initialsDiv = document.querySelector('.gravatar-initials') as HTMLElement;
+                        if (initialsDiv) initialsDiv.style.display = 'none';
+                      }}
                       onError={(e) => {
                         console.log('Gravatar failed to load, showing initials');
                         // If Gravatar fails to load, hide the image to show initials
                         e.currentTarget.style.display = 'none';
                       }}
                     />
-                    <div className="absolute inset-0 flex items-center justify-center bg-[#E07A5F] text-white text-2xl font-bold">
+                    <div className="gravatar-initials absolute inset-0 flex items-center justify-center bg-[#E07A5F] text-white text-2xl font-bold">
                       {getInitials()}
                     </div>
                   </div>
