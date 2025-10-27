@@ -421,8 +421,8 @@ Format as a simple comma-separated list of keywords.`;
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[#0a395f] to-[#1a4a6f] flex items-center justify-center">
-        <div className="text-white text-xl">Loading...</div>
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-gray-600 text-xl">Loading...</div>
       </div>
     );
   }
@@ -432,9 +432,9 @@ Format as a simple comma-separated list of keywords.`;
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0a395f] to-[#1a4a6f]">
+    <div className="min-h-screen bg-white">
       {/* Header */}
-      <header className="bg-white/10 backdrop-blur-md border-b border-white/20 sticky top-0 z-40">
+      <header className="bg-white border-b border-grey/30 sticky top-0 z-50 backdrop-blur-lg bg-white/80">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             {/* Logo */}
@@ -444,15 +444,15 @@ Format as a simple comma-separated list of keywords.`;
                 alt="App Ideas Finder" 
                 className="h-8 w-8 mr-3"
               />
-              <h1 className="text-white text-xl font-bold">App Ideas Finder</h1>
+              <h1 className="text-[#3D405B] text-xl font-bold">App Ideas Finder</h1>
             </div>
 
             {/* Navigation */}
             <nav className="hidden md:flex space-x-8">
-              <a href="/homezone" className="text-white/80 hover:text-white transition-colors">
+              <a href="/homezone" className="text-gray-600 hover:text-[#3D405B] transition-colors">
                 Dashboard
               </a>
-              <a href="/appengine" className="text-white font-semibold">
+              <a href="/appengine" className="text-[#3D405B] font-semibold">
                 App Engine
               </a>
             </nav>
