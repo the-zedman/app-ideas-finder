@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { createClient } from '@/lib/supabase';
+import { createClient } from '@/lib/supabase-client';
 import CryptoJS from 'crypto-js';
 
 // Types
@@ -51,13 +51,14 @@ export default function AppEnginePage() {
   const router = useRouter();
   const apiKeyRef = useRef<HTMLInputElement>(null);
   const appInputRef = useRef<HTMLInputElement>(null);
+  
+  const supabase = createClient();
 
   // Development bypass mode
   const isDevelopmentBypass = process.env.NEXT_PUBLIC_DEV_MODE === 'true';
 
   useEffect(() => {
     const getUser = async () => {
-      const supabase = await createClient();
       const { data: { user } } = await supabase.auth.getUser();
       
       if (user || isDevelopmentBypass) {
@@ -72,7 +73,6 @@ export default function AppEnginePage() {
   }, [router, isDevelopmentBypass]);
 
   const handleLogout = async () => {
-    const supabase = await createClient();
     await supabase.auth.signOut();
     router.push('/');
   };
