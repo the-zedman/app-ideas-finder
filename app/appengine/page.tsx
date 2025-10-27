@@ -49,6 +49,9 @@ export default function AppEnginePage() {
     totalCost: 0
   });
   const [grokApiKey, setGrokApiKey] = useState<string>('');
+  const [showRollups, setShowRollups] = useState(false);
+  const [expandedRollup, setExpandedRollup] = useState<number | null>(null);
+  const [rollupStatuses, setRollupStatuses] = useState<string[]>([]);
   
   const router = useRouter();
   const appInputRef = useRef<HTMLInputElement>(null);
@@ -287,6 +290,12 @@ Format as a simple comma-separated list of keywords.`;
 
     setIsAnalyzing(true);
     setStatus('Fetching app metadata...');
+    setShowRollups(false);
+    setExpandedRollup(null);
+    
+    // Initialize rollup statuses
+    const initialStatuses = Array(11).fill('Waiting...');
+    setRollupStatuses(initialStatuses);
     
     try {
       const appMetaData = await fetchAppInfo(appId);
@@ -297,10 +306,27 @@ Format as a simple comma-separated list of keywords.`;
       }
       
       setAppMeta(appMetaData);
+      setStatus('App Ideas Engine Engaged');
+      setShowRollups(true);
+      
+      // Update first rollup status
+      setRollupStatuses(prev => {
+        const newStatuses = [...prev];
+        newStatuses[0] = 'App Info Loaded';
+        return newStatuses;
+      });
+      
       setStatus('Fetching reviews (this may take a few seconds)...');
       
       const reviews = await fetchAllReviews(appId, 'mostRecent');
       setStatus(`Fetched ${reviews.length} reviews. Preparing AI analysis...`);
+      
+      // Update rollup status
+      setRollupStatuses(prev => {
+        const newStatuses = [...prev];
+        newStatuses[1] = `${reviews.length} Reviews Loaded`;
+        return newStatuses;
+      });
       
       if (reviews.length === 0) {
         setStatus('No reviews found for this app.');
@@ -313,6 +339,14 @@ Format as a simple comma-separated list of keywords.`;
       const allText = texts.join('\n\n---\n\n');
 
       setStatus('Sending all reviews to the ideas engine...this will definitely take a few seconds, so please kindly wait');
+      
+      // Update rollup status
+      setRollupStatuses(prev => {
+        const newStatuses = [...prev];
+        newStatuses[2] = 'Processing...';
+        newStatuses[3] = 'Processing...';
+        return newStatuses;
+      });
 
       // Send all reviews in one request
       const messages = buildChunkPrompt(appMetaData, allText);
@@ -410,8 +444,22 @@ Format as a simple comma-separated list of keywords.`;
 
       setAnalysisResults(finalParsed);
       
+      // Update rollup statuses
+      setRollupStatuses(prev => {
+        const newStatuses = [...prev];
+        newStatuses[2] = 'Complete';
+        newStatuses[3] = 'Complete';
+        newStatuses[4] = 'Complete';
+        return newStatuses;
+      });
+      
       // Generate keywords
       setStatus('Generating keywords for ASO...');
+      setRollupStatuses(prev => {
+        const newStatuses = [...prev];
+        newStatuses[9] = 'Processing...';
+        return newStatuses;
+      });
       try {
         const keywordsMessages = buildKeywordsPrompt(appMetaData, finalParsed.likes);
         const keywordsResponse = await callAI(grokApiKey, keywordsMessages, 'grok', 'grok-4-fast-reasoning');
@@ -419,12 +467,19 @@ Format as a simple comma-separated list of keywords.`;
         if (keywordsResponse && keywordsResponse.trim()) {
           const keywords = keywordsResponse.split(',').map((k: string) => k.trim()).filter((k: string) => k.length > 0);
           setAnalysisResults((prev: ParsedResults) => ({ ...prev, keywords }));
+          
+          // Update rollup status
+          setRollupStatuses(prev => {
+            const newStatuses = [...prev];
+            newStatuses[9] = 'Complete';
+            return newStatuses;
+          });
         }
       } catch (error) {
         console.error('Error generating keywords:', error);
       }
 
-      setStatus('Done.');
+      setStatus('Analysis Complete');
       
     } catch (error) {
       console.error('Analysis error:', error);
@@ -676,6 +731,123 @@ Format as a simple comma-separated list of keywords.`;
                       </div>
                     </div>
                   )}
+                </div>
+              )}
+
+              {/* Rollup Bars */}
+              {showRollups && (
+                <div className="space-y-2 mb-8">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">App Ideas Engine Analysis</h3>
+                  {Array.from({ length: 11 }, (_, index) => {
+                    const colors = [
+                      'from-[#462403] to-[#592D04]',
+                      'from-[#592D04] to-[#6C3604]',
+                      'from-[#6C3604] to-[#7E4005]',
+                      'from-[#7E4005] to-[#914906]',
+                      'from-[#914906] to-[#A55207]',
+                      'from-[#A55207] to-[#B85B08]',
+                      'from-[#B85B08] to-[#CB6409]',
+                      'from-[#CB6409] to-[#DE6D0A]',
+                      'from-[#DE6D0A] to-[#E07A5F]',
+                      'from-[#E07A5F] to-[#E07A5F]/80]',
+                      'from-[#E07A5F]/80 to-[#E07A5F]/60]'
+                    ];
+                    
+                    const titles = [
+                      'App Information',
+                      'User Reviews Analysis',
+                      'What Users Like',
+                      'What Users Dislike',
+                      'Feature Recommendations',
+                      'App Description',
+                      'App Names',
+                      'Product Requirements',
+                      'Pricing Strategy',
+                      'Keywords & ASO',
+                      'Final Summary'
+                    ];
+                    
+                    return (
+                      <div key={index} className="bg-gradient-to-r rounded-xl overflow-hidden">
+                        <div className={`bg-gradient-to-r ${colors[index]} p-4 text-white cursor-pointer`}
+                             onClick={() => setExpandedRollup(expandedRollup === index ? null : index)}>
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                              <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center text-xs font-bold">
+                                {index + 1}
+                              </div>
+                              <h4 className="font-semibold">{titles[index]}</h4>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <span className="text-sm opacity-80">{rollupStatuses[index]}</span>
+                              <div className={`w-2 h-2 rounded-full ${
+                                rollupStatuses[index] === 'Complete' ? 'bg-green-400' :
+                                rollupStatuses[index] === 'Processing...' ? 'bg-yellow-400 animate-pulse' :
+                                'bg-gray-400'
+                              }`}></div>
+                              <span className="text-lg">{expandedRollup === index ? '−' : '+'}</span>
+                            </div>
+                          </div>
+                        </div>
+                        {expandedRollup === index && (
+                          <div className="bg-white p-4 border-l-4 border-[#E07A5F]">
+                            <div className="text-gray-600">
+                              {index === 0 && appMeta && (
+                                <div>
+                                  <p><strong>App Name:</strong> {appMeta.trackName}</p>
+                                  <p><strong>Developer:</strong> {appMeta.artistName}</p>
+                                  <p><strong>Rating:</strong> {appMeta.averageUserRating?.toFixed(1)} ★</p>
+                                  <p><strong>Reviews:</strong> {appMeta.userRatingCount?.toLocaleString()}</p>
+                                </div>
+                              )}
+                              {index === 2 && analysisResults?.likes && (
+                                <ul className="space-y-1">
+                                  {analysisResults.likes.map((like: string, i: number) => (
+                                    <li key={i} className="flex items-start gap-2">
+                                      <span className="text-green-500 mt-1">✓</span>
+                                      <span>{like}</span>
+                                    </li>
+                                  ))}
+                                </ul>
+                              )}
+                              {index === 3 && analysisResults?.dislikes && (
+                                <ul className="space-y-1">
+                                  {analysisResults.dislikes.map((dislike: string, i: number) => (
+                                    <li key={i} className="flex items-start gap-2">
+                                      <span className="text-red-500 mt-1">✗</span>
+                                      <span>{dislike}</span>
+                                    </li>
+                                  ))}
+                                </ul>
+                              )}
+                              {index === 4 && analysisResults?.recommendations && (
+                                <ul className="space-y-1">
+                                  {analysisResults.recommendations.map((rec: string, i: number) => (
+                                    <li key={i} className="flex items-start gap-2">
+                                      <span className="text-blue-500 mt-1">💡</span>
+                                      <span>{rec}</span>
+                                    </li>
+                                  ))}
+                                </ul>
+                              )}
+                              {index === 9 && analysisResults?.keywords && (
+                                <div className="flex flex-wrap gap-2">
+                                  {analysisResults.keywords.map((keyword: string, i: number) => (
+                                    <span key={i} className="bg-gray-100 px-2 py-1 rounded text-sm">
+                                      {keyword}
+                                    </span>
+                                  ))}
+                                </div>
+                              )}
+                              {![0, 2, 3, 4, 9].includes(index) && (
+                                <p className="text-gray-500 italic">Analysis in progress...</p>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               )}
 
