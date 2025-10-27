@@ -48,9 +48,9 @@ export default function AppEnginePage() {
     totalOutputTokens: 0,
     totalCost: 0
   });
+  const [grokApiKey, setGrokApiKey] = useState<string>('');
   
   const router = useRouter();
-  const apiKeyRef = useRef<HTMLInputElement>(null);
   const appInputRef = useRef<HTMLInputElement>(null);
   
   const supabase = createClient();
@@ -72,6 +72,23 @@ export default function AppEnginePage() {
 
     getUser();
   }, [router, isDevelopmentBypass]);
+
+  useEffect(() => {
+    // Fetch the Grok API key from environment
+    const fetchApiKey = async () => {
+      try {
+        const response = await fetch('/api/grok-key');
+        if (response.ok) {
+          const data = await response.json();
+          setGrokApiKey(data.apiKey || '');
+        }
+      } catch (error) {
+        console.error('Error fetching API key:', error);
+      }
+    };
+
+    fetchApiKey();
+  }, []);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -255,11 +272,10 @@ Format as a simple comma-separated list of keywords.`;
 
   // Main analysis function
   const startAnalysis = async () => {
-    const apiKey = apiKeyRef.current?.value.trim();
     const appInput = appInputRef.current?.value.trim();
     
-    if (!apiKey) {
-      alert('Please enter your Grok API key first.');
+    if (!grokApiKey) {
+      alert('Grok API key not available. Please check your environment configuration.');
       return;
     }
     
@@ -300,7 +316,7 @@ Format as a simple comma-separated list of keywords.`;
 
       // Send all reviews in one request
       const messages = buildChunkPrompt(appMetaData, allText);
-      const raw = await callAI(apiKey, messages, 'grok', 'grok-4-fast-reasoning');
+      const raw = await callAI(grokApiKey, messages, 'grok', 'grok-4-fast-reasoning');
 
       // Parse the response
       let summaryText = '';
@@ -398,7 +414,7 @@ Format as a simple comma-separated list of keywords.`;
       setStatus('Generating keywords for ASO...');
       try {
         const keywordsMessages = buildKeywordsPrompt(appMetaData, finalParsed.likes);
-        const keywordsResponse = await callAI(apiKey, keywordsMessages, 'grok', 'grok-4-fast-reasoning');
+        const keywordsResponse = await callAI(grokApiKey, keywordsMessages, 'grok', 'grok-4-fast-reasoning');
         
         if (keywordsResponse && keywordsResponse.trim()) {
           const keywords = keywordsResponse.split(',').map((k: string) => k.trim()).filter((k: string) => k.length > 0);
@@ -544,19 +560,19 @@ Format as a simple comma-separated list of keywords.`;
 
             {/* Engine Interface */}
             <div className="max-w-4xl mx-auto">
-              {/* API Key Input */}
+              {/* API Key Status */}
               <div className="mb-6">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Grok API Key
+                  Grok API Key Status
                 </label>
-                <input
-                  ref={apiKeyRef}
-                  type="password"
-                  placeholder="Enter your Grok API key (gsk-...)"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E07A5F] focus:border-transparent"
-                />
+                <div className="flex items-center gap-2">
+                  <div className={`w-3 h-3 rounded-full ${grokApiKey ? 'bg-green-500' : 'bg-red-500'}`}></div>
+                  <span className="text-sm text-gray-600">
+                    {grokApiKey ? 'API Key Loaded Successfully' : 'Loading API Key...'}
+                  </span>
+                </div>
                 <p className="text-sm text-gray-500 mt-1">
-                  Get your API key from <a href="https://console.x.ai/" target="_blank" className="text-[#E07A5F] hover:underline">X.AI Console</a>
+                  API key is automatically loaded from environment configuration
                 </p>
               </div>
 
