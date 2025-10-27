@@ -9,6 +9,7 @@ import CryptoJS from 'crypto-js';
 interface AppMeta {
   trackId: number;
   trackName: string;
+  collectionName?: string;
   artistName: string;
   averageUserRating: number;
   userRatingCount: number;
