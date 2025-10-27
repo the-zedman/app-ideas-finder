@@ -50,8 +50,9 @@ export default function AppEnginePage() {
   });
   const [grokApiKey, setGrokApiKey] = useState<string>('');
   const [showRollups, setShowRollups] = useState(false);
-  const [expandedRollup, setExpandedRollup] = useState<number | null>(null);
-  const [rollupStatuses, setRollupStatuses] = useState<string[]>([]);
+  const [expandedRollup, setExpandedRollup] = useState<string | null>(null);
+  const [rollupStatuses, setRollupStatuses] = useState<{[key: string]: string}>({});
+  const [rollupContent, setRollupContent] = useState<{[key: string]: any}>({});
   
   const router = useRouter();
   const appInputRef = useRef<HTMLInputElement>(null);
@@ -273,7 +274,7 @@ Format as a simple comma-separated list of keywords.`;
     return [{role: 'user', content: prompt}];
   };
 
-  // Main analysis function
+  // Main analysis function - matches HTML exactly
   const startAnalysis = async () => {
     const appInput = appInputRef.current?.value.trim();
     
@@ -293,8 +294,12 @@ Format as a simple comma-separated list of keywords.`;
     setShowRollups(false);
     setExpandedRollup(null);
     
-    // Initialize rollup statuses
-    const initialStatuses = Array(11).fill('Waiting...');
+    // Initialize rollup statuses - match HTML exactly
+    const sections = ['likes', 'dislikes', 'recommendations', 'keywords', 'definitely', 'backlog', 'description', 'names', 'prp', 'similar', 'pricing'];
+    const initialStatuses: {[key: string]: string} = {};
+    sections.forEach(section => {
+      initialStatuses[section] = 'RESEARCH UNDERWAY';
+    });
     setRollupStatuses(initialStatuses);
     
     try {
@@ -306,27 +311,10 @@ Format as a simple comma-separated list of keywords.`;
       }
       
       setAppMeta(appMetaData);
-      setStatus('App Ideas Engine Engaged');
-      setShowRollups(true);
-      
-      // Update first rollup status
-      setRollupStatuses(prev => {
-        const newStatuses = [...prev];
-        newStatuses[0] = 'App Info Loaded';
-        return newStatuses;
-      });
-      
       setStatus('Fetching reviews (this may take a few seconds)...');
       
       const reviews = await fetchAllReviews(appId, 'mostRecent');
       setStatus(`Fetched ${reviews.length} reviews. Preparing AI analysis...`);
-      
-      // Update rollup status
-      setRollupStatuses(prev => {
-        const newStatuses = [...prev];
-        newStatuses[1] = `${reviews.length} Reviews Loaded`;
-        return newStatuses;
-      });
       
       if (reviews.length === 0) {
         setStatus('No reviews found for this app.');
@@ -334,25 +322,21 @@ Format as a simple comma-separated list of keywords.`;
         return;
       }
 
+      // Show rollup container and spinner - match HTML
+      setShowRollups(true);
+      setStatus('App Ideas Engine Engaged');
+
       // Prepare combined review text
       const texts = reviews.map((r: Review) => `${r.title ? r.title + ' — ' : ''}${r.text} (by ${r.author}, rating ${r.rating})`);
       const allText = texts.join('\n\n---\n\n');
 
       setStatus('Sending all reviews to the ideas engine...this will definitely take a few seconds, so please kindly wait');
-      
-      // Update rollup status
-      setRollupStatuses(prev => {
-        const newStatuses = [...prev];
-        newStatuses[2] = 'Processing...';
-        newStatuses[3] = 'Processing...';
-        return newStatuses;
-      });
 
       // Send all reviews in one request
       const messages = buildChunkPrompt(appMetaData, allText);
       const raw = await callAI(grokApiKey, messages, 'grok', 'grok-4-fast-reasoning');
 
-      // Parse the response
+      // Parse the response exactly like HTML
       let summaryText = '';
       if (!raw || raw.trim() === '') {
         summaryText = 'Unable to analyze reviews.';
@@ -444,22 +428,24 @@ Format as a simple comma-separated list of keywords.`;
 
       setAnalysisResults(finalParsed);
       
-      // Update rollup statuses
-      setRollupStatuses(prev => {
-        const newStatuses = [...prev];
-        newStatuses[2] = 'Complete';
-        newStatuses[3] = 'Complete';
-        newStatuses[4] = 'Complete';
-        return newStatuses;
-      });
+      // Update rollup statuses - mark first 3 as done
+      setRollupStatuses(prev => ({
+        ...prev,
+        likes: 'DONE',
+        dislikes: 'DONE', 
+        recommendations: 'DONE'
+      }));
       
+      // Store content for rollups
+      setRollupContent(prev => ({
+        ...prev,
+        likes: finalParsed.likes,
+        dislikes: finalParsed.dislikes,
+        recommendations: finalParsed.recommendations
+      }));
+
       // Generate keywords
       setStatus('Generating keywords for ASO...');
-      setRollupStatuses(prev => {
-        const newStatuses = [...prev];
-        newStatuses[9] = 'Processing...';
-        return newStatuses;
-      });
       try {
         const keywordsMessages = buildKeywordsPrompt(appMetaData, finalParsed.likes);
         const keywordsResponse = await callAI(grokApiKey, keywordsMessages, 'grok', 'grok-4-fast-reasoning');
@@ -468,18 +454,14 @@ Format as a simple comma-separated list of keywords.`;
           const keywords = keywordsResponse.split(',').map((k: string) => k.trim()).filter((k: string) => k.length > 0);
           setAnalysisResults((prev: ParsedResults) => ({ ...prev, keywords }));
           
-          // Update rollup status
-          setRollupStatuses(prev => {
-            const newStatuses = [...prev];
-            newStatuses[9] = 'Complete';
-            return newStatuses;
-          });
+          setRollupStatuses(prev => ({ ...prev, keywords: 'DONE' }));
+          setRollupContent(prev => ({ ...prev, keywords }));
         }
       } catch (error) {
         console.error('Error generating keywords:', error);
       }
 
-      setStatus('Analysis Complete');
+      setStatus('Done.');
       
     } catch (error) {
       console.error('Analysis error:', error);
@@ -734,115 +716,165 @@ Format as a simple comma-separated list of keywords.`;
                 </div>
               )}
 
-              {/* Rollup Bars */}
+              {/* Rollup Bars - Match HTML exactly */}
               {showRollups && (
                 <div className="space-y-2 mb-8">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">App Ideas Engine Analysis</h3>
-                  {Array.from({ length: 11 }, (_, index) => {
+                  {/* 1. What people like */}
+                  <div className="rollup-bar bg-gradient-to-r from-[#462403] to-[#592D04] rounded-xl overflow-hidden shadow-lg">
+                    <div className="rollup-header bg-gradient-to-r from-[#462403] to-[#592D04] text-white p-4 cursor-pointer hover:transform hover:-translate-y-0.5 transition-all"
+                         onClick={() => setExpandedRollup(expandedRollup === 'likes' ? null : 'likes')}>
+                      <div className="flex justify-between items-center">
+                        <div className="flex items-center gap-3">
+                          <span className="font-bold text-base min-w-[24px]">1.</span>
+                          <span className="font-semibold text-base flex-1">What people like</span>
+                          <span className="text-xs font-semibold px-2 py-1 rounded-xl bg-white/20 text-white uppercase tracking-wide">
+                            {rollupStatuses.likes || 'RESEARCH UNDERWAY'}
+                          </span>
+                        </div>
+                        <span className="text-lg font-bold min-w-[24px] text-center">
+                          {expandedRollup === 'likes' ? '−' : '+'}
+                        </span>
+                      </div>
+                    </div>
+                    {expandedRollup === 'likes' && (
+                      <div className="rollup-content bg-gray-50 p-5 border-t border-gray-200">
+                        <ul className="space-y-1">
+                          {rollupContent.likes?.map((like: string, i: number) => (
+                            <li key={i} className="text-gray-600">{like}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* 2. What people dislike / want */}
+                  <div className="rollup-bar bg-gradient-to-r from-[#592D04] to-[#6C3604] rounded-xl overflow-hidden shadow-lg">
+                    <div className="rollup-header bg-gradient-to-r from-[#592D04] to-[#6C3604] text-white p-4 cursor-pointer hover:transform hover:-translate-y-0.5 transition-all"
+                         onClick={() => setExpandedRollup(expandedRollup === 'dislikes' ? null : 'dislikes')}>
+                      <div className="flex justify-between items-center">
+                        <div className="flex items-center gap-3">
+                          <span className="font-bold text-base min-w-[24px]">2.</span>
+                          <span className="font-semibold text-base flex-1">What people dislike / want</span>
+                          <span className="text-xs font-semibold px-2 py-1 rounded-xl bg-white/20 text-white uppercase tracking-wide">
+                            {rollupStatuses.dislikes || 'RESEARCH UNDERWAY'}
+                          </span>
+                        </div>
+                        <span className="text-lg font-bold min-w-[24px] text-center">
+                          {expandedRollup === 'dislikes' ? '−' : '+'}
+                        </span>
+                      </div>
+                    </div>
+                    {expandedRollup === 'dislikes' && (
+                      <div className="rollup-content bg-gray-50 p-5 border-t border-gray-200">
+                        <ul className="space-y-1">
+                          {rollupContent.dislikes?.map((dislike: string, i: number) => (
+                            <li key={i} className="text-gray-600">{dislike}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* 3. Top recommendations */}
+                  <div className="rollup-bar bg-gradient-to-r from-[#6C3604] to-[#7E4005] rounded-xl overflow-hidden shadow-lg">
+                    <div className="rollup-header bg-gradient-to-r from-[#6C3604] to-[#7E4005] text-white p-4 cursor-pointer hover:transform hover:-translate-y-0.5 transition-all"
+                         onClick={() => setExpandedRollup(expandedRollup === 'recommendations' ? null : 'recommendations')}>
+                      <div className="flex justify-between items-center">
+                        <div className="flex items-center gap-3">
+                          <span className="font-bold text-base min-w-[24px]">3.</span>
+                          <span className="font-semibold text-base flex-1">Top recommendations</span>
+                          <span className="text-xs font-semibold px-2 py-1 rounded-xl bg-white/20 text-white uppercase tracking-wide">
+                            {rollupStatuses.recommendations || 'RESEARCH UNDERWAY'}
+                          </span>
+                        </div>
+                        <span className="text-lg font-bold min-w-[24px] text-center">
+                          {expandedRollup === 'recommendations' ? '−' : '+'}
+                        </span>
+                      </div>
+                    </div>
+                    {expandedRollup === 'recommendations' && (
+                      <div className="rollup-content bg-gray-50 p-5 border-t border-gray-200">
+                        <ul className="space-y-1">
+                          {rollupContent.recommendations?.map((rec: string, i: number) => (
+                            <li key={i} className="text-gray-600">{rec}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* 4. Potential keywords */}
+                  <div className="rollup-bar bg-gradient-to-r from-[#7E4005] to-[#914906] rounded-xl overflow-hidden shadow-lg">
+                    <div className="rollup-header bg-gradient-to-r from-[#7E4005] to-[#914906] text-white p-4 cursor-pointer hover:transform hover:-translate-y-0.5 transition-all"
+                         onClick={() => setExpandedRollup(expandedRollup === 'keywords' ? null : 'keywords')}>
+                      <div className="flex justify-between items-center">
+                        <div className="flex items-center gap-3">
+                          <span className="font-bold text-base min-w-[24px]">4.</span>
+                          <span className="font-semibold text-base flex-1">Suggested keywords</span>
+                          <span className="text-xs font-semibold px-2 py-1 rounded-xl bg-white/20 text-white uppercase tracking-wide">
+                            {rollupStatuses.keywords || 'RESEARCH UNDERWAY'}
+                          </span>
+                        </div>
+                        <span className="text-lg font-bold min-w-[24px] text-center">
+                          {expandedRollup === 'keywords' ? '−' : '+'}
+                        </span>
+                      </div>
+                    </div>
+                    {expandedRollup === 'keywords' && (
+                      <div className="rollup-content bg-gray-50 p-5 border-t border-gray-200">
+                        <div className="flex flex-wrap gap-2">
+                          {rollupContent.keywords?.map((keyword: string, i: number) => (
+                            <span key={i} className="bg-blue-100 px-2 py-1 rounded text-xs text-gray-700">
+                              {keyword}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* 5-11. Other sections (placeholder for now) */}
+                  {['definitely', 'backlog', 'description', 'names', 'prp', 'similar', 'pricing'].map((section, index) => {
                     const colors = [
-                      'from-[#462403] to-[#592D04]',
-                      'from-[#592D04] to-[#6C3604]',
-                      'from-[#6C3604] to-[#7E4005]',
-                      'from-[#7E4005] to-[#914906]',
-                      'from-[#914906] to-[#A55207]',
-                      'from-[#A55207] to-[#B85B08]',
-                      'from-[#B85B08] to-[#CB6409]',
-                      'from-[#CB6409] to-[#DE6D0A]',
-                      'from-[#DE6D0A] to-[#E07A5F]',
-                      'from-[#E07A5F] to-[#E07A5F]/80]',
-                      'from-[#E07A5F]/80 to-[#E07A5F]/60]'
+                      'from-[#914906] to-[#A77445]',
+                      'from-[#A77445] to-[#B65C07]',
+                      'from-[#B65C07] to-[#C86508]',
+                      'from-[#C86508] to-[#DB6E09]',
+                      'from-[#DB6E09] to-[#E07109]',
+                      'from-[#E07109] to-[#F0790A]',
+                      'from-[#F0790A] to-[#FF8A1A]'
                     ];
                     
                     const titles = [
-                      'App Information',
-                      'User Reviews Analysis',
-                      'What Users Like',
-                      'What Users Dislike',
-                      'Feature Recommendations',
-                      'App Description',
-                      'App Names',
-                      'Product Requirements',
-                      'Pricing Strategy',
-                      'Keywords & ASO',
-                      'Final Summary'
+                      'Core features to include',
+                      'Enhanced features to include',
+                      'Suggested app description',
+                      'Suggested App Names',
+                      'PRP (Product Requirements Prompt)',
+                      'Similar Apps',
+                      'Suggested Pricing Model'
                     ];
                     
                     return (
-                      <div key={index} className="bg-gradient-to-r rounded-xl overflow-hidden">
-                        <div className={`bg-gradient-to-r ${colors[index]} p-4 text-white cursor-pointer`}
-                             onClick={() => setExpandedRollup(expandedRollup === index ? null : index)}>
-                          <div className="flex items-center justify-between">
+                      <div key={section} className={`rollup-bar bg-gradient-to-r ${colors[index]} rounded-xl overflow-hidden shadow-lg`}>
+                        <div className={`rollup-header bg-gradient-to-r ${colors[index]} text-white p-4 cursor-pointer hover:transform hover:-translate-y-0.5 transition-all`}
+                             onClick={() => setExpandedRollup(expandedRollup === section ? null : section)}>
+                          <div className="flex justify-between items-center">
                             <div className="flex items-center gap-3">
-                              <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center text-xs font-bold">
-                                {index + 1}
-                              </div>
-                              <h4 className="font-semibold">{titles[index]}</h4>
+                              <span className="font-bold text-base min-w-[24px]">{index + 5}.</span>
+                              <span className="font-semibold text-base flex-1">{titles[index]}</span>
+                              <span className="text-xs font-semibold px-2 py-1 rounded-xl bg-white/20 text-white uppercase tracking-wide">
+                                {rollupStatuses[section] || 'RESEARCH UNDERWAY'}
+                              </span>
                             </div>
-                            <div className="flex items-center gap-2">
-                              <span className="text-sm opacity-80">{rollupStatuses[index]}</span>
-                              <div className={`w-2 h-2 rounded-full ${
-                                rollupStatuses[index] === 'Complete' ? 'bg-green-400' :
-                                rollupStatuses[index] === 'Processing...' ? 'bg-yellow-400 animate-pulse' :
-                                'bg-gray-400'
-                              }`}></div>
-                              <span className="text-lg">{expandedRollup === index ? '−' : '+'}</span>
-                            </div>
+                            <span className="text-lg font-bold min-w-[24px] text-center">
+                              {expandedRollup === section ? '−' : '+'}
+                            </span>
                           </div>
                         </div>
-                        {expandedRollup === index && (
-                          <div className="bg-white p-4 border-l-4 border-[#E07A5F]">
-                            <div className="text-gray-600">
-                              {index === 0 && appMeta && (
-                                <div>
-                                  <p><strong>App Name:</strong> {appMeta.trackName}</p>
-                                  <p><strong>Developer:</strong> {appMeta.artistName}</p>
-                                  <p><strong>Rating:</strong> {appMeta.averageUserRating?.toFixed(1)} ★</p>
-                                  <p><strong>Reviews:</strong> {appMeta.userRatingCount?.toLocaleString()}</p>
-                                </div>
-                              )}
-                              {index === 2 && analysisResults?.likes && (
-                                <ul className="space-y-1">
-                                  {analysisResults.likes.map((like: string, i: number) => (
-                                    <li key={i} className="flex items-start gap-2">
-                                      <span className="text-green-500 mt-1">✓</span>
-                                      <span>{like}</span>
-                                    </li>
-                                  ))}
-                                </ul>
-                              )}
-                              {index === 3 && analysisResults?.dislikes && (
-                                <ul className="space-y-1">
-                                  {analysisResults.dislikes.map((dislike: string, i: number) => (
-                                    <li key={i} className="flex items-start gap-2">
-                                      <span className="text-red-500 mt-1">✗</span>
-                                      <span>{dislike}</span>
-                                    </li>
-                                  ))}
-                                </ul>
-                              )}
-                              {index === 4 && analysisResults?.recommendations && (
-                                <ul className="space-y-1">
-                                  {analysisResults.recommendations.map((rec: string, i: number) => (
-                                    <li key={i} className="flex items-start gap-2">
-                                      <span className="text-blue-500 mt-1">💡</span>
-                                      <span>{rec}</span>
-                                    </li>
-                                  ))}
-                                </ul>
-                              )}
-                              {index === 9 && analysisResults?.keywords && (
-                                <div className="flex flex-wrap gap-2">
-                                  {analysisResults.keywords.map((keyword: string, i: number) => (
-                                    <span key={i} className="bg-gray-100 px-2 py-1 rounded text-sm">
-                                      {keyword}
-                                    </span>
-                                  ))}
-                                </div>
-                              )}
-                              {![0, 2, 3, 4, 9].includes(index) && (
-                                <p className="text-gray-500 italic">Analysis in progress...</p>
-                              )}
-                            </div>
+                        {expandedRollup === section && (
+                          <div className="rollup-content bg-gray-50 p-5 border-t border-gray-200">
+                            <p className="text-gray-500 italic">Analysis in progress...</p>
                           </div>
                         )}
                       </div>
