@@ -213,9 +213,26 @@ export default function AppEnginePage() {
                 ))}
               </div>
             ) : (
-              <ul id={`${section}List`}>
+              <ul id={`${section}List`} style={{ listStyle: 'none', padding: 0, margin: 0 }}>
                 {content?.map((item: string, i: number) => (
-                  <li key={i}>{item}</li>
+                  <li key={i} style={{ 
+                    marginBottom: '4px', 
+                    paddingLeft: '16px', 
+                    position: 'relative',
+                    fontSize: '14px',
+                    lineHeight: '1.4',
+                    color: '#374151'
+                  }}>
+                    <span style={{
+                      position: 'absolute',
+                      left: '0',
+                      top: '0',
+                      color: '#6B7280',
+                      fontSize: '16px',
+                      fontWeight: 'bold'
+                    }}>•</span>
+                    {item}
+                  </li>
                 ))}
               </ul>
             )}
