@@ -773,63 +773,6 @@ Format as a simple comma-separated list of keywords.`;
                 </div>
               )}
 
-              {/* Analysis Results */}
-              {analysisResults && (
-                <div className="space-y-6">
-                  {/* What People Like */}
-                  <div className="bg-gradient-to-r from-[#462403] to-[#592D04] rounded-xl overflow-hidden">
-                    <div className="p-4 text-white">
-                      <h3 className="text-lg font-semibold mb-2">1. What People Like</h3>
-                      <ul className="space-y-1">
-                        {analysisResults.likes.map((like: string, index: number) => (
-                          <li key={index} className="text-sm">• {like}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
-
-                  {/* What People Dislike */}
-                  <div className="bg-gradient-to-r from-[#592D04] to-[#6C3604] rounded-xl overflow-hidden">
-                    <div className="p-4 text-white">
-                      <h3 className="text-lg font-semibold mb-2">2. What People Dislike / Want</h3>
-                      <ul className="space-y-1">
-                        {analysisResults.dislikes.map((dislike: string, index: number) => (
-                          <li key={index} className="text-sm">• {dislike}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
-
-                  {/* Top Recommendations */}
-                  <div className="bg-gradient-to-r from-[#6C3604] to-[#7E4005] rounded-xl overflow-hidden">
-                    <div className="p-4 text-white">
-                      <h3 className="text-lg font-semibold mb-2">3. Top Recommendations</h3>
-                      <ul className="space-y-1">
-                        {analysisResults.recommendations.map((rec: string, index: number) => (
-                          <li key={index} className="text-sm">• {rec}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
-
-                  {/* Keywords */}
-                  {analysisResults.keywords && (
-                    <div className="bg-gradient-to-r from-[#7E4005] to-[#914906] rounded-xl overflow-hidden">
-                      <div className="p-4 text-white">
-                        <h3 className="text-lg font-semibold mb-2">4. Suggested Keywords</h3>
-                        <div className="flex flex-wrap gap-2">
-                          {analysisResults.keywords.map((keyword: string, index: number) => (
-                            <span key={index} className="bg-white/20 px-2 py-1 rounded text-xs">
-                              {keyword}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )}
-
               {/* Rollup Bars Container - Match HTML exactly */}
               {showRollups && (
                 <div className="section mb-8">
