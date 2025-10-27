@@ -560,22 +560,6 @@ Format as a simple comma-separated list of keywords.`;
 
             {/* Engine Interface */}
             <div className="max-w-4xl mx-auto">
-              {/* API Key Status */}
-              <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Grok API Key Status
-                </label>
-                <div className="flex items-center gap-2">
-                  <div className={`w-3 h-3 rounded-full ${grokApiKey ? 'bg-green-500' : 'bg-red-500'}`}></div>
-                  <span className="text-sm text-gray-600">
-                    {grokApiKey ? 'API Key Loaded Successfully' : 'Loading API Key...'}
-                  </span>
-                </div>
-                <p className="text-sm text-gray-500 mt-1">
-                  API key is automatically loaded from environment configuration
-                </p>
-              </div>
-
               {/* App Input */}
               <div className="mb-6">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
