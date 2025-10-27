@@ -188,3 +188,18 @@ Dev bypass enabled: true Path: /profile
  ✓ Compiled in 428ms
  ✓ Compiled in 1598ms
  ✓ Compiled in 367ms
+Dev bypass enabled: true Path: /api/itunes/lookup
+✅ Bypassing auth for development
+ ○ Compiling /_not-found/page ...
+ ✓ Compiled /_not-found/page in 4.3s
+ GET /api/itunes/lookup?id=290051590&country=us 404 in 5724ms
+Dev bypass enabled: true Path: /api/itunes/lookup
+✅ Bypassing auth for development
+ GET /api/itunes/lookup?id=338887129&country=us 404 in 288ms
+Dev bypass enabled: true Path: /api/itunes/lookup
+✅ Bypassing auth for development
+ GET /api/itunes/lookup?id=338887129&country=us 404 in 456ms
+Dev bypass enabled: true Path: /api/itunes/lookup
+✅ Bypassing auth for development
+ GET /api/itunes/lookup?id=6475137430&country=us 404 in 558ms
+[?25h

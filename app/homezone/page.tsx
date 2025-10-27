@@ -180,6 +180,24 @@ export default function HomeZone() {
         </div>
       </header>
 
+      {/* Navigation */}
+      <div className="px-4 py-4">
+        <nav className="max-w-md mx-auto flex space-x-4">
+          <a 
+            href="/homezone" 
+            className="flex-1 text-center py-3 px-4 bg-white rounded-xl font-semibold text-[#E07A5F] border-2 border-[#E07A5F]"
+          >
+            Dashboard
+          </a>
+          <a 
+            href="/appengine" 
+            className="flex-1 text-center py-3 px-4 bg-[#E07A5F] hover:bg-[#E07A5F]/90 text-white rounded-xl font-semibold transition-colors"
+          >
+            App Engine
+          </a>
+        </nav>
+      </div>
+
       {/* Main Content - Scrollable */}
       <main className="flex-1 overflow-y-auto pb-20">
         <div className="max-w-7xl mx-auto px-4 py-6">
