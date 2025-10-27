@@ -121,6 +121,110 @@ export default function AppEnginePage() {
     return `https://www.gravatar.com/avatar/${hash}?d=identicon&s=200`;
   };
 
+  // Helper function to create rollup bar with exact HTML styling
+  const createRollupBar = (section: string, number: number, title: string, gradient: string) => {
+    const isExpanded = expandedRollup === section;
+    const status = rollupStatuses[section] || 'RESEARCH UNDERWAY';
+    const content = rollupContent[section];
+    
+    return (
+      <div key={section} className="rollup-bar" id={`rollup-${section}`} data-section={section}
+           style={{
+             marginBottom: '8px',
+             borderRadius: '12px',
+             overflow: 'hidden',
+             boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+             transition: 'all 0.3s ease',
+             background: gradient
+           }}>
+        <div className="rollup-header" 
+             style={{
+               display: 'flex',
+               justifyContent: 'space-between',
+               alignItems: 'center',
+               padding: '16px 20px',
+               cursor: 'pointer',
+               transition: 'all 0.3s ease',
+               userSelect: 'none',
+               background: gradient,
+               color: 'white'
+             }}
+             onClick={() => setExpandedRollup(isExpanded ? null : section)}>
+          <div className="rollup-title" 
+               style={{
+                 display: 'flex',
+                 alignItems: 'center',
+                 gap: '12px',
+                 flex: 1
+               }}>
+            <span className="rollup-number" 
+                  style={{
+                    fontWeight: 'bold',
+                    fontSize: '16px',
+                    minWidth: '24px'
+                  }}>{number}.</span>
+            <span className="rollup-name" 
+                  style={{
+                    fontWeight: 600,
+                    fontSize: '16px',
+                    flex: 1
+                  }}>{title}</span>
+            <span className={`rollup-status ${status === 'RESEARCH UNDERWAY' ? 'researching' : ''}`}
+                  style={{
+                    fontSize: '12px',
+                    fontWeight: 600,
+                    padding: '4px 8px',
+                    borderRadius: '12px',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.5px',
+                    background: 'rgba(255,255,255,0.2)',
+                    color: 'white',
+                    animation: status === 'RESEARCH UNDERWAY' ? 'pulse 1.5s ease-in-out infinite' : 'none'
+                  }}>
+              {status}
+            </span>
+          </div>
+          <div className={`rollup-icon ${isExpanded ? 'expanded' : ''}`}
+               style={{
+                 fontSize: '18px',
+                 fontWeight: 'bold',
+                 transition: 'transform 0.3s ease',
+                 minWidth: '24px',
+                 textAlign: 'center',
+                 transform: isExpanded ? 'rotate(45deg)' : 'none'
+               }}>
+            {isExpanded ? '−' : 
+             status === 'DONE' ? '+' : '⟳'}
+          </div>
+        </div>
+        {isExpanded && (
+          <div className="rollup-content" id={`content-${section}`}
+               style={{
+                 padding: '0 20px 20px 20px',
+                 background: '#fafbfc',
+                 borderTop: '1px solid #e1e5e9'
+               }}>
+            {section === 'keywords' ? (
+              <div className="flex flex-wrap gap-2">
+                {content?.map((keyword: string, i: number) => (
+                  <span key={i} className="bg-blue-100 px-2 py-1 rounded text-xs text-gray-700">
+                    {keyword}
+                  </span>
+                ))}
+              </div>
+            ) : (
+              <ul id={`${section}List`}>
+                {content?.map((item: string, i: number) => (
+                  <li key={i}>{item}</li>
+                ))}
+              </ul>
+            )}
+          </div>
+        )}
+      </div>
+    );
+  };
+
   // Helper functions
   const escapeHTML = (s: string) => {
     if (s === null || s === undefined) return '';
@@ -729,337 +833,17 @@ Format as a simple comma-separated list of keywords.`;
               {/* Rollup Bars Container - Match HTML exactly */}
               {showRollups && (
                 <div className="section mb-8">
-                  {/* 1. What people like */}
-                  <div className="rollup-bar" id="rollup-likes" data-section="likes"
-                       style={{
-                         marginBottom: '8px',
-                         borderRadius: '12px',
-                         overflow: 'hidden',
-                         boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-                         transition: 'all 0.3s ease',
-                         background: 'linear-gradient(135deg, #462403, #592D04)'
-                       }}>
-                    <div className="rollup-header" 
-                         style={{
-                           display: 'flex',
-                           justifyContent: 'space-between',
-                           alignItems: 'center',
-                           padding: '16px 20px',
-                           cursor: 'pointer',
-                           transition: 'all 0.3s ease',
-                           userSelect: 'none',
-                           background: 'linear-gradient(135deg, #462403, #592D04)',
-                           color: 'white'
-                         }}
-                         onClick={() => setExpandedRollup(expandedRollup === 'likes' ? null : 'likes')}>
-                      <div className="rollup-title" 
-                           style={{
-                             display: 'flex',
-                             alignItems: 'center',
-                             gap: '12px',
-                             flex: 1
-                           }}>
-                        <span className="rollup-number" 
-                              style={{
-                                fontWeight: 'bold',
-                                fontSize: '16px',
-                                minWidth: '24px'
-                              }}>1.</span>
-                        <span className="rollup-name" 
-                              style={{
-                                fontWeight: 600,
-                                fontSize: '16px',
-                                flex: 1
-                              }}>What people like</span>
-                        <span className={`rollup-status ${rollupStatuses.likes === 'RESEARCH UNDERWAY' ? 'researching' : ''}`}
-                              style={{
-                                fontSize: '12px',
-                                fontWeight: 600,
-                                padding: '4px 8px',
-                                borderRadius: '12px',
-                                textTransform: 'uppercase',
-                                letterSpacing: '0.5px',
-                                background: 'rgba(255,255,255,0.2)',
-                                color: 'white',
-                                animation: rollupStatuses.likes === 'RESEARCH UNDERWAY' ? 'pulse 1.5s ease-in-out infinite' : 'none'
-                              }}>
-                          {rollupStatuses.likes || 'RESEARCH UNDERWAY'}
-                        </span>
-                      </div>
-                      <div className={`rollup-icon ${expandedRollup === 'likes' ? 'expanded' : ''}`}
-                           style={{
-                             fontSize: '18px',
-                             fontWeight: 'bold',
-                             transition: 'transform 0.3s ease',
-                             minWidth: '24px',
-                             textAlign: 'center',
-                             transform: expandedRollup === 'likes' ? 'rotate(45deg)' : 'none'
-                           }}>
-                        {expandedRollup === 'likes' ? '−' : 
-                         rollupStatuses.likes === 'DONE' ? '+' : '⟳'}
-                      </div>
-                    </div>
-                    {expandedRollup === 'likes' && (
-                      <div className="rollup-content" id="content-likes"
-                           style={{
-                             padding: '0 20px 20px 20px',
-                             background: '#fafbfc',
-                             borderTop: '1px solid #e1e5e9'
-                           }}>
-                        <ul id="likesList">
-                          {rollupContent.likes?.map((like: string, i: number) => (
-                            <li key={i}>{like}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* 2. What people dislike / want */}
-                  <div className="rollup-bar" id="rollup-dislikes" data-section="dislikes"
-                       style={{
-                         marginBottom: '8px',
-                         borderRadius: '12px',
-                         overflow: 'hidden',
-                         boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-                         transition: 'all 0.3s ease',
-                         background: 'linear-gradient(135deg, #592D04, #6C3604)'
-                       }}>
-                    <div className="rollup-header" 
-                         style={{
-                           display: 'flex',
-                           justifyContent: 'space-between',
-                           alignItems: 'center',
-                           padding: '16px 20px',
-                           cursor: 'pointer',
-                           transition: 'all 0.3s ease',
-                           userSelect: 'none',
-                           background: 'linear-gradient(135deg, #592D04, #6C3604)',
-                           color: 'white'
-                         }}
-                         onClick={() => setExpandedRollup(expandedRollup === 'dislikes' ? null : 'dislikes')}>
-                      <div className="rollup-title" 
-                           style={{
-                             display: 'flex',
-                             alignItems: 'center',
-                             gap: '12px',
-                             flex: 1
-                           }}>
-                        <span className="rollup-number" 
-                              style={{
-                                fontWeight: 'bold',
-                                fontSize: '16px',
-                                minWidth: '24px'
-                              }}>2.</span>
-                        <span className="rollup-name" 
-                              style={{
-                                fontWeight: 600,
-                                fontSize: '16px',
-                                flex: 1
-                              }}>What people dislike / want</span>
-                        <span className={`rollup-status ${rollupStatuses.dislikes === 'RESEARCH UNDERWAY' ? 'researching' : ''}`}
-                              style={{
-                                fontSize: '12px',
-                                fontWeight: 600,
-                                padding: '4px 8px',
-                                borderRadius: '12px',
-                                textTransform: 'uppercase',
-                                letterSpacing: '0.5px',
-                                background: 'rgba(255,255,255,0.2)',
-                                color: 'white',
-                                animation: rollupStatuses.dislikes === 'RESEARCH UNDERWAY' ? 'pulse 1.5s ease-in-out infinite' : 'none'
-                              }}>
-                          {rollupStatuses.dislikes || 'RESEARCH UNDERWAY'}
-                        </span>
-                      </div>
-                      <div className={`rollup-icon ${expandedRollup === 'dislikes' ? 'expanded' : ''}`}
-                           style={{
-                             fontSize: '18px',
-                             fontWeight: 'bold',
-                             transition: 'transform 0.3s ease',
-                             minWidth: '24px',
-                             textAlign: 'center',
-                             transform: expandedRollup === 'dislikes' ? 'rotate(45deg)' : 'none'
-                           }}>
-                        {expandedRollup === 'dislikes' ? '−' : 
-                         rollupStatuses.dislikes === 'DONE' ? '+' : '⟳'}
-                      </div>
-                    </div>
-                    {expandedRollup === 'dislikes' && (
-                      <div className="rollup-content" id="content-dislikes"
-                           style={{
-                             padding: '0 20px 20px 20px',
-                             background: '#fafbfc',
-                             borderTop: '1px solid #e1e5e9'
-                           }}>
-                        <ul id="dislikesList">
-                          {rollupContent.dislikes?.map((dislike: string, i: number) => (
-                            <li key={i}>{dislike}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* 3. Top recommendations */}
-                  <div className="rollup-bar rounded-xl overflow-hidden shadow-lg" 
-                       style={{background: 'linear-gradient(135deg, #6C3604, #7E4005)'}}>
-                    <div className="rollup-header text-white cursor-pointer transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg"
-                         style={{
-                           background: 'linear-gradient(135deg, #6C3604, #7E4005)',
-                           padding: '16px 20px',
-                           display: 'flex',
-                           justifyContent: 'space-between',
-                           alignItems: 'center'
-                         }}
-                         onClick={() => setExpandedRollup(expandedRollup === 'recommendations' ? null : 'recommendations')}>
-                      <div className="rollup-title flex items-center gap-3 flex-1">
-                        <span className="rollup-number font-bold text-base" style={{minWidth: '24px'}}>3.</span>
-                        <span className="rollup-name font-semibold text-base flex-1">Top recommendations</span>
-                        <span className="rollup-status text-xs font-semibold uppercase tracking-wide text-white"
-                              style={{
-                                padding: '4px 8px',
-                                borderRadius: '12px',
-                                background: 'rgba(255,255,255,0.2)',
-                                letterSpacing: '0.5px'
-                              }}>
-                          {rollupStatuses.recommendations || 'RESEARCH UNDERWAY'}
-                        </span>
-                      </div>
-                      <span className="rollup-icon font-bold text-lg transition-transform duration-300"
-                            style={{minWidth: '24px', textAlign: 'center'}}>
-                        {expandedRollup === 'recommendations' ? '−' : '⟳'}
-                      </span>
-                    </div>
-                    {expandedRollup === 'recommendations' && (
-                      <div className="rollup-content border-t"
-                           style={{
-                             padding: '0 20px 20px 20px',
-                             background: '#fafbfc',
-                             borderTop: '1px solid #e1e5e9'
-                           }}>
-                        <ul className="space-y-1">
-                          {rollupContent.recommendations?.map((rec: string, i: number) => (
-                            <li key={i} className="text-gray-600">{rec}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* 4. Potential keywords */}
-                  <div className="rollup-bar rounded-xl overflow-hidden shadow-lg" 
-                       style={{background: 'linear-gradient(135deg, #7E4005, #914906)'}}>
-                    <div className="rollup-header text-white cursor-pointer transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg"
-                         style={{
-                           background: 'linear-gradient(135deg, #7E4005, #914906)',
-                           padding: '16px 20px',
-                           display: 'flex',
-                           justifyContent: 'space-between',
-                           alignItems: 'center'
-                         }}
-                         onClick={() => setExpandedRollup(expandedRollup === 'keywords' ? null : 'keywords')}>
-                      <div className="rollup-title flex items-center gap-3 flex-1">
-                        <span className="rollup-number font-bold text-base" style={{minWidth: '24px'}}>4.</span>
-                        <span className="rollup-name font-semibold text-base flex-1">Suggested keywords</span>
-                        <span className="rollup-status text-xs font-semibold uppercase tracking-wide text-white"
-                              style={{
-                                padding: '4px 8px',
-                                borderRadius: '12px',
-                                background: 'rgba(255,255,255,0.2)',
-                                letterSpacing: '0.5px'
-                              }}>
-                          {rollupStatuses.keywords || 'RESEARCH UNDERWAY'}
-                        </span>
-                      </div>
-                      <span className="rollup-icon font-bold text-lg transition-transform duration-300"
-                            style={{minWidth: '24px', textAlign: 'center'}}>
-                        {expandedRollup === 'keywords' ? '−' : '⟳'}
-                      </span>
-                    </div>
-                    {expandedRollup === 'keywords' && (
-                      <div className="rollup-content border-t"
-                           style={{
-                             padding: '0 20px 20px 20px',
-                             background: '#fafbfc',
-                             borderTop: '1px solid #e1e5e9'
-                           }}>
-                        <div className="flex flex-wrap gap-2">
-                          {rollupContent.keywords?.map((keyword: string, i: number) => (
-                            <span key={i} className="bg-blue-100 px-2 py-1 rounded text-xs text-gray-700">
-                              {keyword}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* 5-11. Other sections */}
-                  {['definitely', 'backlog', 'description', 'names', 'prp', 'similar', 'pricing'].map((section, index) => {
-                    const gradients = [
-                      'linear-gradient(135deg, #914906, #A77445)',
-                      'linear-gradient(135deg, #A77445, #B65C07)',
-                      'linear-gradient(135deg, #B65C07, #C86508)',
-                      'linear-gradient(135deg, #C86508, #DB6E09)',
-                      'linear-gradient(135deg, #DB6E09, #E07109)',
-                      'linear-gradient(135deg, #E07109, #F0790A)',
-                      'linear-gradient(135deg, #F0790A, #FF8A1A)'
-                    ];
-                    
-                    const titles = [
-                      'Core features to include',
-                      'Enhanced features to include',
-                      'Suggested app description',
-                      'Suggested App Names',
-                      'PRP (Product Requirements Prompt)',
-                      'Similar Apps',
-                      'Suggested Pricing Model'
-                    ];
-                    
-                    return (
-                      <div key={section} className="rollup-bar rounded-xl overflow-hidden shadow-lg" 
-                           style={{background: gradients[index]}}>
-                        <div className="rollup-header text-white cursor-pointer transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg"
-                             style={{
-                               background: gradients[index],
-                               padding: '16px 20px',
-                               display: 'flex',
-                               justifyContent: 'space-between',
-                               alignItems: 'center'
-                             }}
-                             onClick={() => setExpandedRollup(expandedRollup === section ? null : section)}>
-                          <div className="rollup-title flex items-center gap-3 flex-1">
-                            <span className="rollup-number font-bold text-base" style={{minWidth: '24px'}}>{index + 5}.</span>
-                            <span className="rollup-name font-semibold text-base flex-1">{titles[index]}</span>
-                            <span className="rollup-status text-xs font-semibold uppercase tracking-wide text-white"
-                                  style={{
-                                    padding: '4px 8px',
-                                    borderRadius: '12px',
-                                    background: 'rgba(255,255,255,0.2)',
-                                    letterSpacing: '0.5px'
-                                  }}>
-                              {rollupStatuses[section] || 'RESEARCH UNDERWAY'}
-                            </span>
-                          </div>
-                          <span className="rollup-icon font-bold text-lg transition-transform duration-300"
-                                style={{minWidth: '24px', textAlign: 'center'}}>
-                            {expandedRollup === section ? '−' : '⟳'}
-                          </span>
-                        </div>
-                        {expandedRollup === section && (
-                          <div className="rollup-content border-t"
-                               style={{
-                                 padding: '0 20px 20px 20px',
-                                 background: '#fafbfc',
-                                 borderTop: '1px solid #e1e5e9'
-                               }}>
-                            <p className="text-gray-500 italic">Analysis in progress...</p>
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
+                  {createRollupBar('likes', 1, 'What people like', 'linear-gradient(135deg, #462403, #592D04)')}
+                  {createRollupBar('dislikes', 2, 'What people dislike / want', 'linear-gradient(135deg, #592D04, #6C3604)')}
+                  {createRollupBar('recommendations', 3, 'Top recommendations', 'linear-gradient(135deg, #6C3604, #7E4005)')}
+                  {createRollupBar('keywords', 4, 'Suggested keywords', 'linear-gradient(135deg, #7E4005, #914906)')}
+                  {createRollupBar('definitely', 5, 'Core features to include', 'linear-gradient(135deg, #914906, #A77445)')}
+                  {createRollupBar('backlog', 6, 'Enhanced features to include', 'linear-gradient(135deg, #A77445, #B65C07)')}
+                  {createRollupBar('description', 7, 'Suggested app description', 'linear-gradient(135deg, #B65C07, #C86508)')}
+                  {createRollupBar('names', 8, 'Suggested App Names', 'linear-gradient(135deg, #C86508, #DB6E09)')}
+                  {createRollupBar('prp', 9, 'PRP (Product Requirements Prompt)', 'linear-gradient(135deg, #DB6E09, #E07109)')}
+                  {createRollupBar('similar', 10, 'Similar Apps', 'linear-gradient(135deg, #E07109, #F0790A)')}
+                  {createRollupBar('pricing', 11, 'Suggested Pricing Model', 'linear-gradient(135deg, #F0790A, #FF8A1A)')}
                 </div>
               )}
 
