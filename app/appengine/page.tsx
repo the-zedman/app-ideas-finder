@@ -293,7 +293,7 @@ Format as a simple comma-separated list of keywords.`;
       }
 
       // Prepare combined review text
-      const texts = reviews.map(r => `${r.title ? r.title + ' — ' : ''}${r.text} (by ${r.author}, rating ${r.rating})`);
+      const texts = reviews.map((r: Review) => `${r.title ? r.title + ' — ' : ''}${r.text} (by ${r.author}, rating ${r.rating})`);
       const allText = texts.join('\n\n---\n\n');
 
       setStatus('Sending all reviews to the ideas engine...this will definitely take a few seconds, so please kindly wait');
@@ -319,16 +319,16 @@ Format as a simple comma-separated list of keywords.`;
       if (likesMatch) {
         likes = likesMatch[1].trim()
           .split('\n')
-          .filter(line => line.trim().startsWith('•') || line.trim().startsWith('-') || line.trim().startsWith('*'))
-          .map(line => line.replace(/^[•\-*]\s*/, '').trim())
-          .filter(line => line.length > 0);
+          .filter((line: string) => line.trim().startsWith('•') || line.trim().startsWith('-') || line.trim().startsWith('*'))
+          .map((line: string) => line.replace(/^[•\-*]\s*/, '').trim())
+          .filter((line: string) => line.length > 0);
       } else {
         const lines = text.split('\n');
         const firstHalf = lines.slice(0, Math.floor(lines.length / 2));
         likes = firstHalf
-          .filter(line => line.trim().startsWith('•') || line.trim().startsWith('-') || line.trim().startsWith('*'))
-          .map(line => line.replace(/^[•\-*]\s*/, '').trim())
-          .filter(line => line.length > 0);
+          .filter((line: string) => line.trim().startsWith('•') || line.trim().startsWith('-') || line.trim().startsWith('*'))
+          .map((line: string) => line.replace(/^[•\-*]\s*/, '').trim())
+          .filter((line: string) => line.length > 0);
       }
       
       // Extract dislikes
@@ -337,16 +337,16 @@ Format as a simple comma-separated list of keywords.`;
       if (dislikesMatch) {
         dislikes = dislikesMatch[1].trim()
           .split('\n')
-          .filter(line => line.trim().startsWith('•') || line.trim().startsWith('-') || line.trim().startsWith('*'))
-          .map(line => line.replace(/^[•\-*]\s*/, '').trim())
-          .filter(line => line.length > 0);
+          .filter((line: string) => line.trim().startsWith('•') || line.trim().startsWith('-') || line.trim().startsWith('*'))
+          .map((line: string) => line.replace(/^[•\-*]\s*/, '').trim())
+          .filter((line: string) => line.length > 0);
       } else {
         const lines = text.split('\n');
         const secondHalf = lines.slice(Math.floor(lines.length / 2));
         dislikes = secondHalf
-          .filter(line => line.trim().startsWith('•') || line.trim().startsWith('-') || line.trim().startsWith('*'))
-          .map(line => line.replace(/^[•\-*]\s*/, '').trim())
-          .filter(line => line.length > 0);
+          .filter((line: string) => line.trim().startsWith('•') || line.trim().startsWith('-') || line.trim().startsWith('*'))
+          .map((line: string) => line.replace(/^[•\-*]\s*/, '').trim())
+          .filter((line: string) => line.length > 0);
       }
       
       // Generate recommendations
@@ -402,7 +402,7 @@ Format as a simple comma-separated list of keywords.`;
         
         if (keywordsResponse && keywordsResponse.trim()) {
           const keywords = keywordsResponse.split(',').map((k: string) => k.trim()).filter((k: string) => k.length > 0);
-          setAnalysisResults(prev => ({ ...prev, keywords }));
+          setAnalysisResults((prev: ParsedResults) => ({ ...prev, keywords }));
         }
       } catch (error) {
         console.error('Error generating keywords:', error);
