@@ -486,6 +486,16 @@ Format as a simple comma-separated list of keywords.`;
 
   return (
     <div className="min-h-screen bg-white">
+      <style jsx>{`
+        @keyframes pulse {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.6; }
+        }
+        .rollup-header:hover {
+          transform: translateY(-1px);
+          box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+      `}</style>
       {/* Header */}
       <header className="bg-white border-b border-grey/30 sticky top-0 z-50 backdrop-blur-lg bg-white/80">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -716,49 +726,89 @@ Format as a simple comma-separated list of keywords.`;
                 </div>
               )}
 
-              {/* Rollup Bars - Match HTML exactly */}
+              {/* Rollup Bars Container - Match HTML exactly */}
               {showRollups && (
-                <div className="space-y-2 mb-8">
+                <div className="section mb-8">
                   {/* 1. What people like */}
-                  <div className="rollup-bar rounded-xl overflow-hidden shadow-lg" 
-                       style={{background: 'linear-gradient(135deg, #462403, #592D04)'}}>
-                    <div className="rollup-header text-white cursor-pointer transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg"
+                  <div className="rollup-bar" id="rollup-likes" data-section="likes"
+                       style={{
+                         marginBottom: '8px',
+                         borderRadius: '12px',
+                         overflow: 'hidden',
+                         boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                         transition: 'all 0.3s ease',
+                         background: 'linear-gradient(135deg, #462403, #592D04)'
+                       }}>
+                    <div className="rollup-header" 
                          style={{
-                           background: 'linear-gradient(135deg, #462403, #592D04)',
-                           padding: '16px 20px',
                            display: 'flex',
                            justifyContent: 'space-between',
-                           alignItems: 'center'
+                           alignItems: 'center',
+                           padding: '16px 20px',
+                           cursor: 'pointer',
+                           transition: 'all 0.3s ease',
+                           userSelect: 'none',
+                           background: 'linear-gradient(135deg, #462403, #592D04)',
+                           color: 'white'
                          }}
                          onClick={() => setExpandedRollup(expandedRollup === 'likes' ? null : 'likes')}>
-                      <div className="rollup-title flex items-center gap-3 flex-1">
-                        <span className="rollup-number font-bold text-base" style={{minWidth: '24px'}}>1.</span>
-                        <span className="rollup-name font-semibold text-base flex-1">What people like</span>
-                        <span className="rollup-status text-xs font-semibold uppercase tracking-wide text-white"
+                      <div className="rollup-title" 
+                           style={{
+                             display: 'flex',
+                             alignItems: 'center',
+                             gap: '12px',
+                             flex: 1
+                           }}>
+                        <span className="rollup-number" 
                               style={{
+                                fontWeight: 'bold',
+                                fontSize: '16px',
+                                minWidth: '24px'
+                              }}>1.</span>
+                        <span className="rollup-name" 
+                              style={{
+                                fontWeight: 600,
+                                fontSize: '16px',
+                                flex: 1
+                              }}>What people like</span>
+                        <span className={`rollup-status ${rollupStatuses.likes === 'RESEARCH UNDERWAY' ? 'researching' : ''}`}
+                              style={{
+                                fontSize: '12px',
+                                fontWeight: 600,
                                 padding: '4px 8px',
                                 borderRadius: '12px',
+                                textTransform: 'uppercase',
+                                letterSpacing: '0.5px',
                                 background: 'rgba(255,255,255,0.2)',
-                                letterSpacing: '0.5px'
+                                color: 'white',
+                                animation: rollupStatuses.likes === 'RESEARCH UNDERWAY' ? 'pulse 1.5s ease-in-out infinite' : 'none'
                               }}>
                           {rollupStatuses.likes || 'RESEARCH UNDERWAY'}
                         </span>
                       </div>
-                      <span className="rollup-icon font-bold text-lg transition-transform duration-300"
-                            style={{minWidth: '24px', textAlign: 'center'}}>
-                        {expandedRollup === 'likes' ? '−' : '⟳'}
-                      </span>
+                      <div className={`rollup-icon ${expandedRollup === 'likes' ? 'expanded' : ''}`}
+                           style={{
+                             fontSize: '18px',
+                             fontWeight: 'bold',
+                             transition: 'transform 0.3s ease',
+                             minWidth: '24px',
+                             textAlign: 'center',
+                             transform: expandedRollup === 'likes' ? 'rotate(45deg)' : 'none'
+                           }}>
+                        {expandedRollup === 'likes' ? '−' : 
+                         rollupStatuses.likes === 'DONE' ? '+' : '⟳'}
+                      </div>
                     </div>
                     {expandedRollup === 'likes' && (
-                      <div className="rollup-content border-t"
+                      <div className="rollup-content" id="content-likes"
                            style={{
                              padding: '0 20px 20px 20px',
                              background: '#fafbfc',
                              borderTop: '1px solid #e1e5e9'
                            }}>
-                        <ul className="space-y-1">
+                        <ul id="likesList">
                           {rollupContent.likes?.map((like: string, i: number) => (
-                            <li key={i} className="text-gray-600">{like}</li>
+                            <li key={i}>{like}</li>
                           ))}
                         </ul>
                       </div>
@@ -766,45 +816,85 @@ Format as a simple comma-separated list of keywords.`;
                   </div>
 
                   {/* 2. What people dislike / want */}
-                  <div className="rollup-bar rounded-xl overflow-hidden shadow-lg" 
-                       style={{background: 'linear-gradient(135deg, #592D04, #6C3604)'}}>
-                    <div className="rollup-header text-white cursor-pointer transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg"
+                  <div className="rollup-bar" id="rollup-dislikes" data-section="dislikes"
+                       style={{
+                         marginBottom: '8px',
+                         borderRadius: '12px',
+                         overflow: 'hidden',
+                         boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                         transition: 'all 0.3s ease',
+                         background: 'linear-gradient(135deg, #592D04, #6C3604)'
+                       }}>
+                    <div className="rollup-header" 
                          style={{
-                           background: 'linear-gradient(135deg, #592D04, #6C3604)',
-                           padding: '16px 20px',
                            display: 'flex',
                            justifyContent: 'space-between',
-                           alignItems: 'center'
+                           alignItems: 'center',
+                           padding: '16px 20px',
+                           cursor: 'pointer',
+                           transition: 'all 0.3s ease',
+                           userSelect: 'none',
+                           background: 'linear-gradient(135deg, #592D04, #6C3604)',
+                           color: 'white'
                          }}
                          onClick={() => setExpandedRollup(expandedRollup === 'dislikes' ? null : 'dislikes')}>
-                      <div className="rollup-title flex items-center gap-3 flex-1">
-                        <span className="rollup-number font-bold text-base" style={{minWidth: '24px'}}>2.</span>
-                        <span className="rollup-name font-semibold text-base flex-1">What people dislike / want</span>
-                        <span className="rollup-status text-xs font-semibold uppercase tracking-wide text-white"
+                      <div className="rollup-title" 
+                           style={{
+                             display: 'flex',
+                             alignItems: 'center',
+                             gap: '12px',
+                             flex: 1
+                           }}>
+                        <span className="rollup-number" 
                               style={{
+                                fontWeight: 'bold',
+                                fontSize: '16px',
+                                minWidth: '24px'
+                              }}>2.</span>
+                        <span className="rollup-name" 
+                              style={{
+                                fontWeight: 600,
+                                fontSize: '16px',
+                                flex: 1
+                              }}>What people dislike / want</span>
+                        <span className={`rollup-status ${rollupStatuses.dislikes === 'RESEARCH UNDERWAY' ? 'researching' : ''}`}
+                              style={{
+                                fontSize: '12px',
+                                fontWeight: 600,
                                 padding: '4px 8px',
                                 borderRadius: '12px',
+                                textTransform: 'uppercase',
+                                letterSpacing: '0.5px',
                                 background: 'rgba(255,255,255,0.2)',
-                                letterSpacing: '0.5px'
+                                color: 'white',
+                                animation: rollupStatuses.dislikes === 'RESEARCH UNDERWAY' ? 'pulse 1.5s ease-in-out infinite' : 'none'
                               }}>
                           {rollupStatuses.dislikes || 'RESEARCH UNDERWAY'}
                         </span>
                       </div>
-                      <span className="rollup-icon font-bold text-lg transition-transform duration-300"
-                            style={{minWidth: '24px', textAlign: 'center'}}>
-                        {expandedRollup === 'dislikes' ? '−' : '⟳'}
-                      </span>
+                      <div className={`rollup-icon ${expandedRollup === 'dislikes' ? 'expanded' : ''}`}
+                           style={{
+                             fontSize: '18px',
+                             fontWeight: 'bold',
+                             transition: 'transform 0.3s ease',
+                             minWidth: '24px',
+                             textAlign: 'center',
+                             transform: expandedRollup === 'dislikes' ? 'rotate(45deg)' : 'none'
+                           }}>
+                        {expandedRollup === 'dislikes' ? '−' : 
+                         rollupStatuses.dislikes === 'DONE' ? '+' : '⟳'}
+                      </div>
                     </div>
                     {expandedRollup === 'dislikes' && (
-                      <div className="rollup-content border-t"
+                      <div className="rollup-content" id="content-dislikes"
                            style={{
                              padding: '0 20px 20px 20px',
                              background: '#fafbfc',
                              borderTop: '1px solid #e1e5e9'
                            }}>
-                        <ul className="space-y-1">
+                        <ul id="dislikesList">
                           {rollupContent.dislikes?.map((dislike: string, i: number) => (
-                            <li key={i} className="text-gray-600">{dislike}</li>
+                            <li key={i}>{dislike}</li>
                           ))}
                         </ul>
                       </div>
