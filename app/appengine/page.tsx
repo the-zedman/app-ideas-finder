@@ -401,7 +401,7 @@ Format as a simple comma-separated list of keywords.`;
         const keywordsResponse = await callAI(apiKey, keywordsMessages, 'grok', 'grok-4-fast-reasoning');
         
         if (keywordsResponse && keywordsResponse.trim()) {
-          const keywords = keywordsResponse.split(',').map(k => k.trim()).filter(k => k.length > 0);
+          const keywords = keywordsResponse.split(',').map((k: string) => k.trim()).filter((k: string) => k.length > 0);
           setAnalysisResults(prev => ({ ...prev, keywords }));
         }
       } catch (error) {
