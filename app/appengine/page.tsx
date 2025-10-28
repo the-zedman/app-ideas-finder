@@ -977,15 +977,21 @@ Keep each section concise and focused. Do not include revenue projections.`;
       // Generate keywords
       setStatus('Generating keywords for ASO...');
       try {
+        console.log('DEBUG - Section 4 Input:', finalParsed.likes);
         const keywordsMessages = buildKeywordsPrompt(appMetaData, finalParsed.likes);
+        console.log('DEBUG - Section 4 Messages:', keywordsMessages);
         const keywordsResponse = await callAI(grokApiKey, keywordsMessages, 'grok', 'grok-4-fast-reasoning');
+        console.log('DEBUG - Section 4 Response:', keywordsResponse);
         
         if (keywordsResponse && keywordsResponse.trim()) {
           const keywords = keywordsResponse.split(',').map((k: string) => k.trim()).filter((k: string) => k.length > 0);
+          console.log('DEBUG - Section 4 Parsed Keywords:', keywords);
           setAnalysisResults((prev: ParsedResults) => ({ ...prev, keywords }));
           
           setRollupStatuses(prev => ({ ...prev, keywords: 'DONE' }));
           setRollupContent(prev => ({ ...prev, keywords }));
+        } else {
+          console.log('DEBUG - Section 4: Empty response');
         }
       } catch (error) {
         console.error('Error generating keywords:', error);
