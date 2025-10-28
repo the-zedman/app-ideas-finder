@@ -214,26 +214,39 @@ export default function AppEnginePage() {
               </div>
             ) : (
               <ul id={`${section}List`} style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-                {content?.map((item: string, i: number) => (
-                  <li key={i} style={{ 
-                    marginBottom: '4px', 
-                    paddingLeft: '16px', 
-                    position: 'relative',
-                    fontSize: '14px',
-                    lineHeight: '1.4',
-                    color: '#374151'
-                  }}>
-                    <span style={{
-                      position: 'absolute',
-                      left: '0',
-                      top: '0',
-                      color: '#6B7280',
-                      fontSize: '16px',
-                      fontWeight: 'bold'
-                    }}>•</span>
-                    {item}
-                  </li>
-                ))}
+                {content?.map((item: string, i: number) => {
+                  // Parse markdown bold formatting (**text**)
+                  const parseMarkdown = (text: string) => {
+                    return text.split(/(\*\*.*?\*\*)/).map((part, index) => {
+                      if (part.startsWith('**') && part.endsWith('**')) {
+                        const boldText = part.slice(2, -2);
+                        return <strong key={index} style={{ fontWeight: 'bold' }}>{boldText}</strong>;
+                      }
+                      return part;
+                    });
+                  };
+
+                  return (
+                    <li key={i} style={{ 
+                      marginBottom: '4px', 
+                      paddingLeft: '16px', 
+                      position: 'relative',
+                      fontSize: '14px',
+                      lineHeight: '1.4',
+                      color: '#374151'
+                    }}>
+                      <span style={{
+                        position: 'absolute',
+                        left: '0',
+                        top: '0',
+                        color: '#6B7280',
+                        fontSize: '16px',
+                        fontWeight: 'bold'
+                      }}>•</span>
+                      {parseMarkdown(item)}
+                    </li>
+                  );
+                })}
               </ul>
             )}
           </div>
