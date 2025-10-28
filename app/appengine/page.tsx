@@ -1062,9 +1062,7 @@ Keep each section concise and focused. Do not include revenue projections.`;
       setStatus('Generating app names...');
       let appNames: string[] = [];
       try {
-        // Use the local variables that were just generated
-        const description = rollupContent.description?.[0] || '';
-        
+        // Use the local description variable that was just generated
         const appNameMessages = buildAppNamePrompt(appMetaData, definitelyIncludeFeatures, backlogItems, keywordsArray, description);
         const appNameResponse = await callAI(grokApiKey, appNameMessages, 'grok', 'grok-4-fast-reasoning');
         
@@ -1085,8 +1083,6 @@ Keep each section concise and focused. Do not include revenue projections.`;
       let prpContent: string = '';
       try {
         // Use the local variables that were just generated
-        const description = rollupContent.description?.[0] || '';
-        
         const prpMessages = buildPRPPrompt(appMetaData, definitelyIncludeFeatures, backlogItems, keywordsArray, description, appNames);
         const prpResponse = await callAI(grokApiKey, prpMessages, 'grok', 'grok-4-fast-reasoning');
         
@@ -1115,8 +1111,6 @@ Keep each section concise and focused. Do not include revenue projections.`;
       let pricingContent: string = '';
       try {
         // Use the local variables that were just generated
-        const description = rollupContent.description?.[0] || '';
-        
         const pricingMessages = buildPricingModelPrompt(appMetaData, definitelyIncludeFeatures, backlogItems, keywordsArray, description, appNames, similarApps);
         const pricingResponse = await callAI(grokApiKey, pricingMessages, 'grok', 'grok-4-fast-reasoning');
         
