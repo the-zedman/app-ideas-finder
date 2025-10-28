@@ -1043,10 +1043,10 @@ Keep each section concise and focused. Do not include revenue projections.`;
       // Generate app description
       setStatus('Generating app description...');
       try {
-        // Extract data from the generated content
-        const definitelyIncludeFeatures = rollupContent.definitely || [];
-        const backlogItems = rollupContent.backlog || [];
-        const keywords = rollupContent.keywords || [];
+        // Extract data from the generated content - get actual text content
+        const definitelyIncludeFeatures = (rollupContent.definitely || []).map((feature: string) => feature.trim()).filter((feature: string) => feature.length > 0);
+        const backlogItems = (rollupContent.backlog || []).map((item: any) => item.content.trim()).filter((content: string) => content.length > 0);
+        const keywords = (rollupContent.keywords || []).map((keyword: string) => keyword.trim()).filter((keyword: string) => keyword.length > 0);
         
         const appDescriptionMessages = buildAppDescriptionPrompt(appMetaData, definitelyIncludeFeatures, backlogItems, keywords);
         const appDescriptionResponse = await callAI(grokApiKey, appDescriptionMessages, 'grok', 'grok-4-fast-reasoning');
@@ -1062,10 +1062,10 @@ Keep each section concise and focused. Do not include revenue projections.`;
       // Generate app names
       setStatus('Generating app names...');
       try {
-        // Extract data from the generated content
-        const definitelyIncludeFeatures = rollupContent.definitely || [];
-        const backlogItems = rollupContent.backlog || [];
-        const keywords = rollupContent.keywords || [];
+        // Extract data from the generated content - get actual text content
+        const definitelyIncludeFeatures = (rollupContent.definitely || []).map((feature: string) => feature.trim()).filter((feature: string) => feature.length > 0);
+        const backlogItems = (rollupContent.backlog || []).map((item: any) => item.content.trim()).filter((content: string) => content.length > 0);
+        const keywords = (rollupContent.keywords || []).map((keyword: string) => keyword.trim()).filter((keyword: string) => keyword.length > 0);
         const description = rollupContent.description?.[0] || '';
         
         const appNameMessages = buildAppNamePrompt(appMetaData, definitelyIncludeFeatures, backlogItems, keywords, description);
@@ -1086,12 +1086,12 @@ Keep each section concise and focused. Do not include revenue projections.`;
       // Generate PRP
       setStatus('Generating product requirements prompt...');
       try {
-        // Extract data from the generated content
-        const definitelyIncludeFeatures = rollupContent.definitely || [];
-        const backlogItems = rollupContent.backlog || [];
-        const keywords = rollupContent.keywords || [];
+        // Extract data from the generated content - get actual text content
+        const definitelyIncludeFeatures = (rollupContent.definitely || []).map((feature: string) => feature.trim()).filter((feature: string) => feature.length > 0);
+        const backlogItems = (rollupContent.backlog || []).map((item: any) => item.content.trim()).filter((content: string) => content.length > 0);
+        const keywords = (rollupContent.keywords || []).map((keyword: string) => keyword.trim()).filter((keyword: string) => keyword.length > 0);
         const description = rollupContent.description?.[0] || '';
-        const appNames = rollupContent.names || [];
+        const appNames = (rollupContent.names || []).map((name: string) => name.trim()).filter((name: string) => name.length > 0);
         
         const prpMessages = buildPRPPrompt(appMetaData, definitelyIncludeFeatures, backlogItems, keywords, description, appNames);
         const prpResponse = await callAI(grokApiKey, prpMessages, 'grok', 'grok-4-fast-reasoning');
@@ -1117,12 +1117,12 @@ Keep each section concise and focused. Do not include revenue projections.`;
       // Generate pricing model
       setStatus('Analyzing pricing models...');
       try {
-        // Extract data from the generated content
-        const definitelyIncludeFeatures = rollupContent.definitely || [];
-        const backlogItems = rollupContent.backlog || [];
-        const keywords = rollupContent.keywords || [];
+        // Extract data from the generated content - get actual text content
+        const definitelyIncludeFeatures = (rollupContent.definitely || []).map((feature: string) => feature.trim()).filter((feature: string) => feature.length > 0);
+        const backlogItems = (rollupContent.backlog || []).map((item: any) => item.content.trim()).filter((content: string) => content.length > 0);
+        const keywords = (rollupContent.keywords || []).map((keyword: string) => keyword.trim()).filter((keyword: string) => keyword.length > 0);
         const description = rollupContent.description?.[0] || '';
-        const appNames = rollupContent.names || [];
+        const appNames = (rollupContent.names || []).map((name: string) => name.trim()).filter((name: string) => name.length > 0);
         const similarApps = rollupContent.similar || [];
         
         const pricingMessages = buildPricingModelPrompt(appMetaData, definitelyIncludeFeatures, backlogItems, keywords, description, appNames, similarApps);
