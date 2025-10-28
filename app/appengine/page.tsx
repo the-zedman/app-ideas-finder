@@ -227,7 +227,7 @@ export default function AppEnginePage() {
         {isExpanded && (
           <div className="rollup-content" id={`content-${section}`}
                style={{
-                 padding: '0 20px 20px 20px',
+                 padding: '16px 20px 16px 20px',
                  background: '#fafbfc',
                  borderTop: '1px solid #e1e5e9'
                }}>
@@ -1327,7 +1327,7 @@ Keep each section concise and focused. Do not include revenue projections.`;
                   disabled={isAnalyzing}
                   className="bg-[#E07A5F] hover:bg-[#E07A5F]/90 text-white font-semibold py-3 px-8 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {isAnalyzing ? 'Analyzing...' : 'Get Reviews + App Ideas'}
+                  {isAnalyzing ? 'Analyzing...' : 'Generate'}
                 </button>
                 <div id="spinner" className="hidden ml-4 inline-block"></div>
               </div>
