@@ -212,6 +212,38 @@ export default function AppEnginePage() {
                   </span>
                 ))}
               </div>
+            ) : section === 'backlog' ? (
+              <div>
+                {content?.map((item: any, i: number) => {
+                  const priorityColor = item.priority === 'High' ? '#dc3545' : 
+                                       item.priority === 'Medium' ? '#ffc107' : '#28a745';
+                  
+                  return (
+                    <div key={i} style={{
+                      padding: '8px 12px',
+                      borderLeft: `4px solid ${priorityColor}`,
+                      margin: '8px 0',
+                      background: '#f8f9fa',
+                      borderRadius: '4px'
+                    }}>
+                      <div style={{
+                        fontWeight: 600,
+                        color: priorityColor,
+                        fontSize: '12px',
+                        textTransform: 'uppercase'
+                      }}>
+                        {item.priority} Priority
+                      </div>
+                      <div style={{
+                        marginTop: '4px',
+                        color: '#333'
+                      }}>
+                        {item.content}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             ) : (
               <ul id={`${section}List`} style={{ listStyle: 'none', padding: 0, margin: 0 }}>
                 {content?.map((item: string, i: number) => {
@@ -435,6 +467,37 @@ Example:
     return [{role:'user', content: prompt}];
   };
 
+  // Generate backlog items based on user feedback
+  const buildBacklogPrompt = (appMeta: AppMeta, dislikes: string[], likes: string[]) => {
+    const appName = appMeta?.trackName || appMeta?.collectionName || 'this app';
+    const dislikesText = dislikes.join(', ');
+    const likesText = likes.join(', ');
+    
+    const prompt = `Based on user feedback for ${appName}, create a prioritized project backlog of specific, actionable development tasks that address user complaints and requests.
+
+What users dislike/want: ${dislikesText}
+
+What users like: ${likesText}
+
+Create 8-12 backlog items that are:
+- Specific and actionable development tasks
+- Prioritized by user impact and feasibility
+- Based directly on user feedback
+- Include both bug fixes and feature requests
+- Written as clear development tasks
+
+Format each item as:
+1. [Priority] Task Title - Brief description of what needs to be built/fixed
+
+Example:
+1. [High] Fix App Crashes - Address stability issues causing app to crash on startup
+2. [Medium] Add Dark Mode - Implement dark theme option in settings menu
+
+Focus on the most frequently mentioned issues and most requested features.`;
+
+    return [{role:'user', content: prompt}];
+  };
+
   // Main analysis function - matches HTML exactly
   const startAnalysis = async () => {
     const appInput = appInputRef.current?.value.trim();
@@ -642,6 +705,34 @@ Example:
         }
       } catch (error) {
         console.error('Error generating definitely include features:', error);
+      }
+
+      // Generate backlog items
+      setStatus('Generating project backlog items...');
+      try {
+        const backlogMessages = buildBacklogPrompt(appMetaData, finalParsed.dislikes, finalParsed.likes);
+        const backlogResponse = await callAI(grokApiKey, backlogMessages, 'grok', 'grok-4-fast-reasoning');
+        
+        if (backlogResponse && backlogResponse.trim()) {
+          // Parse the backlog items from the text
+          const lines = backlogResponse.split('\n').filter((line: string) => line.trim().length > 0);
+          const items = lines.map((line: string) => {
+            // Extract priority and content
+            const priorityMatch = line.match(/\[(High|Medium|Low)\]/);
+            const priority = priorityMatch ? priorityMatch[1] : 'Medium';
+            const content = line.replace(/^\d+\.\s*\[(High|Medium|Low)\]\s*/, '').trim();
+            
+            return {
+              priority,
+              content
+            };
+          }).filter((item: any) => item.content.length > 0);
+          
+          setRollupStatuses(prev => ({ ...prev, backlog: 'DONE' }));
+          setRollupContent(prev => ({ ...prev, backlog: items }));
+        }
+      } catch (error) {
+        console.error('Error generating backlog items:', error);
       }
 
       setStatus('Done.');
