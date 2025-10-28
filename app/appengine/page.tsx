@@ -1045,14 +1045,16 @@ Keep each section concise and focused. Do not include revenue projections.`;
 
       // Generate app description
       setStatus('Generating app description...');
+      let description: string = '';
       try {
         // Use the local variables that were just generated
         const appDescriptionMessages = buildAppDescriptionPrompt(appMetaData, definitelyIncludeFeatures, backlogItems, keywordsArray);
         const appDescriptionResponse = await callAI(grokApiKey, appDescriptionMessages, 'grok', 'grok-4-fast-reasoning');
         
         if (appDescriptionResponse && appDescriptionResponse.trim()) {
+          description = appDescriptionResponse.trim();
           setRollupStatuses(prev => ({ ...prev, description: 'DONE' }));
-          setRollupContent(prev => ({ ...prev, description: [appDescriptionResponse.trim()] }));
+          setRollupContent(prev => ({ ...prev, description: [description] }));
         }
       } catch (error) {
         console.error('Error generating app description:', error);
