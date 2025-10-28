@@ -992,6 +992,7 @@ Keep each section concise and focused. Do not include revenue projections.`;
 
       // Generate definitely include features
       setStatus('Generating features to definitely include...');
+      let definitelyIncludeFeatures: string[] = [];
       try {
         const definitelyIncludeMessages = buildDefinitelyIncludePrompt(appMetaData, finalParsed.likes);
         const definitelyIncludeResponse = await callAI(grokApiKey, definitelyIncludeMessages, 'grok', 'grok-4-fast-reasoning');
@@ -999,14 +1000,14 @@ Keep each section concise and focused. Do not include revenue projections.`;
         if (definitelyIncludeResponse && definitelyIncludeResponse.trim()) {
           // Parse the features from the text
           const lines = definitelyIncludeResponse.split('\n').filter((line: string) => line.trim().length > 0);
-          const features = lines.map((line: string) => {
+          definitelyIncludeFeatures = lines.map((line: string) => {
             // Remove bullet points and clean up
             const cleanLine = line.replace(/^[•\-\*]\s*/, '').trim();
             return cleanLine;
           }).filter((feature: string) => feature.length > 0);
           
           setRollupStatuses(prev => ({ ...prev, definitely: 'DONE' }));
-          setRollupContent(prev => ({ ...prev, definitely: features }));
+          setRollupContent(prev => ({ ...prev, definitely: definitelyIncludeFeatures }));
         }
       } catch (error) {
         console.error('Error generating definitely include features:', error);
@@ -1014,6 +1015,7 @@ Keep each section concise and focused. Do not include revenue projections.`;
 
       // Generate backlog items
       setStatus('Generating enhanced features to include...');
+      let backlogItems: any[] = [];
       try {
         const backlogMessages = buildBacklogPrompt(appMetaData, finalParsed.dislikes, finalParsed.likes);
         const backlogResponse = await callAI(grokApiKey, backlogMessages, 'grok', 'grok-4-fast-reasoning');
@@ -1021,7 +1023,7 @@ Keep each section concise and focused. Do not include revenue projections.`;
         if (backlogResponse && backlogResponse.trim()) {
           // Parse the backlog items from the text
           const lines = backlogResponse.split('\n').filter((line: string) => line.trim().length > 0);
-          const items = lines.map((line: string) => {
+          backlogItems = lines.map((line: string) => {
             // Extract priority and content
             const priorityMatch = line.match(/\[(High|Medium|Low)\]/);
             const priority = priorityMatch ? priorityMatch[1] : 'Medium';
@@ -1034,7 +1036,7 @@ Keep each section concise and focused. Do not include revenue projections.`;
           }).filter((item: any) => item.content.length > 0);
           
           setRollupStatuses(prev => ({ ...prev, backlog: 'DONE' }));
-          setRollupContent(prev => ({ ...prev, backlog: items }));
+          setRollupContent(prev => ({ ...prev, backlog: backlogItems }));
         }
       } catch (error) {
         console.error('Error generating backlog items:', error);
@@ -1043,16 +1045,13 @@ Keep each section concise and focused. Do not include revenue projections.`;
       // Generate app description
       setStatus('Generating app description...');
       try {
-        // Extract data from the generated content - get actual text content
-        const definitelyIncludeFeatures = (rollupContent.definitely || []).map((feature: string) => feature.trim()).filter((feature: string) => feature.length > 0);
-        const backlogItems = (rollupContent.backlog || []).map((item: any) => item.content.trim()).filter((content: string) => content.length > 0);
+        // Use the local variables that were just generated
         const keywords = (rollupContent.keywords || []).map((keyword: string) => keyword.trim()).filter((keyword: string) => keyword.length > 0);
         
         console.log('DEBUG - App Description Input Data:');
         console.log('definitelyIncludeFeatures:', definitelyIncludeFeatures);
         console.log('backlogItems:', backlogItems);
         console.log('keywords:', keywords);
-        console.log('rollupContent:', rollupContent);
         
         const appDescriptionMessages = buildAppDescriptionPrompt(appMetaData, definitelyIncludeFeatures, backlogItems, keywords);
         const appDescriptionResponse = await callAI(grokApiKey, appDescriptionMessages, 'grok', 'grok-4-fast-reasoning');
