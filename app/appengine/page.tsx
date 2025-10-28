@@ -122,6 +122,33 @@ export default function AppEnginePage() {
   };
 
   // Helper function to create rollup bar with exact HTML styling
+  // Parse markdown formatting for sections 9 and 11
+  const parseMarkdownContent = (text: string) => {
+    if (!text) return '';
+    
+    // Split by lines and process each line
+    const lines = text.split('\n');
+    const processedLines = lines.map((line: string) => {
+      // Handle headings (### 1. Title -> bold title)
+      if (line.startsWith('### ')) {
+        const headingText = line.replace(/^### \d+\.\s*/, '').trim();
+        return `<div style="font-weight: bold; font-size: 16px; margin: 12px 0 8px 0; color: #1f2937;">${headingText}</div>`;
+      }
+      
+      // Handle bold text (**text** -> bold text)
+      const boldText = line.replace(/\*\*(.*?)\*\*/g, '<strong style="font-weight: bold;">$1</strong>');
+      
+      // Handle regular lines
+      if (line.trim()) {
+        return `<div style="margin: 4px 0; line-height: 1.5;">${boldText}</div>`;
+      }
+      
+      return '<div style="margin: 8px 0;"></div>'; // Empty line spacing
+    });
+    
+    return processedLines.join('');
+  };
+
   const createRollupBar = (section: string, number: number, title: string, gradient: string) => {
     const isExpanded = expandedRollup === section;
     const status = rollupStatuses[section] || 'RESEARCH UNDERWAY';
@@ -244,7 +271,7 @@ export default function AppEnginePage() {
                   );
                 })}
               </div>
-            ) : section === 'description' || section === 'prp' || section === 'pricing' ? (
+            ) : section === 'description' ? (
               <div style={{
                 fontSize: '14px',
                 lineHeight: '1.6',
@@ -253,6 +280,14 @@ export default function AppEnginePage() {
               }}>
                 {content?.[0]}
               </div>
+            ) : section === 'prp' || section === 'pricing' ? (
+              <div style={{
+                fontSize: '14px',
+                lineHeight: '1.6',
+                color: '#374151'
+              }}
+                dangerouslySetInnerHTML={{ __html: parseMarkdownContent(content?.[0] || '') }}
+              />
             ) : section === 'names' ? (
               <div className="flex flex-wrap gap-2">
                 {content?.map((name: string, i: number) => (
