@@ -408,6 +408,33 @@ Format as a simple comma-separated list of keywords.`;
     return [{role: 'user', content: prompt}];
   };
 
+  // Generate definitely include features based on what users like
+  const buildDefinitelyIncludePrompt = (appMeta: AppMeta, likes: string[]) => {
+    const appName = appMeta?.trackName || appMeta?.collectionName || 'this app';
+    const likesText = likes.join(', ');
+    
+    const prompt = `Based on what users like about ${appName}, create a list of features that should definitely be included in a similar app to ensure user satisfaction.
+
+What users like: ${likesText}
+
+Create 6-10 specific features that should definitely be included, based on what users are praising. These should be:
+- Core features that users consistently mention as positive
+- Essential functionality that users love
+- Key user experience elements that work well
+- Features that differentiate the app positively
+
+Format as a simple bullet point list of features to definitely include.
+
+Example:
+• Fast and responsive user interface
+• Offline functionality
+• Dark mode option
+• Intuitive navigation
+• Real-time synchronization`;
+
+    return [{role:'user', content: prompt}];
+  };
+
   // Main analysis function - matches HTML exactly
   const startAnalysis = async () => {
     const appInput = appInputRef.current?.value.trim();
@@ -593,6 +620,28 @@ Format as a simple comma-separated list of keywords.`;
         }
       } catch (error) {
         console.error('Error generating keywords:', error);
+      }
+
+      // Generate definitely include features
+      setStatus('Generating features to definitely include...');
+      try {
+        const definitelyIncludeMessages = buildDefinitelyIncludePrompt(appMetaData, finalParsed.likes);
+        const definitelyIncludeResponse = await callAI(grokApiKey, definitelyIncludeMessages, 'grok', 'grok-4-fast-reasoning');
+        
+        if (definitelyIncludeResponse && definitelyIncludeResponse.trim()) {
+          // Parse the features from the text
+          const lines = definitelyIncludeResponse.split('\n').filter(line => line.trim().length > 0);
+          const features = lines.map(line => {
+            // Remove bullet points and clean up
+            const cleanLine = line.replace(/^[•\-\*]\s*/, '').trim();
+            return cleanLine;
+          }).filter(feature => feature.length > 0);
+          
+          setRollupStatuses(prev => ({ ...prev, definitely: 'DONE' }));
+          setRollupContent(prev => ({ ...prev, definitely: features }));
+        }
+      } catch (error) {
+        console.error('Error generating definitely include features:', error);
       }
 
       setStatus('Done.');
