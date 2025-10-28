@@ -1060,23 +1060,21 @@ Keep each section concise and focused. Do not include revenue projections.`;
 
       // Generate app names
       setStatus('Generating app names...');
+      let appNames: string[] = [];
       try {
-        // Extract data from the generated content - get actual text content
-        const definitelyIncludeFeatures = (rollupContent.definitely || []).map((feature: string) => feature.trim()).filter((feature: string) => feature.length > 0);
-        const backlogItems = (rollupContent.backlog || []).map((item: any) => item.content.trim()).filter((content: string) => content.length > 0);
-        const keywords = (rollupContent.keywords || []).map((keyword: string) => keyword.trim()).filter((keyword: string) => keyword.length > 0);
+        // Use the local variables that were just generated
         const description = rollupContent.description?.[0] || '';
         
-        const appNameMessages = buildAppNamePrompt(appMetaData, definitelyIncludeFeatures, backlogItems, keywords, description);
+        const appNameMessages = buildAppNamePrompt(appMetaData, definitelyIncludeFeatures, backlogItems, keywordsArray, description);
         const appNameResponse = await callAI(grokApiKey, appNameMessages, 'grok', 'grok-4-fast-reasoning');
         
         if (appNameResponse && appNameResponse.trim()) {
           // Parse app names from the text
           const lines = appNameResponse.split('\n').filter((line: string) => line.trim().length > 0);
-          const names = lines.map((line: string) => line.trim()).filter((name: string) => name.length > 0);
+          appNames = lines.map((line: string) => line.trim()).filter((name: string) => name.length > 0);
           
           setRollupStatuses(prev => ({ ...prev, names: 'DONE' }));
-          setRollupContent(prev => ({ ...prev, names }));
+          setRollupContent(prev => ({ ...prev, names: appNames }));
         }
       } catch (error) {
         console.error('Error generating app names:', error);
@@ -1084,20 +1082,18 @@ Keep each section concise and focused. Do not include revenue projections.`;
 
       // Generate PRP
       setStatus('Generating product requirements prompt...');
+      let prpContent: string = '';
       try {
-        // Extract data from the generated content - get actual text content
-        const definitelyIncludeFeatures = (rollupContent.definitely || []).map((feature: string) => feature.trim()).filter((feature: string) => feature.length > 0);
-        const backlogItems = (rollupContent.backlog || []).map((item: any) => item.content.trim()).filter((content: string) => content.length > 0);
-        const keywords = (rollupContent.keywords || []).map((keyword: string) => keyword.trim()).filter((keyword: string) => keyword.length > 0);
+        // Use the local variables that were just generated
         const description = rollupContent.description?.[0] || '';
-        const appNames = (rollupContent.names || []).map((name: string) => name.trim()).filter((name: string) => name.length > 0);
         
-        const prpMessages = buildPRPPrompt(appMetaData, definitelyIncludeFeatures, backlogItems, keywords, description, appNames);
+        const prpMessages = buildPRPPrompt(appMetaData, definitelyIncludeFeatures, backlogItems, keywordsArray, description, appNames);
         const prpResponse = await callAI(grokApiKey, prpMessages, 'grok', 'grok-4-fast-reasoning');
         
         if (prpResponse && prpResponse.trim()) {
+          prpContent = prpResponse.trim();
           setRollupStatuses(prev => ({ ...prev, prp: 'DONE' }));
-          setRollupContent(prev => ({ ...prev, prp: [prpResponse.trim()] }));
+          setRollupContent(prev => ({ ...prev, prp: [prpContent] }));
         }
       } catch (error) {
         console.error('Error generating PRP:', error);
@@ -1105,8 +1101,9 @@ Keep each section concise and focused. Do not include revenue projections.`;
 
       // Search and display similar apps
       setStatus('Searching for similar apps...');
+      let similarApps: any[] = [];
       try {
-        const similarApps = await searchSimilarApps(appMetaData);
+        similarApps = await searchSimilarApps(appMetaData);
         setRollupStatuses(prev => ({ ...prev, similar: 'DONE' }));
         setRollupContent(prev => ({ ...prev, similar: similarApps }));
       } catch (error) {
@@ -1115,21 +1112,18 @@ Keep each section concise and focused. Do not include revenue projections.`;
 
       // Generate pricing model
       setStatus('Analyzing pricing models...');
+      let pricingContent: string = '';
       try {
-        // Extract data from the generated content - get actual text content
-        const definitelyIncludeFeatures = (rollupContent.definitely || []).map((feature: string) => feature.trim()).filter((feature: string) => feature.length > 0);
-        const backlogItems = (rollupContent.backlog || []).map((item: any) => item.content.trim()).filter((content: string) => content.length > 0);
-        const keywords = (rollupContent.keywords || []).map((keyword: string) => keyword.trim()).filter((keyword: string) => keyword.length > 0);
+        // Use the local variables that were just generated
         const description = rollupContent.description?.[0] || '';
-        const appNames = (rollupContent.names || []).map((name: string) => name.trim()).filter((name: string) => name.length > 0);
-        const similarApps = rollupContent.similar || [];
         
-        const pricingMessages = buildPricingModelPrompt(appMetaData, definitelyIncludeFeatures, backlogItems, keywords, description, appNames, similarApps);
+        const pricingMessages = buildPricingModelPrompt(appMetaData, definitelyIncludeFeatures, backlogItems, keywordsArray, description, appNames, similarApps);
         const pricingResponse = await callAI(grokApiKey, pricingMessages, 'grok', 'grok-4-fast-reasoning');
         
         if (pricingResponse && pricingResponse.trim()) {
+          pricingContent = pricingResponse.trim();
           setRollupStatuses(prev => ({ ...prev, pricing: 'DONE' }));
-          setRollupContent(prev => ({ ...prev, pricing: [pricingResponse.trim()] }));
+          setRollupContent(prev => ({ ...prev, pricing: [pricingContent] }));
         }
       } catch (error) {
         console.error('Error generating pricing model:', error);
