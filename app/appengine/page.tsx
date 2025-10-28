@@ -976,6 +976,7 @@ Keep each section concise and focused. Do not include revenue projections.`;
 
       // Generate keywords
       setStatus('Generating keywords for ASO...');
+      let keywordsArray: string[] = [];
       try {
         console.log('DEBUG - Section 4 Input:', finalParsed.likes);
         const keywordsMessages = buildKeywordsPrompt(appMetaData, finalParsed.likes);
@@ -984,12 +985,12 @@ Keep each section concise and focused. Do not include revenue projections.`;
         console.log('DEBUG - Section 4 Response:', keywordsResponse);
         
         if (keywordsResponse && keywordsResponse.trim()) {
-          const keywords = keywordsResponse.split(',').map((k: string) => k.trim()).filter((k: string) => k.length > 0);
-          console.log('DEBUG - Section 4 Parsed Keywords:', keywords);
-          setAnalysisResults((prev: ParsedResults) => ({ ...prev, keywords }));
+          keywordsArray = keywordsResponse.split(',').map((k: string) => k.trim()).filter((k: string) => k.length > 0);
+          console.log('DEBUG - Section 4 Parsed Keywords:', keywordsArray);
+          setAnalysisResults((prev: ParsedResults) => ({ ...prev, keywords: keywordsArray }));
           
           setRollupStatuses(prev => ({ ...prev, keywords: 'DONE' }));
-          setRollupContent(prev => ({ ...prev, keywords }));
+          setRollupContent(prev => ({ ...prev, keywords: keywordsArray }));
         } else {
           console.log('DEBUG - Section 4: Empty response');
         }
@@ -1065,14 +1066,12 @@ Keep each section concise and focused. Do not include revenue projections.`;
       setStatus('Generating app description...');
       try {
         // Use the local variables that were just generated
-        const keywords = (rollupContent.keywords || []).map((keyword: string) => keyword.trim()).filter((keyword: string) => keyword.length > 0);
-        
         console.log('DEBUG - App Description Input Data:');
         console.log('definitelyIncludeFeatures:', definitelyIncludeFeatures);
         console.log('backlogItems:', backlogItems);
-        console.log('keywords:', keywords);
+        console.log('keywords:', keywordsArray);
         
-        const appDescriptionMessages = buildAppDescriptionPrompt(appMetaData, definitelyIncludeFeatures, backlogItems, keywords);
+        const appDescriptionMessages = buildAppDescriptionPrompt(appMetaData, definitelyIncludeFeatures, backlogItems, keywordsArray);
         const appDescriptionResponse = await callAI(grokApiKey, appDescriptionMessages, 'grok', 'grok-4-fast-reasoning');
         
         if (appDescriptionResponse && appDescriptionResponse.trim()) {
