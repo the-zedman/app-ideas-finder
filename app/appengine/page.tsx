@@ -244,6 +244,83 @@ export default function AppEnginePage() {
                   );
                 })}
               </div>
+            ) : section === 'description' || section === 'prp' || section === 'pricing' ? (
+              <div style={{
+                fontSize: '14px',
+                lineHeight: '1.6',
+                color: '#374151',
+                whiteSpace: 'pre-wrap'
+              }}>
+                {content?.[0]}
+              </div>
+            ) : section === 'names' ? (
+              <div className="flex flex-wrap gap-2">
+                {content?.map((name: string, i: number) => (
+                  <span key={i} className="bg-green-100 px-3 py-2 rounded text-sm text-gray-700 font-medium">
+                    {name}
+                  </span>
+                ))}
+              </div>
+            ) : section === 'similar' ? (
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', justifyContent: 'space-between' }}>
+                {content?.map((app: any, i: number) => {
+                  const name = app.trackName || 'Unknown App';
+                  const developer = app.artistName || 'Unknown Developer';
+                  const rating = app.averageUserRating ? Number(app.averageUserRating).toFixed(1) : 'N/A';
+                  const ratingCount = app.userRatingCount ? app.userRatingCount.toLocaleString() : 'N/A';
+                  const icon = app.artworkUrl100 || '';
+                  const storeUrl = app.trackViewUrl || '#';
+                  const genre = app.primaryGenreName || 'Unknown Genre';
+                  const description = app.description ? app.description.substring(0, 150) + '...' : 'No description available';
+                  
+                  return (
+                    <div key={i} style={{
+                      width: 'calc(33.333% - 11px)',
+                      background: '#fff',
+                      border: '1px solid #e5e7eb',
+                      borderRadius: '8px',
+                      padding: '12px',
+                      textAlign: 'center'
+                    }}>
+                      {icon && (
+                        <img src={icon} alt={name} style={{
+                          width: '60px',
+                          height: '60px',
+                          borderRadius: '12px',
+                          margin: '0 auto 8px',
+                          display: 'block'
+                        }} />
+                      )}
+                      <h4 style={{ margin: '0 0 4px', fontSize: '14px', fontWeight: '600', color: '#111' }}>
+                        {name}
+                      </h4>
+                      <p style={{ margin: '0 0 4px', fontSize: '12px', color: '#666' }}>
+                        {developer}
+                      </p>
+                      <p style={{ margin: '0 0 4px', fontSize: '12px', color: '#666' }}>
+                        {genre}
+                      </p>
+                      <p style={{ margin: '0 0 8px', fontSize: '12px' }}>
+                        <span style={{ color: '#ff9500' }}>★</span> {rating} ({ratingCount})
+                      </p>
+                      <p style={{ margin: '0 0 8px', fontSize: '11px', lineHeight: '1.4', color: '#555', textAlign: 'left' }}>
+                        {description}
+                      </p>
+                      <a href={storeUrl} target="_blank" rel="noopener noreferrer" style={{
+                        display: 'inline-block',
+                        background: '#0366d6',
+                        color: '#fff',
+                        textDecoration: 'none',
+                        padding: '6px 12px',
+                        borderRadius: '4px',
+                        fontSize: '12px'
+                      }}>
+                        View in Store
+                      </a>
+                    </div>
+                  );
+                })}
+              </div>
             ) : (
               <ul id={`${section}List`} style={{ listStyle: 'none', padding: 0, margin: 0 }}>
                 {content?.map((item: string, i: number) => {
@@ -498,6 +575,234 @@ Focus on the most frequently mentioned issues and most requested features.`;
     return [{role:'user', content: prompt}];
   };
 
+  // Generate app description based on features, backlog, and keywords
+  const buildAppDescriptionPrompt = (appMeta: AppMeta, definitelyInclude: string[], backlog: any[], keywords: string[]) => {
+    const appName = appMeta?.trackName || appMeta?.collectionName || 'this app';
+    const definitelyIncludeText = definitelyInclude.join(', ');
+    const backlogText = backlog.map((item: any) => item.content).join(', ');
+    const keywordsText = keywords.join(', ');
+    
+    const prompt = `Based on the analysis, create a compelling 2-3 sentence app description for a new app that addresses user needs and incorporates the best features.
+
+Features to definitely include: ${definitelyIncludeText}
+
+Backlog items to address: ${backlogText}
+
+Keywords: ${keywordsText}
+
+Create a description that:
+- Explains what the app does in clear terms
+- Highlights why it's good and how it helps users
+- Incorporates the most important features and benefits
+- Is engaging and compelling for potential users
+- Is 2-3 sentences maximum
+- Use "This new app" instead of any specific app name
+
+Write as if this is the App Store description for a new, improved app.`;
+
+    return [{role:'user', content: prompt}];
+  };
+
+  // Generate app names based on all analysis
+  const buildAppNamePrompt = (appMeta: AppMeta, definitelyInclude: string[], backlog: any[], keywords: string[], description: string) => {
+    const definitelyIncludeText = definitelyInclude.join(', ');
+    const backlogText = backlog.map((item: any) => item.content).join(', ');
+    const keywordsText = keywords.join(', ');
+    
+    const prompt = `Based on all the analysis and learnings, generate up to 20 creative and compelling app names for a new app.
+
+Features to definitely include: ${definitelyIncludeText}
+
+Backlog items to address: ${backlogText}
+
+Keywords: ${keywordsText}
+
+App description: ${description}
+
+Create app names that are:
+- Creative and memorable
+- Relevant to the app's functionality
+- Easy to pronounce and spell
+- App Store friendly (not too long)
+- Unique and distinctive
+- Appeal to the target audience
+
+Generate 15-20 app names, one per line, without numbers or bullet points.`;
+
+    return [{role:'user', content: prompt}];
+  };
+
+  // Generate PRP (Product Requirements Prompt) for AI development
+  const buildPRPPrompt = (appMeta: AppMeta, definitelyInclude: string[], backlog: any[], keywords: string[], description: string, appNames: string[]) => {
+    const definitelyIncludeText = definitelyInclude.join(', ');
+    const backlogText = backlog.map((item: any) => item.content).join(', ');
+    const keywordsText = keywords.join(', ');
+    const appNamesText = appNames.join(', ');
+    
+    const prompt = `Create a comprehensive Product Requirements Prompt (PRP) that a developer can use to prompt an AI to build this app.
+
+App Description: ${description}
+
+Features to definitely include: ${definitelyIncludeText}
+
+Backlog items to address: ${backlogText}
+
+Keywords: ${keywordsText}
+
+Potential app names: ${appNamesText}
+
+Create a detailed PRP that includes:
+- Clear project overview and objectives
+- Detailed feature specifications
+- User experience requirements
+- Technical requirements and constraints
+- Success metrics and goals
+- Development phases and priorities
+- User stories and use cases
+
+Format as a comprehensive prompt that an AI developer can use to start building the app. Make it detailed, actionable, and comprehensive.`;
+
+    return [{role:'user', content: prompt}];
+  };
+
+  // Generate pricing model based on similar apps and app features
+  const buildPricingModelPrompt = (appMeta: AppMeta, definitelyInclude: string[], backlog: any[], keywords: string[], description: string, appNames: string[], similarApps: any[]) => {
+    const definitelyIncludeText = definitelyInclude.join(', ');
+    const backlogText = backlog.map((item: any) => item.content).join(', ');
+    const keywordsText = keywords.join(', ');
+    const appNamesText = appNames.join(', ');
+    
+    // Format similar apps data
+    const similarAppsText = similarApps.map((app: any) => 
+      `${app.trackName} - ${app.formattedPrice || 'Free'} - ${app.averageUserRating || 'N/A'}★ - ${app.description ? app.description.substring(0, 200) + '...' : 'No description'}`
+    ).join('\n');
+    
+    const prompt = `Based on the analysis of similar apps and the new app features, suggest an appropriate pricing model and specific prices in USD.
+
+New App Description: ${description}
+
+Features to definitely include: ${definitelyIncludeText}
+
+Backlog items to address: ${backlogText}
+
+Keywords: ${keywordsText}
+
+Similar Apps and their pricing:
+${similarAppsText}
+
+Create a concise pricing strategy that considers the value proposition and compares against similar apps. Provide:
+
+1. **Executive Summary** - Brief overview of the pricing recommendation
+2. **Recommended Pricing Model** - (Free, Paid, Freemium, Subscription, etc.)
+3. **Specific Price Points** - Exact USD prices for different tiers
+4. **Rationale** - Why this pricing strategy makes sense
+5. **Comparison** - How it compares to similar apps
+
+Keep each section concise and focused. Do not include revenue projections.`;
+
+    return [{role:'user', content: prompt}];
+  };
+
+  // Search for similar apps using iTunes API
+  const searchSimilarApps = async (appMeta: AppMeta) => {
+    const appName = appMeta.trackName || appMeta.collectionName || '';
+    const appDescription = appMeta.description || '';
+    
+    console.log('Searching for similar apps:', { appName, appDescription: appDescription.substring(0, 100) + '...' });
+    
+    // Extract key terms from app name and description for search
+    const searchTerms = extractSearchTerms(appName, appDescription);
+    console.log('Search terms:', searchTerms);
+    
+    const similarApps: any[] = [];
+    const seenAppIds = new Set();
+    
+    // Search for each term and collect unique apps
+    for (const term of searchTerms) {
+      try {
+        const url = `/api/itunes/search?term=${encodeURIComponent(term)}&limit=20`;
+        console.log('Searching URL:', url);
+        const response = await fetch(url);
+        if (response.ok) {
+          const data = await response.json();
+          console.log(`Search results for "${term}":`, data.resultCount || 0, 'apps found');
+          if (data.results && data.results.length > 0) {
+            for (const app of data.results) {
+              // Skip the original app and duplicates
+              if (app.trackId !== appMeta.trackId && !seenAppIds.has(app.trackId)) {
+                seenAppIds.add(app.trackId);
+                similarApps.push({
+                  trackId: app.trackId,
+                  trackName: app.trackName,
+                  artistName: app.artistName,
+                  averageUserRating: app.averageUserRating,
+                  userRatingCount: app.userRatingCount,
+                  artworkUrl100: app.artworkUrl100,
+                  trackViewUrl: app.trackViewUrl,
+                  description: app.description,
+                  primaryGenreName: app.primaryGenreName,
+                  formattedPrice: app.formattedPrice
+                });
+                
+                // Stop when we have enough apps
+                if (similarApps.length >= 9) break;
+              }
+            }
+          }
+        } else {
+          console.error(`Search failed for term "${term}":`, response.status);
+        }
+      } catch (error) {
+        console.error(`Error searching for term "${term}":`, error);
+      }
+      
+      // Stop if we have enough apps
+      if (similarApps.length >= 9) break;
+    }
+    
+    console.log('Total similar apps found:', similarApps.length);
+    return similarApps.slice(0, 9);
+  };
+
+  // Extract search terms from app name and description
+  const extractSearchTerms = (appName: string, description: string) => {
+    const terms: string[] = [];
+    
+    // Add the app name itself
+    if (appName) {
+      terms.push(appName);
+      
+      // Split app name into words
+      const nameWords = appName.toLowerCase().split(/\s+/).filter((word: string) => word.length > 2);
+      terms.push(...nameWords);
+    }
+    
+    // Extract key terms from description
+    if (description) {
+      const descWords = description.toLowerCase()
+        .replace(/[^\w\s]/g, ' ')
+        .split(/\s+/)
+        .filter((word: string) => word.length > 3)
+        .filter((word: string) => !['this', 'that', 'with', 'from', 'they', 'have', 'been', 'will', 'were', 'said', 'each', 'which', 'their', 'time', 'would', 'there', 'could', 'other', 'after', 'first', 'well', 'also', 'where', 'much', 'some', 'very', 'when', 'here', 'just', 'into', 'your', 'work', 'life', 'only', 'over', 'think', 'back', 'even', 'before', 'move', 'right', 'being', 'good', 'make', 'most', 'useful', 'great', 'best', 'help', 'easy', 'simple', 'new', 'app', 'app', 'apps'].includes(word));
+      
+      // Get most common words
+      const wordCount: { [key: string]: number } = {};
+      descWords.forEach((word: string) => {
+        wordCount[word] = (wordCount[word] || 0) + 1;
+      });
+      
+      const sortedWords = Object.entries(wordCount)
+        .sort(([,a], [,b]) => b - a)
+        .slice(0, 5)
+        .map(([word]) => word);
+      
+      terms.push(...sortedWords);
+    }
+    
+    // Remove duplicates and limit
+    return [...new Set(terms)].slice(0, 8);
+  };
+
   // Main analysis function - matches HTML exactly
   const startAnalysis = async () => {
     const appInput = appInputRef.current?.value.trim();
@@ -708,7 +1013,7 @@ Focus on the most frequently mentioned issues and most requested features.`;
       }
 
       // Generate backlog items
-      setStatus('Generating project backlog items...');
+      setStatus('Generating enhanced features to include...');
       try {
         const backlogMessages = buildBacklogPrompt(appMetaData, finalParsed.dislikes, finalParsed.likes);
         const backlogResponse = await callAI(grokApiKey, backlogMessages, 'grok', 'grok-4-fast-reasoning');
@@ -733,6 +1038,102 @@ Focus on the most frequently mentioned issues and most requested features.`;
         }
       } catch (error) {
         console.error('Error generating backlog items:', error);
+      }
+
+      // Generate app description
+      setStatus('Generating app description...');
+      try {
+        // Extract data from the generated content
+        const definitelyIncludeFeatures = rollupContent.definitely || [];
+        const backlogItems = rollupContent.backlog || [];
+        const keywords = rollupContent.keywords || [];
+        
+        const appDescriptionMessages = buildAppDescriptionPrompt(appMetaData, definitelyIncludeFeatures, backlogItems, keywords);
+        const appDescriptionResponse = await callAI(grokApiKey, appDescriptionMessages, 'grok', 'grok-4-fast-reasoning');
+        
+        if (appDescriptionResponse && appDescriptionResponse.trim()) {
+          setRollupStatuses(prev => ({ ...prev, description: 'DONE' }));
+          setRollupContent(prev => ({ ...prev, description: [appDescriptionResponse.trim()] }));
+        }
+      } catch (error) {
+        console.error('Error generating app description:', error);
+      }
+
+      // Generate app names
+      setStatus('Generating app names...');
+      try {
+        // Extract data from the generated content
+        const definitelyIncludeFeatures = rollupContent.definitely || [];
+        const backlogItems = rollupContent.backlog || [];
+        const keywords = rollupContent.keywords || [];
+        const description = rollupContent.description?.[0] || '';
+        
+        const appNameMessages = buildAppNamePrompt(appMetaData, definitelyIncludeFeatures, backlogItems, keywords, description);
+        const appNameResponse = await callAI(grokApiKey, appNameMessages, 'grok', 'grok-4-fast-reasoning');
+        
+        if (appNameResponse && appNameResponse.trim()) {
+          // Parse app names from the text
+          const lines = appNameResponse.split('\n').filter((line: string) => line.trim().length > 0);
+          const names = lines.map((line: string) => line.trim()).filter((name: string) => name.length > 0);
+          
+          setRollupStatuses(prev => ({ ...prev, names: 'DONE' }));
+          setRollupContent(prev => ({ ...prev, names }));
+        }
+      } catch (error) {
+        console.error('Error generating app names:', error);
+      }
+
+      // Generate PRP
+      setStatus('Generating product requirements prompt...');
+      try {
+        // Extract data from the generated content
+        const definitelyIncludeFeatures = rollupContent.definitely || [];
+        const backlogItems = rollupContent.backlog || [];
+        const keywords = rollupContent.keywords || [];
+        const description = rollupContent.description?.[0] || '';
+        const appNames = rollupContent.names || [];
+        
+        const prpMessages = buildPRPPrompt(appMetaData, definitelyIncludeFeatures, backlogItems, keywords, description, appNames);
+        const prpResponse = await callAI(grokApiKey, prpMessages, 'grok', 'grok-4-fast-reasoning');
+        
+        if (prpResponse && prpResponse.trim()) {
+          setRollupStatuses(prev => ({ ...prev, prp: 'DONE' }));
+          setRollupContent(prev => ({ ...prev, prp: [prpResponse.trim()] }));
+        }
+      } catch (error) {
+        console.error('Error generating PRP:', error);
+      }
+
+      // Search and display similar apps
+      setStatus('Searching for similar apps...');
+      try {
+        const similarApps = await searchSimilarApps(appMetaData);
+        setRollupStatuses(prev => ({ ...prev, similar: 'DONE' }));
+        setRollupContent(prev => ({ ...prev, similar: similarApps }));
+      } catch (error) {
+        console.error('Error searching for similar apps:', error);
+      }
+
+      // Generate pricing model
+      setStatus('Analyzing pricing models...');
+      try {
+        // Extract data from the generated content
+        const definitelyIncludeFeatures = rollupContent.definitely || [];
+        const backlogItems = rollupContent.backlog || [];
+        const keywords = rollupContent.keywords || [];
+        const description = rollupContent.description?.[0] || '';
+        const appNames = rollupContent.names || [];
+        const similarApps = rollupContent.similar || [];
+        
+        const pricingMessages = buildPricingModelPrompt(appMetaData, definitelyIncludeFeatures, backlogItems, keywords, description, appNames, similarApps);
+        const pricingResponse = await callAI(grokApiKey, pricingMessages, 'grok', 'grok-4-fast-reasoning');
+        
+        if (pricingResponse && pricingResponse.trim()) {
+          setRollupStatuses(prev => ({ ...prev, pricing: 'DONE' }));
+          setRollupContent(prev => ({ ...prev, pricing: [pricingResponse.trim()] }));
+        }
+      } catch (error) {
+        console.error('Error generating pricing model:', error);
       }
 
       setStatus('Done.');
