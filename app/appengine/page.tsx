@@ -53,6 +53,9 @@ export default function AppEnginePage() {
   const [expandedRollup, setExpandedRollup] = useState<string | null>(null);
   const [rollupStatuses, setRollupStatuses] = useState<{[key: string]: string}>({});
   const [rollupContent, setRollupContent] = useState<{[key: string]: any}>({});
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [showSearchResults, setShowSearchResults] = useState(false);
+  const [appInput, setAppInput] = useState('');
   
   const router = useRouter();
   const appInputRef = useRef<HTMLInputElement>(null);
@@ -92,6 +95,19 @@ export default function AppEnginePage() {
     };
 
     fetchApiKey();
+  }, []);
+
+  // Handle clicking outside search results to close them
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      if (!target.closest('.search-results-container') && !target.closest('input[type="text"]')) {
+        setShowSearchResults(false);
+      }
+    };
+
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
   }, []);
 
   const handleLogout = async () => {
@@ -415,6 +431,62 @@ export default function AppEnginePage() {
     if (/^\d+$/.test(input)) return input;
     const m = input.match(/id(\d+)/);
     return m ? m[1] : '';
+  };
+
+  // Search for apps by name/keyword
+  const searchAppsByName = async (searchTerm: string) => {
+    if (!searchTerm || searchTerm.trim().length < 2) {
+      setShowSearchResults(false);
+      return;
+    }
+    
+    try {
+      const response = await fetch(`/api/itunes/search?term=${encodeURIComponent(searchTerm)}&limit=10`);
+      if (response.ok) {
+        const data = await response.json();
+        if (data.results && data.results.length > 0) {
+          setSearchResults(data.results);
+          setShowSearchResults(true);
+        } else {
+          setShowSearchResults(false);
+        }
+      } else {
+        setShowSearchResults(false);
+      }
+    } catch (error) {
+      console.error('Error searching apps:', error);
+      setShowSearchResults(false);
+    }
+  };
+
+  // Handle input change with debouncing
+  const handleInputChange = (value: string) => {
+    setAppInput(value);
+    
+    // Clear search results if input is empty or too short
+    if (!value || value.trim().length < 2) {
+      setShowSearchResults(false);
+      return;
+    }
+    
+    // Check if it's a URL or ID first
+    const appId = extractAppId(value);
+    if (appId) {
+      setShowSearchResults(false);
+      return;
+    }
+    
+    // Debounce search for app names/keywords
+    setTimeout(() => {
+      searchAppsByName(value);
+    }, 300);
+  };
+
+  // Handle app selection from search results
+  const handleAppSelection = (app: any) => {
+    const appId = app.trackId?.toString() || '';
+    setAppInput(appId);
+    setShowSearchResults(false);
   };
 
   // iTunes API functions
@@ -1311,13 +1383,47 @@ Keep each section concise and focused. Do not include revenue projections.`;
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   App Store URL, App ID, or App Name
                 </label>
-                <input
-                  ref={appInputRef}
-                  type="text"
-                  placeholder="e.g. https://apps.apple.com/us/app/.../id6475137430, 6475137430, or 'Instagram'"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E07A5F] focus:border-transparent"
-                />
-                <div id="searchResults" className="hidden mt-2 border border-gray-200 rounded-lg bg-white max-h-48 overflow-y-auto"></div>
+                <div className="relative">
+                  <input
+                    ref={appInputRef}
+                    type="text"
+                    value={appInput}
+                    onChange={(e) => handleInputChange(e.target.value)}
+                    placeholder="e.g. https://apps.apple.com/us/app/.../id6475137430, 6475137430, or 'Instagram'"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E07A5F] focus:border-transparent"
+                  />
+                  {showSearchResults && searchResults.length > 0 && (
+                    <div className="search-results-container absolute top-full left-0 right-0 mt-1 border border-gray-200 rounded-lg bg-white shadow-lg max-h-48 overflow-y-auto z-10">
+                      {searchResults.map((app, index) => {
+                        const name = app.trackName || 'Unknown App';
+                        const developer = app.artistName || 'Unknown Developer';
+                        const rating = app.averageUserRating ? Number(app.averageUserRating).toFixed(1) : 'N/A';
+                        const icon = app.artworkUrl100 || '';
+                        
+                        return (
+                          <div
+                            key={index}
+                            onClick={() => handleAppSelection(app)}
+                            className="p-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0 flex items-center gap-3"
+                          >
+                            {icon && (
+                              <img
+                                src={icon}
+                                alt={name}
+                                className="w-12 h-12 rounded-lg object-cover"
+                              />
+                            )}
+                            <div className="flex-1 min-w-0">
+                              <div className="font-medium text-gray-900 truncate">{name}</div>
+                              <div className="text-sm text-gray-500 truncate">{developer}</div>
+                              <div className="text-sm text-gray-500">★ {rating}</div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* Start Button */}
