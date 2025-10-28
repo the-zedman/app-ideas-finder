@@ -630,12 +630,12 @@ Example:
         
         if (definitelyIncludeResponse && definitelyIncludeResponse.trim()) {
           // Parse the features from the text
-          const lines = definitelyIncludeResponse.split('\n').filter(line => line.trim().length > 0);
-          const features = lines.map(line => {
+          const lines = definitelyIncludeResponse.split('\n').filter((line: string) => line.trim().length > 0);
+          const features = lines.map((line: string) => {
             // Remove bullet points and clean up
             const cleanLine = line.replace(/^[•\-\*]\s*/, '').trim();
             return cleanLine;
-          }).filter(feature => feature.length > 0);
+          }).filter((feature: string) => feature.length > 0);
           
           setRollupStatuses(prev => ({ ...prev, definitely: 'DONE' }));
           setRollupContent(prev => ({ ...prev, definitely: features }));
