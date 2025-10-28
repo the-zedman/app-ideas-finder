@@ -1048,6 +1048,12 @@ Keep each section concise and focused. Do not include revenue projections.`;
         const backlogItems = (rollupContent.backlog || []).map((item: any) => item.content.trim()).filter((content: string) => content.length > 0);
         const keywords = (rollupContent.keywords || []).map((keyword: string) => keyword.trim()).filter((keyword: string) => keyword.length > 0);
         
+        console.log('DEBUG - App Description Input Data:');
+        console.log('definitelyIncludeFeatures:', definitelyIncludeFeatures);
+        console.log('backlogItems:', backlogItems);
+        console.log('keywords:', keywords);
+        console.log('rollupContent:', rollupContent);
+        
         const appDescriptionMessages = buildAppDescriptionPrompt(appMetaData, definitelyIncludeFeatures, backlogItems, keywords);
         const appDescriptionResponse = await callAI(grokApiKey, appDescriptionMessages, 'grok', 'grok-4-fast-reasoning');
         
