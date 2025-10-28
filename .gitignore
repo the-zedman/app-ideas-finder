@@ -40,3 +40,6 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# Reference files (contain sensitive data)
+appstore_reviews6.html
+
