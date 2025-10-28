@@ -966,6 +966,7 @@ Keep each section concise and focused. Do not include revenue projections.`;
       }));
       
       // Store content for rollups
+      console.log('DEBUG - Final Parsed Data:', finalParsed);
       setRollupContent(prev => ({
         ...prev,
         likes: finalParsed.likes,
@@ -994,8 +995,11 @@ Keep each section concise and focused. Do not include revenue projections.`;
       setStatus('Generating features to definitely include...');
       let definitelyIncludeFeatures: string[] = [];
       try {
+        console.log('DEBUG - Section 5 Input:', finalParsed.likes);
         const definitelyIncludeMessages = buildDefinitelyIncludePrompt(appMetaData, finalParsed.likes);
+        console.log('DEBUG - Section 5 Messages:', definitelyIncludeMessages);
         const definitelyIncludeResponse = await callAI(grokApiKey, definitelyIncludeMessages, 'grok', 'grok-4-fast-reasoning');
+        console.log('DEBUG - Section 5 Response:', definitelyIncludeResponse);
         
         if (definitelyIncludeResponse && definitelyIncludeResponse.trim()) {
           // Parse the features from the text
@@ -1006,8 +1010,11 @@ Keep each section concise and focused. Do not include revenue projections.`;
             return cleanLine;
           }).filter((feature: string) => feature.length > 0);
           
+          console.log('DEBUG - Section 5 Parsed Features:', definitelyIncludeFeatures);
           setRollupStatuses(prev => ({ ...prev, definitely: 'DONE' }));
           setRollupContent(prev => ({ ...prev, definitely: definitelyIncludeFeatures }));
+        } else {
+          console.log('DEBUG - Section 5: Empty response');
         }
       } catch (error) {
         console.error('Error generating definitely include features:', error);
@@ -1017,8 +1024,11 @@ Keep each section concise and focused. Do not include revenue projections.`;
       setStatus('Generating enhanced features to include...');
       let backlogItems: any[] = [];
       try {
+        console.log('DEBUG - Section 6 Input:', finalParsed.dislikes, finalParsed.likes);
         const backlogMessages = buildBacklogPrompt(appMetaData, finalParsed.dislikes, finalParsed.likes);
+        console.log('DEBUG - Section 6 Messages:', backlogMessages);
         const backlogResponse = await callAI(grokApiKey, backlogMessages, 'grok', 'grok-4-fast-reasoning');
+        console.log('DEBUG - Section 6 Response:', backlogResponse);
         
         if (backlogResponse && backlogResponse.trim()) {
           // Parse the backlog items from the text
@@ -1035,8 +1045,11 @@ Keep each section concise and focused. Do not include revenue projections.`;
             };
           }).filter((item: any) => item.content.length > 0);
           
+          console.log('DEBUG - Section 6 Parsed Items:', backlogItems);
           setRollupStatuses(prev => ({ ...prev, backlog: 'DONE' }));
           setRollupContent(prev => ({ ...prev, backlog: backlogItems }));
+        } else {
+          console.log('DEBUG - Section 6: Empty response');
         }
       } catch (error) {
         console.error('Error generating backlog items:', error);
