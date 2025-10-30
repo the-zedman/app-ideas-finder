@@ -1393,7 +1393,7 @@ Keep each section concise and focused. Do not include revenue projections.`;
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E07A5F] focus:border-transparent"
                   />
                   {showSearchResults && searchResults.length > 0 && (
-            <div className="search-results-container absolute top-full left-0 right-0 mt-1 border border-gray-200 rounded-lg bg-white shadow-lg max-h-48 overflow-y-auto z-50">
+            <div className="search-results-container absolute top-full left-0 mt-1 border border-gray-200 rounded-lg bg-white shadow-lg max-h-96 overflow-y-auto z-50 w-auto min-w-[22rem] max-w-[36rem]">
                       {searchResults.map((app, index) => {
                         const name = app.trackName || 'Unknown App';
                         const developer = app.artistName || 'Unknown Developer';
