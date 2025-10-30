@@ -572,6 +572,10 @@ export default function AppEnginePage() {
     if (data.usage) {
       const inputTokens = data.usage.prompt_tokens || 0;
       const outputTokens = data.usage.completion_tokens || 0;
+      // Also log for debugging if needed
+      if (process.env.NODE_ENV === 'development') {
+        console.log('API call tokens:', { inputTokens, outputTokens, total: inputTokens + outputTokens });
+      }
       updateCostTracking(inputTokens, outputTokens);
     }
     
@@ -585,9 +589,10 @@ export default function AppEnginePage() {
       const newTotalCalls = prev.totalCalls + 1;
       
       // Calculate costs (grok-4-fast-reasoning pricing: $0.20 input, $0.50 output per 1M tokens)
-      const inputCost = (newTotalInput / 1_000_000) * 0.20;
-      const outputCost = (newTotalOutput / 1_000_000) * 0.50;
-      const totalCost = inputCost + outputCost;
+      // Using incremental calculation to avoid cumulative rounding errors
+      const inputCostIncrement = (inputTokens / 1_000_000) * 0.20;
+      const outputCostIncrement = (outputTokens / 1_000_000) * 0.50;
+      const totalCost = prev.totalCost + inputCostIncrement + outputCostIncrement;
       
       return {
         totalCalls: newTotalCalls,
@@ -934,6 +939,14 @@ Keep each section concise and focused. Do not include revenue projections.`;
     setStatus('Fetching app metadata...');
     setShowRollups(false);
     setExpandedRollup(null);
+    
+    // Reset cost tracking for new analysis
+    setCostTracking({
+      totalCalls: 0,
+      totalInputTokens: 0,
+      totalOutputTokens: 0,
+      totalCost: 0
+    });
     
     // Initialize rollup statuses - match HTML exactly
     const sections = ['likes', 'dislikes', 'recommendations', 'keywords', 'definitely', 'backlog', 'description', 'names', 'prp', 'similar', 'pricing'];
