@@ -537,16 +537,6 @@ export default function AppEnginePage() {
   };
 
   // AI API function
-  const MODEL_PRICING: Record<string, { inputPerMillion: number; outputPerMillion: number }> = {
-    'grok-4-fast-reasoning': { inputPerMillion: 0.20, outputPerMillion: 0.50 },
-    'grok-4-fast-non-reasoning': { inputPerMillion: 0.20, outputPerMillion: 0.50 },
-    'grok-code-fast-1': { inputPerMillion: 0.20, outputPerMillion: 1.50 },
-    'grok-4-0709': { inputPerMillion: 3.00, outputPerMillion: 15.00 },
-    'grok-3-mini': { inputPerMillion: 0.30, outputPerMillion: 0.50 },
-    'grok-3': { inputPerMillion: 3.00, outputPerMillion: 15.00 },
-    'grok-2-vision-1212': { inputPerMillion: 2.00, outputPerMillion: 10.00 },
-    'grok-2-1212': { inputPerMillion: 2.00, outputPerMillion: 10.00 }
-  };
   const callAI = async (apiKey: string, messages: any[], provider: string = 'grok', model: string = 'grok-4-fast-reasoning') => {
     const endpoint = 'https://api.x.ai/v1/chat/completions';
     const body = {
@@ -577,22 +567,21 @@ export default function AppEnginePage() {
     if (data.usage) {
       const inputTokens = data.usage.prompt_tokens || 0;
       const outputTokens = data.usage.completion_tokens || 0;
-      updateCostTracking(inputTokens, outputTokens, model);
+      updateCostTracking(inputTokens, outputTokens);
     }
     
     return data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
   };
 
-  const updateCostTracking = (inputTokens: number, outputTokens: number, model: string) => {
+  const updateCostTracking = (inputTokens: number, outputTokens: number) => {
     setCostTracking(prev => {
       const newTotalInput = prev.totalInputTokens + inputTokens;
       const newTotalOutput = prev.totalOutputTokens + outputTokens;
       const newTotalCalls = prev.totalCalls + 1;
       
-      // Calculate costs using the actual model pricing
-      const pricing = MODEL_PRICING[model] || MODEL_PRICING['grok-4-fast-reasoning'];
-      const inputCost = (newTotalInput / 1_000_000) * pricing.inputPerMillion;
-      const outputCost = (newTotalOutput / 1_000_000) * pricing.outputPerMillion;
+      // Calculate costs (grok-4-fast-reasoning pricing: $0.20 input, $0.50 output per 1M tokens)
+      const inputCost = (newTotalInput / 1_000_000) * 0.20;
+      const outputCost = (newTotalOutput / 1_000_000) * 0.50;
       const totalCost = inputCost + outputCost;
       
       return {
