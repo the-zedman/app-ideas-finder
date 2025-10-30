@@ -171,7 +171,9 @@ export default function AppEnginePage() {
     const content = rollupContent[section];
     
     // Bar background colors based on status (only affect the bar visuals)
-    const barBackground = status === 'DONE' ? '#22c55e' /* green-500 */ : '#e5e7eb' /* gray-200 */;
+    // Researching: #8E81A2 (rich light-ish grey/purple)
+    // Done: #3FA265 (beautiful green)
+    const barBackground = status === 'DONE' ? '#3FA265' : '#8E81A2';
     
     return (
       <div key={section} className="rollup-bar" id={`rollup-${section}`} data-section={section}
