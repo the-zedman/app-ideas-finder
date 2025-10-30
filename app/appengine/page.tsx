@@ -1486,14 +1486,14 @@ Keep each section concise and focused. Do not include revenue projections.`;
                   {createRollupBar('likes', 1, 'What people like', 'linear-gradient(135deg, #462403, #592D04)')}
                   {createRollupBar('dislikes', 2, 'What people dislike / want', 'linear-gradient(135deg, #592D04, #6C3604)')}
                   {createRollupBar('recommendations', 3, 'Top recommendations', 'linear-gradient(135deg, #6C3604, #7E4005)')}
-                  {createRollupBar('keywords', 4, 'Suggested keywords', 'linear-gradient(135deg, #7E4005, #914906)')}
-                  {createRollupBar('definitely', 5, 'Core features to include', 'linear-gradient(135deg, #914906, #A77445)')}
-                  {createRollupBar('backlog', 6, 'Enhanced features to include', 'linear-gradient(135deg, #A77445, #B65C07)')}
-                  {createRollupBar('description', 7, 'Suggested app description', 'linear-gradient(135deg, #B65C07, #C86508)')}
-                  {createRollupBar('names', 8, 'Suggested App Names', 'linear-gradient(135deg, #C86508, #DB6E09)')}
+                  {createRollupBar('keywords', 4, 'Suggested keywords for your app', 'linear-gradient(135deg, #7E4005, #914906)')}
+                  {createRollupBar('definitely', 5, 'Core features to include in your app', 'linear-gradient(135deg, #914906, #A77445)')}
+                  {createRollupBar('backlog', 6, 'New and additional features to include in your app', 'linear-gradient(135deg, #A77445, #B65C07)')}
+                  {createRollupBar('description', 7, 'Suggested description for your app', 'linear-gradient(135deg, #B65C07, #C86508)')}
+                  {createRollupBar('names', 8, 'Suggested names for your app', 'linear-gradient(135deg, #C86508, #DB6E09)')}
                   {createRollupBar('prp', 9, 'PRP (Product Requirements Prompt)', 'linear-gradient(135deg, #DB6E09, #E07109)')}
                   {createRollupBar('similar', 10, 'Similar Apps', 'linear-gradient(135deg, #E07109, #F0790A)')}
-                  {createRollupBar('pricing', 11, 'Suggested Pricing Model', 'linear-gradient(135deg, #F0790A, #FF8A1A)')}
+                  {createRollupBar('pricing', 11, 'Suggested pricing model for your app', 'linear-gradient(135deg, #F0790A, #FF8A1A)')}
                 </div>
               )}
 
