@@ -170,6 +170,9 @@ export default function AppEnginePage() {
     const status = rollupStatuses[section] || 'RESEARCH UNDERWAY';
     const content = rollupContent[section];
     
+    // Bar background colors based on status (only affect the bar visuals)
+    const barBackground = status === 'DONE' ? '#22c55e' /* green-500 */ : '#e5e7eb' /* gray-200 */;
+    
     return (
       <div key={section} className="rollup-bar" id={`rollup-${section}`} data-section={section}
            style={{
@@ -178,7 +181,7 @@ export default function AppEnginePage() {
              overflow: 'hidden',
              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
              transition: 'all 0.3s ease',
-             background: gradient
+             background: barBackground
            }}>
         <div className="rollup-header" 
              style={{
@@ -189,7 +192,7 @@ export default function AppEnginePage() {
                cursor: 'pointer',
                transition: 'all 0.3s ease',
                userSelect: 'none',
-               background: gradient,
+               background: barBackground,
                color: 'white'
              }}
              onClick={() => setExpandedRollup(isExpanded ? null : section)}>
