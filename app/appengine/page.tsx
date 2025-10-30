@@ -1381,7 +1381,7 @@ Keep each section concise and focused. Do not include revenue projections.`;
               {/* App Input */}
               <div className="mb-6 overflow-visible">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  App Store URL, App ID, or App Name
+                  App Store URL, App ID, App Name, or keyword
                 </label>
                 <div className="relative overflow-visible">
                   <input
@@ -1393,7 +1393,7 @@ Keep each section concise and focused. Do not include revenue projections.`;
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E07A5F] focus:border-transparent"
                   />
                   {showSearchResults && searchResults.length > 0 && (
-                    <div className="search-results-container absolute bottom-full left-0 right-0 mb-1 border border-gray-200 rounded-lg bg-white shadow-lg max-h-48 overflow-y-auto z-50">
+            <div className="search-results-container absolute top-full left-0 right-0 mt-1 border border-gray-200 rounded-lg bg-white shadow-lg max-h-48 overflow-y-auto z-50">
                       {searchResults.map((app, index) => {
                         const name = app.trackName || 'Unknown App';
                         const developer = app.artistName || 'Unknown Developer';
