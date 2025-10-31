@@ -52,6 +52,7 @@ export default function AppEnginePage() {
     callNumber: number;
     inputTokens: number;
     outputTokens: number;
+    systemTokens: number;
     totalTokens: number;
     cost: number;
     timestamp: string;
@@ -619,30 +620,38 @@ export default function AppEnginePage() {
       const outputTokens = data.usage.completion_tokens || 0;
       const totalTokens = data.usage.total_tokens || (inputTokens + outputTokens);
       
+      // Grok includes system/overhead tokens in total_tokens but not in prompt/completion
+      // The difference represents system/metadata tokens that are typically billed as input
+      const systemTokens = totalTokens - (inputTokens + outputTokens);
+      const effectiveInputTokens = inputTokens + systemTokens;
+      
       // Calculate cost for this call
-      const inputCost = Number((inputTokens * 0.0000002).toFixed(10));
+      // System tokens are billed at input rate
+      const inputCost = Number((effectiveInputTokens * 0.0000002).toFixed(10));
       const outputCost = Number((outputTokens * 0.0000005).toFixed(10));
       const callCost = Number((inputCost + outputCost).toFixed(10));
       
       // Always log to console for debugging
-      console.log(`[API Call] Input: ${inputTokens}, Output: ${outputTokens}, Total: ${totalTokens}, Cost: $${callCost.toFixed(6)}`);
+      console.log(`[API Call] Input: ${inputTokens}, Output: ${outputTokens}, System: ${systemTokens}, Total: ${totalTokens}, Cost: $${callCost.toFixed(6)}`);
       
-      // Verify token counts match
-      if (totalTokens !== (inputTokens + outputTokens)) {
-        console.warn('Token mismatch:', { totalTokens, inputTokens, outputTokens, calculated: inputTokens + outputTokens });
+      // Log mismatch if significant
+      if (systemTokens > 0) {
+        console.log(`ℹ️ System/overhead tokens detected: ${systemTokens} (${((systemTokens / totalTokens) * 100).toFixed(1)}%)`);
       }
       
-      // Track individual call details
+      // Track individual call details (show system tokens separately)
       setApiCallLogs(prev => [...prev, {
         callNumber: prev.length + 1,
-        inputTokens,
+        inputTokens: inputTokens, // Original prompt tokens
         outputTokens,
+        systemTokens: systemTokens, // System/overhead tokens
         totalTokens,
         cost: callCost,
         timestamp: new Date().toISOString()
       }]);
       
-      updateCostTracking(inputTokens, outputTokens);
+      // Update cost tracking with effective tokens (including system)
+      updateCostTracking(effectiveInputTokens, outputTokens);
     } else {
       console.warn('No usage data in API response:', data);
     }
@@ -1629,6 +1638,7 @@ Keep each section concise and focused. Do not include revenue projections.`;
                             <tr className="border-b border-gray-200">
                               <th className="text-left py-1 px-2">#</th>
                               <th className="text-left py-1 px-2">Input</th>
+                              <th className="text-left py-1 px-2">System</th>
                               <th className="text-left py-1 px-2">Output</th>
                               <th className="text-left py-1 px-2">Total</th>
                               <th className="text-left py-1 px-2">Cost</th>
@@ -1639,6 +1649,7 @@ Keep each section concise and focused. Do not include revenue projections.`;
                               <tr key={idx} className="border-b border-gray-100">
                                 <td className="py-1 px-2">{log.callNumber}</td>
                                 <td className="py-1 px-2">{log.inputTokens.toLocaleString()}</td>
+                                <td className="py-1 px-2 text-gray-500">{log.systemTokens.toLocaleString()}</td>
                                 <td className="py-1 px-2">{log.outputTokens.toLocaleString()}</td>
                                 <td className="py-1 px-2">{log.totalTokens.toLocaleString()}</td>
                                 <td className="py-1 px-2">${log.cost.toFixed(6)}</td>
@@ -1649,6 +1660,7 @@ Keep each section concise and focused. Do not include revenue projections.`;
                             <tr className="border-t-2 border-gray-300 font-semibold">
                               <td className="py-1 px-2">Total</td>
                               <td className="py-1 px-2">{apiCallLogs.reduce((sum, log) => sum + log.inputTokens, 0).toLocaleString()}</td>
+                              <td className="py-1 px-2 text-gray-500">{apiCallLogs.reduce((sum, log) => sum + log.systemTokens, 0).toLocaleString()}</td>
                               <td className="py-1 px-2">{apiCallLogs.reduce((sum, log) => sum + log.outputTokens, 0).toLocaleString()}</td>
                               <td className="py-1 px-2">{apiCallLogs.reduce((sum, log) => sum + log.totalTokens, 0).toLocaleString()}</td>
                               <td className="py-1 px-2">${apiCallLogs.reduce((sum, log) => sum + log.cost, 0).toFixed(6)}</td>
@@ -1656,7 +1668,7 @@ Keep each section concise and focused. Do not include revenue projections.`;
                           </tfoot>
                         </table>
                         <div className="mt-2 text-xs text-gray-500 italic">
-                          💡 Check browser console (F12) for real-time logs: Look for "[API Call]" messages
+                          💡 System tokens = overhead/metadata (billed as input). Check console (F12) for "[API Call]" messages
                         </div>
                       </div>
                     </div>
