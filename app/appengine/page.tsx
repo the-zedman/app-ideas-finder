@@ -48,6 +48,14 @@ export default function AppEnginePage() {
     totalOutputTokens: 0,
     totalCost: 0
   });
+  const [apiCallLogs, setApiCallLogs] = useState<Array<{
+    callNumber: number;
+    inputTokens: number;
+    outputTokens: number;
+    totalTokens: number;
+    cost: number;
+    timestamp: string;
+  }>>([]);
   const [grokApiKey, setGrokApiKey] = useState<string>('');
   const [showRollups, setShowRollups] = useState(false);
   const [expandedRollup, setExpandedRollup] = useState<string | null>(null);
@@ -574,20 +582,29 @@ export default function AppEnginePage() {
       const outputTokens = data.usage.completion_tokens || 0;
       const totalTokens = data.usage.total_tokens || (inputTokens + outputTokens);
       
+      // Calculate cost for this call
+      const inputCost = Number((inputTokens * 0.0000002).toFixed(10));
+      const outputCost = Number((outputTokens * 0.0000005).toFixed(10));
+      const callCost = Number((inputCost + outputCost).toFixed(10));
+      
+      // Always log to console for debugging
+      console.log(`[API Call] Input: ${inputTokens}, Output: ${outputTokens}, Total: ${totalTokens}, Cost: $${callCost.toFixed(6)}`);
+      
       // Verify token counts match
       if (totalTokens !== (inputTokens + outputTokens)) {
         console.warn('Token mismatch:', { totalTokens, inputTokens, outputTokens, calculated: inputTokens + outputTokens });
       }
       
-      // Log for debugging
-      if (process.env.NODE_ENV === 'development') {
-        console.log('API call tokens:', { 
-          inputTokens, 
-          outputTokens, 
-          totalTokens,
-          calculated: inputTokens + outputTokens 
-        });
-      }
+      // Track individual call details
+      setApiCallLogs(prev => [...prev, {
+        callNumber: prev.length + 1,
+        inputTokens,
+        outputTokens,
+        totalTokens,
+        cost: callCost,
+        timestamp: new Date().toISOString()
+      }]);
+      
       updateCostTracking(inputTokens, outputTokens);
     } else {
       console.warn('No usage data in API response:', data);
@@ -963,6 +980,7 @@ Keep each section concise and focused. Do not include revenue projections.`;
       totalOutputTokens: 0,
       totalCost: 0
     });
+    setApiCallLogs([]);
     
     // Initialize rollup statuses - match HTML exactly
     const sections = ['likes', 'dislikes', 'recommendations', 'keywords', 'definitely', 'backlog', 'description', 'names', 'prp', 'similar', 'pricing'];
@@ -1557,6 +1575,49 @@ Keep each section concise and focused. Do not include revenue projections.`;
                       </div>
                     </div>
                   </div>
+                  
+                  {/* Detailed API Call Log */}
+                  {apiCallLogs.length > 0 && (
+                    <div className="mt-4 bg-white p-4 rounded-lg border border-gray-200">
+                      <h4 className="font-semibold text-gray-900 mb-2">📋 Detailed API Call Log</h4>
+                      <div className="text-xs text-gray-600 max-h-64 overflow-y-auto">
+                        <table className="w-full">
+                          <thead>
+                            <tr className="border-b border-gray-200">
+                              <th className="text-left py-1 px-2">#</th>
+                              <th className="text-left py-1 px-2">Input</th>
+                              <th className="text-left py-1 px-2">Output</th>
+                              <th className="text-left py-1 px-2">Total</th>
+                              <th className="text-left py-1 px-2">Cost</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {apiCallLogs.map((log, idx) => (
+                              <tr key={idx} className="border-b border-gray-100">
+                                <td className="py-1 px-2">{log.callNumber}</td>
+                                <td className="py-1 px-2">{log.inputTokens.toLocaleString()}</td>
+                                <td className="py-1 px-2">{log.outputTokens.toLocaleString()}</td>
+                                <td className="py-1 px-2">{log.totalTokens.toLocaleString()}</td>
+                                <td className="py-1 px-2">${log.cost.toFixed(6)}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                          <tfoot>
+                            <tr className="border-t-2 border-gray-300 font-semibold">
+                              <td className="py-1 px-2">Total</td>
+                              <td className="py-1 px-2">{apiCallLogs.reduce((sum, log) => sum + log.inputTokens, 0).toLocaleString()}</td>
+                              <td className="py-1 px-2">{apiCallLogs.reduce((sum, log) => sum + log.outputTokens, 0).toLocaleString()}</td>
+                              <td className="py-1 px-2">{apiCallLogs.reduce((sum, log) => sum + log.totalTokens, 0).toLocaleString()}</td>
+                              <td className="py-1 px-2">${apiCallLogs.reduce((sum, log) => sum + log.cost, 0).toFixed(6)}</td>
+                            </tr>
+                          </tfoot>
+                        </table>
+                        <div className="mt-2 text-xs text-gray-500 italic">
+                          💡 Check browser console (F12) for real-time logs: Look for "[API Call]" messages
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
