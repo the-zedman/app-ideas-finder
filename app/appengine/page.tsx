@@ -572,11 +572,25 @@ export default function AppEnginePage() {
     if (data.usage) {
       const inputTokens = data.usage.prompt_tokens || 0;
       const outputTokens = data.usage.completion_tokens || 0;
-      // Also log for debugging if needed
+      const totalTokens = data.usage.total_tokens || (inputTokens + outputTokens);
+      
+      // Verify token counts match
+      if (totalTokens !== (inputTokens + outputTokens)) {
+        console.warn('Token mismatch:', { totalTokens, inputTokens, outputTokens, calculated: inputTokens + outputTokens });
+      }
+      
+      // Log for debugging
       if (process.env.NODE_ENV === 'development') {
-        console.log('API call tokens:', { inputTokens, outputTokens, total: inputTokens + outputTokens });
+        console.log('API call tokens:', { 
+          inputTokens, 
+          outputTokens, 
+          totalTokens,
+          calculated: inputTokens + outputTokens 
+        });
       }
       updateCostTracking(inputTokens, outputTokens);
+    } else {
+      console.warn('No usage data in API response:', data);
     }
     
     return data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
@@ -589,10 +603,12 @@ export default function AppEnginePage() {
       const newTotalCalls = prev.totalCalls + 1;
       
       // Calculate costs (grok-4-fast-reasoning pricing: $0.20 input, $0.50 output per 1M tokens)
-      // Using incremental calculation to avoid cumulative rounding errors
-      const inputCostIncrement = (inputTokens / 1_000_000) * 0.20;
-      const outputCostIncrement = (outputTokens / 1_000_000) * 0.50;
-      const totalCost = prev.totalCost + inputCostIncrement + outputCostIncrement;
+      // Using incremental calculation with proper precision
+      // Input: $0.20 per 1M tokens = $0.0000002 per token
+      // Output: $0.50 per 1M tokens = $0.0000005 per token
+      const inputCostIncrement = Number((inputTokens * 0.0000002).toFixed(10));
+      const outputCostIncrement = Number((outputTokens * 0.0000005).toFixed(10));
+      const totalCost = Number((prev.totalCost + inputCostIncrement + outputCostIncrement).toFixed(10));
       
       return {
         totalCalls: newTotalCalls,
