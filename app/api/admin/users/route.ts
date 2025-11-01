@@ -99,7 +99,7 @@ export async function GET(request: Request) {
         last_active: lastActive,
         analysis_count: analysisCount,
         provider: provider,
-        disabled: authUser.banned_until ? true : false
+        disabled: false // Can be extended with ban functionality later
       };
     });
     
