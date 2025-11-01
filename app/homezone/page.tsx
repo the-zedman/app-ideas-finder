@@ -15,6 +15,12 @@ export default function HomeZone() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [usageData, setUsageData] = useState<any>(null);
   const [recentAnalyses, setRecentAnalyses] = useState<any[]>([]);
+  const [popularApps, setPopularApps] = useState<any[]>([
+    { name: 'Instagram', id: '389801252', icon: '' },
+    { name: 'Uber', id: '368677368', icon: '' },
+    { name: 'Spotify', id: '324684580', icon: '' },
+    { name: 'TikTok', id: '835599320', icon: '' }
+  ]);
   
   const supabase = createClient();
 
@@ -52,6 +58,9 @@ export default function HomeZone() {
           .limit(5);
         
         setRecentAnalyses(analyses || []);
+        
+        // Fetch popular app icons from iTunes API
+        fetchPopularAppIcons();
       }
       
       setLoading(false);
@@ -59,6 +68,35 @@ export default function HomeZone() {
 
     init();
   }, []);
+
+  const fetchPopularAppIcons = async () => {
+    const apps = [
+      { name: 'Instagram', id: '389801252' },
+      { name: 'Uber', id: '368677368' },
+      { name: 'Spotify', id: '324684580' },
+      { name: 'TikTok', id: '835599320' }
+    ];
+
+    const appsWithIcons = await Promise.all(
+      apps.map(async (app) => {
+        try {
+          const response = await fetch(`/api/itunes/lookup?id=${app.id}`);
+          const data = await response.json();
+          if (data.results && data.results.length > 0) {
+            return {
+              ...app,
+              icon: data.results[0].artworkUrl100 || data.results[0].artworkUrl512 || data.results[0].artworkUrl60 || ''
+            };
+          }
+        } catch (error) {
+          console.error(`Failed to fetch icon for ${app.name}:`, error);
+        }
+        return { ...app, icon: '' };
+      })
+    );
+
+    setPopularApps(appsWithIcons);
+  };
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -85,13 +123,6 @@ export default function HomeZone() {
   const handleQuickStart = (appName: string) => {
     router.push(`/appengine?app=${encodeURIComponent(appName)}`);
   };
-
-  const popularApps = [
-    { name: 'Instagram', id: '389801252', icon: 'https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/ab/8f/61/ab8f6167-1fc8-0234-713e-b9c96c3e0263/Prod-0-0-1x_U007emarketing-0-7-0-85-220.png/100x100bb.jpg' },
-    { name: 'Uber', id: '368677368', icon: 'https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/20/63/56/20635639-b63f-c858-5c41-199f2e4a0906/AppIcon-0-0-1x_U007ephone-0-1-0-85-220.png/100x100bb.jpg' },
-    { name: 'Spotify', id: '324684580', icon: 'https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/57/10/f2/5710f26a-1616-e8e0-1045-67df1d0e59ab/AppIconDefault-0-0-1x_U007ephone-0-1-0-85-220.png/100x100bb.jpg' },
-    { name: 'TikTok', id: '835599320', icon: 'https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/94/c0/c3/94c0c334-1bb4-08a1-6c2f-90753cd4eaa9/AppIcon_TikTok-0-0-1x_U007emarketing-0-7-0-0-85-220.png/100x100bb.jpg' }
-  ];
 
   if (loading) {
     return (
@@ -303,7 +334,23 @@ export default function HomeZone() {
                   disabled={!usageData?.canSearch}
                   className="flex flex-col items-center p-4 rounded-xl border-2 border-gray-200 hover:border-[#E07A5F] hover:shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <img src={app.icon} alt={app.name} className="w-16 h-16 rounded-2xl mb-2" />
+                  {app.icon ? (
+                    <img 
+                      src={app.icon} 
+                      alt={app.name} 
+                      className="w-16 h-16 rounded-2xl mb-2"
+                      onError={(e) => {
+                        e.currentTarget.style.display = 'none';
+                        (e.currentTarget.nextElementSibling as HTMLElement)!.style.display = 'flex';
+                      }}
+                    />
+                  ) : null}
+                  <div 
+                    className="w-16 h-16 rounded-2xl mb-2 bg-gray-200 flex items-center justify-center text-2xl"
+                    style={{ display: app.icon ? 'none' : 'flex' }}
+                  >
+                    📱
+                  </div>
                   <span className="text-sm font-medium text-gray-900">{app.name}</span>
                 </button>
               ))}
