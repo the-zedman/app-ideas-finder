@@ -72,6 +72,7 @@ function AppEngineContent() {
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [showSearchResults, setShowSearchResults] = useState(false);
   const [appInput, setAppInput] = useState('');
+  const [shouldAutoStart, setShouldAutoStart] = useState(false);
   
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -96,20 +97,6 @@ function AppEngineContent() {
           const adminData = await adminResponse.json();
           setIsAdmin(adminData.isAdmin || false);
         }
-        
-        // Check for app parameter in URL and auto-start analysis
-        const appParam = searchParams.get('app');
-        if (appParam && !hasAutoStarted.current && !isAnalyzing && grokApiKey) {
-          hasAutoStarted.current = true;
-          setAppInput(appParam);
-          // Set the input ref value and trigger analysis
-          setTimeout(() => {
-            if (appInputRef.current) {
-              appInputRef.current.value = appParam;
-              startAnalysis();
-            }
-          }, 1000);
-        }
       } else {
         router.push('/login');
       }
@@ -117,7 +104,7 @@ function AppEngineContent() {
     };
 
     getUser();
-  }, [router, isDevelopmentBypass, searchParams]);
+  }, [router, isDevelopmentBypass]);
 
   useEffect(() => {
     // Fetch the Grok API key from environment
@@ -136,6 +123,22 @@ function AppEngineContent() {
     fetchApiKey();
   }, []);
 
+  // Auto-start analysis if app parameter is in URL
+  useEffect(() => {
+    const appParam = searchParams.get('app');
+    if (appParam && grokApiKey && !hasAutoStarted.current && !loading) {
+      console.log('Auto-starting analysis for:', appParam);
+      hasAutoStarted.current = true;
+      
+      // Set the input field value
+      if (appInputRef.current) {
+        appInputRef.current.value = appParam;
+      }
+      
+      // Trigger auto-start
+      setShouldAutoStart(true);
+    }
+  }, [grokApiKey, searchParams, loading]);
 
   // Handle clicking outside search results to close them
   useEffect(() => {
@@ -1462,6 +1465,15 @@ Keep each section concise and focused. Do not include revenue projections.`;
       setIsAnalyzing(false);
     }
   };
+
+  // Auto-start analysis when shouldAutoStart is set
+  useEffect(() => {
+    if (shouldAutoStart && !isAnalyzing) {
+      console.log('Triggering auto-start analysis...');
+      setShouldAutoStart(false);
+      startAnalysis();
+    }
+  }, [shouldAutoStart, isAnalyzing]);
 
   if (loading) {
     return (
