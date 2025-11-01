@@ -112,42 +112,6 @@ export default function AppEnginePage() {
     fetchApiKey();
   }, []);
 
-  // Try to fetch usage data from Grok API (if available)
-  const fetchGrokUsageData = async () => {
-    if (!grokApiKey) return null;
-    
-    // Common usage/billing endpoint patterns to try
-    const possibleEndpoints = [
-      'https://api.x.ai/v1/usage',
-      'https://api.x.ai/v1/billing/usage',
-      'https://api.x.ai/v1/usage/stats',
-      'https://api.x.ai/v1/dashboard/usage'
-    ];
-    
-    for (const endpoint of possibleEndpoints) {
-      try {
-        const response = await fetch(endpoint, {
-          headers: {
-            'Authorization': `Bearer ${grokApiKey}`,
-            'Content-Type': 'application/json'
-          }
-        });
-        
-        if (response.ok) {
-          const data = await response.json();
-          console.log(`✅ Found usage endpoint: ${endpoint}`, data);
-          return data;
-        } else if (response.status !== 404) {
-          console.log(`❌ ${endpoint} returned ${response.status}`);
-        }
-      } catch (error) {
-        // Continue trying other endpoints
-      }
-    }
-    
-    console.log('ℹ️ No usage endpoint found. x.ai may not expose usage data via API.');
-    return null;
-  };
 
   // Handle clicking outside search results to close them
   useEffect(() => {
@@ -1394,12 +1358,6 @@ Keep each section concise and focused. Do not include revenue projections.`;
       }, 500);
       
       setStatus('Done.');
-      
-      // Try to fetch usage data from Grok API if available
-      const grokUsageData = await fetchGrokUsageData();
-      if (grokUsageData) {
-        console.log('📊 Grok Usage API Data:', grokUsageData);
-      }
       
       // Use accumulated cost from local variable (most accurate)
       const finalApiCost = costAccumulator.value;
