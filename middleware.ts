@@ -76,9 +76,8 @@ export async function middleware(request: NextRequest) {
   }
 
   // Check admin access for admin routes
-  if (isAdminRoute) {
+  if (isAdminRoute && !isDevelopmentBypass) {
     if (!user) {
-      console.log('❌ Admin route - no user, redirecting to login')
       // Not logged in - redirect to login
       const redirectUrl = request.nextUrl.clone()
       redirectUrl.pathname = '/login'
@@ -90,26 +89,22 @@ export async function middleware(request: NextRequest) {
     const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
     
     if (!serviceRoleKey) {
-      // Service role key not available - this will prevent admin access
-      // Log as error but don't expose in production
-      if (process.env.NODE_ENV === 'development') {
-        console.error('SUPABASE_SERVICE_ROLE_KEY not set - admin access blocked')
-      }
+      // Service role key not available - block admin access
       const redirectUrl = request.nextUrl.clone()
       redirectUrl.pathname = '/homezone'
       return NextResponse.redirect(redirectUrl)
     }
     
-    const supabaseAdmin = createServerClient(
+    // Create admin client with service role (bypasses RLS)
+    const { createClient } = await import('@supabase/supabase-js')
+    const supabaseAdmin = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       serviceRoleKey,
       {
-        cookies: {
-          getAll() { return request.cookies.getAll() },
-          setAll(cookiesToSet) {
-            cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
-          },
-        },
+        auth: {
+          autoRefreshToken: false,
+          persistSession: false
+        }
       }
     )
     
@@ -117,25 +112,16 @@ export async function middleware(request: NextRequest) {
       .from('admins')
       .select('role')
       .eq('user_id', user.id)
-      .single()
+      .maybeSingle()
     
-    console.log('📊 Admin query result:', { 
-      userId: user.id, 
-      found: !!adminData, 
-      role: adminData?.role,
-      error: adminError?.message 
-    })
-    
-    if (!adminData) {
-      console.log('❌ User is not an admin, redirecting to homezone')
+    if (!adminData || adminError) {
       // Not an admin - redirect to homezone
       const redirectUrl = request.nextUrl.clone()
       redirectUrl.pathname = '/homezone'
       return NextResponse.redirect(redirectUrl)
     }
     
-    console.log('✅ Admin access granted:', adminData.role)
-    // User is admin - allow access
+    // User is admin - allow access (don't need to do anything, just continue)
   }
 
   return supabaseResponse
