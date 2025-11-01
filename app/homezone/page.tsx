@@ -2,159 +2,170 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
 import { createClient } from '@/lib/supabase-client';
 import type { User } from '@supabase/supabase-js';
 import CryptoJS from 'crypto-js';
 
 export default function HomeZone() {
   const router = useRouter();
-  const [selectedTab, setSelectedTab] = useState('discover');
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<any>(null);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [usageData, setUsageData] = useState<any>(null);
+  const [recentAnalyses, setRecentAnalyses] = useState<any[]>([]);
   
   const supabase = createClient();
 
   useEffect(() => {
-    const getUser = async () => {
+    const init = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       setUser(user);
       
       if (user) {
-        // Fetch profile data
-        const { data: profileData, error } = await supabase
+        // Fetch profile
+        const { data: profileData } = await supabase
           .from('profiles')
           .select('*')
           .eq('id', user.id)
           .single();
         
-        console.log('Profile data:', profileData);
-        console.log('Profile error:', error);
-        
         setProfile(profileData);
         
-        // Check if user is admin
+        // Check admin status
         const adminResponse = await fetch('/api/check-admin');
         const adminData = await adminResponse.json();
         setIsAdmin(adminData.isAdmin || false);
+        
+        // Fetch usage data
+        const usageResponse = await fetch('/api/subscription/usage');
+        const usage = await usageResponse.json();
+        setUsageData(usage);
+        
+        // Fetch recent analyses
+        const { data: analyses } = await supabase
+          .from('user_analyses')
+          .select('id, app_name, app_icon_url, created_at')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(5);
+        
+        setRecentAnalyses(analyses || []);
       }
       
       setLoading(false);
     };
 
-    getUser();
-
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-    });
-
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, [supabase.auth]);
+    init();
+  }, []);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
     router.push('/');
-    router.refresh();
   };
 
   const getDisplayName = () => {
-    if (user?.user_metadata?.full_name) {
-      return user.user_metadata.full_name;
-    }
-    if (user?.email) {
-      return user.email.split('@')[0];
-    }
-    return 'User';
-  };
-
-  // Get Gravatar URL from email
-  const getGravatarUrl = (email: string, size: number = 200) => {
-    const hash = CryptoJS.MD5(email.toLowerCase().trim()).toString();
-    return `https://www.gravatar.com/avatar/${hash}?s=${size}&d=identicon`;
+    const firstName = profile?.first_name || '';
+    const lastName = profile?.last_name || '';
+    const fullName = `${firstName} ${lastName}`.trim();
+    return fullName || user?.email?.split('@')[0] || 'User';
   };
 
   const getInitials = () => {
-    if (profile?.custom_initials) return profile.custom_initials.toUpperCase();
-    if (profile?.first_name && profile?.last_name) {
-      return `${profile.first_name[0]}${profile.last_name[0]}`.toUpperCase();
-    }
     const name = getDisplayName();
-    return name.charAt(0).toUpperCase();
+    return name.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2);
   };
+
+  const getGravatarUrl = (email: string) => {
+    const hash = CryptoJS.MD5(email.toLowerCase()).toString();
+    return `https://www.gravatar.com/avatar/${hash}?d=identicon&s=200`;
+  };
+
+  const handleQuickStart = (appName: string) => {
+    router.push(`/appengine?app=${encodeURIComponent(appName)}`);
+  };
+
+  const popularApps = [
+    { name: 'Instagram', id: '389801252', icon: 'https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/ab/8f/61/ab8f6167-1fc8-0234-713e-b9c96c3e0263/Prod-0-0-1x_U007emarketing-0-7-0-85-220.png/100x100bb.jpg' },
+    { name: 'Uber', id: '368677368', icon: 'https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/20/63/56/20635639-b63f-c858-5c41-199f2e4a0906/AppIcon-0-0-1x_U007ephone-0-1-0-85-220.png/100x100bb.jpg' },
+    { name: 'Spotify', id: '324684580', icon: 'https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/57/10/f2/5710f26a-1616-e8e0-1045-67df1d0e59ab/AppIconDefault-0-0-1x_U007ephone-0-1-0-85-220.png/100x100bb.jpg' },
+    { name: 'TikTok', id: '835599320', icon: 'https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/94/c0/c3/94c0c334-1bb4-08a1-6c2f-90753cd4eaa9/AppIcon_TikTok-0-0-1x_U007emarketing-0-7-0-0-85-220.png/100x100bb.jpg' }
+  ];
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-[#3D405B]">Loading...</div>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-gray-600 text-xl">Loading...</div>
       </div>
     );
   }
 
-  return (
-    <div className="min-h-screen bg-white flex flex-col">
-      {/* Header - Fixed at top, iOS style */}
-      <header className="bg-white border-b border-grey/30 sticky top-0 z-50 backdrop-blur-lg bg-white/80">
-        <div className="px-4 py-3 flex items-center justify-between max-w-7xl mx-auto">
-          <div className="flex items-center gap-3">
-            <Image
-              src="/App Ideas Finder - logo - 200x200.png"
-              alt="App Ideas Finder"
-              width={40}
-              height={40}
-              className="w-10 h-10 rounded-lg"
-            />
-            <h1 className="text-lg font-semibold text-[#3D405B]">
-              HomeZone
-            </h1>
-          </div>
-          
-          {/* Profile Button - Minimum 44x44pt touch target */}
-          <div className="relative">
-            <button 
-              onClick={() => setShowProfileMenu(!showProfileMenu)}
-              className="w-11 h-11 rounded-full bg-[#E07A5F] flex items-center justify-center text-white font-semibold active:scale-95 transition-transform overflow-hidden relative"
-              aria-label="Profile"
-            >
-              <img 
-                src={getGravatarUrl(user?.email || '', 44)} 
-                alt="Profile" 
-                className="w-full h-full object-cover absolute inset-0"
-                onLoad={() => {
-                  // Hide initials when Gravatar loads
-                  const initialsDiv = document.querySelector('.homezone-gravatar-initials') as HTMLElement;
-                  if (initialsDiv) initialsDiv.style.display = 'none';
-                }}
-                onError={(e) => {
-                  // If Gravatar fails to load, hide the image to show initials
-                  e.currentTarget.style.display = 'none';
-                }}
-              />
-              <div className="homezone-gravatar-initials absolute inset-0 flex items-center justify-center bg-[#E07A5F] text-white text-sm font-semibold">
-                {getInitials()}
-              </div>
-            </button>
+  if (!user) {
+    router.push('/login');
+    return null;
+  }
 
-            {/* Profile Dropdown Menu */}
-            {showProfileMenu && (
-              <div className="relative">
-                <div 
-                  className="fixed inset-0 z-40" 
-                  onClick={() => setShowProfileMenu(false)}
-                />
-                <div 
-                  className="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-xl border border-gray-200 z-50"
-                  style={{ 
-                    backgroundColor: '#ffffff',
-                    opacity: 1,
-                    zIndex: 9999
-                  }}
-                >
+  const isFirstTime = recentAnalyses.length === 0;
+  const isUnlimited = usageData?.status === 'free_unlimited';
+  const searchesUsed = usageData?.searchesUsed || 0;
+  const searchesLimit = usageData?.searchesLimit || 10;
+  const searchesRemaining = usageData?.searchesRemaining || 0;
+  const usagePercent = isUnlimited ? 0 : Math.min(100, (searchesUsed / searchesLimit) * 100);
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <header className="bg-white border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            {/* Logo */}
+            <div className="flex items-center gap-3">
+              <img 
+                src="/App Ideas Finder - logo - 200x200.png" 
+                alt="App Ideas Finder" 
+                className="h-8 w-8"
+              />
+              <h1 className="text-xl font-bold text-[#3D405B]">App Ideas Finder</h1>
+            </div>
+
+            {/* Navigation */}
+            <nav className="flex items-center gap-6">
+              <a href="/homezone" className="text-[#3D405B] font-semibold">
+                Dashboard
+              </a>
+              <a href="/appengine" className="text-gray-600 hover:text-[#3D405B] transition-colors">
+                App Engine
+              </a>
+            </nav>
+
+            {/* Profile Dropdown */}
+            <div className="relative">
+              <button
+                onClick={() => setShowProfileMenu(!showProfileMenu)}
+                className="flex items-center space-x-3 hover:bg-gray-100 rounded-lg px-3 py-2 transition-colors"
+              >
+                <div className="relative w-8 h-8 rounded-full overflow-hidden">
+                  {user?.email ? (
+                    <img
+                      src={getGravatarUrl(user.email)}
+                      alt="Profile"
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        e.currentTarget.style.display = 'none';
+                        (e.currentTarget.nextElementSibling as HTMLElement)!.style.display = 'flex';
+                      }}
+                    />
+                  ) : null}
+                  <div className="absolute inset-0 flex items-center justify-center bg-[#E07A5F] text-white text-sm font-semibold">
+                    {getInitials()}
+                  </div>
+                </div>
+                <span className="hidden sm:block text-gray-900">{getDisplayName()}</span>
+              </button>
+
+              {showProfileMenu && (
+                <div className="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-xl border border-gray-200 z-50">
                   <div className="p-4 border-b border-gray-200">
                     <p className="font-semibold text-gray-900">{getDisplayName()}</p>
                     <p className="text-sm text-gray-600 truncate">{user?.email}</p>
@@ -191,188 +202,226 @@ export default function HomeZone() {
                     </button>
                   </div>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         </div>
       </header>
 
-      {/* Navigation */}
-      <div className="px-4 py-4">
-        <nav className="max-w-md mx-auto flex space-x-4">
-          <a 
-            href="/homezone" 
-            className="flex-1 text-center py-3 px-4 bg-white rounded-xl font-semibold text-[#E07A5F] border-2 border-[#E07A5F]"
-          >
-            Dashboard
-          </a>
-          <a 
-            href="/appengine" 
-            className="flex-1 text-center py-3 px-4 bg-[#E07A5F] hover:bg-[#E07A5F]/90 text-white rounded-xl font-semibold transition-colors"
-          >
-            App Engine
-          </a>
-        </nav>
-      </div>
+      {/* Main Content */}
+      <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Welcome Message */}
+        <div className="bg-gradient-to-br from-[#E07A5F] to-[#E07A5F]/80 rounded-2xl p-8 mb-8 text-white">
+          <h2 className="text-3xl font-bold mb-2">
+            {isFirstTime ? `Welcome, ${getDisplayName()}! 🎉` : `Welcome Back, ${getDisplayName()}! 👋`}
+          </h2>
+          <p className="text-white/90 text-lg">
+            {isFirstTime 
+              ? "Let's find your next app idea. Analyze your first app below!" 
+              : "Ready to discover more app opportunities?"}
+          </p>
+        </div>
 
-      {/* Main Content - Scrollable */}
-      <main className="flex-1 overflow-y-auto pb-20">
-        <div className="max-w-7xl mx-auto px-4 py-6">
-          {/* Welcome Card */}
-          <div className="bg-gradient-to-br from-[#E07A5F] to-[#E07A5F]/80 rounded-2xl p-6 mb-6 text-white">
-            <h2 className="text-2xl font-bold mb-2">Welcome Back, {getDisplayName()}!</h2>
-            <p className="text-white/90 text-base leading-relaxed">
-              Ready to discover your next big app idea? Let's get started.
-            </p>
-          </div>
-
-          {/* Quick Stats - iOS Style Cards */}
-          <div className="grid grid-cols-2 gap-3 mb-6">
-            <div className="bg-white rounded-2xl p-4 border border-grey/30">
-              <div className="text-3xl font-bold text-[#E07A5F] mb-1">0</div>
-              <div className="text-sm text-[#3D405B]/70">Ideas Saved</div>
-            </div>
-            <div className="bg-white rounded-2xl p-4 border border-grey/30">
-              <div className="text-3xl font-bold text-[#E07A5F] mb-1">0</div>
-              <div className="text-sm text-[#3D405B]/70">Searches</div>
-            </div>
-          </div>
-
-          {/* Main Content Cards */}
-          <div className="space-y-4">
-            {/* Discover Card */}
-            <div className="bg-white rounded-2xl border border-grey/30 overflow-hidden">
-              <div className="p-4">
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="w-12 h-12 bg-[#E07A5F]/10 rounded-full flex items-center justify-center">
-                    <svg className="w-6 h-6 text-[#E07A5F]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="text-lg font-semibold text-[#3D405B]">Discover Ideas</h3>
-                    <p className="text-sm text-[#3D405B]/60">Find your next project</p>
-                  </div>
+        {/* Usage Card */}
+        {!isUnlimited && (
+          <div className="bg-white rounded-2xl p-6 mb-8 border-2 border-gray-200 shadow-sm">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">
+                  🔍 Searches This Month
+                </h3>
+                <p className="text-sm text-gray-600">
+                  {usageData?.planName || 'Trial'} Plan
+                  {usageData?.status === 'trial' && usageData?.trialTimeRemaining && (
+                    <span className="ml-2 text-[#E07A5F] font-semibold">
+                      • {usageData.trialTimeRemaining.days}d {usageData.trialTimeRemaining.hours}h {usageData.trialTimeRemaining.minutes}m left
+                    </span>
+                  )}
+                </p>
+              </div>
+              <div className="text-right">
+                <div className="text-4xl font-bold text-gray-900">
+                  {searchesUsed} <span className="text-gray-400">/</span> {searchesLimit}
                 </div>
-                <button className="w-full py-3 bg-[#E07A5F] hover:bg-[#E07A5F]/90 active:scale-98 text-white font-semibold rounded-xl transition-all">
-                  Start Discovering
+                <div className="text-sm text-gray-600">searches used</div>
+              </div>
+            </div>
+            
+            {/* Progress Bar */}
+            <div className="w-full bg-gray-200 rounded-full h-3 mb-4">
+              <div 
+                className={`h-3 rounded-full transition-all ${
+                  usagePercent >= 90 ? 'bg-red-500' : 
+                  usagePercent >= 70 ? 'bg-yellow-500' : 
+                  'bg-green-500'
+                }`}
+                style={{ width: `${usagePercent}%` }}
+              />
+            </div>
+
+            {/* Action based on usage */}
+            {searchesRemaining === 0 ? (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                <p className="text-red-800 font-medium mb-2">⚠️ You've used all your searches this month</p>
+                <button className="bg-[#E07A5F] text-white px-6 py-2 rounded-lg font-semibold hover:bg-[#E07A5F]/90">
+                  Upgrade Plan or Buy Search Pack
                 </button>
               </div>
-            </div>
-
-            {/* Trending Card */}
-            <div className="bg-white rounded-2xl border border-grey/30 overflow-hidden">
-              <div className="p-4">
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="w-12 h-12 bg-[#3D405B]/10 rounded-full flex items-center justify-center">
-                    <svg className="w-6 h-6 text-[#3D405B]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                    </svg>
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="text-lg font-semibold text-[#3D405B]">Trending Now</h3>
-                    <p className="text-sm text-[#3D405B]/60">See what's popular</p>
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <div className="py-2 px-3 bg-black/5 rounded-lg">
-                    <p className="text-sm text-[#3D405B]">AI-powered productivity tools</p>
-                  </div>
-                  <div className="py-2 px-3 bg-black/5 rounded-lg">
-                    <p className="text-sm text-[#3D405B]">Health & wellness apps</p>
-                  </div>
-                  <div className="py-2 px-3 bg-black/5 rounded-lg">
-                    <p className="text-sm text-[#3D405B]">Social collaboration platforms</p>
-                  </div>
-                </div>
+            ) : searchesRemaining <= 2 ? (
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                <p className="text-yellow-800 font-medium">💡 Only {searchesRemaining} searches remaining this month</p>
               </div>
+            ) : null}
+          </div>
+        )}
+
+        {isUnlimited && (
+          <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl p-6 mb-8 text-white">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-2xl font-bold mb-1">🎁 Unlimited Access</h3>
+                <p className="text-white/90">You have unlimited searches - enjoy!</p>
+              </div>
+              <div className="text-5xl">∞</div>
+            </div>
+          </div>
+        )}
+
+        {/* Quick Start (First Time Users) */}
+        {isFirstTime && (
+          <div className="bg-white rounded-2xl p-8 mb-8 border border-gray-200 shadow-sm">
+            <h3 className="text-2xl font-bold text-gray-900 mb-4">🚀 Analyze Your First App</h3>
+            <p className="text-gray-600 mb-6">
+              Try analyzing one of these popular apps to see what App Ideas Finder can do:
+            </p>
+            
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+              {popularApps.map((app) => (
+                <button
+                  key={app.id}
+                  onClick={() => handleQuickStart(app.name)}
+                  disabled={!usageData?.canSearch}
+                  className="flex flex-col items-center p-4 rounded-xl border-2 border-gray-200 hover:border-[#E07A5F] hover:shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <img src={app.icon} alt={app.name} className="w-16 h-16 rounded-2xl mb-2" />
+                  <span className="text-sm font-medium text-gray-900">{app.name}</span>
+                </button>
+              ))}
             </div>
 
-            {/* Recent Activity Card */}
-            <div className="bg-white rounded-2xl border border-grey/30 overflow-hidden">
-              <div className="p-4">
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="w-12 h-12 bg-[#E07A5F]/10 rounded-full flex items-center justify-center">
-                    <svg className="w-6 h-6 text-[#E07A5F]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="text-lg font-semibold text-[#3D405B]">Recent Activity</h3>
-                    <p className="text-sm text-[#3D405B]/60">Your latest actions</p>
-                  </div>
+            <div className="border-t border-gray-200 pt-6">
+              <p className="text-sm text-gray-600 mb-3">Or search for any app:</p>
+              <button
+                onClick={() => router.push('/appengine')}
+                disabled={!usageData?.canSearch}
+                className="w-full bg-[#E07A5F] hover:bg-[#E07A5F]/90 text-white font-semibold py-4 px-6 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-lg"
+              >
+                Go to App Engine →
+              </button>
+            </div>
+
+            {/* What You'll Discover */}
+            <div className="mt-8 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-6">
+              <h4 className="font-semibold text-gray-900 mb-4">💡 What You'll Discover</h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-gray-700">
+                <div className="flex items-start gap-2">
+                  <span className="text-green-600 font-bold">✓</span>
+                  <span>What users love (keep these features)</span>
                 </div>
-                <div className="text-center py-8">
-                  <p className="text-sm text-[#3D405B]/50">No recent activity yet</p>
+                <div className="flex items-start gap-2">
+                  <span className="text-green-600 font-bold">✓</span>
+                  <span>What they hate (avoid these mistakes)</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="text-green-600 font-bold">✓</span>
+                  <span>Missing features (your opportunity)</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="text-green-600 font-bold">✓</span>
+                  <span>App names, pricing strategy & more</span>
                 </div>
               </div>
             </div>
           </div>
-        </div>
+        )}
+
+        {/* Recent Analyses (Returning Users) */}
+        {!isFirstTime && (
+          <div className="bg-white rounded-2xl p-8 mb-8 border border-gray-200 shadow-sm">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-2xl font-bold text-gray-900">📊 Your Recent Analyses</h3>
+              <button
+                onClick={() => router.push('/appengine')}
+                disabled={!usageData?.canSearch}
+                className="bg-[#E07A5F] hover:bg-[#E07A5F]/90 text-white font-semibold py-2 px-6 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                + Analyze Another App
+              </button>
+            </div>
+
+            {recentAnalyses.length > 0 ? (
+              <div className="space-y-4">
+                {recentAnalyses.map((analysis) => (
+                  <div 
+                    key={analysis.id}
+                    className="flex items-center gap-4 p-4 rounded-xl border border-gray-200 hover:border-[#E07A5F] hover:shadow-md transition-all group"
+                  >
+                    {analysis.app_icon_url && (
+                      <img 
+                        src={analysis.app_icon_url} 
+                        alt={analysis.app_name}
+                        className="w-16 h-16 rounded-xl"
+                      />
+                    )}
+                    <div className="flex-1">
+                      <h4 className="font-semibold text-gray-900 text-lg">{analysis.app_name}</h4>
+                      <p className="text-sm text-gray-500">
+                        {new Date(analysis.created_at).toLocaleDateString('en-US', { 
+                          month: 'short', 
+                          day: 'numeric',
+                          year: 'numeric'
+                        })}
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => router.push(`/analyses/${analysis.id}`)}
+                      className="bg-gray-100 group-hover:bg-[#E07A5F] group-hover:text-white text-gray-700 px-6 py-2 rounded-lg font-medium transition-colors"
+                    >
+                      View Analysis →
+                    </button>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-12 text-gray-500">
+                <div className="text-4xl mb-3">🔍</div>
+                <p>No analyses yet. Start by analyzing an app above!</p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Suggested Next Steps (Returning Users) */}
+        {!isFirstTime && (
+          <div className="bg-white rounded-2xl p-8 border border-gray-200 shadow-sm">
+            <h3 className="text-xl font-bold text-gray-900 mb-4">🔥 Suggested Next Steps</h3>
+            <div className="space-y-3">
+              <div className="flex items-center gap-3 text-gray-700">
+                <span className="text-2xl">•</span>
+                <span>Analyze a competitor in your space</span>
+              </div>
+              <div className="flex items-center gap-3 text-gray-700">
+                <span className="text-2xl">•</span>
+                <span>Compare multiple apps to find patterns</span>
+              </div>
+              <div className="flex items-center gap-3 text-gray-700">
+                <span className="text-2xl">•</span>
+                <span>Explore trending apps for inspiration</span>
+              </div>
+            </div>
+          </div>
+        )}
       </main>
-
-      {/* Bottom Tab Bar - iOS style, fixed at bottom */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-grey/30 backdrop-blur-lg bg-white/80 safe-area-inset-bottom">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex items-center justify-around py-2">
-            {/* Discover Tab - Minimum 44x44pt touch target */}
-            <button
-              onClick={() => setSelectedTab('discover')}
-              className={`flex flex-col items-center justify-center w-20 h-12 transition-colors ${
-                selectedTab === 'discover' ? 'text-[#E07A5F]' : 'text-[#3D405B]/50'
-              }`}
-              aria-label="Discover"
-            >
-              <svg className="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-              <span className="text-xs font-medium">Discover</span>
-            </button>
-
-            {/* Saved Tab */}
-            <button
-              onClick={() => setSelectedTab('saved')}
-              className={`flex flex-col items-center justify-center w-20 h-12 transition-colors ${
-                selectedTab === 'saved' ? 'text-[#E07A5F]' : 'text-[#3D405B]/50'
-              }`}
-              aria-label="Saved"
-            >
-              <svg className="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-              </svg>
-              <span className="text-xs font-medium">Saved</span>
-            </button>
-
-            {/* Trending Tab */}
-            <button
-              onClick={() => setSelectedTab('trending')}
-              className={`flex flex-col items-center justify-center w-20 h-12 transition-colors ${
-                selectedTab === 'trending' ? 'text-[#E07A5F]' : 'text-[#3D405B]/50'
-              }`}
-              aria-label="Trending"
-            >
-              <svg className="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-              </svg>
-              <span className="text-xs font-medium">Trending</span>
-            </button>
-
-            {/* Profile Tab */}
-            <button
-              onClick={() => setSelectedTab('profile')}
-              className={`flex flex-col items-center justify-center w-20 h-12 transition-colors ${
-                selectedTab === 'profile' ? 'text-[#E07A5F]' : 'text-[#3D405B]/50'
-              }`}
-              aria-label="Profile"
-            >
-              <svg className="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-              </svg>
-              <span className="text-xs font-medium">Profile</span>
-            </button>
-          </div>
-        </div>
-      </nav>
     </div>
   );
 }
