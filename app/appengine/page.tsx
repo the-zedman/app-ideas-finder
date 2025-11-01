@@ -661,8 +661,8 @@ export default function AppEnginePage() {
 
   const updateCostTracking = (inputTokens: number, outputTokens: number, systemTokens: number = 0) => {
     setCostTracking(prev => {
-      const newTotalInput = prev.totalInputTokens + inputTokens + systemTokens; // Include system in input count for display
-      const newTotalOutput = prev.totalOutputTokens + outputTokens;
+      const newTotalInput = prev.totalInputTokens + inputTokens; // Only prompt tokens (billed at $0.20/1M)
+      const newTotalOutput = prev.totalOutputTokens + outputTokens + systemTokens; // Completion + system (both billed at $0.50/1M)
       const newTotalCalls = prev.totalCalls + 1;
       
       // Calculate costs (grok-4-fast-reasoning pricing: $0.20 input, $0.50 output per 1M tokens)
@@ -1608,10 +1608,12 @@ Keep each section concise and focused. Do not include revenue projections.`;
                       <div className="bg-white p-3 rounded-lg border border-gray-200">
                         <div className="font-semibold text-gray-600 mb-1">Input Tokens</div>
                         <div className="text-xl font-bold text-gray-900">{costTracking.totalInputTokens.toLocaleString()}</div>
+                        <div className="text-xs text-gray-500 mt-1">@$0.20/1M</div>
                       </div>
                       <div className="bg-white p-3 rounded-lg border border-gray-200">
                         <div className="font-semibold text-gray-600 mb-1">Output Tokens</div>
                         <div className="text-xl font-bold text-gray-900">{costTracking.totalOutputTokens.toLocaleString()}</div>
+                        <div className="text-xs text-gray-500 mt-1">@$0.50/1M (includes system)</div>
                       </div>
                     </div>
                     <div className="bg-white p-4 rounded-lg border border-gray-200">
