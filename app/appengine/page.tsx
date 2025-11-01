@@ -1792,7 +1792,7 @@ Keep each section concise and focused. Do not include revenue projections.`;
                                     ${totalSavings.toFixed(2)}
                                   </div>
                                   <div style={{ fontSize: '12px', opacity: 0.8, marginTop: '8px' }}>
-                                    Manual analysis: ${manualAnalysisCost.toFixed(2)} @${ANALYSIS_HOURLY_RATE}/hr vs AI: ${aiCost.toFixed(4)}
+                                    Manual analysis: ${manualAnalysisCost.toFixed(2)} @${ANALYSIS_HOURLY_RATE}/hr
                                   </div>
                                 </div>
                                 
