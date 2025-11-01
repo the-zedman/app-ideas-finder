@@ -190,7 +190,7 @@ export default function AdminDashboard() {
               <div className="text-sm text-gray-600">Track API spending and usage</div>
             </a>
             <a
-              href="/api/dashboard-waitlist"
+              href="/admin/waitlist"
               className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow"
             >
               <div className="text-lg font-semibold text-gray-900 mb-2">📝 Waitlist Management</div>
