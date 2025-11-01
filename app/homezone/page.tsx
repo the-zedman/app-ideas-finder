@@ -120,8 +120,8 @@ export default function HomeZone() {
     return `https://www.gravatar.com/avatar/${hash}?d=identicon&s=200`;
   };
 
-  const handleQuickStart = (appName: string) => {
-    router.push(`/appengine?app=${encodeURIComponent(appName)}`);
+  const handleQuickStart = (appId: string) => {
+    router.push(`/appengine?app=${encodeURIComponent(appId)}`);
   };
 
   if (loading) {
@@ -330,7 +330,7 @@ export default function HomeZone() {
               {popularApps.map((app) => (
                 <button
                   key={app.id}
-                  onClick={() => handleQuickStart(app.name)}
+                  onClick={() => handleQuickStart(app.id)}
                   disabled={!usageData?.canSearch}
                   className="flex flex-col items-center p-4 rounded-xl border-2 border-gray-200 hover:border-[#E07A5F] hover:shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 >
