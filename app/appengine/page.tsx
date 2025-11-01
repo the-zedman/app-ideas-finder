@@ -38,6 +38,7 @@ export default function AppEnginePage() {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [status, setStatus] = useState('');
   const [appMeta, setAppMeta] = useState<AppMeta | null>(null);
@@ -86,6 +87,13 @@ export default function AppEnginePage() {
       
       if (user || isDevelopmentBypass) {
         setUser(user);
+        
+        // Check if user is admin
+        if (user) {
+          const adminResponse = await fetch('/api/check-admin');
+          const adminData = await adminResponse.json();
+          setIsAdmin(adminData.isAdmin || false);
+        }
       } else {
         router.push('/login');
       }
@@ -1509,6 +1517,17 @@ Keep each section concise and focused. Do not include revenue projections.`;
                       <p className="text-sm text-gray-600 truncate">{user?.email}</p>
                     </div>
                     <div className="p-2">
+                      {isAdmin && (
+                        <button
+                          onClick={() => {
+                            setShowProfileMenu(false);
+                            router.push('/admin');
+                          }}
+                          className="w-full text-left px-4 py-3 rounded-lg hover:bg-purple-50 text-purple-600 transition-colors font-medium"
+                        >
+                          🔐 Admin Dashboard
+                        </button>
+                      )}
                       <button
                         onClick={() => {
                           setShowProfileMenu(false);

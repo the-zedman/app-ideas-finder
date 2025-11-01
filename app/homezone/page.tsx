@@ -14,6 +14,7 @@ export default function HomeZone() {
   const [profile, setProfile] = useState<any>(null);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
   
   const supabase = createClient();
 
@@ -34,6 +35,11 @@ export default function HomeZone() {
         console.log('Profile error:', error);
         
         setProfile(profileData);
+        
+        // Check if user is admin
+        const adminResponse = await fetch('/api/check-admin');
+        const adminData = await adminResponse.json();
+        setIsAdmin(adminData.isAdmin || false);
       }
       
       setLoading(false);
@@ -154,6 +160,17 @@ export default function HomeZone() {
                     <p className="text-sm text-gray-600 truncate">{user?.email}</p>
                   </div>
                   <div className="p-2">
+                    {isAdmin && (
+                      <button
+                        onClick={() => {
+                          setShowProfileMenu(false);
+                          router.push('/admin');
+                        }}
+                        className="w-full text-left px-4 py-3 rounded-lg hover:bg-purple-50 text-purple-600 transition-colors font-medium"
+                      >
+                        🔐 Admin Dashboard
+                      </button>
+                    )}
                     <button
                       onClick={() => {
                         setShowProfileMenu(false);
