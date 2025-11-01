@@ -48,6 +48,11 @@ export default function AppEnginePage() {
     totalOutputTokens: 0,
     totalCost: 0
   });
+  const [analysisMetrics, setAnalysisMetrics] = useState({
+    reviewCount: 0,
+    analysisTimeSeconds: 0,
+    startTime: 0
+  });
   const [apiCallLogs, setApiCallLogs] = useState<Array<{
     callNumber: number;
     inputTokens: number;
@@ -1030,6 +1035,14 @@ Keep each section concise and focused. Do not include revenue projections.`;
     });
     setApiCallLogs([]);
     
+    // Track analysis start time
+    const startTime = Date.now();
+    setAnalysisMetrics({
+      reviewCount: 0,
+      analysisTimeSeconds: 0,
+      startTime: startTime
+    });
+    
     // Initialize rollup statuses - match HTML exactly
     const sections = ['likes', 'dislikes', 'recommendations', 'keywords', 'definitely', 'backlog', 'description', 'names', 'prp', 'similar', 'pricing'];
     const initialStatuses: {[key: string]: string} = {};
@@ -1050,7 +1063,14 @@ Keep each section concise and focused. Do not include revenue projections.`;
       setStatus('Fetching reviews (this may take a few seconds)...');
       
       const reviews = await fetchAllReviews(appId, 'mostRecent');
-      setStatus(`Fetched ${reviews.length} reviews. Preparing AI analysis...`);
+      
+      // Update metrics with review count
+      setAnalysisMetrics(prev => ({
+        ...prev,
+        reviewCount: reviews.length
+      }));
+      
+      setStatus(`Fetched ${reviews.length.toLocaleString()} reviews. Preparing AI analysis...`);
       
       if (reviews.length === 0) {
         setStatus('No reviews found for this app.');
@@ -1066,7 +1086,7 @@ Keep each section concise and focused. Do not include revenue projections.`;
       const texts = reviews.map((r: Review) => `${r.title ? r.title + ' — ' : ''}${r.text} (by ${r.author}, rating ${r.rating})`);
       const allText = texts.join('\n\n---\n\n');
 
-      setStatus('Sending all reviews to the ideas engine...this will definitely take a few seconds, so please kindly wait');
+      setStatus(`Sending ${reviews.length.toLocaleString()} reviews to the ideas engine...this will definitely take a few seconds, so please kindly wait`);
 
       // Send all reviews in one request
       const messages = buildChunkPrompt(appMetaData, allText);
@@ -1332,6 +1352,14 @@ Keep each section concise and focused. Do not include revenue projections.`;
         console.error('Error generating pricing model:', error);
       }
 
+      // Calculate final analysis time
+      const endTime = Date.now();
+      const analysisTimeSeconds = (endTime - startTime) / 1000;
+      setAnalysisMetrics(prev => ({
+        ...prev,
+        analysisTimeSeconds: analysisTimeSeconds
+      }));
+      
       setStatus('Done.');
       
       // Try to fetch usage data from Grok API if available
@@ -1596,6 +1624,197 @@ Keep each section concise and focused. Do not include revenue projections.`;
                   {createRollupBar('prp', 9, 'PRP (Product Requirements Prompt) for your app', 'linear-gradient(135deg, #DB6E09, #E07109)')}
                   {createRollupBar('similar', 10, 'Similar Apps', 'linear-gradient(135deg, #E07109, #F0790A)')}
                   {createRollupBar('pricing', 11, 'Suggested pricing model for your app', 'linear-gradient(135deg, #F0790A, #FF8A1A)')}
+                  
+                  {/* Section 12: Time & Cost Savings */}
+                  {analysisMetrics.reviewCount > 0 && (
+                    <div className="rollup-bar" style={{
+                      marginBottom: '8px',
+                      borderRadius: '12px',
+                      overflow: 'hidden',
+                      boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                      background: 'linear-gradient(135deg, #FF8A1A, #FFB84D)'
+                    }}>
+                      <div className="rollup-header" 
+                           style={{
+                             display: 'flex',
+                             justifyContent: 'space-between',
+                             alignItems: 'center',
+                             padding: '16px 20px',
+                             cursor: 'pointer',
+                             transition: 'all 0.3s ease',
+                             userSelect: 'none',
+                             background: 'linear-gradient(135deg, #FF8A1A, #FFB84D)',
+                             color: 'white'
+                           }}
+                           onClick={() => setExpandedRollup(expandedRollup === 'savings' ? null : 'savings')}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1 }}>
+                          <span style={{ fontWeight: 'bold', fontSize: '16px', minWidth: '24px' }}>12.</span>
+                          <span style={{ fontWeight: 600, fontSize: '16px', flex: 1 }}>Time & Cost Savings Analysis</span>
+                          <span style={{
+                            fontSize: '12px',
+                            fontWeight: 600,
+                            padding: '4px 8px',
+                            borderRadius: '12px',
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.5px',
+                            background: 'rgba(255,255,255,0.2)',
+                            color: 'white'
+                          }}>DONE</span>
+                        </div>
+                        <div style={{
+                          fontSize: '18px',
+                          fontWeight: 'bold',
+                          transition: 'transform 0.3s ease',
+                          minWidth: '24px',
+                          textAlign: 'center',
+                          transform: expandedRollup === 'savings' ? 'rotate(45deg)' : 'none'
+                        }}>
+                          {expandedRollup === 'savings' ? '−' : '+'}
+                        </div>
+                      </div>
+                      {expandedRollup === 'savings' && (
+                        <div style={{
+                          padding: '20px',
+                          background: '#fafbfc',
+                          borderTop: '1px solid #e1e5e9'
+                        }}>
+                          {(() => {
+                            // Constants for calculations
+                            const WORDS_PER_MINUTE_READING = 200;
+                            const AVERAGE_REVIEW_WORDS = 50;
+                            const ANALYSIS_HOURLY_RATE = 75; // $75/hour for human analyst
+                            
+                            // Calculate reading time
+                            const totalWords = analysisMetrics.reviewCount * AVERAGE_REVIEW_WORDS;
+                            const readingTimeMinutes = totalWords / WORDS_PER_MINUTE_READING;
+                            const readingTimeHours = readingTimeMinutes / 60;
+                            
+                            // Calculate analysis time (assume 2x reading time for analysis/note-taking)
+                            const manualAnalysisHours = readingTimeHours * 2;
+                            
+                            // Calculate cost savings
+                            const manualAnalysisCost = manualAnalysisHours * ANALYSIS_HOURLY_RATE;
+                            const aiCost = costTracking.totalCost;
+                            const totalSavings = manualAnalysisCost - aiCost;
+                            
+                            // Calculate time savings
+                            const actualTimeSeconds = analysisMetrics.analysisTimeSeconds;
+                            const manualTimeSeconds = manualAnalysisHours * 3600;
+                            const timeSavedSeconds = manualTimeSeconds - actualTimeSeconds;
+                            const timeSavedHours = timeSavedSeconds / 3600;
+                            
+                            // Format time
+                            const formatTime = (seconds: number) => {
+                              const hours = Math.floor(seconds / 3600);
+                              const minutes = Math.floor((seconds % 3600) / 60);
+                              const secs = Math.floor(seconds % 60);
+                              if (hours > 0) return `${hours}h ${minutes}m`;
+                              if (minutes > 0) return `${minutes}m ${secs}s`;
+                              return `${secs}s`;
+                            };
+                            
+                            return (
+                              <div style={{ fontSize: '14px', lineHeight: '1.6', color: '#374151' }}>
+                                <div style={{ 
+                                  display: 'grid', 
+                                  gridTemplateColumns: 'repeat(2, 1fr)', 
+                                  gap: '16px',
+                                  marginBottom: '20px'
+                                }}>
+                                  <div style={{
+                                    background: '#fff',
+                                    padding: '16px',
+                                    borderRadius: '8px',
+                                    border: '1px solid #e5e7eb'
+                                  }}>
+                                    <div style={{ fontSize: '12px', color: '#6b7280', marginBottom: '4px' }}>
+                                      Reviews Analyzed
+                                    </div>
+                                    <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#111' }}>
+                                      {analysisMetrics.reviewCount.toLocaleString()}
+                                    </div>
+                                  </div>
+                                  
+                                  <div style={{
+                                    background: '#fff',
+                                    padding: '16px',
+                                    borderRadius: '8px',
+                                    border: '1px solid #e5e7eb'
+                                  }}>
+                                    <div style={{ fontSize: '12px', color: '#6b7280', marginBottom: '4px' }}>
+                                      Analysis Time (AI)
+                                    </div>
+                                    <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#10b981' }}>
+                                      {formatTime(actualTimeSeconds)}
+                                    </div>
+                                  </div>
+                                  
+                                  <div style={{
+                                    background: '#fff',
+                                    padding: '16px',
+                                    borderRadius: '8px',
+                                    border: '1px solid #e5e7eb'
+                                  }}>
+                                    <div style={{ fontSize: '12px', color: '#6b7280', marginBottom: '4px' }}>
+                                      Manual Analysis Time
+                                    </div>
+                                    <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#ef4444' }}>
+                                      {manualAnalysisHours.toFixed(1)}h
+                                    </div>
+                                  </div>
+                                  
+                                  <div style={{
+                                    background: '#fff',
+                                    padding: '16px',
+                                    borderRadius: '8px',
+                                    border: '1px solid #e5e7eb'
+                                  }}>
+                                    <div style={{ fontSize: '12px', color: '#6b7280', marginBottom: '4px' }}>
+                                      Time Saved
+                                    </div>
+                                    <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#10b981' }}>
+                                      {timeSavedHours.toFixed(1)}h
+                                    </div>
+                                  </div>
+                                </div>
+                                
+                                <div style={{
+                                  background: 'linear-gradient(135deg, #10b981, #059669)',
+                                  padding: '20px',
+                                  borderRadius: '8px',
+                                  color: 'white',
+                                  marginBottom: '16px'
+                                }}>
+                                  <div style={{ fontSize: '14px', marginBottom: '8px', opacity: 0.9 }}>
+                                    💰 Total Cost Savings
+                                  </div>
+                                  <div style={{ fontSize: '36px', fontWeight: 'bold' }}>
+                                    ${totalSavings.toFixed(2)}
+                                  </div>
+                                  <div style={{ fontSize: '12px', opacity: 0.8, marginTop: '8px' }}>
+                                    Manual analysis: ${manualAnalysisCost.toFixed(2)} @${ANALYSIS_HOURLY_RATE}/hr vs AI: ${aiCost.toFixed(4)}
+                                  </div>
+                                </div>
+                                
+                                <div style={{
+                                  background: '#fef3c7',
+                                  border: '1px solid #fbbf24',
+                                  padding: '12px',
+                                  borderRadius: '6px',
+                                  fontSize: '12px',
+                                  color: '#92400e'
+                                }}>
+                                  <strong>💡 Methodology:</strong> Reading time based on {WORDS_PER_MINUTE_READING} words/min, 
+                                  ~{AVERAGE_REVIEW_WORDS} words per review. Manual analysis assumes 2x reading time for 
+                                  note-taking and synthesis. Human analyst rate: ${ANALYSIS_HOURLY_RATE}/hour.
+                                </div>
+                              </div>
+                            );
+                          })()}
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               )}
 
