@@ -1393,6 +1393,49 @@ Keep each section concise and focused. Do not include revenue projections.`;
         console.log('📊 Grok Usage API Data:', grokUsageData);
       }
       
+      // Save analysis to database
+      try {
+        if (user || isDevelopmentBypass) {
+          const userId = user?.id;
+          
+          // Only save if we have a real user (not dev bypass)
+          if (userId) {
+            const { error: saveError } = await supabase
+              .from('user_analyses')
+              .insert({
+                user_id: userId,
+                app_id: appId,
+                app_name: appMetaData.trackName,
+                app_developer: appMetaData.artistName,
+                app_icon_url: appMetaData.artworkUrl100,
+                review_count: reviews.length,
+                analysis_time_seconds: analysisTimeSeconds,
+                api_cost: costTracking.totalCost,
+                likes: finalParsed.likes,
+                dislikes: finalParsed.dislikes,
+                recommendations: finalParsed.recommendations,
+                keywords: keywordsArray,
+                definitely_include: definitelyIncludeFeatures,
+                backlog: backlogItems,
+                description: description,
+                app_names: appNames,
+                prp: prpContent,
+                similar_apps: similarApps,
+                pricing_model: pricingContent
+              });
+            
+            if (saveError) {
+              console.error('Error saving analysis:', saveError);
+            } else {
+              console.log('✅ Analysis saved to database');
+            }
+          }
+        }
+      } catch (saveError) {
+        console.error('Failed to save analysis:', saveError);
+        // Don't block the user if save fails - they still get their results
+      }
+      
     } catch (error) {
       console.error('Analysis error:', error);
       setStatus('Error: ' + (error instanceof Error ? error.message : 'Unknown error'));
