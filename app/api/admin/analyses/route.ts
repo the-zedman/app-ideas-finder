@@ -44,10 +44,10 @@ export async function GET(request: Request) {
     const userId = searchParams.get('user_id') || '';
     const dateFilter = searchParams.get('date') || '';
     
-    // Build query
+    // Build query - fetch analyses first
     let query = supabaseAdmin
       .from('user_analyses')
-      .select('*, profiles!user_analyses_user_id_fkey(first_name, last_name, email)')
+      .select('*')
       .order('created_at', { ascending: false });
     
     // Apply filters
@@ -86,13 +86,30 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'Failed to fetch analyses', message: error.message }, { status: 500 });
     }
     
+    // Fetch all profiles separately
+    const { data: profiles } = await supabaseAdmin
+      .from('profiles')
+      .select('id, first_name, last_name, email');
+    
+    // Create a map of profiles
+    const profileMap = new Map();
+    profiles?.forEach(p => {
+      profileMap.set(p.id, p);
+    });
+    
+    // Enrich analyses with profile data
+    const enrichedAnalyses = analyses?.map(a => ({
+      ...a,
+      profiles: profileMap.get(a.user_id) || { first_name: '', last_name: '', email: 'Unknown' }
+    })) || [];
+    
     // Calculate stats
-    const totalCost = analyses?.reduce((sum, a) => sum + (parseFloat(a.api_cost) || 0), 0) || 0;
-    const avgCost = analyses && analyses.length > 0 ? totalCost / analyses.length : 0;
+    const totalCost = enrichedAnalyses?.reduce((sum, a) => sum + (parseFloat(a.api_cost) || 0), 0) || 0;
+    const avgCost = enrichedAnalyses && enrichedAnalyses.length > 0 ? totalCost / enrichedAnalyses.length : 0;
     
     // Most analyzed app
     const appCounts = new Map();
-    analyses?.forEach(a => {
+    enrichedAnalyses?.forEach(a => {
       appCounts.set(a.app_name, (appCounts.get(a.app_name) || 0) + 1);
     });
     
@@ -106,9 +123,9 @@ export async function GET(request: Request) {
     });
     
     return NextResponse.json({
-      analyses: analyses || [],
+      analyses: enrichedAnalyses,
       stats: {
-        totalAnalyses: analyses?.length || 0,
+        totalAnalyses: enrichedAnalyses?.length || 0,
         totalCost,
         avgCost,
         mostAnalyzedApp: mostAnalyzedApp || 'N/A'
