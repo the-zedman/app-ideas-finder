@@ -114,24 +114,35 @@ export async function GET(request: Request) {
       userCostsMap.set(a.user_id, (userCostsMap.get(a.user_id) || 0) + (parseFloat(a.api_cost) || 0));
     });
     
+    // Get auth users for email fallback
+    const { data: authUsers } = await supabaseAdmin.auth.admin.listUsers();
+    const authUserMap = new Map();
+    authUsers?.users.forEach(u => {
+      authUserMap.set(u.id, u);
+    });
+    
     const costsByUser = Array.from(userCostsMap.entries())
       .map(([userId, cost]) => {
         const profile = profileMap.get(userId);
+        const authUser = authUserMap.get(userId);
+        
         const firstName = profile?.first_name || '';
         const lastName = profile?.last_name || '';
-        const fullName = `${firstName} ${lastName}`.trim() || 'Unknown User';
+        const fullName = `${firstName} ${lastName}`.trim();
+        
+        // Use profile name, or fall back to email username
+        const displayName = fullName || authUser?.email?.split('@')[0] || 'Unknown User';
+        const email = authUser?.email || profile?.email || 'unknown@email.com';
         
         return {
           userId,
-          name: fullName,
-          email: profile?.email || 'unknown@email.com',
+          name: displayName,
+          email: email,
           cost
         };
       })
       .sort((a, b) => b.cost - a.cost)
       .slice(0, 10); // Top 10
-    
-    console.log('Costs by user sample:', costsByUser.slice(0, 2));
     
     // Costs by app
     const appCostsMap = new Map();
