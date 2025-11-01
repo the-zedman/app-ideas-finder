@@ -78,6 +78,7 @@ export async function middleware(request: NextRequest) {
   // Check admin access for admin routes
   if (isAdminRoute) {
     if (!user) {
+      console.log('❌ Admin route - no user, redirecting to login')
       // Not logged in - redirect to login
       const redirectUrl = request.nextUrl.clone()
       redirectUrl.pathname = '/login'
@@ -85,10 +86,21 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(redirectUrl)
     }
     
+    console.log('🔍 Checking admin status for user:', user.id)
+    
     // Check if user is an admin using service role to bypass RLS
+    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+    
+    if (!serviceRoleKey) {
+      console.error('❌ SUPABASE_SERVICE_ROLE_KEY not set!')
+      const redirectUrl = request.nextUrl.clone()
+      redirectUrl.pathname = '/homezone'
+      return NextResponse.redirect(redirectUrl)
+    }
+    
     const supabaseAdmin = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      serviceRoleKey,
       {
         cookies: {
           getAll() { return request.cookies.getAll() },
@@ -105,17 +117,22 @@ export async function middleware(request: NextRequest) {
       .eq('user_id', user.id)
       .single()
     
-    if (process.env.NODE_ENV === 'development') {
-      console.log('Admin middleware check:', { userId: user.id, adminData, adminError })
-    }
+    console.log('📊 Admin query result:', { 
+      userId: user.id, 
+      found: !!adminData, 
+      role: adminData?.role,
+      error: adminError?.message 
+    })
     
     if (!adminData) {
+      console.log('❌ User is not an admin, redirecting to homezone')
       // Not an admin - redirect to homezone
       const redirectUrl = request.nextUrl.clone()
       redirectUrl.pathname = '/homezone'
       return NextResponse.redirect(redirectUrl)
     }
     
+    console.log('✅ Admin access granted:', adminData.role)
     // User is admin - allow access
   }
 
