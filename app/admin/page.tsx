@@ -33,21 +33,36 @@ export default function AdminDashboard() {
       
       setUser(user);
       
-      // Check admin status
-      const adminStatus = await checkAdminStatus(user.id);
-      
-      console.log('Admin check result:', { userId: user.id, adminStatus });
-      
-      if (!adminStatus.isAdmin) {
-        console.log('Not admin - redirecting to homezone');
+      // Use the debug endpoint to check admin status
+      try {
+        const response = await fetch('/api/check-admin');
+        const data = await response.json();
+        
+        console.log('Admin check via API:', data);
+        
+        if (!data.isAdmin) {
+          console.log('Not admin - redirecting to homezone');
+          router.push('/homezone');
+          return;
+        }
+        
+        const adminStatus = {
+          isAdmin: data.isAdmin,
+          role: data.role,
+          isSuperAdmin: data.role === 'super_admin',
+          isSupport: data.role === 'support'
+        };
+        
+        setAdminCheck(adminStatus);
+        
+        // Fetch dashboard stats
+        await fetchStats(adminStatus);
+        
+      } catch (error) {
+        console.error('Error checking admin status:', error);
         router.push('/homezone');
         return;
       }
-      
-      setAdminCheck(adminStatus);
-      
-      // Fetch dashboard stats
-      await fetchStats(adminStatus);
       
       setLoading(false);
     };
