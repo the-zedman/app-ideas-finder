@@ -999,6 +999,20 @@ Keep each section concise and focused. Do not include revenue projections.`;
       return;
     }
 
+    // Check usage limits before starting
+    try {
+      const usageResponse = await fetch('/api/subscription/usage');
+      const usageData = await usageResponse.json();
+      
+      if (!usageData.canSearch) {
+        alert('You have reached your monthly search limit. Please upgrade your plan or purchase a Search Pack to continue.');
+        return;
+      }
+    } catch (error) {
+      console.error('Error checking usage:', error);
+      // Continue anyway if check fails (graceful degradation)
+    }
+
     setIsAnalyzing(true);
     setStatus('Fetching app metadata...');
     setShowRollups(false);
@@ -1407,6 +1421,15 @@ Keep each section concise and focused. Do not include revenue projections.`;
               console.error('Error saving analysis:', saveError);
             } else {
               console.log('✅ Analysis saved to database with cost:', finalApiCost);
+              
+              // Increment usage counter
+              try {
+                await fetch('/api/subscription/increment-usage', {
+                  method: 'POST'
+                });
+              } catch (usageError) {
+                console.error('Failed to increment usage:', usageError);
+              }
             }
           }
         }
