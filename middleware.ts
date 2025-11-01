@@ -86,13 +86,15 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(redirectUrl)
     }
     
-    console.log('🔍 Checking admin status for user:', user.id)
-    
     // Check if user is an admin using service role to bypass RLS
     const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
     
     if (!serviceRoleKey) {
-      console.error('❌ SUPABASE_SERVICE_ROLE_KEY not set!')
+      // Service role key not available - this will prevent admin access
+      // Log as error but don't expose in production
+      if (process.env.NODE_ENV === 'development') {
+        console.error('SUPABASE_SERVICE_ROLE_KEY not set - admin access blocked')
+      }
       const redirectUrl = request.nextUrl.clone()
       redirectUrl.pathname = '/homezone'
       return NextResponse.redirect(redirectUrl)
