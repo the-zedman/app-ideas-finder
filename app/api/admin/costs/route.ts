@@ -117,15 +117,21 @@ export async function GET(request: Request) {
     const costsByUser = Array.from(userCostsMap.entries())
       .map(([userId, cost]) => {
         const profile = profileMap.get(userId);
+        const firstName = profile?.first_name || '';
+        const lastName = profile?.last_name || '';
+        const fullName = `${firstName} ${lastName}`.trim() || 'Unknown User';
+        
         return {
           userId,
-          name: profile ? `${profile.first_name} ${profile.last_name}`.trim() : 'Unknown',
+          name: fullName,
           email: profile?.email || 'unknown@email.com',
           cost
         };
       })
       .sort((a, b) => b.cost - a.cost)
       .slice(0, 10); // Top 10
+    
+    console.log('Costs by user sample:', costsByUser.slice(0, 2));
     
     // Costs by app
     const appCostsMap = new Map();
