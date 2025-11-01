@@ -594,7 +594,7 @@ export default function AppEnginePage() {
   };
 
   // AI API function
-  const callAI = async (apiKey: string, messages: any[], provider: string = 'grok', model: string = 'grok-4-fast-reasoning') => {
+  const callAI = async (apiKey: string, messages: any[], provider: string = 'grok', model: string = 'grok-4-fast-reasoning', costAccumulator?: { value: number }) => {
     const endpoint = 'https://api.x.ai/v1/chat/completions';
     const body = {
       model: model,
@@ -658,6 +658,11 @@ export default function AppEnginePage() {
       
       // Update cost tracking (system tokens tracked separately, billed at output rate)
       updateCostTracking(inputTokens, outputTokens, systemTokens);
+      
+      // If cost accumulator provided, add to it
+      if (costAccumulator) {
+        costAccumulator.value += callCost;
+      }
     } else {
       console.warn('No usage data in API response:', data);
     }
@@ -1027,6 +1032,9 @@ Keep each section concise and focused. Do not include revenue projections.`;
     setShowRollups(false);
     setExpandedRollup(null);
     
+    // Track total cost locally (not relying on state)
+    const costAccumulator = { value: 0 };
+    
     // Reset cost tracking for new analysis
     setCostTracking({
       totalCalls: 0,
@@ -1092,7 +1100,7 @@ Keep each section concise and focused. Do not include revenue projections.`;
 
       // Send all reviews in one request
       const messages = buildChunkPrompt(appMetaData, allText);
-      const raw = await callAI(grokApiKey, messages, 'grok', 'grok-4-fast-reasoning');
+      const raw = await callAI(grokApiKey, messages, 'grok', 'grok-4-fast-reasoning', costAccumulator);
 
       // Parse the response exactly like HTML
       let summaryText = '';
@@ -1207,7 +1215,7 @@ Keep each section concise and focused. Do not include revenue projections.`;
       let keywordsArray: string[] = [];
       try {
         const keywordsMessages = buildKeywordsPrompt(appMetaData, finalParsed.likes);
-        const keywordsResponse = await callAI(grokApiKey, keywordsMessages, 'grok', 'grok-4-fast-reasoning');
+        const keywordsResponse = await callAI(grokApiKey, keywordsMessages, 'grok', 'grok-4-fast-reasoning', costAccumulator);
         
         if (keywordsResponse && keywordsResponse.trim()) {
           keywordsArray = keywordsResponse.split(',').map((k: string) => k.trim()).filter((k: string) => k.length > 0);
@@ -1225,7 +1233,7 @@ Keep each section concise and focused. Do not include revenue projections.`;
       let definitelyIncludeFeatures: string[] = [];
       try {
         const definitelyIncludeMessages = buildDefinitelyIncludePrompt(appMetaData, finalParsed.likes);
-        const definitelyIncludeResponse = await callAI(grokApiKey, definitelyIncludeMessages, 'grok', 'grok-4-fast-reasoning');
+        const definitelyIncludeResponse = await callAI(grokApiKey, definitelyIncludeMessages, 'grok', 'grok-4-fast-reasoning', costAccumulator);
         
         if (definitelyIncludeResponse && definitelyIncludeResponse.trim()) {
           // Parse the features from the text
@@ -1248,7 +1256,7 @@ Keep each section concise and focused. Do not include revenue projections.`;
       let backlogItems: any[] = [];
       try {
         const backlogMessages = buildBacklogPrompt(appMetaData, finalParsed.dislikes, finalParsed.likes);
-        const backlogResponse = await callAI(grokApiKey, backlogMessages, 'grok', 'grok-4-fast-reasoning');
+        const backlogResponse = await callAI(grokApiKey, backlogMessages, 'grok', 'grok-4-fast-reasoning', costAccumulator);
         
         if (backlogResponse && backlogResponse.trim()) {
           // Parse the backlog items from the text
@@ -1278,7 +1286,7 @@ Keep each section concise and focused. Do not include revenue projections.`;
       try {
         // Use the local variables that were just generated
         const appDescriptionMessages = buildAppDescriptionPrompt(appMetaData, definitelyIncludeFeatures, backlogItems, keywordsArray);
-        const appDescriptionResponse = await callAI(grokApiKey, appDescriptionMessages, 'grok', 'grok-4-fast-reasoning');
+        const appDescriptionResponse = await callAI(grokApiKey, appDescriptionMessages, 'grok', 'grok-4-fast-reasoning', costAccumulator);
         
         if (appDescriptionResponse && appDescriptionResponse.trim()) {
           description = appDescriptionResponse.trim();
@@ -1295,7 +1303,7 @@ Keep each section concise and focused. Do not include revenue projections.`;
       try {
         // Use the local description variable that was just generated
         const appNameMessages = buildAppNamePrompt(appMetaData, definitelyIncludeFeatures, backlogItems, keywordsArray, description);
-        const appNameResponse = await callAI(grokApiKey, appNameMessages, 'grok', 'grok-4-fast-reasoning');
+        const appNameResponse = await callAI(grokApiKey, appNameMessages, 'grok', 'grok-4-fast-reasoning', costAccumulator);
         
         if (appNameResponse && appNameResponse.trim()) {
           // Parse app names from the text
@@ -1315,7 +1323,7 @@ Keep each section concise and focused. Do not include revenue projections.`;
       try {
         // Use the local variables that were just generated
         const prpMessages = buildPRPPrompt(appMetaData, definitelyIncludeFeatures, backlogItems, keywordsArray, description, appNames);
-        const prpResponse = await callAI(grokApiKey, prpMessages, 'grok', 'grok-4-fast-reasoning');
+        const prpResponse = await callAI(grokApiKey, prpMessages, 'grok', 'grok-4-fast-reasoning', costAccumulator);
         
         if (prpResponse && prpResponse.trim()) {
           prpContent = prpResponse.trim();
@@ -1343,7 +1351,7 @@ Keep each section concise and focused. Do not include revenue projections.`;
       try {
         // Use the local variables that were just generated
         const pricingMessages = buildPricingModelPrompt(appMetaData, definitelyIncludeFeatures, backlogItems, keywordsArray, description, appNames, similarApps);
-        const pricingResponse = await callAI(grokApiKey, pricingMessages, 'grok', 'grok-4-fast-reasoning');
+        const pricingResponse = await callAI(grokApiKey, pricingMessages, 'grok', 'grok-4-fast-reasoning', costAccumulator);
         
         if (pricingResponse && pricingResponse.trim()) {
           pricingContent = pricingResponse.trim();
@@ -1393,8 +1401,8 @@ Keep each section concise and focused. Do not include revenue projections.`;
         console.log('📊 Grok Usage API Data:', grokUsageData);
       }
       
-      // Calculate final API cost from logs (more accurate than state)
-      const finalApiCost = apiCallLogs.reduce((sum, log) => sum + log.cost, 0);
+      // Use accumulated cost from local variable (most accurate)
+      const finalApiCost = costAccumulator.value;
       
       // Save analysis to database
       try {
@@ -1403,7 +1411,7 @@ Keep each section concise and focused. Do not include revenue projections.`;
           
           // Only save if we have a real user (not dev bypass)
           if (userId) {
-            console.log('Saving analysis with cost:', finalApiCost);
+            console.log('Saving analysis with cost:', finalApiCost.toFixed(6));
             
             const { error: saveError } = await supabase
               .from('user_analyses')
