@@ -165,12 +165,12 @@ export default function HomeZone() {
               </button>
 
               {showProfileMenu && (
-                <div className="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-xl border border-gray-200 z-50">
-                  <div className="p-4 border-b border-gray-200">
+                <div className="absolute right-0 mt-2 w-64 rounded-lg shadow-xl border border-gray-200 z-50" style={{ backgroundColor: '#ffffff', opacity: 1 }}>
+                  <div className="p-4 border-b border-gray-200" style={{ backgroundColor: '#ffffff' }}>
                     <p className="font-semibold text-gray-900">{getDisplayName()}</p>
                     <p className="text-sm text-gray-600 truncate">{user?.email}</p>
                   </div>
-                  <div className="p-2">
+                  <div className="p-2" style={{ backgroundColor: '#ffffff' }}>
                     {isAdmin && (
                       <button
                         onClick={() => {
