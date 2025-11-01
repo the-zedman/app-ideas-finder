@@ -36,7 +36,10 @@ export default function AdminDashboard() {
       // Check admin status
       const adminStatus = await checkAdminStatus(user.id);
       
+      console.log('Admin check result:', { userId: user.id, adminStatus });
+      
       if (!adminStatus.isAdmin) {
+        console.log('Not admin - redirecting to homezone');
         router.push('/homezone');
         return;
       }

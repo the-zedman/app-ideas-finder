@@ -33,7 +33,10 @@ export async function checkAdminStatus(userId: string | undefined): Promise<Admi
       .eq('user_id', userId)
       .single();
 
+    console.log('Admin query result:', { userId, data, error });
+
     if (error || !data) {
+      console.log('Admin check failed:', error?.message || 'No data');
       return {
         isAdmin: false,
         role: null,
