@@ -265,8 +265,8 @@ export default function AdminSubscriptionsPage() {
 
       {/* Change Plan Modal */}
       {showChangePlanModal && selectedUser && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-8 max-w-md w-full mx-4">
+        <div className="fixed inset-0 flex items-center justify-center z-50" style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
+          <div className="rounded-lg p-8 max-w-md w-full mx-4" style={{ backgroundColor: '#ffffff' }}>
             <h3 className="text-xl font-bold text-gray-900 mb-4">Change Plan for {selectedUser.user_name}</h3>
             
             <div className="mb-4">
@@ -319,8 +319,8 @@ export default function AdminSubscriptionsPage() {
 
       {/* Award Bonus Modal */}
       {showBonusModal && selectedUser && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-8 max-w-md w-full mx-4">
+        <div className="fixed inset-0 flex items-center justify-center z-50" style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
+          <div className="rounded-lg p-8 max-w-md w-full mx-4" style={{ backgroundColor: '#ffffff' }}>
             <h3 className="text-xl font-bold text-gray-900 mb-4">Award Bonus to {selectedUser.user_name}</h3>
             
             <form onSubmit={handleAwardBonus}>
