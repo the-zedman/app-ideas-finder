@@ -85,12 +85,29 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(redirectUrl)
     }
     
-    // Check if user is an admin
-    const { data: adminData } = await supabase
+    // Check if user is an admin using service role to bypass RLS
+    const supabaseAdmin = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      {
+        cookies: {
+          getAll() { return request.cookies.getAll() },
+          setAll(cookiesToSet) {
+            cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
+          },
+        },
+      }
+    )
+    
+    const { data: adminData, error: adminError } = await supabaseAdmin
       .from('admins')
       .select('role')
       .eq('user_id', user.id)
       .single()
+    
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Admin middleware check:', { userId: user.id, adminData, adminError })
+    }
     
     if (!adminData) {
       // Not an admin - redirect to homezone
