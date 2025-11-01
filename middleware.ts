@@ -42,11 +42,15 @@ export async function middleware(request: NextRequest) {
   // Protected routes
   const protectedRoutes = ['/homezone', '/profile', '/appengine']
   const authRoutes = ['/login', '/signup']
+  const adminRoutes = ['/admin']
   
   const isProtectedRoute = protectedRoutes.some(route => 
     request.nextUrl.pathname.startsWith(route)
   )
   const isAuthRoute = authRoutes.some(route => 
+    request.nextUrl.pathname.startsWith(route)
+  )
+  const isAdminRoute = adminRoutes.some(route => 
     request.nextUrl.pathname.startsWith(route)
   )
 
@@ -69,6 +73,33 @@ export async function middleware(request: NextRequest) {
     const redirectUrl = request.nextUrl.clone()
     redirectUrl.pathname = '/homezone'
     return NextResponse.redirect(redirectUrl)
+  }
+
+  // Check admin access for admin routes
+  if (isAdminRoute) {
+    if (!user) {
+      // Not logged in - redirect to login
+      const redirectUrl = request.nextUrl.clone()
+      redirectUrl.pathname = '/login'
+      redirectUrl.searchParams.set('redirectTo', request.nextUrl.pathname)
+      return NextResponse.redirect(redirectUrl)
+    }
+    
+    // Check if user is an admin
+    const { data: adminData } = await supabase
+      .from('admins')
+      .select('role')
+      .eq('user_id', user.id)
+      .single()
+    
+    if (!adminData) {
+      // Not an admin - redirect to homezone
+      const redirectUrl = request.nextUrl.clone()
+      redirectUrl.pathname = '/homezone'
+      return NextResponse.redirect(redirectUrl)
+    }
+    
+    // User is admin - allow access
   }
 
   return supabaseResponse
