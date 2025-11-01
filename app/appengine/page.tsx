@@ -1555,7 +1555,7 @@ Keep each section concise and focused. Do not include revenue projections.`;
               {/* Summary Container */}
               {appMeta && (
                 <div className="mb-8">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-3">Target App</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-3">TARGET App</h3>
                   <div className="bg-gray-50 rounded-xl p-6 flex gap-4 items-start">
                     <img 
                       src={appMeta.artworkUrl100} 
@@ -1604,11 +1604,7 @@ Keep each section concise and focused. Do not include revenue projections.`;
                 <div className="mt-8 p-6 bg-gray-50 rounded-xl border border-gray-200">
                   <h3 className="text-lg font-semibold text-gray-900 mb-4">💰 Complete Engine Cycle (CEC) Cost Breakdown</h3>
                   <div className="font-mono text-sm">
-                    <div className="grid grid-cols-3 gap-4 mb-4">
-                      <div className="bg-white p-3 rounded-lg border border-gray-200">
-                        <div className="font-semibold text-gray-600 mb-1">Total API Calls</div>
-                        <div className="text-xl font-bold text-gray-900">{costTracking.totalCalls}</div>
-                      </div>
+                    <div className="grid grid-cols-2 gap-4 mb-4">
                       <div className="bg-white p-3 rounded-lg border border-gray-200">
                         <div className="font-semibold text-gray-600 mb-1">Input Tokens</div>
                         <div className="text-xl font-bold text-gray-900">{costTracking.totalInputTokens.toLocaleString()}</div>
@@ -1670,7 +1666,7 @@ Keep each section concise and focused. Do not include revenue projections.`;
                           </tfoot>
                         </table>
                         <div className="mt-2 text-xs text-gray-500 italic">
-                          💡 System tokens = overhead/metadata (billed at output rate $0.50/1M). Check console (F12) for "[API Call]" messages
+                          💡 System tokens = overhead/metadata (billed at output rate $0.50/1M)
                         </div>
                       </div>
                     </div>
