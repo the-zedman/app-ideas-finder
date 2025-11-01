@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase-client';
 import CryptoJS from 'crypto-js';
 
@@ -74,7 +74,9 @@ export default function AppEnginePage() {
   const [appInput, setAppInput] = useState('');
   
   const router = useRouter();
+  const searchParams = useSearchParams();
   const appInputRef = useRef<HTMLInputElement>(null);
+  const hasAutoStarted = useRef(false);
   
   const supabase = createClient();
 
@@ -94,6 +96,20 @@ export default function AppEnginePage() {
           const adminData = await adminResponse.json();
           setIsAdmin(adminData.isAdmin || false);
         }
+        
+        // Check for app parameter in URL and auto-start analysis
+        const appParam = searchParams.get('app');
+        if (appParam && !hasAutoStarted.current && !isAnalyzing && grokApiKey) {
+          hasAutoStarted.current = true;
+          setAppInput(appParam);
+          // Set the input ref value and trigger analysis
+          setTimeout(() => {
+            if (appInputRef.current) {
+              appInputRef.current.value = appParam;
+              startAnalysis();
+            }
+          }, 1000);
+        }
       } else {
         router.push('/login');
       }
@@ -101,7 +117,7 @@ export default function AppEnginePage() {
     };
 
     getUser();
-  }, [router, isDevelopmentBypass]);
+  }, [router, isDevelopmentBypass, searchParams]);
 
   useEffect(() => {
     // Fetch the Grok API key from environment
