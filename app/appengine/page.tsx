@@ -51,7 +51,8 @@ export default function AppEnginePage() {
   const [analysisMetrics, setAnalysisMetrics] = useState({
     reviewCount: 0,
     analysisTimeSeconds: 0,
-    startTime: 0
+    startTime: 0,
+    manualTaskHours: 0
   });
   const [apiCallLogs, setApiCallLogs] = useState<Array<{
     callNumber: number;
@@ -1040,11 +1041,12 @@ Keep each section concise and focused. Do not include revenue projections.`;
     setAnalysisMetrics({
       reviewCount: 0,
       analysisTimeSeconds: 0,
-      startTime: startTime
+      startTime: startTime,
+      manualTaskHours: 0
     });
     
     // Initialize rollup statuses - match HTML exactly
-    const sections = ['likes', 'dislikes', 'recommendations', 'keywords', 'definitely', 'backlog', 'description', 'names', 'prp', 'similar', 'pricing'];
+    const sections = ['likes', 'dislikes', 'recommendations', 'keywords', 'definitely', 'backlog', 'description', 'names', 'prp', 'similar', 'pricing', 'savings'];
     const initialStatuses: {[key: string]: string} = {};
     sections.forEach(section => {
       initialStatuses[section] = 'RESEARCH UNDERWAY';
@@ -1352,13 +1354,36 @@ Keep each section concise and focused. Do not include revenue projections.`;
         console.error('Error generating pricing model:', error);
       }
 
-      // Calculate final analysis time
+      // Calculate final analysis time and manual task estimates
       const endTime = Date.now();
       const analysisTimeSeconds = (endTime - startTime) / 1000;
+      
+      // Estimate manual time for each analytical task (in hours)
+      // These are conservative estimates for a skilled analyst
+      const manualTaskEstimates = {
+        readingAndSummarizing: reviews.length * 0.5 / 60, // 30 seconds per review to read and categorize likes/dislikes
+        keywords: 2, // 2 hours to research and identify ASO keywords
+        features: 1.5, // 1.5 hours to identify and document core features
+        backlog: 2, // 2 hours to create prioritized feature backlog
+        description: 1, // 1 hour to write compelling app description
+        naming: 3, // 3 hours to brainstorm and research app names
+        prp: 2, // 2 hours to write comprehensive product requirements
+        similarApps: 1.5, // 1.5 hours to research and document competitor apps
+        pricing: 1.5 // 1.5 hours to analyze pricing strategies
+      };
+      
+      const totalManualTaskHours = Object.values(manualTaskEstimates).reduce((sum, hours) => sum + hours, 0);
+      
       setAnalysisMetrics(prev => ({
         ...prev,
-        analysisTimeSeconds: analysisTimeSeconds
+        analysisTimeSeconds: analysisTimeSeconds,
+        manualTaskHours: totalManualTaskHours
       }));
+      
+      // Mark Section 12 as done after a brief delay
+      setTimeout(() => {
+        setRollupStatuses(prev => ({ ...prev, savings: 'DONE' }));
+      }, 500);
       
       setStatus('Done.');
       
@@ -1626,53 +1651,58 @@ Keep each section concise and focused. Do not include revenue projections.`;
                   {createRollupBar('pricing', 11, 'Suggested pricing model for your app', 'linear-gradient(135deg, #F0790A, #FF8A1A)')}
                   
                   {/* Section 12: Time & Cost Savings */}
-                  {analysisMetrics.reviewCount > 0 && (
-                    <div className="rollup-bar" style={{
-                      marginBottom: '8px',
-                      borderRadius: '12px',
-                      overflow: 'hidden',
-                      boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-                      background: '#3FA265'
-                    }}>
-                      <div className="rollup-header" 
-                           style={{
-                             display: 'flex',
-                             justifyContent: 'space-between',
-                             alignItems: 'center',
-                             padding: '16px 20px',
-                             cursor: 'pointer',
-                             transition: 'all 0.3s ease',
-                             userSelect: 'none',
-                             background: '#3FA265',
-                             color: 'white'
-                           }}
-                           onClick={() => setExpandedRollup(expandedRollup === 'savings' ? null : 'savings')}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1 }}>
-                          <span style={{ fontWeight: 'bold', fontSize: '16px', minWidth: '24px' }}>12.</span>
-                          <span style={{ fontWeight: 600, fontSize: '16px', flex: 1 }}>Time & Cost Savings Analysis</span>
-                          <span style={{
-                            fontSize: '12px',
-                            fontWeight: 600,
-                            padding: '4px 8px',
-                            borderRadius: '12px',
-                            textTransform: 'uppercase',
-                            letterSpacing: '0.5px',
-                            background: 'rgba(255,255,255,0.2)',
-                            color: 'white'
-                          }}>DONE</span>
+                  {analysisMetrics.reviewCount > 0 && (() => {
+                    const status = rollupStatuses['savings'] || 'RESEARCH UNDERWAY';
+                    const barBackground = status === 'DONE' ? '#3FA265' : '#8E81A2';
+                    
+                    return (
+                      <div className="rollup-bar" style={{
+                        marginBottom: '8px',
+                        borderRadius: '12px',
+                        overflow: 'hidden',
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                        background: barBackground
+                      }}>
+                        <div className="rollup-header" 
+                             style={{
+                               display: 'flex',
+                               justifyContent: 'space-between',
+                               alignItems: 'center',
+                               padding: '16px 20px',
+                               cursor: 'pointer',
+                               transition: 'all 0.3s ease',
+                               userSelect: 'none',
+                               background: barBackground,
+                               color: 'white'
+                             }}
+                             onClick={() => setExpandedRollup(expandedRollup === 'savings' ? null : 'savings')}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1 }}>
+                            <span style={{ fontWeight: 'bold', fontSize: '16px', minWidth: '24px' }}>12.</span>
+                            <span style={{ fontWeight: 600, fontSize: '16px', flex: 1 }}>Time & Cost Savings Analysis</span>
+                            <span style={{
+                              fontSize: '12px',
+                              fontWeight: 600,
+                              padding: '4px 8px',
+                              borderRadius: '12px',
+                              textTransform: 'uppercase',
+                              letterSpacing: '0.5px',
+                              background: 'rgba(255,255,255,0.2)',
+                              color: 'white',
+                              animation: status === 'RESEARCH UNDERWAY' ? 'pulse 1.5s ease-in-out infinite' : 'none'
+                            }}>{status}</span>
+                          </div>
+                          <div style={{
+                            fontSize: '18px',
+                            fontWeight: 'bold',
+                            transition: 'transform 0.3s ease',
+                            minWidth: '24px',
+                            textAlign: 'center',
+                            transform: expandedRollup === 'savings' ? 'rotate(45deg)' : 'none'
+                          }}>
+                            {expandedRollup === 'savings' ? '−' : status === 'DONE' ? '+' : '⟳'}
+                          </div>
                         </div>
-                        <div style={{
-                          fontSize: '18px',
-                          fontWeight: 'bold',
-                          transition: 'transform 0.3s ease',
-                          minWidth: '24px',
-                          textAlign: 'center',
-                          transform: expandedRollup === 'savings' ? 'rotate(45deg)' : 'none'
-                        }}>
-                          {expandedRollup === 'savings' ? '−' : '+'}
-                        </div>
-                      </div>
-                      {expandedRollup === 'savings' && (
+                        {expandedRollup === 'savings' && (
                         <div style={{
                           padding: '20px',
                           background: '#fafbfc',
@@ -1689,17 +1719,19 @@ Keep each section concise and focused. Do not include revenue projections.`;
                             const readingTimeMinutes = totalWords / WORDS_PER_MINUTE_READING;
                             const readingTimeHours = readingTimeMinutes / 60;
                             
-                            // Calculate analysis time (assume 2x reading time for analysis/note-taking)
-                            const manualAnalysisHours = readingTimeHours * 2;
+                            // Calculate total manual time: reading + analysis tasks
+                            const manualAnalysisHours = readingTimeHours * 2; // Reading + summarizing
+                            const manualTaskHours = analysisMetrics.manualTaskHours; // Other analytical tasks
+                            const totalManualHours = manualAnalysisHours + manualTaskHours;
                             
                             // Calculate cost savings
-                            const manualAnalysisCost = manualAnalysisHours * ANALYSIS_HOURLY_RATE;
+                            const manualAnalysisCost = totalManualHours * ANALYSIS_HOURLY_RATE;
                             const aiCost = costTracking.totalCost;
                             const totalSavings = manualAnalysisCost - aiCost;
                             
                             // Calculate time savings
                             const actualTimeSeconds = analysisMetrics.analysisTimeSeconds;
-                            const manualTimeSeconds = manualAnalysisHours * 3600;
+                            const manualTimeSeconds = totalManualHours * 3600;
                             const timeSavedSeconds = manualTimeSeconds - actualTimeSeconds;
                             const timeSavedHours = timeSavedSeconds / 3600;
                             
@@ -1759,7 +1791,10 @@ Keep each section concise and focused. Do not include revenue projections.`;
                                       Manual Analysis Time
                                     </div>
                                     <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#ef4444' }}>
-                                      {manualAnalysisHours.toFixed(1)}h
+                                      {totalManualHours.toFixed(1)}h
+                                    </div>
+                                    <div style={{ fontSize: '10px', color: '#9ca3af', marginTop: '4px' }}>
+                                      {manualAnalysisHours.toFixed(1)}h reading + {manualTaskHours.toFixed(1)}h tasks
                                     </div>
                                   </div>
                                   
@@ -1804,9 +1839,11 @@ Keep each section concise and focused. Do not include revenue projections.`;
                                   fontSize: '12px',
                                   color: '#92400e'
                                 }}>
-                                  <strong>💡 Methodology:</strong> Reading time based on {WORDS_PER_MINUTE_READING} words/min, 
-                                  ~{AVERAGE_REVIEW_WORDS} words per review. Manual analysis assumes 2x reading time for 
-                                  note-taking and synthesis. Human analyst rate: ${ANALYSIS_HOURLY_RATE}/hour.
+                                  <strong>💡 Methodology:</strong> Manual time includes reading reviews 
+                                  ({WORDS_PER_MINUTE_READING} words/min × 2 for notes) plus analytical tasks: keyword research (2h), 
+                                  feature identification (1.5h), backlog creation (2h), description writing (1h), app naming (3h), 
+                                  PRP documentation (2h), competitor research (1.5h), and pricing analysis (1.5h). 
+                                  Human analyst rate: ${ANALYSIS_HOURLY_RATE}/hour.
                                   {analysisMetrics.reviewCount >= 490 && (
                                     <div style={{ marginTop: '8px', paddingTop: '8px', borderTop: '1px solid #fbbf24' }}>
                                       <strong>📊 Data Source:</strong> Analyzed the most recent {analysisMetrics.reviewCount.toLocaleString()} reviews 
@@ -1818,10 +1855,11 @@ Keep each section concise and focused. Do not include revenue projections.`;
                               </div>
                             );
                           })()}
-                        </div>
-                      )}
-                    </div>
-                  )}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })()}
                 </div>
               )}
 
