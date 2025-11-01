@@ -1632,7 +1632,7 @@ Keep each section concise and focused. Do not include revenue projections.`;
                       borderRadius: '12px',
                       overflow: 'hidden',
                       boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-                      background: 'linear-gradient(135deg, #FF8A1A, #FFB84D)'
+                      background: '#3FA265'
                     }}>
                       <div className="rollup-header" 
                            style={{
@@ -1643,7 +1643,7 @@ Keep each section concise and focused. Do not include revenue projections.`;
                              cursor: 'pointer',
                              transition: 'all 0.3s ease',
                              userSelect: 'none',
-                             background: 'linear-gradient(135deg, #FF8A1A, #FFB84D)',
+                             background: '#3FA265',
                              color: 'white'
                            }}
                            onClick={() => setExpandedRollup(expandedRollup === 'savings' ? null : 'savings')}>
