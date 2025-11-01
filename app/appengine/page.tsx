@@ -621,15 +621,15 @@ export default function AppEnginePage() {
       const totalTokens = data.usage.total_tokens || (inputTokens + outputTokens);
       
       // Grok includes system/overhead tokens in total_tokens but not in prompt/completion
-      // The difference represents system/metadata tokens that are typically billed as input
+      // The difference represents system/metadata tokens
       const systemTokens = totalTokens - (inputTokens + outputTokens);
-      const effectiveInputTokens = inputTokens + systemTokens;
       
       // Calculate cost for this call
-      // System tokens are billed at input rate
-      const inputCost = Number((effectiveInputTokens * 0.0000002).toFixed(10));
+      // Based on testing: system tokens appear to be billed at OUTPUT rate ($0.5/1M)
+      const inputCost = Number((inputTokens * 0.0000002).toFixed(10));
+      const systemCost = Number((systemTokens * 0.0000005).toFixed(10)); // System at output rate
       const outputCost = Number((outputTokens * 0.0000005).toFixed(10));
-      const callCost = Number((inputCost + outputCost).toFixed(10));
+      const callCost = Number((inputCost + systemCost + outputCost).toFixed(10));
       
       // Always log to console for debugging
       console.log(`[API Call] Input: ${inputTokens}, Output: ${outputTokens}, System: ${systemTokens}, Total: ${totalTokens}, Cost: $${callCost.toFixed(6)}`);
@@ -650,8 +650,8 @@ export default function AppEnginePage() {
         timestamp: new Date().toISOString()
       }]);
       
-      // Update cost tracking with effective tokens (including system)
-      updateCostTracking(effectiveInputTokens, outputTokens);
+      // Update cost tracking (system tokens tracked separately, billed at output rate)
+      updateCostTracking(inputTokens, outputTokens, systemTokens);
     } else {
       console.warn('No usage data in API response:', data);
     }
@@ -659,19 +659,21 @@ export default function AppEnginePage() {
     return data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
   };
 
-  const updateCostTracking = (inputTokens: number, outputTokens: number) => {
+  const updateCostTracking = (inputTokens: number, outputTokens: number, systemTokens: number = 0) => {
     setCostTracking(prev => {
-      const newTotalInput = prev.totalInputTokens + inputTokens;
+      const newTotalInput = prev.totalInputTokens + inputTokens + systemTokens; // Include system in input count for display
       const newTotalOutput = prev.totalOutputTokens + outputTokens;
       const newTotalCalls = prev.totalCalls + 1;
       
       // Calculate costs (grok-4-fast-reasoning pricing: $0.20 input, $0.50 output per 1M tokens)
-      // Using incremental calculation with proper precision
+      // System tokens are billed at OUTPUT rate based on empirical testing
       // Input: $0.20 per 1M tokens = $0.0000002 per token
       // Output: $0.50 per 1M tokens = $0.0000005 per token
+      // System: $0.50 per 1M tokens = $0.0000005 per token
       const inputCostIncrement = Number((inputTokens * 0.0000002).toFixed(10));
+      const systemCostIncrement = Number((systemTokens * 0.0000005).toFixed(10));
       const outputCostIncrement = Number((outputTokens * 0.0000005).toFixed(10));
-      const totalCost = Number((prev.totalCost + inputCostIncrement + outputCostIncrement).toFixed(10));
+      const totalCost = Number((prev.totalCost + inputCostIncrement + systemCostIncrement + outputCostIncrement).toFixed(10));
       
       return {
         totalCalls: newTotalCalls,
@@ -1668,7 +1670,7 @@ Keep each section concise and focused. Do not include revenue projections.`;
                           </tfoot>
                         </table>
                         <div className="mt-2 text-xs text-gray-500 italic">
-                          💡 System tokens = overhead/metadata (billed as input). Check console (F12) for "[API Call]" messages
+                          💡 System tokens = overhead/metadata (billed at output rate $0.50/1M). Check console (F12) for "[API Call]" messages
                         </div>
                       </div>
                     </div>
