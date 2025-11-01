@@ -71,70 +71,28 @@ export default function AdminDashboard() {
   }, [router]);
 
   const fetchStats = async (adminCheck: AdminCheck) => {
-    // Total users
-    const { count: totalUsers } = await supabase
-      .from('profiles')
-      .select('*', { count: 'exact', head: true });
-
-    // Recent signups (last 10)
-    const { data: recentSignups } = await supabase
-      .from('profiles')
-      .select('id, first_name, last_name, created_at')
-      .order('created_at', { ascending: false })
-      .limit(10);
-
-    // Total analyses (if user_analyses table exists)
-    let totalAnalyses = 0;
-    let activeUsers = 0;
-    let totalApiCost = 0;
-    let recentAnalyses: any[] = [];
-
     try {
-      const { count: analysisCount } = await supabase
-        .from('user_analyses')
-        .select('*', { count: 'exact', head: true });
+      // Fetch stats from API endpoint (uses service role to bypass RLS)
+      const response = await fetch('/api/admin/stats');
       
-      totalAnalyses = analysisCount || 0;
-
-      // Active users (analyzed in last 30 days)
-      const thirtyDaysAgo = new Date();
-      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+      if (!response.ok) {
+        console.error('Failed to fetch admin stats:', response.status);
+        return;
+      }
       
-      const { data: activeData } = await supabase
-        .from('user_analyses')
-        .select('user_id')
-        .gte('created_at', thirtyDaysAgo.toISOString());
+      const data = await response.json();
       
-      activeUsers = new Set(activeData?.map(a => a.user_id) || []).size;
-
-      // Total API cost
-      const { data: costData } = await supabase
-        .from('user_analyses')
-        .select('api_cost');
-      
-      totalApiCost = costData?.reduce((sum, a) => sum + (parseFloat(a.api_cost) || 0), 0) || 0;
-
-      // Recent analyses
-      const { data: recentData } = await supabase
-        .from('user_analyses')
-        .select('id, app_name, review_count, api_cost, created_at')
-        .order('created_at', { ascending: false })
-        .limit(10);
-      
-      recentAnalyses = recentData || [];
-
+      setStats({
+        totalUsers: data.totalUsers,
+        activeUsers: data.activeUsers,
+        totalAnalyses: data.totalAnalyses,
+        totalApiCost: data.totalApiCost,
+        recentSignups: data.recentSignups,
+        recentAnalyses: data.recentAnalyses
+      });
     } catch (error) {
-      console.log('user_analyses table not yet created');
+      console.error('Error fetching stats:', error);
     }
-
-    setStats({
-      totalUsers: totalUsers || 0,
-      activeUsers,
-      totalAnalyses,
-      totalApiCost,
-      recentSignups: recentSignups || [],
-      recentAnalyses
-    });
   };
 
   const handleLogout = async () => {
