@@ -130,13 +130,18 @@ function AppEngineContent() {
       console.log('Auto-starting analysis for:', appParam);
       hasAutoStarted.current = true;
       
-      // Set the input field value
-      if (appInputRef.current) {
-        appInputRef.current.value = appParam;
-      }
-      
-      // Trigger auto-start
-      setShouldAutoStart(true);
+      // Set the input field value and wait for it to be set
+      setTimeout(() => {
+        if (appInputRef.current) {
+          appInputRef.current.value = appParam;
+          console.log('Set input field to:', appParam);
+          
+          // Wait a bit more before triggering analysis
+          setTimeout(() => {
+            setShouldAutoStart(true);
+          }, 500);
+        }
+      }, 500);
     }
   }, [grokApiKey, searchParams, loading]);
 
@@ -1470,6 +1475,7 @@ Keep each section concise and focused. Do not include revenue projections.`;
   useEffect(() => {
     if (shouldAutoStart && !isAnalyzing) {
       console.log('Triggering auto-start analysis...');
+      console.log('Input ref value:', appInputRef.current?.value);
       setShouldAutoStart(false);
       startAnalysis();
     }
