@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase-client';
 import CryptoJS from 'crypto-js';
@@ -34,7 +34,7 @@ interface ParsedResults {
   recommendations: string[];
 }
 
-export default function AppEnginePage() {
+function AppEngineContent() {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
@@ -2016,5 +2016,17 @@ Keep each section concise and focused. Do not include revenue projections.`;
         </div>
       </main>
     </div>
+  );
+}
+
+export default function AppEnginePage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-gray-600 text-xl">Loading...</div>
+      </div>
+    }>
+      <AppEngineContent />
+    </Suspense>
   );
 }
