@@ -1393,6 +1393,9 @@ Keep each section concise and focused. Do not include revenue projections.`;
         console.log('📊 Grok Usage API Data:', grokUsageData);
       }
       
+      // Calculate final API cost from logs (more accurate than state)
+      const finalApiCost = apiCallLogs.reduce((sum, log) => sum + log.cost, 0);
+      
       // Save analysis to database
       try {
         if (user || isDevelopmentBypass) {
@@ -1400,6 +1403,8 @@ Keep each section concise and focused. Do not include revenue projections.`;
           
           // Only save if we have a real user (not dev bypass)
           if (userId) {
+            console.log('Saving analysis with cost:', finalApiCost);
+            
             const { error: saveError } = await supabase
               .from('user_analyses')
               .insert({
@@ -1410,7 +1415,7 @@ Keep each section concise and focused. Do not include revenue projections.`;
                 app_icon_url: appMetaData.artworkUrl100,
                 review_count: reviews.length,
                 analysis_time_seconds: analysisTimeSeconds,
-                api_cost: costTracking.totalCost,
+                api_cost: finalApiCost,
                 likes: finalParsed.likes,
                 dislikes: finalParsed.dislikes,
                 recommendations: finalParsed.recommendations,
@@ -1427,7 +1432,7 @@ Keep each section concise and focused. Do not include revenue projections.`;
             if (saveError) {
               console.error('Error saving analysis:', saveError);
             } else {
-              console.log('✅ Analysis saved to database');
+              console.log('✅ Analysis saved to database with cost:', finalApiCost);
             }
           }
         }
