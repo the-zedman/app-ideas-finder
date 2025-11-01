@@ -1070,7 +1070,7 @@ Keep each section concise and focused. Do not include revenue projections.`;
         reviewCount: reviews.length
       }));
       
-      setStatus(`Fetched ${reviews.length.toLocaleString()} reviews. Preparing AI analysis...`);
+      setStatus(`Fetched ${reviews.length.toLocaleString()} reviews ${reviews.length >= 490 ? '(Apple RSS API limit) ' : ''}— Preparing AI analysis...`);
       
       if (reviews.length === 0) {
         setStatus('No reviews found for this app.');
@@ -1807,6 +1807,13 @@ Keep each section concise and focused. Do not include revenue projections.`;
                                   <strong>💡 Methodology:</strong> Reading time based on {WORDS_PER_MINUTE_READING} words/min, 
                                   ~{AVERAGE_REVIEW_WORDS} words per review. Manual analysis assumes 2x reading time for 
                                   note-taking and synthesis. Human analyst rate: ${ANALYSIS_HOURLY_RATE}/hour.
+                                  {analysisMetrics.reviewCount >= 490 && (
+                                    <div style={{ marginTop: '8px', paddingTop: '8px', borderTop: '1px solid #fbbf24' }}>
+                                      <strong>📊 Data Source:</strong> Analyzed the most recent {analysisMetrics.reviewCount.toLocaleString()} reviews 
+                                      (Apple RSS API limit). This represents current user feedback and is typically sufficient for 
+                                      comprehensive insights. Recent reviews are more valuable as they reflect the current app version.
+                                    </div>
+                                  )}
                                 </div>
                               </div>
                             );
