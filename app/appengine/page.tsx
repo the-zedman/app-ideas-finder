@@ -36,6 +36,7 @@ interface ParsedResults {
 
 function AppEngineContent() {
   const [user, setUser] = useState<any>(null);
+  const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
@@ -93,8 +94,17 @@ function AppEngineContent() {
       if (user || isDevelopmentBypass) {
         setUser(user);
         
-        // Check if user is admin
+        // Fetch profile
         if (user) {
+          const { data: profileData } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', user.id)
+            .single();
+          
+          setProfile(profileData);
+          
+          // Check if user is admin
           const adminResponse = await fetch('/api/check-admin');
           const adminData = await adminResponse.json();
           setIsAdmin(adminData.isAdmin || false);
@@ -169,18 +179,19 @@ function AppEngineContent() {
 
   const getDisplayName = () => {
     if (!user && isDevelopmentBypass) return 'Dev User';
-    return user?.user_metadata?.full_name || 
-           user?.user_metadata?.name || 
-           user?.email?.split('@')[0] || 
-           'User';
+    const firstName = profile?.first_name || '';
+    const lastName = profile?.last_name || '';
+    const fullName = `${firstName} ${lastName}`.trim();
+    return fullName || user?.email?.split('@')[0] || 'User';
   };
 
   const getInitials = () => {
     if (!user && isDevelopmentBypass) return 'DU';
-    const name = user?.user_metadata?.full_name || 
-                 user?.user_metadata?.name || 
-                 user?.email?.split('@')[0] || 
-                 'User';
+    // Use custom initials if set, otherwise calculate from name
+    if (profile?.custom_initials) {
+      return profile.custom_initials.toUpperCase();
+    }
+    const name = getDisplayName();
     return name.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2);
   };
 
