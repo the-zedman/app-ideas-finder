@@ -1783,7 +1783,7 @@ Keep each section concise and focused. Do not include revenue projections.`;
               {/* Start Button */}
               <div className="text-center mb-8">
                 <button
-                  onClick={startAnalysis}
+                  onClick={() => startAnalysis(false)}
                   disabled={isAnalyzing}
                   className="bg-[#E07A5F] hover:bg-[#E07A5F]/90 text-white font-semibold py-3 px-8 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
