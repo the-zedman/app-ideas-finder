@@ -7,8 +7,10 @@ import { createClient } from '@/lib/supabase-client';
 export default function BillingPage() {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [usageData, setUsageData] = useState<any>(null);
-  const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [subscription, setSubscription] = useState<any>(null);
+  const [usage, setUsage] = useState<any>(null);
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [processingCheckout, setProcessingCheckout] = useState(false);
   
   const router = useRouter();
   const supabase = createClient();
@@ -23,21 +25,114 @@ export default function BillingPage() {
       }
       
       setUser(user);
-      
-      // Fetch usage data
-      const usageResponse = await fetch('/api/subscription/usage');
-      const usage = await usageResponse.json();
-      setUsageData(usage);
-      
+      await fetchSubscription();
+      await fetchUsage();
       setLoading(false);
     };
 
     init();
-  }, [router]);
+  }, []);
+
+  const fetchSubscription = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data, error } = await supabase
+        .from('user_subscriptions')
+        .select('*, subscription_plans(*)')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      if (error) {
+        console.error('Error fetching subscription:', error);
+        return;
+      }
+
+      setSubscription(data);
+    } catch (error) {
+      console.error('Error fetching subscription:', error);
+    }
+  };
+
+  const fetchUsage = async () => {
+    try {
+      const response = await fetch('/api/subscription/usage');
+      const data = await response.json();
+      setUsage(data);
+    } catch (error) {
+      console.error('Error fetching usage:', error);
+    }
+  };
+
+  const handleCheckout = async (planType: string, priceId: string) => {
+    setProcessingCheckout(true);
+    
+    try {
+      const response = await fetch('/api/stripe/create-checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          priceId,
+          planType,
+          successUrl: `${window.location.origin}/billing?success=true`,
+          cancelUrl: `${window.location.origin}/billing?canceled=true`,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        alert('Error creating checkout session');
+        setProcessingCheckout(false);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Failed to start checkout');
+      setProcessingCheckout(false);
+    }
+  };
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
     router.push('/');
+  };
+
+  const getDisplayName = () => {
+    const firstName = user?.user_metadata?.first_name || '';
+    const lastName = user?.user_metadata?.last_name || '';
+    const fullName = `${firstName} ${lastName}`.trim();
+    return fullName || user?.email?.split('@')[0] || 'User';
+  };
+
+  const getPlanDisplayName = (planId: string) => {
+    const planNames: any = {
+      trial: 'Trial',
+      core_monthly: 'Core (Monthly)',
+      core_annual: 'Core (Annual)',
+      prime_monthly: 'Prime (Monthly)',
+      prime_annual: 'Prime (Annual)',
+      free_unlimited: 'Free Unlimited',
+    };
+    return planNames[planId] || planId;
+  };
+
+  const getStatusBadge = (status: string) => {
+    const badges: any = {
+      trial: { bg: 'bg-yellow-100', text: 'text-yellow-800', label: 'Trial' },
+      active: { bg: 'bg-green-100', text: 'text-green-800', label: 'Active' },
+      cancelled: { bg: 'bg-red-100', text: 'text-red-800', label: 'Cancelled' },
+      expired: { bg: 'bg-gray-100', text: 'text-gray-800', label: 'Expired' },
+      free_unlimited: { bg: 'bg-purple-100', text: 'text-purple-800', label: 'Free Unlimited' },
+    };
+    const badge = badges[status] || badges.active;
+    return (
+      <span className={`px-3 py-1 rounded-full text-sm font-semibold ${badge.bg} ${badge.text}`}>
+        {badge.label}
+      </span>
+    );
   };
 
   if (loading) {
@@ -48,38 +143,10 @@ export default function BillingPage() {
     );
   }
 
-  const plans = [
-    {
-      id: 'core_monthly',
-      name: 'Core',
-      price: 39,
-      annual: 399,
-      searches: 75,
-      features: [
-        '75 searches per month',
-        'All 12 analysis sections',
-        'Save unlimited analyses',
-        'Export results',
-        'Email support'
-      ],
-      popular: true
-    },
-    {
-      id: 'prime_monthly',
-      name: 'Prime',
-      price: 79,
-      annual: 799,
-      searches: 225,
-      features: [
-        '225 searches per month',
-        'Everything in Core',
-        'Priority support',
-        'Advanced analytics',
-        'API access (coming soon)'
-      ],
-      popular: false
-    }
-  ];
+  const currentPlan = subscription?.plan_id || 'trial';
+  const isUnlimited = subscription?.status === 'free_unlimited';
+  const isTrial = subscription?.status === 'trial';
+  const isActive = subscription?.status === 'active';
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -87,137 +154,278 @@ export default function BillingPage() {
       <header className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <div className="flex items-center gap-3">
-              <img 
-                src="/App Ideas Finder - logo - 200x200.png" 
-                alt="App Ideas Finder" 
-                className="h-8 w-8"
-              />
-              <h1 className="text-xl font-bold text-[#3D405B]">App Ideas Finder</h1>
+            <div className="flex items-center gap-4">
+              <a href="/homezone" className="text-xl font-bold text-gray-900 hover:text-gray-700">
+                App Ideas Finder
+              </a>
+              <span className="text-gray-400">/</span>
+              <h1 className="text-xl font-bold text-gray-900">Billing & Subscription</h1>
             </div>
-            <nav className="flex items-center gap-6">
-              <a href="/homezone" className="text-gray-600 hover:text-[#3D405B]">Dashboard</a>
-              <a href="/appengine" className="text-gray-600 hover:text-[#3D405B]">App Engine</a>
-              <a href="/billing" className="text-[#3D405B] font-semibold">Billing</a>
-            </nav>
+            <div className="flex items-center gap-4">
+              <a href="/homezone" className="text-gray-600 hover:text-gray-900">Back to Home</a>
+              <button onClick={handleLogout} className="text-red-600 hover:text-red-700">Sign Out</button>
+            </div>
           </div>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Current Plan */}
-        <div className="bg-white rounded-2xl p-8 mb-12 border border-gray-200 shadow-sm">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Your Current Plan</h2>
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Current Subscription Card */}
+        <div className="bg-white rounded-2xl p-8 mb-8 border border-gray-200 shadow-sm">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">Current Subscription</h2>
           
-          <div className="flex items-center justify-between mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div>
-              <h3 className="text-xl font-semibold text-[#E07A5F]">{usageData?.planName || 'Trial'}</h3>
-              <p className="text-gray-600">
-                {usageData?.searchesUsed || 0} / {usageData?.searchesLimit === -1 ? '∞' : usageData?.searchesLimit || 0} searches used
-              </p>
-              {usageData?.status === 'trial' && usageData?.trialTimeRemaining && (
-                <p className="text-sm text-gray-500 mt-1">
-                  Trial ends in {usageData.trialTimeRemaining.days}d {usageData.trialTimeRemaining.hours}h {usageData.trialTimeRemaining.minutes}m
-                </p>
+              <div className="text-sm text-gray-600 mb-2">Plan</div>
+              <div className="text-xl font-bold text-gray-900">
+                {getPlanDisplayName(currentPlan)}
+              </div>
+              <div className="mt-2">
+                {subscription && getStatusBadge(subscription.status)}
+              </div>
+            </div>
+            
+            <div>
+              <div className="text-sm text-gray-600 mb-2">Searches This Month</div>
+              <div className="text-xl font-bold text-gray-900">
+                {usage?.searchesUsed || 0} / {isUnlimited ? '∞' : (usage?.searchesRemaining + usage?.searchesUsed || 0)}
+              </div>
+              <div className="mt-2">
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div 
+                    className="bg-[#E07A5F] h-2 rounded-full transition-all"
+                    style={{ 
+                      width: isUnlimited ? '100%' : `${((usage?.searchesUsed || 0) / ((usage?.searchesRemaining + usage?.searchesUsed) || 1)) * 100}%` 
+                    }}
+                  ></div>
+                </div>
+              </div>
+            </div>
+            
+            <div>
+              <div className="text-sm text-gray-600 mb-2">
+                {isTrial ? 'Trial Ends' : 'Next Billing Date'}
+              </div>
+              <div className="text-xl font-bold text-gray-900">
+                {subscription?.current_period_end 
+                  ? new Date(subscription.current_period_end).toLocaleDateString()
+                  : 'N/A'}
+              </div>
+              {isTrial && subscription?.trial_end_date && (
+                <div className="mt-2 text-sm text-yellow-600 font-medium">
+                  {Math.ceil((new Date(subscription.trial_end_date).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))} days remaining
+                </div>
               )}
             </div>
-            <div>
-              {usageData?.status === 'trial' && (
-                <button className="bg-gray-200 text-gray-600 px-6 py-2 rounded-lg font-medium">
+          </div>
+        </div>
+
+        {/* Pricing Plans */}
+        <div className="mb-8">
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Choose Your Plan</h2>
+          <p className="text-gray-600 mb-6">Upgrade, downgrade, or purchase additional searches anytime.</p>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Core Plan */}
+            <div className="bg-white rounded-2xl p-6 border-2 border-gray-200 hover:border-[#E07A5F] transition-all">
+              <div className="text-center mb-4">
+                <h3 className="text-2xl font-bold text-gray-900 mb-2">Core</h3>
+                <div className="text-4xl font-bold text-gray-900 mb-2">$39</div>
+                <div className="text-gray-600">per month</div>
+                <div className="text-sm text-gray-500 mt-2">75 searches/month</div>
+              </div>
+              
+              <ul className="space-y-3 mb-6">
+                <li className="flex items-start gap-2">
+                  <span className="text-green-500 font-bold">✓</span>
+                  <span className="text-gray-700">75 app analyses per month</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-green-500 font-bold">✓</span>
+                  <span className="text-gray-700">Full AI-powered insights</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-green-500 font-bold">✓</span>
+                  <span className="text-gray-700">Export all results</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-green-500 font-bold">✓</span>
+                  <span className="text-gray-700">Cancel anytime</span>
+                </li>
+              </ul>
+              
+              {currentPlan === 'core_monthly' ? (
+                <button disabled className="w-full py-3 bg-gray-200 text-gray-500 font-semibold rounded-lg cursor-not-allowed">
                   Current Plan
                 </button>
+              ) : (
+                <button
+                  onClick={() => handleCheckout('core_monthly', 'price_core_monthly')}
+                  disabled={processingCheckout}
+                  className="w-full py-3 bg-[#E07A5F] hover:bg-[#E07A5F]/90 text-white font-semibold rounded-lg transition-colors disabled:opacity-50"
+                >
+                  {processingCheckout ? 'Processing...' : 'Select Core Monthly'}
+                </button>
               )}
+              
+              <div className="mt-3 text-center">
+                <button
+                  onClick={() => handleCheckout('core_annual', 'price_core_annual')}
+                  disabled={processingCheckout}
+                  className="text-sm text-[#E07A5F] hover:underline"
+                >
+                  Or pay annually for $399 (save $69/year)
+                </button>
+              </div>
             </div>
-          </div>
 
-          {usageData?.status === 'trial' && (
-            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-              <p className="text-yellow-800 text-sm">
-                💡 <strong>Trial Info:</strong> Your trial automatically converts to Core plan ($39/month) after 3 days unless you cancel.
-              </p>
+            {/* Prime Plan */}
+            <div className="bg-gradient-to-br from-[#E07A5F] to-[#D06A4F] rounded-2xl p-6 text-white relative transform scale-105 shadow-xl">
+              <div className="absolute top-4 right-4 bg-white text-[#E07A5F] px-3 py-1 rounded-full text-xs font-bold">
+                POPULAR
+              </div>
+              
+              <div className="text-center mb-4">
+                <h3 className="text-2xl font-bold mb-2">Prime</h3>
+                <div className="text-4xl font-bold mb-2">$79</div>
+                <div className="text-white/90">per month</div>
+                <div className="text-sm text-white/80 mt-2">225 searches/month</div>
+              </div>
+              
+              <ul className="space-y-3 mb-6">
+                <li className="flex items-start gap-2">
+                  <span className="font-bold">✓</span>
+                  <span>225 app analyses per month</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="font-bold">✓</span>
+                  <span>Priority AI processing</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="font-bold">✓</span>
+                  <span>Advanced analytics</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="font-bold">✓</span>
+                  <span>Priority support</span>
+                </li>
+              </ul>
+              
+              {currentPlan === 'prime_monthly' ? (
+                <button disabled className="w-full py-3 bg-white/20 text-white font-semibold rounded-lg cursor-not-allowed">
+                  Current Plan
+                </button>
+              ) : (
+                <button
+                  onClick={() => handleCheckout('prime_monthly', 'price_prime_monthly')}
+                  disabled={processingCheckout}
+                  className="w-full py-3 bg-white text-[#E07A5F] hover:bg-white/90 font-semibold rounded-lg transition-colors disabled:opacity-50"
+                >
+                  {processingCheckout ? 'Processing...' : 'Select Prime Monthly'}
+                </button>
+              )}
+              
+              <div className="mt-3 text-center">
+                <button
+                  onClick={() => handleCheckout('prime_annual', 'price_prime_annual')}
+                  disabled={processingCheckout}
+                  className="text-sm text-white hover:underline"
+                >
+                  Or pay annually for $799 (save $149/year)
+                </button>
+              </div>
             </div>
-          )}
-        </div>
 
-        {/* Available Plans */}
-        <div className="mb-12">
-          <h2 className="text-3xl font-bold text-gray-900 text-center mb-3">Choose Your Plan</h2>
-          <p className="text-gray-600 text-center mb-8">Select the plan that fits your needs</p>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {plans.map((plan) => (
-              <div 
-                key={plan.id}
-                className={`bg-white rounded-2xl p-8 border-2 ${
-                  plan.popular ? 'border-[#E07A5F] shadow-xl' : 'border-gray-200 shadow-sm'
-                } relative`}
+            {/* Search Pack */}
+            <div className="bg-white rounded-2xl p-6 border-2 border-gray-200 hover:border-[#E07A5F] transition-all">
+              <div className="text-center mb-4">
+                <h3 className="text-2xl font-bold text-gray-900 mb-2">Search Pack</h3>
+                <div className="text-4xl font-bold text-gray-900 mb-2">$29</div>
+                <div className="text-gray-600">one-time</div>
+                <div className="text-sm text-gray-500 mt-2">50 extra searches</div>
+              </div>
+              
+              <ul className="space-y-3 mb-6">
+                <li className="flex items-start gap-2">
+                  <span className="text-green-500 font-bold">✓</span>
+                  <span className="text-gray-700">50 additional searches</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-green-500 font-bold">✓</span>
+                  <span className="text-gray-700">Never expires</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-green-500 font-bold">✓</span>
+                  <span className="text-gray-700">Works with any plan</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-green-500 font-bold">✓</span>
+                  <span className="text-gray-700">Purchase multiple packs</span>
+                </li>
+              </ul>
+              
+              <button
+                onClick={() => handleCheckout('search_pack', 'price_search_pack')}
+                disabled={processingCheckout}
+                className="w-full py-3 bg-gray-900 hover:bg-gray-800 text-white font-semibold rounded-lg transition-colors disabled:opacity-50"
               >
-                {plan.popular && (
-                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                    <span className="bg-[#E07A5F] text-white px-4 py-1 rounded-full text-sm font-semibold">
-                      Most Popular
-                    </span>
-                  </div>
-                )}
-                
-                <h3 className="text-2xl font-bold text-gray-900 mb-2">{plan.name}</h3>
-                <div className="mb-6">
-                  <div className="flex items-baseline gap-2">
-                    <span className="text-4xl font-bold text-gray-900">${plan.price}</span>
-                    <span className="text-gray-600">/month</span>
-                  </div>
-                  <div className="text-sm text-gray-500 mt-1">
-                    or ${plan.annual}/year <span className="text-green-600 font-medium">(Save ${(plan.price * 12) - plan.annual})</span>
-                  </div>
-                </div>
-
-                <ul className="space-y-3 mb-8">
-                  {plan.features.map((feature, idx) => (
-                    <li key={idx} className="flex items-start gap-2 text-gray-700">
-                      <span className="text-green-600 font-bold mt-0.5">✓</span>
-                      <span>{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-
-                <button className="w-full bg-[#E07A5F] hover:bg-[#E07A5F]/90 text-white font-semibold py-3 px-6 rounded-lg transition-colors">
-                  Choose {plan.name}
-                </button>
-                <p className="text-xs text-center text-gray-500 mt-3">Payment integration coming soon</p>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Search Packs */}
-        <div className="bg-white rounded-2xl p-8 border border-gray-200 shadow-sm">
-          <h3 className="text-2xl font-bold text-gray-900 mb-4">Need Extra Searches?</h3>
-          <p className="text-gray-600 mb-6">Purchase Search Packs that never expire</p>
-          
-          <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-6 border border-purple-200">
-            <div className="flex items-center justify-between">
-              <div>
-                <h4 className="text-xl font-bold text-gray-900">Search Pack</h4>
-                <p className="text-gray-600">50 additional searches</p>
-                <p className="text-sm text-purple-700 font-medium mt-1">Never expires • Rolls over monthly</p>
-              </div>
-              <div className="text-right">
-                <div className="text-3xl font-bold text-gray-900 mb-2">$69</div>
-                <button className="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-6 rounded-lg transition-colors">
-                  Buy Now
-                </button>
-                <p className="text-xs text-gray-500 mt-2">Coming soon</p>
+                {processingCheckout ? 'Processing...' : 'Buy Search Pack'}
+              </button>
+              
+              <div className="mt-3 text-center text-sm text-gray-500">
+                Perfect for occasional extra searches
               </div>
             </div>
           </div>
-
-          <p className="text-sm text-gray-500 mt-4 text-center">
-            💡 Recommended: $1.38/search vs $0.52-1.04/search on plans
-          </p>
         </div>
+
+        {/* Cancel Subscription */}
+        {isActive && !isUnlimited && (
+          <div className="bg-white rounded-2xl p-6 border border-gray-200">
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Cancel Subscription</h3>
+            <p className="text-gray-600 mb-4">
+              Your subscription will remain active until the end of your current billing period.
+            </p>
+            <button
+              onClick={() => setShowCancelModal(true)}
+              className="px-6 py-2 border border-red-300 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+            >
+              Cancel Subscription
+            </button>
+          </div>
+        )}
       </main>
+
+      {/* Cancel Modal */}
+      {showCancelModal && (
+        <div className="fixed inset-0 flex items-center justify-center z-50" style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
+          <div className="rounded-lg p-8 max-w-md w-full mx-4" style={{ backgroundColor: '#ffffff' }}>
+            <h3 className="text-xl font-bold text-gray-900 mb-4">Cancel Subscription?</h3>
+            <p className="text-gray-600 mb-6">
+              Are you sure you want to cancel? You'll lose access to your current plan at the end of this billing period.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowCancelModal(false)}
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+              >
+                Keep Subscription
+              </button>
+              <button
+                onClick={() => {
+                  // TODO: Implement cancellation
+                  alert('Cancellation will be implemented with Stripe integration');
+                  setShowCancelModal(false);
+                }}
+                className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+              >
+                Yes, Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
-
