@@ -1843,7 +1843,7 @@ Keep each section concise and focused. Do not include revenue projections.`;
                 <div className="section mb-8">
                   {/* Cache Notice */}
                   {showCacheNotice && cachedResult && (
-                    <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+                    <div className="rounded-lg p-4 mb-6" style={{ backgroundColor: '#CCDDB7', border: '1px solid #B8D19F' }}>
                       <div className="flex items-start justify-between">
                         <div className="flex items-start gap-3">
                           <div className="text-2xl">💾</div>
@@ -2073,12 +2073,12 @@ Keep each section concise and focused. Do not include revenue projections.`;
                                 </div>
                                 
                                 <div style={{
-                                  background: '#fef3c7',
-                                  border: '1px solid #fbbf24',
+                                  background: '#CCDDB7',
+                                  border: '1px solid #B8D19F',
                                   padding: '12px',
                                   borderRadius: '6px',
                                   fontSize: '12px',
-                                  color: '#92400e'
+                                  color: '#2d5016'
                                 }}>
                                   <strong>💡 Methodology:</strong> Manual time includes reading reviews 
                                   ({WORDS_PER_MINUTE_READING} words/min × 2 for notes) plus analytical tasks: keyword research (2h), 
@@ -2086,7 +2086,7 @@ Keep each section concise and focused. Do not include revenue projections.`;
                                   PRP documentation (2h), competitor research (1.5h), and pricing analysis (1.5h). 
                                   Human analyst rate: ${ANALYSIS_HOURLY_RATE}/hour.
                                   {analysisMetrics.reviewCount >= 490 && (
-                                    <div style={{ marginTop: '8px', paddingTop: '8px', borderTop: '1px solid #fbbf24' }}>
+                                    <div style={{ marginTop: '8px', paddingTop: '8px', borderTop: '1px solid #B8D19F' }}>
                                       <strong>📊 Data Source:</strong> Analyzed the most recent {analysisMetrics.reviewCount.toLocaleString()} reviews 
                                       (Apple RSS API limit). This represents current user feedback and is typically sufficient for 
                                       comprehensive insights. Recent reviews are more valuable as they reflect the current app version.
