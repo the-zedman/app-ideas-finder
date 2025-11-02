@@ -413,10 +413,24 @@ export default function BillingPage() {
                 Keep Subscription
               </button>
               <button
-                onClick={() => {
-                  // TODO: Implement cancellation
-                  alert('Cancellation will be implemented with Stripe integration');
-                  setShowCancelModal(false);
+                onClick={async () => {
+                  try {
+                    const response = await fetch('/api/stripe/cancel-subscription', {
+                      method: 'POST',
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (response.ok) {
+                      alert(data.message);
+                      setShowCancelModal(false);
+                      await fetchSubscription();
+                    } else {
+                      alert(data.error || 'Failed to cancel subscription');
+                    }
+                  } catch (error) {
+                    alert('Error cancelling subscription');
+                  }
                 }}
                 className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
               >
