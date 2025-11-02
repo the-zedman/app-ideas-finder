@@ -1651,20 +1651,19 @@ Keep each section concise and focused. Do not include revenue projections.`;
                 className="flex items-center space-x-3 text-white hover:bg-white/10 rounded-lg px-3 py-2 transition-colors"
               >
                 <div className="relative w-8 h-8 rounded-full overflow-hidden">
+                  <div className="absolute inset-0 flex items-center justify-center bg-[#88D18A] text-white text-sm font-semibold">
+                    {getInitials()}
+                  </div>
                   {user && user.email ? (
                     <img
                       src={getGravatarUrl(user.email)}
                       alt="Profile"
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover absolute inset-0 z-10"
                       onError={(e) => {
                         e.currentTarget.style.display = 'none';
-                        (e.currentTarget.nextElementSibling as HTMLElement)!.style.display = 'flex';
                       }}
                     />
                   ) : null}
-                  <div className="homezone-gravatar-initials absolute inset-0 flex items-center justify-center bg-[#88D18A] text-white text-sm font-semibold">
-                    {getInitials()}
-                  </div>
                 </div>
                 <span className="hidden sm:block">{getDisplayName()}</span>
               </button>
