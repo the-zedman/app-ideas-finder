@@ -110,8 +110,8 @@ export async function POST(request: Request) {
           }
         }
         
-        const periodStart = new Date(subscription.current_period_start * 1000);
-        const periodEnd = new Date(subscription.current_period_end * 1000);
+        const periodStart = new Date((subscription as any).current_period_start * 1000);
+        const periodEnd = new Date((subscription as any).current_period_end * 1000);
         
         // Determine plan type from price ID
         const priceId = subscription.items.data[0]?.price.id;
