@@ -247,7 +247,10 @@ function AppEngineContent() {
                background: barBackground,
                color: 'white'
              }}
-             onClick={() => setExpandedRollup(isExpanded ? null : section)}>
+             onClick={(e) => {
+               e.preventDefault();
+               setExpandedRollup(isExpanded ? null : section);
+             }}>
           <div className="rollup-title" 
                style={{
                  display: 'flex',
@@ -1771,7 +1774,10 @@ Keep each section concise and focused. Do not include revenue projections.`;
                                background: barBackground,
                                color: 'white'
                              }}
-                             onClick={() => setExpandedRollup(expandedRollup === 'savings' ? null : 'savings')}>
+                             onClick={(e) => {
+                               e.preventDefault();
+                               setExpandedRollup(expandedRollup === 'savings' ? null : 'savings');
+                             }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1 }}>
                             <span style={{ fontWeight: 'bold', fontSize: '16px', minWidth: '24px' }}>12.</span>
                             <span style={{ fontWeight: 600, fontSize: '16px', flex: 1 }}>Time & Cost Savings Analysis</span>
