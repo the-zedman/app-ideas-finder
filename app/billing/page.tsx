@@ -155,7 +155,12 @@ export default function BillingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center gap-4">
-              <a href="/homezone" className="text-xl font-bold text-gray-900 hover:text-gray-700">
+              <img 
+                src="/App Ideas Finder - logo - 200x200.png" 
+                alt="App Ideas Finder" 
+                className="h-8 w-8"
+              />
+              <a href="/homezone" className="text-xl font-bold text-[#3D405B] hover:text-gray-700">
                 App Ideas Finder
               </a>
               <span className="text-gray-400">/</span>
@@ -208,9 +213,11 @@ export default function BillingPage() {
                 {isTrial ? 'Trial Ends' : 'Next Billing Date'}
               </div>
               <div className="text-xl font-bold text-gray-900">
-                {subscription?.current_period_end 
-                  ? new Date(subscription.current_period_end).toLocaleDateString()
-                  : 'N/A'}
+                {isTrial && subscription?.trial_end_date
+                  ? new Date(subscription.trial_end_date).toLocaleDateString()
+                  : subscription?.current_period_end 
+                    ? new Date(subscription.current_period_end).toLocaleDateString()
+                    : 'N/A'}
               </div>
               {isTrial && subscription?.trial_end_date && (
                 <div className="mt-2 text-sm text-yellow-600 font-medium">
@@ -223,10 +230,10 @@ export default function BillingPage() {
 
         {/* Pricing Plans */}
         <div className="mb-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Choose Your Plan</h2>
-          <p className="text-gray-600 mb-6">Upgrade, downgrade, or purchase additional searches anytime.</p>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Subscription Plans</h2>
+          <p className="text-gray-600 mb-6">Upgrade, downgrade, or change your billing frequency anytime.</p>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Core Plan */}
             <div className="bg-white rounded-2xl p-6 border-2 border-gray-200 hover:border-[#E07A5F] transition-all">
               <div className="text-center mb-4">
@@ -281,46 +288,46 @@ export default function BillingPage() {
             </div>
 
             {/* Prime Plan */}
-            <div className="bg-gradient-to-br from-[#E07A5F] to-[#D06A4F] rounded-2xl p-6 text-white relative transform scale-105 shadow-xl">
-              <div className="absolute top-4 right-4 bg-white text-[#E07A5F] px-3 py-1 rounded-full text-xs font-bold">
+            <div className="bg-white rounded-2xl p-6 border-2 border-[#E07A5F] relative shadow-lg">
+              <div className="absolute top-4 right-4 bg-[#E07A5F] text-white px-3 py-1 rounded-full text-xs font-bold">
                 POPULAR
               </div>
               
               <div className="text-center mb-4">
-                <h3 className="text-2xl font-bold mb-2">Prime</h3>
-                <div className="text-4xl font-bold mb-2">$79</div>
-                <div className="text-white/90">per month</div>
-                <div className="text-sm text-white/80 mt-2">225 searches/month</div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-2">Prime</h3>
+                <div className="text-4xl font-bold text-gray-900 mb-2">$79</div>
+                <div className="text-gray-600">per month</div>
+                <div className="text-sm text-gray-500 mt-2">225 searches/month</div>
               </div>
               
               <ul className="space-y-3 mb-6">
                 <li className="flex items-start gap-2">
-                  <span className="font-bold">✓</span>
-                  <span>225 app analyses per month</span>
+                  <span className="text-green-500 font-bold">✓</span>
+                  <span className="text-gray-700">225 app analyses per month</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="font-bold">✓</span>
-                  <span>Priority AI processing</span>
+                  <span className="text-green-500 font-bold">✓</span>
+                  <span className="text-gray-700">Priority AI processing</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="font-bold">✓</span>
-                  <span>Advanced analytics</span>
+                  <span className="text-green-500 font-bold">✓</span>
+                  <span className="text-gray-700">Advanced analytics</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="font-bold">✓</span>
-                  <span>Priority support</span>
+                  <span className="text-green-500 font-bold">✓</span>
+                  <span className="text-gray-700">Priority support</span>
                 </li>
               </ul>
               
               {currentPlan === 'prime_monthly' ? (
-                <button disabled className="w-full py-3 bg-white/20 text-white font-semibold rounded-lg cursor-not-allowed">
+                <button disabled className="w-full py-3 bg-gray-200 text-gray-500 font-semibold rounded-lg cursor-not-allowed">
                   Current Plan
                 </button>
               ) : (
                 <button
                   onClick={() => handleCheckout('prime_monthly', 'price_prime_monthly')}
                   disabled={processingCheckout}
-                  className="w-full py-3 bg-white text-[#E07A5F] hover:bg-white/90 font-semibold rounded-lg transition-colors disabled:opacity-50"
+                  className="w-full py-3 bg-[#E07A5F] hover:bg-[#E07A5F]/90 text-white font-semibold rounded-lg transition-colors disabled:opacity-50"
                 >
                   {processingCheckout ? 'Processing...' : 'Select Prime Monthly'}
                 </button>
@@ -330,51 +337,59 @@ export default function BillingPage() {
                 <button
                   onClick={() => handleCheckout('prime_annual', 'price_prime_annual')}
                   disabled={processingCheckout}
-                  className="text-sm text-white hover:underline"
+                  className="text-sm text-[#E07A5F] hover:underline"
                 >
                   Or pay annually for $799 (save $149/year)
                 </button>
               </div>
             </div>
+          </div>
+        </div>
 
-            {/* Search Pack */}
-            <div className="bg-white rounded-2xl p-6 border-2 border-gray-200 hover:border-[#E07A5F] transition-all">
-              <div className="text-center mb-4">
-                <h3 className="text-2xl font-bold text-gray-900 mb-2">Search Pack</h3>
-                <div className="text-4xl font-bold text-gray-900 mb-2">$29</div>
-                <div className="text-gray-600">one-time</div>
-                <div className="text-sm text-gray-500 mt-2">50 extra searches</div>
+        {/* Search Pack Add-on */}
+        <div className="mb-8">
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Need More Searches?</h2>
+          <p className="text-gray-600 mb-6">Purchase additional searches that never expire and work with any plan.</p>
+          
+          <div className="bg-white rounded-2xl p-8 border border-gray-200 shadow-sm">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-8">
+              <div className="flex-1">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="text-4xl">📦</div>
+                  <div>
+                    <h3 className="text-2xl font-bold text-gray-900">Search Pack</h3>
+                    <p className="text-gray-600">One-time purchase, never expires</p>
+                  </div>
+                </div>
+                
+                <ul className="space-y-2 mb-4">
+                  <li className="flex items-center gap-2 text-gray-700">
+                    <span className="text-green-500 font-bold">✓</span>
+                    <span>50 additional searches</span>
+                  </li>
+                  <li className="flex items-center gap-2 text-gray-700">
+                    <span className="text-green-500 font-bold">✓</span>
+                    <span>No expiration date - use anytime</span>
+                  </li>
+                  <li className="flex items-center gap-2 text-gray-700">
+                    <span className="text-green-500 font-bold">✓</span>
+                    <span>Compatible with all subscription plans</span>
+                  </li>
+                </ul>
               </div>
               
-              <ul className="space-y-3 mb-6">
-                <li className="flex items-start gap-2">
-                  <span className="text-green-500 font-bold">✓</span>
-                  <span className="text-gray-700">50 additional searches</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-green-500 font-bold">✓</span>
-                  <span className="text-gray-700">Never expires</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-green-500 font-bold">✓</span>
-                  <span className="text-gray-700">Works with any plan</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-green-500 font-bold">✓</span>
-                  <span className="text-gray-700">Purchase multiple packs</span>
-                </li>
-              </ul>
-              
-              <button
-                onClick={() => handleCheckout('search_pack', 'price_search_pack')}
-                disabled={processingCheckout}
-                className="w-full py-3 bg-gray-900 hover:bg-gray-800 text-white font-semibold rounded-lg transition-colors disabled:opacity-50"
-              >
-                {processingCheckout ? 'Processing...' : 'Buy Search Pack'}
-              </button>
-              
-              <div className="mt-3 text-center text-sm text-gray-500">
-                Perfect for occasional extra searches
+              <div className="flex flex-col items-center gap-4">
+                <div>
+                  <div className="text-5xl font-bold text-gray-900">$29</div>
+                  <div className="text-sm text-gray-500 text-center mt-1">one-time payment</div>
+                </div>
+                <button
+                  onClick={() => handleCheckout('search_pack', 'price_search_pack')}
+                  disabled={processingCheckout}
+                  className="px-8 py-3 bg-[#E07A5F] hover:bg-[#E07A5F]/90 text-white font-semibold rounded-lg transition-colors disabled:opacity-50 whitespace-nowrap"
+                >
+                  {processingCheckout ? 'Processing...' : 'Purchase Search Pack'}
+                </button>
               </div>
             </div>
           </div>
