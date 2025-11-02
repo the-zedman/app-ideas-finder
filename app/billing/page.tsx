@@ -11,6 +11,7 @@ export default function BillingPage() {
   const [usage, setUsage] = useState<any>(null);
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [processingCheckout, setProcessingCheckout] = useState(false);
+  const [billingInterval, setBillingInterval] = useState<'monthly' | 'annual'>('monthly');
   
   const router = useRouter();
   const supabase = createClient();
@@ -230,17 +231,56 @@ export default function BillingPage() {
 
         {/* Pricing Plans */}
         <div className="mb-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Subscription Plans</h2>
-          <p className="text-gray-600 mb-6">Upgrade, downgrade, or change your billing frequency anytime.</p>
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900">Subscription Plans</h2>
+              <p className="text-gray-600 mt-1">Upgrade, downgrade, or change your billing frequency anytime.</p>
+            </div>
+            
+            {/* Billing Interval Toggle */}
+            <div className="bg-gray-100 rounded-lg p-1 flex gap-1">
+              <button
+                onClick={() => setBillingInterval('monthly')}
+                className={`px-6 py-2 rounded-lg font-medium transition-all ${
+                  billingInterval === 'monthly'
+                    ? 'bg-white text-gray-900 shadow-sm'
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                Monthly
+              </button>
+              <button
+                onClick={() => setBillingInterval('annual')}
+                className={`px-6 py-2 rounded-lg font-medium transition-all ${
+                  billingInterval === 'annual'
+                    ? 'bg-white text-gray-900 shadow-sm'
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                Annual
+              </button>
+            </div>
+          </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Core Plan */}
             <div className="bg-white rounded-2xl p-6 border-2 border-gray-200 hover:border-[#E07A5F] transition-all">
+              {billingInterval === 'annual' && (
+                <div className="bg-green-50 text-green-700 text-sm font-semibold px-3 py-1 rounded-full inline-block mb-4">
+                  Save $69/year
+                </div>
+              )}
+              
               <div className="text-center mb-4">
                 <h3 className="text-2xl font-bold text-gray-900 mb-2">Core</h3>
-                <div className="text-4xl font-bold text-gray-900 mb-2">$39</div>
-                <div className="text-gray-600">per month</div>
+                <div className="text-4xl font-bold text-gray-900 mb-2">
+                  ${billingInterval === 'monthly' ? '39' : '399'}
+                </div>
+                <div className="text-gray-600">per {billingInterval === 'monthly' ? 'month' : 'year'}</div>
                 <div className="text-sm text-gray-500 mt-2">75 searches/month</div>
+                <div className="text-xs text-gray-400 mt-1">
+                  ${billingInterval === 'monthly' ? '0.52' : '0.44'} per search
+                </div>
               </div>
               
               <ul className="space-y-3 mb-6">
@@ -262,29 +302,23 @@ export default function BillingPage() {
                 </li>
               </ul>
               
-              {currentPlan === 'core_monthly' ? (
+              {(billingInterval === 'monthly' && currentPlan === 'core_monthly') || 
+               (billingInterval === 'annual' && currentPlan === 'core_annual') ? (
                 <button disabled className="w-full py-3 bg-gray-200 text-gray-500 font-semibold rounded-lg cursor-not-allowed">
                   Current Plan
                 </button>
               ) : (
                 <button
-                  onClick={() => handleCheckout('core_monthly', 'price_core_monthly')}
+                  onClick={() => handleCheckout(
+                    billingInterval === 'monthly' ? 'core_monthly' : 'core_annual',
+                    billingInterval === 'monthly' ? 'price_core_monthly' : 'price_core_annual'
+                  )}
                   disabled={processingCheckout}
                   className="w-full py-3 bg-[#E07A5F] hover:bg-[#E07A5F]/90 text-white font-semibold rounded-lg transition-colors disabled:opacity-50"
                 >
-                  {processingCheckout ? 'Processing...' : 'Select Core Monthly'}
+                  {processingCheckout ? 'Processing...' : `Select Core ${billingInterval === 'monthly' ? 'Monthly' : 'Annual'}`}
                 </button>
               )}
-              
-              <div className="mt-3 text-center">
-                <button
-                  onClick={() => handleCheckout('core_annual', 'price_core_annual')}
-                  disabled={processingCheckout}
-                  className="text-sm text-[#E07A5F] hover:underline"
-                >
-                  Or pay annually for $399 (save $69/year)
-                </button>
-              </div>
             </div>
 
             {/* Prime Plan */}
@@ -293,11 +327,22 @@ export default function BillingPage() {
                 POPULAR
               </div>
               
+              {billingInterval === 'annual' && (
+                <div className="bg-green-50 text-green-700 text-sm font-semibold px-3 py-1 rounded-full inline-block mb-4">
+                  Save $149/year
+                </div>
+              )}
+              
               <div className="text-center mb-4">
                 <h3 className="text-2xl font-bold text-gray-900 mb-2">Prime</h3>
-                <div className="text-4xl font-bold text-gray-900 mb-2">$79</div>
-                <div className="text-gray-600">per month</div>
+                <div className="text-4xl font-bold text-gray-900 mb-2">
+                  ${billingInterval === 'monthly' ? '79' : '799'}
+                </div>
+                <div className="text-gray-600">per {billingInterval === 'monthly' ? 'month' : 'year'}</div>
                 <div className="text-sm text-gray-500 mt-2">225 searches/month</div>
+                <div className="text-xs text-gray-400 mt-1">
+                  ${billingInterval === 'monthly' ? '0.35' : '0.30'} per search
+                </div>
               </div>
               
               <ul className="space-y-3 mb-6">
@@ -319,29 +364,23 @@ export default function BillingPage() {
                 </li>
               </ul>
               
-              {currentPlan === 'prime_monthly' ? (
+              {(billingInterval === 'monthly' && currentPlan === 'prime_monthly') || 
+               (billingInterval === 'annual' && currentPlan === 'prime_annual') ? (
                 <button disabled className="w-full py-3 bg-gray-200 text-gray-500 font-semibold rounded-lg cursor-not-allowed">
                   Current Plan
                 </button>
               ) : (
                 <button
-                  onClick={() => handleCheckout('prime_monthly', 'price_prime_monthly')}
+                  onClick={() => handleCheckout(
+                    billingInterval === 'monthly' ? 'prime_monthly' : 'prime_annual',
+                    billingInterval === 'monthly' ? 'price_prime_monthly' : 'price_prime_annual'
+                  )}
                   disabled={processingCheckout}
                   className="w-full py-3 bg-[#E07A5F] hover:bg-[#E07A5F]/90 text-white font-semibold rounded-lg transition-colors disabled:opacity-50"
                 >
-                  {processingCheckout ? 'Processing...' : 'Select Prime Monthly'}
+                  {processingCheckout ? 'Processing...' : `Select Prime ${billingInterval === 'monthly' ? 'Monthly' : 'Annual'}`}
                 </button>
               )}
-              
-              <div className="mt-3 text-center">
-                <button
-                  onClick={() => handleCheckout('prime_annual', 'price_prime_annual')}
-                  disabled={processingCheckout}
-                  className="text-sm text-[#E07A5F] hover:underline"
-                >
-                  Or pay annually for $799 (save $149/year)
-                </button>
-              </div>
             </div>
           </div>
         </div>
@@ -382,6 +421,7 @@ export default function BillingPage() {
                 <div>
                   <div className="text-5xl font-bold text-gray-900">$29</div>
                   <div className="text-sm text-gray-500 text-center mt-1">one-time payment</div>
+                  <div className="text-xs text-gray-400 text-center mt-1">$0.58 per search</div>
                 </div>
                 <button
                   onClick={() => handleCheckout('search_pack', 'price_search_pack')}
