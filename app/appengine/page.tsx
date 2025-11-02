@@ -1737,7 +1737,7 @@ Keep each section concise and focused. Do not include revenue projections.`;
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="bg-white rounded-2xl shadow-xl overflow-visible">
+        <div className="bg-white rounded-2xl overflow-visible">
           {/* App Ideas Engine Content */}
           <div className="p-8">
             <div className="text-center mb-8">
