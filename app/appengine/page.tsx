@@ -1050,7 +1050,7 @@ Keep each section concise and focused. Do not include revenue projections.`;
       setAppMeta(appMetaData);
     }
     
-    // Set rollup content
+    // Set rollup content (wrap strings in arrays for consistency with live analysis)
     setRollupContent({
       likes: cached.likes,
       dislikes: cached.dislikes,
@@ -1058,11 +1058,11 @@ Keep each section concise and focused. Do not include revenue projections.`;
       keywords: cached.keywords,
       definitely: cached.definitely_include,
       backlog: cached.backlog,
-      description: cached.description,
+      description: cached.description ? [cached.description] : [],
       names: cached.app_names,
-      prp: cached.prp,
+      prp: cached.prp ? [cached.prp] : [],
       similar: cached.similar_apps,
-      pricing: cached.pricing_model
+      pricing: cached.pricing_model ? [cached.pricing_model] : []
     });
     
     // Set all rollup statuses to DONE
