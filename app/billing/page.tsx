@@ -323,8 +323,8 @@ export default function BillingPage() {
 
             {/* Prime Plan */}
             <div className="bg-white rounded-2xl p-6 border-2 border-[#E07A5F] relative shadow-lg">
-              <div className="absolute top-4 right-4 bg-[#E07A5F] text-white px-3 py-1 rounded-full text-xs font-bold">
-                POPULAR
+              <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-blue-500 text-white px-4 py-1 rounded-full text-xs font-bold">
+                MOST POPULAR
               </div>
               
               {billingInterval === 'annual' && (
