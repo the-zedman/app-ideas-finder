@@ -1038,6 +1038,12 @@ Keep each section concise and focused. Do not include revenue projections.`;
     setCachedResult(cached);
     setShowCacheNotice(true);
     
+    console.log('Loading cached data:', {
+      description: cached.description,
+      prp: cached.prp,
+      pricing_model: cached.pricing_model
+    });
+    
     // Fetch app metadata
     const appMetaData = await fetchAppInfo(cached.app_id);
     if (appMetaData) {
