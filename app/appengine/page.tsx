@@ -130,18 +130,18 @@ function AppEngineContent() {
       console.log('Auto-starting analysis for app ID:', appParam);
       hasAutoStarted.current = true;
       
-      // Set the input field value and wait for it to be set
+      // Set the input state (which will update the controlled input field)
+      setAppInput(appParam);
+      
+      // Wait for the state to update and the input to render
       setTimeout(() => {
         if (appInputRef.current) {
-          appInputRef.current.value = appParam;
+          appInputRef.current.value = appParam; // Also set ref value as backup
           console.log('Set input field to:', appParam);
           console.log('Input field now contains:', appInputRef.current.value);
           
-          // Wait a bit more before triggering analysis
-          setTimeout(() => {
-            console.log('About to trigger auto-start, input field value:', appInputRef.current?.value);
-            setShouldAutoStart(true);
-          }, 800);
+          // Trigger auto-start
+          setShouldAutoStart(true);
         }
       }, 500);
     }
