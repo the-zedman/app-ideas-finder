@@ -73,6 +73,8 @@ function AppEngineContent() {
   const [showSearchResults, setShowSearchResults] = useState(false);
   const [appInput, setAppInput] = useState('');
   const [shouldAutoStart, setShouldAutoStart] = useState(false);
+  const [cachedResult, setCachedResult] = useState<any>(null);
+  const [showCacheNotice, setShowCacheNotice] = useState(false);
   
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -1013,11 +1015,92 @@ Keep each section concise and focused. Do not include revenue projections.`;
     return [...new Set(terms)].slice(0, 8);
   };
 
+  // Check for cached analysis (less than 14 days old)
+  const checkCachedAnalysis = async (appId: string) => {
+    try {
+      const fourteenDaysAgo = new Date();
+      fourteenDaysAgo.setDate(fourteenDaysAgo.getDate() - 14);
+      
+      const { data, error } = await supabase
+        .from('user_analyses')
+        .select('*')
+        .eq('app_id', appId)
+        .gte('created_at', fourteenDaysAgo.toISOString())
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      
+      if (error) {
+        console.error('Error checking cache:', error);
+        return null;
+      }
+      
+      return data;
+    } catch (error) {
+      console.error('Error checking cached analysis:', error);
+      return null;
+    }
+  };
+
+  // Load cached results into the UI
+  const loadCachedResults = async (cached: any) => {
+    setCachedResult(cached);
+    setShowCacheNotice(true);
+    
+    // Fetch app metadata
+    const appMetaData = await fetchAppInfo(cached.app_id);
+    if (appMetaData) {
+      setAppMeta(appMetaData);
+    }
+    
+    // Set rollup content
+    setRollupContent({
+      likes: cached.likes,
+      dislikes: cached.dislikes,
+      recommendations: cached.recommendations,
+      keywords: cached.keywords,
+      definitely: cached.definitely_include,
+      backlog: cached.backlog,
+      description: cached.description,
+      names: cached.app_names,
+      prp: cached.prp,
+      similar: cached.similar_apps,
+      pricing: cached.pricing_model
+    });
+    
+    // Set all rollup statuses to DONE
+    const statuses: {[key: string]: string} = {};
+    ['likes', 'dislikes', 'recommendations', 'keywords', 'definitely', 'backlog', 'description', 'names', 'prp', 'similar', 'pricing', 'savings'].forEach(key => {
+      statuses[key] = 'DONE';
+    });
+    setRollupStatuses(statuses);
+    
+    // Set analysis metrics
+    setAnalysisMetrics({
+      reviewCount: cached.review_count || 0,
+      analysisTimeSeconds: cached.analysis_time_seconds || 0,
+      startTime: 0,
+      manualTaskHours: 0
+    });
+    
+    // Set cost tracking
+    setCostTracking({
+      totalCalls: 0,
+      totalInputTokens: 0,
+      totalOutputTokens: 0,
+      totalCost: cached.api_cost || 0
+    });
+    
+    // Show rollups
+    setShowRollups(true);
+    setStatus('Loaded cached results from ' + new Date(cached.created_at).toLocaleDateString());
+  };
+
   // Main analysis function - matches HTML exactly
-  const startAnalysis = async () => {
+  const startAnalysis = async (forceRefresh: boolean = false) => {
     const appInput = appInputRef.current?.value.trim();
     
-    console.log('startAnalysis called with input:', appInput);
+    console.log('startAnalysis called with input:', appInput, 'forceRefresh:', forceRefresh);
     
     if (!grokApiKey) {
       alert('Grok API key not available. Please check your environment configuration.');
@@ -1032,7 +1115,17 @@ Keep each section concise and focused. Do not include revenue projections.`;
       return;
     }
 
-    // Check usage limits before starting
+    // Check for cached results first (unless forcing refresh)
+    if (!forceRefresh) {
+      const cached = await checkCachedAnalysis(appId);
+      if (cached) {
+        console.log('Found cached analysis from:', cached.created_at);
+        loadCachedResults(cached);
+        return;
+      }
+    }
+
+    // Check usage limits before starting new analysis
     try {
       const usageResponse = await fetch('/api/subscription/usage');
       const usageData = await usageResponse.json();
@@ -1050,6 +1143,8 @@ Keep each section concise and focused. Do not include revenue projections.`;
     setStatus('Fetching app metadata...');
     setShowRollups(false);
     setExpandedRollup(null);
+    setShowCacheNotice(false);
+    setCachedResult(null);
     
     // Track total cost locally (not relying on state)
     const costAccumulator = { value: 0 };
@@ -1737,6 +1832,41 @@ Keep each section concise and focused. Do not include revenue projections.`;
               {/* Rollup Bars Container - Match HTML exactly */}
               {showRollups && (
                 <div className="section mb-8">
+                  {/* Cache Notice */}
+                  {showCacheNotice && cachedResult && (
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-start gap-3">
+                          <div className="text-2xl">💾</div>
+                          <div>
+                            <h4 className="font-semibold text-blue-900 mb-1">Cached Results</h4>
+                            <p className="text-sm text-blue-800">
+                              This analysis was completed on <strong>{new Date(cachedResult.created_at).toLocaleDateString()}</strong> and 
+                              is being displayed from our database to save your search credits. The data is less than 14 days old and still relevant.
+                            </p>
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => {
+                            setShowCacheNotice(false);
+                            setCachedResult(null);
+                            startAnalysis(true); // Force refresh
+                          }}
+                          className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors ml-4 whitespace-nowrap"
+                          title="Run fresh analysis (will use 1 search credit)"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                          </svg>
+                          Refresh Analysis
+                        </button>
+                      </div>
+                      <p className="text-xs text-blue-700 mt-2 ml-11">
+                        💡 Clicking "Refresh Analysis" will run a new search and consume 1 credit from your monthly allowance.
+                      </p>
+                    </div>
+                  )}
+                  
                   {createRollupBar('likes', 1, 'What people like about the TARGET app', 'linear-gradient(135deg, #462403, #592D04)')}
                   {createRollupBar('dislikes', 2, 'What Users Want (and Don’t Want) from the TARGET App', 'linear-gradient(135deg, #592D04, #6C3604)')}
                   {createRollupBar('recommendations', 3, 'Top recommendations', 'linear-gradient(135deg, #6C3604, #7E4005)')}
