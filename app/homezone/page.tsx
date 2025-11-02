@@ -70,32 +70,45 @@ export default function HomeZone() {
   }, []);
 
   const fetchPopularAppIcons = async () => {
-    const apps = [
-      { name: 'Instagram', id: '389801252' },
-      { name: 'Uber', id: '368677368' },
-      { name: 'Spotify', id: '324684580' },
-      { name: 'TikTok', id: '835599320' }
-    ];
-
-    const appsWithIcons = await Promise.all(
-      apps.map(async (app) => {
-        try {
-          const response = await fetch(`/api/itunes/lookup?id=${app.id}`);
-          const data = await response.json();
-          if (data.results && data.results.length > 0) {
-            return {
-              ...app,
-              icon: data.results[0].artworkUrl100 || data.results[0].artworkUrl512 || data.results[0].artworkUrl60 || ''
-            };
-          }
-        } catch (error) {
-          console.error(`Failed to fetch icon for ${app.name}:`, error);
-        }
-        return { ...app, icon: '' };
-      })
-    );
-
-    setPopularApps(appsWithIcons);
+    try {
+      // Fetch top free apps from iTunes
+      const response = await fetch('https://itunes.apple.com/us/rss/topfreeapplications/limit=100/json');
+      const data = await response.json();
+      
+      if (data?.feed?.entry && data.feed.entry.length > 0) {
+        // Extract app info from RSS feed
+        const allApps = data.feed.entry.map((entry: any) => ({
+          name: entry['im:name']?.label || 'Unknown',
+          id: entry.id.attributes['im:id'],
+          icon: entry['im:image']?.[2]?.label || entry['im:image']?.[1]?.label || entry['im:image']?.[0]?.label || ''
+        }));
+        
+        // Randomly select 4 apps
+        const shuffled = allApps.sort(() => 0.5 - Math.random());
+        const selected = shuffled.slice(0, 4);
+        
+        console.log('Selected popular apps:', selected.map((a: any) => a.name));
+        setPopularApps(selected);
+      } else {
+        // Fallback to hardcoded apps if API fails
+        console.warn('Failed to fetch top apps, using fallback');
+        setPopularApps([
+          { name: 'Instagram', id: '389801252', icon: '' },
+          { name: 'Uber', id: '368677368', icon: '' },
+          { name: 'Spotify', id: '324684580', icon: '' },
+          { name: 'TikTok', id: '835599320', icon: '' }
+        ]);
+      }
+    } catch (error) {
+      console.error('Error fetching popular apps:', error);
+      // Fallback to hardcoded apps if fetch fails
+      setPopularApps([
+        { name: 'Instagram', id: '389801252', icon: '' },
+        { name: 'Uber', id: '368677368', icon: '' },
+        { name: 'Spotify', id: '324684580', icon: '' },
+        { name: 'TikTok', id: '835599320', icon: '' }
+      ]);
+    }
   };
 
   const handleLogout = async () => {
