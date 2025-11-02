@@ -127,6 +127,10 @@ export default function HomeZone() {
   };
 
   const getInitials = () => {
+    // Use custom initials if set, otherwise calculate from name
+    if (profile?.custom_initials) {
+      return profile.custom_initials.toUpperCase();
+    }
     const name = getDisplayName();
     return name.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2);
   };
