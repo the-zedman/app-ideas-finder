@@ -181,6 +181,9 @@ export default function HomeZone() {
               <a href="/appengine" className="text-gray-600 hover:text-[#3D405B] transition-colors">
                 App Engine
               </a>
+              <a href="/billing" className="text-gray-600 hover:text-[#3D405B] transition-colors">
+                Billing
+              </a>
             </nav>
 
             {/* Profile Dropdown */}
@@ -226,6 +229,15 @@ export default function HomeZone() {
                         🔐 Admin Dashboard
                       </button>
                     )}
+                    <button
+                      onClick={() => {
+                        setShowProfileMenu(false);
+                        router.push('/billing');
+                      }}
+                      className="w-full text-left px-4 py-3 rounded-lg hover:bg-gray-50 text-gray-900 transition-colors"
+                    >
+                      💳 Billing & Subscription
+                    </button>
                     <button
                       onClick={() => {
                         setShowProfileMenu(false);
