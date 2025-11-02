@@ -1,5 +1,7 @@
 # Stripe Integration Setup Guide
 
+Complete guide for setting up Stripe payment processing for App Ideas Finder.
+
 ## Step 1: Add Environment Variables
 
 Add these to your `.env.local` file and Vercel environment variables:
