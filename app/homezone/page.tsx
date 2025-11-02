@@ -173,7 +173,7 @@ export default function HomeZone() {
               <h1 className="text-xl font-bold text-[#3D405B]">App Ideas Finder</h1>
             </div>
 
-            {/* Navigation */}
+            {/* Main Navigation */}
             <nav className="flex items-center gap-6">
               <a href="/homezone" className="text-[#3D405B] font-semibold">
                 Dashboard
