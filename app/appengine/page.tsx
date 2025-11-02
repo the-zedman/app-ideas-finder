@@ -127,7 +127,7 @@ function AppEngineContent() {
   useEffect(() => {
     const appParam = searchParams.get('app');
     if (appParam && grokApiKey && !hasAutoStarted.current && !loading) {
-      console.log('Auto-starting analysis for:', appParam);
+      console.log('Auto-starting analysis for app ID:', appParam);
       hasAutoStarted.current = true;
       
       // Set the input field value and wait for it to be set
@@ -135,11 +135,13 @@ function AppEngineContent() {
         if (appInputRef.current) {
           appInputRef.current.value = appParam;
           console.log('Set input field to:', appParam);
+          console.log('Input field now contains:', appInputRef.current.value);
           
           // Wait a bit more before triggering analysis
           setTimeout(() => {
+            console.log('About to trigger auto-start, input field value:', appInputRef.current?.value);
             setShouldAutoStart(true);
-          }, 500);
+          }, 800);
         }
       }, 500);
     }
@@ -1012,12 +1014,16 @@ Keep each section concise and focused. Do not include revenue projections.`;
   const startAnalysis = async () => {
     const appInput = appInputRef.current?.value.trim();
     
+    console.log('startAnalysis called with input:', appInput);
+    
     if (!grokApiKey) {
       alert('Grok API key not available. Please check your environment configuration.');
       return;
     }
     
     const appId = extractAppId(appInput || '');
+    console.log('Extracted app ID:', appId);
+    
     if (!appId) {
       alert('Please enter an App Store URL or App ID.');
       return;
