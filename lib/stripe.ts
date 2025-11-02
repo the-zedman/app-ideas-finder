@@ -1,10 +1,12 @@
 import Stripe from 'stripe';
 
-// Initialize Stripe with the secret key
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2025-10-29.clover',
-  typescript: true,
-});
+// Initialize Stripe with the secret key (only if available)
+export const stripe = process.env.STRIPE_SECRET_KEY 
+  ? new Stripe(process.env.STRIPE_SECRET_KEY, {
+      apiVersion: '2025-10-29.clover',
+      typescript: true,
+    })
+  : null as any as Stripe; // Type assertion for build time
 
 // Stripe Price IDs - these will be created in Stripe Dashboard
 export const STRIPE_PRICES = {
