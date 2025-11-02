@@ -1,0 +1,65 @@
+import Stripe from 'stripe';
+
+// Initialize Stripe with the secret key
+export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+  apiVersion: '2024-11-20.acacia',
+  typescript: true,
+});
+
+// Stripe Price IDs - these will be created in Stripe Dashboard
+export const STRIPE_PRICES = {
+  TRIAL: process.env.STRIPE_PRICE_TRIAL!, // $1 one-time
+  CORE_MONTHLY: process.env.STRIPE_PRICE_CORE_MONTHLY!, // $39/month
+  CORE_ANNUAL: process.env.STRIPE_PRICE_CORE_ANNUAL!, // $399/year
+  PRIME_MONTHLY: process.env.STRIPE_PRICE_PRIME_MONTHLY!, // $79/month
+  PRIME_ANNUAL: process.env.STRIPE_PRICE_PRIME_ANNUAL!, // $799/year
+  SEARCH_PACK: process.env.STRIPE_PRICE_SEARCH_PACK!, // Search pack pricing (to be determined)
+};
+
+// Plan details
+export const PLAN_DETAILS = {
+  trial: {
+    name: 'Trial',
+    searches: 10,
+    duration: 3, // days
+    price: 1.00,
+    priceId: STRIPE_PRICES.TRIAL,
+  },
+  core_monthly: {
+    name: 'Core (Monthly)',
+    searches: 75,
+    price: 39.00,
+    interval: 'month',
+    priceId: STRIPE_PRICES.CORE_MONTHLY,
+  },
+  core_annual: {
+    name: 'Core (Annual)',
+    searches: 75,
+    price: 399.00,
+    interval: 'year',
+    savings: 69,
+    priceId: STRIPE_PRICES.CORE_ANNUAL,
+  },
+  prime_monthly: {
+    name: 'Prime (Monthly)',
+    searches: 225,
+    price: 79.00,
+    interval: 'month',
+    priceId: STRIPE_PRICES.PRIME_MONTHLY,
+  },
+  prime_annual: {
+    name: 'Prime (Annual)',
+    searches: 225,
+    price: 799.00,
+    interval: 'year',
+    savings: 149,
+    priceId: STRIPE_PRICES.PRIME_ANNUAL,
+  },
+  search_pack: {
+    name: 'Search Pack',
+    searches: 50,
+    price: 29.00, // Suggested pricing
+    priceId: STRIPE_PRICES.SEARCH_PACK,
+  },
+};
+
