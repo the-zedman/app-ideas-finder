@@ -1651,7 +1651,7 @@ Keep each section concise and focused. Do not include revenue projections.`;
                       }}
                     />
                   ) : null}
-                  <div className="homezone-gravatar-initials absolute inset-0 flex items-center justify-center bg-[#E07A5F] text-white text-sm font-semibold">
+                  <div className="homezone-gravatar-initials absolute inset-0 flex items-center justify-center bg-[#88D18A] text-white text-sm font-semibold">
                     {getInitials()}
                   </div>
                 </div>
@@ -1752,7 +1752,7 @@ Keep each section concise and focused. Do not include revenue projections.`;
                     value={appInput}
                     onChange={(e) => handleInputChange(e.target.value)}
                     placeholder="e.g. https://apps.apple.com/us/app/.../id6475137430, 6475137430, or 'Instagram'"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E07A5F] focus:border-transparent"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#88D18A] focus:border-transparent"
                   />
                   {showSearchResults && searchResults.length > 0 && (
             <div className="search-results-container absolute top-full left-0 mt-1 border border-gray-200 rounded-lg bg-white shadow-lg max-h-96 overflow-y-auto z-50 w-auto min-w-[22rem] max-w-[36rem] divide-y divide-gray-100"
@@ -1794,7 +1794,7 @@ Keep each section concise and focused. Do not include revenue projections.`;
                 <button
                   onClick={() => startAnalysis(false)}
                   disabled={isAnalyzing}
-                  className="bg-[#E07A5F] hover:bg-[#E07A5F]/90 text-white font-semibold py-3 px-8 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="bg-[#88D18A] hover:bg-[#88D18A]/90 text-white font-semibold py-3 px-8 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isAnalyzing ? 'Analyzing...' : 'Generate'}
                 </button>
@@ -1828,7 +1828,7 @@ Keep each section concise and focused. Do not include revenue projections.`;
                         <strong>Rating:</strong> {appMeta.averageUserRating?.toFixed(1)} ★ ({appMeta.userRatingCount?.toLocaleString()} ratings)
                       </p>
                       <p className="text-sm text-gray-600 mb-2">
-                        <strong>Store:</strong> <a href={appMeta.trackViewUrl} target="_blank" className="text-[#E07A5F] hover:underline">Open in App Store</a>
+                        <strong>Store:</strong> <a href={appMeta.trackViewUrl} target="_blank" className="text-[#88D18A] hover:underline">Open in App Store</a>
                       </p>
                       <p className="text-sm text-gray-600">
                         <strong>Description:</strong> {appMeta.description?.substring(0, 200)}...

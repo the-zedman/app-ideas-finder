@@ -207,7 +207,7 @@ export default function HomeZone() {
                       }}
                     />
                   ) : null}
-                  <div className="absolute inset-0 flex items-center justify-center bg-[#E07A5F] text-white text-sm font-semibold">
+                  <div className="absolute inset-0 flex items-center justify-center bg-[#88D18A] text-white text-sm font-semibold">
                     {getInitials()}
                   </div>
                 </div>
@@ -270,7 +270,7 @@ export default function HomeZone() {
       {/* Main Content */}
       <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Welcome Message */}
-        <div className="bg-gradient-to-br from-[#E07A5F] to-[#E07A5F]/80 rounded-2xl p-8 mb-8 text-white">
+        <div className="bg-gradient-to-br from-[#88D18A] to-[#88D18A]/80 rounded-2xl p-8 mb-8 text-white">
           <h2 className="text-3xl font-bold mb-2">
             {isFirstTime ? `Welcome, ${getDisplayName()}! 🎉` : `Welcome Back, ${getDisplayName()}! 👋`}
           </h2>
@@ -292,7 +292,7 @@ export default function HomeZone() {
                 <p className="text-sm text-gray-600">
                   {usageData?.planName || 'Trial'} Plan
                   {usageData?.status === 'trial' && usageData?.trialTimeRemaining && (
-                    <span className="ml-2 text-[#E07A5F] font-semibold">
+                    <span className="ml-2 text-[#88D18A] font-semibold">
                       • {usageData.trialTimeRemaining.days}d {usageData.trialTimeRemaining.hours}h {usageData.trialTimeRemaining.minutes}m left
                     </span>
                   )}
@@ -322,7 +322,7 @@ export default function HomeZone() {
             {searchesRemaining === 0 ? (
               <div className="bg-red-50 border border-red-200 rounded-lg p-4">
                 <p className="text-red-800 font-medium mb-2">⚠️ You've used all your searches this month</p>
-                <button className="bg-[#E07A5F] text-white px-6 py-2 rounded-lg font-semibold hover:bg-[#E07A5F]/90">
+                <button className="bg-[#88D18A] text-white px-6 py-2 rounded-lg font-semibold hover:bg-[#88D18A]/90">
                   Upgrade Plan or Buy Search Pack
                 </button>
               </div>
@@ -373,7 +373,7 @@ export default function HomeZone() {
                   key={app.id}
                   onClick={() => handleQuickStart(app.id)}
                   disabled={!usageData?.canSearch}
-                  className="flex flex-col items-center p-4 rounded-xl border-2 border-gray-200 hover:border-[#E07A5F] hover:shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex flex-col items-center p-4 rounded-xl border-2 border-gray-200 hover:border-[#88D18A] hover:shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {app.icon ? (
                     <img 
@@ -402,7 +402,7 @@ export default function HomeZone() {
               <button
                 onClick={() => router.push('/appengine')}
                 disabled={!usageData?.canSearch}
-                className="w-full bg-[#E07A5F] hover:bg-[#E07A5F]/90 text-white font-semibold py-4 px-6 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-lg"
+                className="w-full bg-[#88D18A] hover:bg-[#88D18A]/90 text-white font-semibold py-4 px-6 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-lg"
               >
                 Go to App Engine →
               </button>
@@ -441,7 +441,7 @@ export default function HomeZone() {
               <button
                 onClick={() => router.push('/appengine')}
                 disabled={!usageData?.canSearch}
-                className="bg-[#E07A5F] hover:bg-[#E07A5F]/90 text-white font-semibold py-2 px-6 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="bg-[#88D18A] hover:bg-[#88D18A]/90 text-white font-semibold py-2 px-6 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 + Analyze Another App
               </button>
@@ -452,7 +452,7 @@ export default function HomeZone() {
                 {recentAnalyses.map((analysis) => (
                   <div 
                     key={analysis.id}
-                    className="flex items-center gap-4 p-4 rounded-xl border border-gray-200 hover:border-[#E07A5F] hover:shadow-md transition-all group"
+                    className="flex items-center gap-4 p-4 rounded-xl border border-gray-200 hover:border-[#88D18A] hover:shadow-md transition-all group"
                   >
                     {analysis.app_icon_url && (
                       <img 
@@ -473,7 +473,7 @@ export default function HomeZone() {
                     </div>
                     <button
                       onClick={() => router.push(`/analyses/${analysis.id}`)}
-                      className="bg-gray-100 group-hover:bg-[#E07A5F] group-hover:text-white text-gray-700 px-6 py-2 rounded-lg font-medium transition-colors"
+                      className="bg-gray-100 group-hover:bg-[#88D18A] group-hover:text-white text-gray-700 px-6 py-2 rounded-lg font-medium transition-colors"
                     >
                       View Analysis →
                     </button>

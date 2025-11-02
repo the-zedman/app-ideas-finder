@@ -232,12 +232,12 @@ export default function Dashboard() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Enter admin password"
-              className="w-full px-4 py-3 rounded-lg border-2 border-grey/40 bg-white text-black placeholder-grey focus:outline-none focus:border-[#E07A5F]"
+              className="w-full px-4 py-3 rounded-lg border-2 border-grey/40 bg-white text-black placeholder-grey focus:outline-none focus:border-[#88D18A]"
               onKeyPress={(e) => e.key === 'Enter' && handleLogin()}
             />
             <button
               onClick={handleLogin}
-              className="w-full px-6 py-3 bg-[#E07A5F] hover:bg-[#E07A5F]/80 text-white font-semibold rounded-lg transition-all transform hover:scale-105"
+              className="w-full px-6 py-3 bg-[#88D18A] hover:bg-[#88D18A]/80 text-white font-semibold rounded-lg transition-all transform hover:scale-105"
             >
               Access Dashboard
             </button>
@@ -298,7 +298,7 @@ export default function Dashboard() {
             </button>
             <button
               onClick={() => setAuthenticated(false)}
-              className="px-4 py-2 bg-[#E07A5F] hover:bg-[#E07A5F]/80 text-white rounded-lg transition-all"
+              className="px-4 py-2 bg-[#88D18A] hover:bg-[#88D18A]/80 text-white rounded-lg transition-all"
             >
               Logout
             </button>
@@ -309,22 +309,22 @@ export default function Dashboard() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <div className="bg-white backdrop-blur-sm rounded-lg p-6 border-2 border-grey/40">
             <h3 className="text-[#3D405B] text-sm font-medium mb-2">Total Signups</h3>
-            <p className="text-3xl font-bold text-[#E07A5F]">{stats.totalSignups.toLocaleString()}</p>
+            <p className="text-3xl font-bold text-[#88D18A]">{stats.totalSignups.toLocaleString()}</p>
           </div>
           
           <div className="bg-white backdrop-blur-sm rounded-lg p-6 border-2 border-grey/40">
             <h3 className="text-[#3D405B] text-sm font-medium mb-2">Daily Signups</h3>
-            <p className="text-3xl font-bold text-[#E07A5F]">{stats.dailySignups}</p>
+            <p className="text-3xl font-bold text-[#88D18A]">{stats.dailySignups}</p>
           </div>
           
           <div className="bg-white backdrop-blur-sm rounded-lg p-6 border-2 border-grey/40">
             <h3 className="text-[#3D405B] text-sm font-medium mb-2">Weekly Signups</h3>
-            <p className="text-3xl font-bold text-[#E07A5F]">{stats.weeklySignups}</p>
+            <p className="text-3xl font-bold text-[#88D18A]">{stats.weeklySignups}</p>
           </div>
           
           <div className="bg-white backdrop-blur-sm rounded-lg p-6 border-2 border-grey/40">
             <h3 className="text-[#3D405B] text-sm font-medium mb-2">Monthly Signups</h3>
-            <p className="text-3xl font-bold text-[#E07A5F]">{stats.monthlySignups}</p>
+            <p className="text-3xl font-bold text-[#88D18A]">{stats.monthlySignups}</p>
           </div>
         </div>
 
@@ -364,7 +364,7 @@ export default function Dashboard() {
                 <Tooltip 
                   contentStyle={{ 
                     backgroundColor: '#ffffff', 
-                    border: '2px solid #E07A5F',
+                    border: '2px solid #88D18A',
                     borderRadius: '8px',
                     color: '#3D405B'
                   }} 
@@ -372,8 +372,8 @@ export default function Dashboard() {
                 <Area 
                   type="monotone" 
                   dataKey="signups" 
-                  stroke="#E07A5F" 
-                  fill="#E07A5F" 
+                  stroke="#88D18A" 
+                  fill="#88D18A" 
                   fillOpacity={0.3}
                   name="Signups"
                 />

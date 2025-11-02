@@ -111,7 +111,7 @@ export default function Home() {
         <div className="max-w-4xl mx-auto text-center">
           {/* Limited Early Access Badge */}
           <div className="mb-6 inline-block">
-            <span className="px-4 py-2 bg-[#E07A5F] text-white text-sm font-bold uppercase tracking-wider rounded-full border-2 border-[#E07A5F] shadow-lg">
+            <span className="px-4 py-2 bg-[#88D18A] text-white text-sm font-bold uppercase tracking-wider rounded-full border-2 border-[#88D18A] shadow-lg">
               🔥 Limited Early Access
             </span>
           </div>
@@ -119,7 +119,7 @@ export default function Home() {
           {/* Headline */}
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-[#3D405B] mb-6 leading-tight">
             Never Run Out of
-            <span className="block text-[#E07A5F] mt-2">App Ideas Again</span>
+            <span className="block text-[#88D18A] mt-2">App Ideas Again</span>
           </h2>
 
           {/* Attention-grabbing phrases */}
@@ -146,12 +146,12 @@ export default function Home() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter your email"
                 required
-                className="flex-1 px-6 py-4 rounded-lg text-lg border-2 border-grey bg-white text-black placeholder-black/60 focus:outline-none focus:border-[#E07A5F] focus:bg-white transition-all"
+                className="flex-1 px-6 py-4 rounded-lg text-lg border-2 border-grey bg-white text-black placeholder-black/60 focus:outline-none focus:border-[#88D18A] focus:bg-white transition-all"
               />
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="px-8 py-4 bg-[#E07A5F] hover:bg-[#E07A5F]/80 text-white font-semibold rounded-lg text-lg transition-all transform hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 shadow-lg"
+                className="px-8 py-4 bg-[#88D18A] hover:bg-[#88D18A]/80 text-white font-semibold rounded-lg text-lg transition-all transform hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 shadow-lg"
               >
                 {isSubmitting ? 'Joining...' : 'Join the Waitlist'}
               </button>
@@ -166,7 +166,7 @@ export default function Home() {
 
             {/* Success Message */}
             {message && (
-              <div className="mt-4 p-4 bg-[#E07A5F]/20 border border-[#E07A5F] rounded-lg">
+              <div className="mt-4 p-4 bg-[#88D18A]/20 border border-[#88D18A] rounded-lg">
                 <p className="text-black font-medium">{message}</p>
               </div>
             )}
@@ -175,7 +175,7 @@ export default function Home() {
           {/* Waitlist Counter */}
           <div className="inline-block px-6 py-3 bg-black/5 backdrop-blur-sm rounded-full border border-grey/40">
             <p className="text-black/70 text-sm md:text-base">
-              <span className="font-bold text-[#E07A5F] text-xl md:text-2xl">{waitlistCount}</span>
+              <span className="font-bold text-[#88D18A] text-xl md:text-2xl">{waitlistCount}</span>
               {' '}developers already on the waitlist
             </p>
           </div>

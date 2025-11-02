@@ -275,7 +275,7 @@ export default function ProfilePage() {
           </div>
           <button
             onClick={() => router.push('/homezone')}
-            className="px-4 py-2 bg-[#E07A5F] text-white rounded-lg font-medium hover:bg-[#E07A5F]/90 transition-colors"
+            className="px-4 py-2 bg-[#88D18A] text-white rounded-lg font-medium hover:bg-[#88D18A]/90 transition-colors"
           >
             Back to HomeZone
           </button>
@@ -322,7 +322,7 @@ export default function ProfilePage() {
               {/* Avatar/Initials Display */}
               <div className="flex items-center space-x-4">
                 <div className="relative">
-                  <div className="w-20 h-20 rounded-full bg-[#E07A5F] flex items-center justify-center text-2xl font-bold text-white overflow-hidden relative">
+                  <div className="w-20 h-20 rounded-full bg-[#88D18A] flex items-center justify-center text-2xl font-bold text-white overflow-hidden relative">
                     <img 
                       src={getGravatarUrl(getEmail(), 80)} 
                       alt="Profile" 
@@ -337,7 +337,7 @@ export default function ProfilePage() {
                         e.currentTarget.style.display = 'none';
                       }}
                     />
-                    <div className="gravatar-initials absolute inset-0 flex items-center justify-center bg-[#E07A5F] text-white text-2xl font-bold">
+                    <div className="gravatar-initials absolute inset-0 flex items-center justify-center bg-[#88D18A] text-white text-2xl font-bold">
                       {getInitials()}
                     </div>
                   </div>
@@ -346,7 +346,7 @@ export default function ProfilePage() {
                   <h3 className="text-lg font-medium text-gray-900">Profile Display</h3>
                   <p className="text-sm text-gray-600">Shows your Gravatar if available, otherwise your initials</p>
                   <p className="text-xs text-gray-500 mt-1">
-                    Set up your Gravatar at <a href="https://gravatar.com" target="_blank" rel="noopener noreferrer" className="text-[#E07A5F] hover:underline">gravatar.com</a>
+                    Set up your Gravatar at <a href="https://gravatar.com" target="_blank" rel="noopener noreferrer" className="text-[#88D18A] hover:underline">gravatar.com</a>
                   </p>
                   
                   {/* Custom Initials Setting */}
@@ -360,7 +360,7 @@ export default function ProfilePage() {
                       onChange={(e) => setFormData({...formData, customInitials: e.target.value})}
                       placeholder="e.g., JR"
                       maxLength={3}
-                      className="w-32 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#E07A5F] focus:border-transparent"
+                      className="w-32 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#88D18A] focus:border-transparent"
                     />
                     <p className="text-xs text-gray-500 mt-1">
                       Set custom initials to display instead of your name initials (max 3 characters)
@@ -379,7 +379,7 @@ export default function ProfilePage() {
                       type="text"
                       value={formData.firstName}
                       onChange={(e) => setFormData({...formData, firstName: e.target.value})}
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#E07A5F] focus:border-transparent"
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#88D18A] focus:border-transparent"
                       placeholder="Enter first name"
                     />
                     <button className="ml-2 p-2 text-gray-400 hover:text-gray-600">
@@ -398,7 +398,7 @@ export default function ProfilePage() {
                     type="text"
                     value={formData.lastName}
                     onChange={(e) => setFormData({...formData, lastName: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#E07A5F] focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#88D18A] focus:border-transparent"
                     placeholder="Enter last name"
                   />
                 </div>
@@ -433,7 +433,7 @@ export default function ProfilePage() {
                     type="text"
                     value={formData.username}
                     onChange={(e) => setFormData({...formData, username: e.target.value})}
-                    className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#E07A5F] focus:border-transparent"
+                    className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#88D18A] focus:border-transparent"
                     placeholder="Enter username"
                   />
                   <button className="ml-2 p-2 text-gray-400 hover:text-gray-600">
@@ -552,7 +552,7 @@ export default function ProfilePage() {
                   <select
                     value={formData.timezone}
                     onChange={(e) => setFormData({...formData, timezone: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#E07A5F] focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#88D18A] focus:border-transparent"
                   >
                     <option value="UTC">UTC</option>
                     <option value="America/New_York">Eastern Time</option>
@@ -578,14 +578,14 @@ export default function ProfilePage() {
                       checked={formData.email_notifications}
                       onChange={(e) => setFormData({...formData, email_notifications: e.target.checked})}
                     />
-                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-[#E07A5F]/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-[#88D18A]/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
                   </label>
                 </div>
 
                 <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
                   <div>
                     <h4 className="font-medium text-gray-900">Dark Mode</h4>
-                    <p className="text-sm text-gray-600">Switch to dark theme <span className="text-[#E07A5F] font-medium">(Coming Soon)</span></p>
+                    <p className="text-sm text-gray-600">Switch to dark theme <span className="text-[#88D18A] font-medium">(Coming Soon)</span></p>
                   </div>
                   <label className="relative inline-flex items-center cursor-not-allowed">
                     <input 

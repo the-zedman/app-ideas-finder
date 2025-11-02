@@ -83,7 +83,7 @@ function LoginContent() {
         <div className="max-w-md mx-auto flex items-center justify-between">
           <button
             onClick={() => router.push('/')}
-            className="text-[#E07A5F] font-medium active:scale-95 transition-transform"
+            className="text-[#88D18A] font-medium active:scale-95 transition-transform"
           >
             ← Back to Home
           </button>
@@ -122,7 +122,7 @@ function LoginContent() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter your email"
                 required
-                className="w-full px-4 py-3 rounded-xl border-2 border-grey/40 bg-white text-[#3D405B] placeholder-[#3D405B]/40 focus:outline-none focus:border-[#E07A5F] transition-colors"
+                className="w-full px-4 py-3 rounded-xl border-2 border-grey/40 bg-white text-[#3D405B] placeholder-[#3D405B]/40 focus:outline-none focus:border-[#88D18A] transition-colors"
               />
             </div>
 
@@ -143,7 +143,7 @@ function LoginContent() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 bg-[#E07A5F] hover:bg-[#E07A5F]/90 active:scale-98 text-white font-semibold rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full py-3 bg-[#88D18A] hover:bg-[#88D18A]/90 active:scale-98 text-white font-semibold rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? 'Sending Magic Link...' : 'Send Magic Link'}
             </button>
@@ -197,7 +197,7 @@ function LoginContent() {
               Don't have an account?{' '}
               <button
                 onClick={() => router.push('/signup')}
-                className="text-[#E07A5F] font-medium hover:underline"
+                className="text-[#88D18A] font-medium hover:underline"
               >
                 Sign up
               </button>
