@@ -1018,24 +1018,15 @@ Keep each section concise and focused. Do not include revenue projections.`;
   // Check for cached analysis (less than 14 days old)
   const checkCachedAnalysis = async (appId: string) => {
     try {
-      const fourteenDaysAgo = new Date();
-      fourteenDaysAgo.setDate(fourteenDaysAgo.getDate() - 14);
+      const response = await fetch(`/api/check-cache?appId=${appId}`);
+      const data = await response.json();
       
-      const { data, error } = await supabase
-        .from('user_analyses')
-        .select('*')
-        .eq('app_id', appId)
-        .gte('created_at', fourteenDaysAgo.toISOString())
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .maybeSingle();
-      
-      if (error) {
-        console.error('Error checking cache:', error);
+      if (!response.ok || !data.cached) {
         return null;
       }
       
-      return data;
+      console.log('Found cached analysis from:', data.cached.created_at);
+      return data.cached;
     } catch (error) {
       console.error('Error checking cached analysis:', error);
       return null;
