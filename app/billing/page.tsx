@@ -200,7 +200,7 @@ export default function BillingPage() {
               <div className="mt-2">
                 <div className="w-full bg-gray-200 rounded-full h-2">
                   <div 
-                    className="bg-[#E07A5F] h-2 rounded-full transition-all"
+                    className="bg-[#88D18A] h-2 rounded-full transition-all"
                     style={{ 
                       width: isUnlimited ? '100%' : `${((usage?.searchesUsed || 0) / ((usage?.searchesRemaining + usage?.searchesUsed) || 1)) * 100}%` 
                     }}
@@ -264,7 +264,7 @@ export default function BillingPage() {
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Core Plan */}
-            <div className="bg-white rounded-2xl p-6 border-2 border-gray-200 hover:border-[#E07A5F] transition-all">
+            <div className="bg-white rounded-2xl p-6 border-2 border-gray-200 hover:border-[#88D18A] transition-all">
               {billingInterval === 'annual' && (
                 <div className="bg-green-50 text-green-700 text-sm font-semibold px-3 py-1 rounded-full inline-block mb-4">
                   Save $69/year
@@ -314,7 +314,7 @@ export default function BillingPage() {
                     billingInterval === 'monthly' ? 'price_core_monthly' : 'price_core_annual'
                   )}
                   disabled={processingCheckout}
-                  className="w-full py-3 bg-[#E07A5F] hover:bg-[#E07A5F]/90 text-white font-semibold rounded-lg transition-colors disabled:opacity-50"
+                  className="w-full py-3 bg-[#88D18A] hover:bg-[#88D18A]/90 text-white font-semibold rounded-lg transition-colors disabled:opacity-50"
                 >
                   {processingCheckout ? 'Processing...' : `Select Core ${billingInterval === 'monthly' ? 'Monthly' : 'Annual'}`}
                 </button>
@@ -322,7 +322,7 @@ export default function BillingPage() {
             </div>
 
             {/* Prime Plan */}
-            <div className="bg-white rounded-2xl p-6 border-2 border-[#E07A5F] relative shadow-lg">
+            <div className="bg-white rounded-2xl p-6 border-2 border-[#88D18A] relative shadow-lg">
               <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-blue-500 text-white px-4 py-1 rounded-full text-xs font-bold">
                 MOST POPULAR
               </div>
@@ -376,7 +376,7 @@ export default function BillingPage() {
                     billingInterval === 'monthly' ? 'price_prime_monthly' : 'price_prime_annual'
                   )}
                   disabled={processingCheckout}
-                  className="w-full py-3 bg-[#E07A5F] hover:bg-[#E07A5F]/90 text-white font-semibold rounded-lg transition-colors disabled:opacity-50"
+                  className="w-full py-3 bg-[#88D18A] hover:bg-[#88D18A]/90 text-white font-semibold rounded-lg transition-colors disabled:opacity-50"
                 >
                   {processingCheckout ? 'Processing...' : `Select Prime ${billingInterval === 'monthly' ? 'Monthly' : 'Annual'}`}
                 </button>
@@ -426,7 +426,7 @@ export default function BillingPage() {
                 <button
                   onClick={() => handleCheckout('search_pack', 'price_search_pack')}
                   disabled={processingCheckout}
-                  className="px-8 py-3 bg-[#E07A5F] hover:bg-[#E07A5F]/90 text-white font-semibold rounded-lg transition-colors disabled:opacity-50 whitespace-nowrap"
+                  className="px-8 py-3 bg-[#88D18A] hover:bg-[#88D18A]/90 text-white font-semibold rounded-lg transition-colors disabled:opacity-50 whitespace-nowrap"
                 >
                   {processingCheckout ? 'Processing...' : 'Purchase Search Pack'}
                 </button>
