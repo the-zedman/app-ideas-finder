@@ -44,6 +44,9 @@ export default function HomeZone() {
         const adminData = await adminResponse.json();
         setIsAdmin(adminData.isAdmin || false);
         
+        // Check if trial has expired and needs conversion
+        await fetch('/api/check-trial-expiry', { method: 'POST' });
+        
         // Fetch usage data
         const usageResponse = await fetch('/api/subscription/usage');
         const usage = await usageResponse.json();
