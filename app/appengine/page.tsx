@@ -1843,13 +1843,13 @@ Keep each section concise and focused. Do not include revenue projections.`;
                 <div className="section mb-8">
                   {/* Cache Notice */}
                   {showCacheNotice && cachedResult && (
-                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                    <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
                       <div className="flex items-start justify-between">
                         <div className="flex items-start gap-3">
                           <div className="text-2xl">💾</div>
                           <div>
-                            <h4 className="font-semibold text-blue-900 mb-1">Cached Results</h4>
-                            <p className="text-sm text-blue-800">
+                            <h4 className="font-semibold text-green-900 mb-1">Cached Results</h4>
+                            <p className="text-sm text-green-800">
                               This analysis was completed on <strong>{new Date(cachedResult.created_at).toLocaleDateString()}</strong> and 
                               is being displayed from our database to save your search credits. The data is less than 14 days old and still relevant.
                             </p>
@@ -1861,7 +1861,7 @@ Keep each section concise and focused. Do not include revenue projections.`;
                             setCachedResult(null);
                             startAnalysis(true); // Force refresh
                           }}
-                          className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors ml-4 whitespace-nowrap"
+                          className="flex items-center gap-2 px-4 py-2 bg-[#88D18A] hover:bg-[#88D18A]/90 text-white text-sm font-medium rounded-lg transition-colors ml-4 whitespace-nowrap"
                           title="Run fresh analysis (will use 1 search credit)"
                         >
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1870,7 +1870,7 @@ Keep each section concise and focused. Do not include revenue projections.`;
                           Refresh Analysis
                         </button>
                       </div>
-                      <p className="text-xs text-blue-700 mt-2 ml-11">
+                      <p className="text-xs text-green-700 mt-2 ml-11">
                         💡 Clicking "Refresh Analysis" will run a new search and consume 1 credit from your monthly allowance.
                       </p>
                     </div>
@@ -2055,7 +2055,7 @@ Keep each section concise and focused. Do not include revenue projections.`;
                                 </div>
                                 
                                 <div style={{
-                                  background: 'linear-gradient(135deg, #10b981, #059669)',
+                                  background: 'linear-gradient(135deg, #88D18A, #6BC070)',
                                   padding: '20px',
                                   borderRadius: '8px',
                                   color: 'white',
