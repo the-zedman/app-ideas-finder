@@ -223,9 +223,9 @@ function AppEngineContent() {
     const content = rollupContent[section];
     
     // Bar background colors based on status (only affect the bar visuals)
-    // Researching: #8E81A2 (rich light-ish grey/purple)
-    // Done: #3FA265 (beautiful green)
-    const barBackground = status === 'DONE' ? '#3FA265' : '#8E81A2';
+    // Researching: #CCDDB7 (Tea Green)
+    // Done: #88D18A (Pistachio)
+    const barBackground = status === 'DONE' ? '#88D18A' : '#CCDDB7';
     
     return (
       <div key={section} className="rollup-bar" id={`rollup-${section}`} data-section={section}
@@ -1891,7 +1891,7 @@ Keep each section concise and focused. Do not include revenue projections.`;
                   {/* Section 12: Time & Cost Savings */}
                   {analysisMetrics.reviewCount > 0 && (() => {
                     const status = rollupStatuses['savings'] || 'RESEARCH UNDERWAY';
-                    const barBackground = status === 'DONE' ? '#3FA265' : '#8E81A2';
+                    const barBackground = status === 'DONE' ? '#88D18A' : '#CCDDB7';
                     
                     return (
                       <div className="rollup-bar" style={{
