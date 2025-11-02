@@ -273,7 +273,7 @@ export default function HomeZone() {
       {/* Main Content */}
       <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Welcome Message */}
-        <div className="bg-white rounded-2xl p-8 mb-8 border border-gray-200 shadow-sm">
+        <div className="bg-white rounded-2xl p-8 mb-8">
           <h2 className="text-3xl font-bold mb-2 text-gray-900">
             {isFirstTime ? `Welcome, ${getDisplayName()}! 🎉` : `Welcome Back, ${getDisplayName()}! 👋`}
           </h2>
@@ -351,7 +351,7 @@ export default function HomeZone() {
 
         {/* Quick Start (First Time Users) */}
         {isFirstTime && (
-          <div className="bg-white rounded-2xl p-8 mb-8 border border-gray-200 shadow-sm">
+          <div className="bg-white rounded-2xl p-8 mb-8">
             <div className="flex items-center justify-between mb-4">
               <div>
                 <h3 className="text-2xl font-bold text-gray-900">🚀 Analyze Your First App</h3>
