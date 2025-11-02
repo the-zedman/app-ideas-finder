@@ -273,11 +273,11 @@ export default function HomeZone() {
       {/* Main Content */}
       <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Welcome Message */}
-        <div className="bg-gradient-to-br from-[#88D18A] to-[#88D18A]/80 rounded-2xl p-8 mb-8 text-white">
-          <h2 className="text-3xl font-bold mb-2">
+        <div className="bg-white rounded-2xl p-8 mb-8 border border-gray-200 shadow-sm">
+          <h2 className="text-3xl font-bold mb-2 text-gray-900">
             {isFirstTime ? `Welcome, ${getDisplayName()}! 🎉` : `Welcome Back, ${getDisplayName()}! 👋`}
           </h2>
-          <p className="text-white/90 text-lg">
+          <p className="text-gray-600 text-lg">
             {isFirstTime 
               ? "Let's find your next app idea. Analyze your first app below!" 
               : "Ready to discover more app opportunities?"}
@@ -407,7 +407,7 @@ export default function HomeZone() {
                 disabled={!usageData?.canSearch}
                 className="w-full bg-[#88D18A] hover:bg-[#88D18A]/90 text-white font-semibold py-4 px-6 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-lg"
               >
-                Go to App Engine →
+                Go to App Ideas Engine →
               </button>
             </div>
 
