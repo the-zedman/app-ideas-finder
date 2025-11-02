@@ -323,7 +323,7 @@ export default function BillingPage() {
 
             {/* Prime Plan */}
             <div className="bg-white rounded-2xl p-6 border-2 border-[#88D18A] relative shadow-lg">
-              <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-blue-500 text-white px-4 py-1 rounded-full text-xs font-bold">
+              <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-[#88D18A] text-white px-4 py-1 rounded-full text-xs font-bold">
                 MOST POPULAR
               </div>
               
