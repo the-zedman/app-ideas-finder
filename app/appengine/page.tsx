@@ -2092,8 +2092,8 @@ Keep each section concise and focused. Do not include revenue projections.`;
                 </div>
               )}
 
-              {/* Cost Tracking */}
-              {costTracking.totalCalls > 0 && (
+              {/* Cost Tracking - Admin Only */}
+              {isAdmin && costTracking.totalCalls > 0 && (
                 <div className="mt-8 p-6 bg-gray-50 rounded-xl border border-gray-200">
                   <h3 className="text-lg font-semibold text-gray-900 mb-4">💰 Complete Engine Cycle (CEC) Cost Breakdown</h3>
                   <div className="font-mono text-sm">
