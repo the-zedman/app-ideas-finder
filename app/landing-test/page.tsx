@@ -287,7 +287,7 @@ export default function LandingTest() {
                 Choose the app you want to analyze
               </h3>
               <div className="flex justify-center">
-                <div className="animate-bounce-slow">
+                <div className="animate-fade-in">
                   <div className="w-20 h-20 bg-gray-200 rounded-2xl shadow-lg flex items-center justify-center text-4xl">
                     📱
                   </div>
@@ -311,15 +311,31 @@ export default function LandingTest() {
             </div>
           </div>
           
-          {/* Animation Lines */}
-          <div className="flex justify-center mb-4">
-            <img 
-              key={animationKey}
-              src="/lines-circles.svg"
-              alt="Processing animation"
-              className="w-full max-w-5xl h-24"
-              style={{ objectFit: 'contain' }}
-            />
+          {/* Progress Animation */}
+          <div className="mb-4 max-w-5xl mx-auto px-8">
+            <div className="relative h-24 flex items-center">
+              {/* Growing line */}
+              <div className="absolute left-0 right-0 top-1/2 h-1 bg-gray-200">
+                <div className="h-full bg-[#88D18A] animate-grow-line"></div>
+              </div>
+              
+              {/* Numbered circles */}
+              <div className="relative flex justify-between w-full">
+                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((num, idx) => (
+                  <div 
+                    key={num}
+                    className="flex items-center justify-center w-12 h-12 rounded-full bg-[#88D18A] text-white font-bold text-lg shadow-lg animate-pop-in"
+                    style={{ 
+                      animationDelay: `${2.3 + (idx * 0.092)}s`,
+                      opacity: 0,
+                      animationFillMode: 'forwards'
+                    }}
+                  >
+                    {num}
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
           
           {/* Result Text */}
@@ -375,12 +391,14 @@ export default function LandingTest() {
       
       {/* Add animations to the page */}
       <style jsx>{`
-        @keyframes bounce-slow {
-          0%, 100% {
-            transform: translateY(0);
+        @keyframes fade-in {
+          from {
+            opacity: 0;
+            transform: scale(0.9);
           }
-          50% {
-            transform: translateY(-10px);
+          to {
+            opacity: 1;
+            transform: scale(1);
           }
         }
         
@@ -395,12 +413,43 @@ export default function LandingTest() {
           }
         }
         
-        .animate-bounce-slow {
-          animation: bounce-slow 2s ease-in-out infinite;
+        @keyframes grow-line {
+          from {
+            width: 0%;
+          }
+          to {
+            width: 100%;
+          }
+        }
+        
+        @keyframes pop-in {
+          0% {
+            opacity: 0;
+            transform: scale(0);
+          }
+          50% {
+            transform: scale(1.1);
+          }
+          100% {
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+        
+        .animate-fade-in {
+          animation: fade-in 0.8s ease-out forwards;
         }
         
         .animate-click-pulse {
           animation: click-pulse 1.5s ease-in-out infinite;
+        }
+        
+        .animate-grow-line {
+          animation: grow-line 2.3s ease-out forwards;
+        }
+        
+        .animate-pop-in {
+          animation: pop-in 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
         }
       `}</style>
 
