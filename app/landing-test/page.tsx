@@ -114,7 +114,7 @@ export default function LandingTest() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           {/* Left Column - Text */}
           <div>
-            <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
+            <h1 className="text-gray-900 mb-6 leading-tight" style={{ fontSize: '70px', fontWeight: 900 }}>
               The super fast app ideas generator!
             </h1>
             <p className="text-xl text-gray-600 mb-8">
@@ -315,7 +315,7 @@ export default function LandingTest() {
           </div>
           
           <div className="border-t border-gray-800 mt-8 pt-8 flex justify-between items-center">
-            <p className="text-sm">© 2025 App Ideas Finder. Using AI to better mankind.</p>
+            <p className="text-sm">© 2025 App Ideas Finder. Elevating humanity, one algorithm at a time.</p>
             <div className="flex gap-4">
               <a href="#" className="hover:text-white">Twitter</a>
               <a href="#" className="hover:text-white">LinkedIn</a>
