@@ -234,52 +234,43 @@ export default function LandingTest() {
         </div>
       </section>
 
-      {/* Features Section */}
+      {/* Benefits Section */}
       <section className="bg-gray-50 py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
-            {/* Feature 1 */}
-            <div className="bg-white rounded-2xl p-6 text-center hover:shadow-md transition-shadow">
-              <div className="text-4xl mb-4">📱</div>
-              <h3 className="font-bold text-gray-900 mb-2">iOS App Analysis</h3>
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {/* Card 1 */}
+            <div className="bg-white rounded-2xl p-6 hover:shadow-md transition-shadow">
+              <div className="text-4xl mb-4">🔍</div>
+              <h3 className="font-bold text-gray-900 mb-2">A Better Way to Be a Creator</h3>
               <p className="text-sm text-gray-600">
-                Analyze any iOS app on the App Store instantly.
+                Discover what's working in the market and find opportunities your competitors are missing.
               </p>
             </div>
             
-            {/* Feature 2 */}
-            <div className="bg-white rounded-2xl p-6 text-center hover:shadow-md transition-shadow">
-              <div className="text-4xl mb-4">🤖</div>
-              <h3 className="font-bold text-gray-900 mb-2">AI-Powered</h3>
+            {/* Card 2 */}
+            <div className="bg-white rounded-2xl p-6 hover:shadow-md transition-shadow">
+              <div className="text-4xl mb-4">🚀</div>
+              <h3 className="font-bold text-gray-900 mb-2">Start Building</h3>
               <p className="text-sm text-gray-600">
-                Advanced AI analyzes hundreds of reviews in seconds.
+                Get actionable insights and resources to turn your ideas into reality.
               </p>
             </div>
             
-            {/* Feature 3 */}
-            <div className="bg-white rounded-2xl p-6 text-center hover:shadow-md transition-shadow">
-              <div className="text-4xl mb-4">💡</div>
-              <h3 className="font-bold text-gray-900 mb-2">Feature Ideas</h3>
+            {/* Card 3 */}
+            <div className="bg-white rounded-2xl p-6 hover:shadow-md transition-shadow">
+              <div className="text-4xl mb-4">🎯</div>
+              <h3 className="font-bold text-gray-900 mb-2">Steal Ideas from Competitors</h3>
               <p className="text-sm text-gray-600">
-                Get core features and enhancement suggestions.
+                See what users love about competing apps and what they're desperately asking for.
               </p>
             </div>
             
-            {/* Feature 4 */}
-            <div className="bg-white rounded-2xl p-6 text-center hover:shadow-md transition-shadow">
-              <div className="text-4xl mb-4">📊</div>
-              <h3 className="font-bold text-gray-900 mb-2">Market Research</h3>
+            {/* Card 4 */}
+            <div className="bg-white rounded-2xl p-6 hover:shadow-md transition-shadow">
+              <div className="text-4xl mb-4">💭</div>
+              <h3 className="font-bold text-gray-900 mb-2">Break Ideas Paralysis</h3>
               <p className="text-sm text-gray-600">
-                Understand user sentiment and market opportunities.
-              </p>
-            </div>
-            
-            {/* Feature 5 */}
-            <div className="bg-white rounded-2xl p-6 text-center hover:shadow-md transition-shadow">
-              <div className="text-4xl mb-4">⚡</div>
-              <h3 className="font-bold text-gray-900 mb-2">Save Time</h3>
-              <p className="text-sm text-gray-600">
-                Get insights that would take days in just seconds.
+                Stop overthinking. Get data-driven validation and clear direction for your next app.
               </p>
             </div>
           </div>
@@ -296,14 +287,16 @@ export default function LandingTest() {
           {/* Steps Row */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-6 max-w-3xl mx-auto">
             {/* Step 1 */}
-            <div className="text-center">
-              <div className="inline-block bg-[#CCDDB7] text-gray-800 px-3 py-1 rounded-full font-bold text-xs mb-4">
-                STEP 1
+            <div className="flex flex-col">
+              <div className="text-center">
+                <div className="inline-block bg-[#CCDDB7] text-gray-800 px-3 py-1 rounded-full font-bold text-xs mb-4">
+                  STEP 1
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-4">
+                  Choose the app you want to analyze
+                </h3>
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-4">
-                Choose the app you want to analyze
-              </h3>
-              <div className="flex justify-center">
+              <div className="flex justify-center items-center flex-1">
                 {isHowItWorksVisible && (
                   <div className="animate-fade-in">
                     <div className="flex items-center justify-center text-9xl">
@@ -315,14 +308,16 @@ export default function LandingTest() {
             </div>
             
             {/* Step 2 */}
-            <div className="text-center">
-              <div className="inline-block bg-[#CCDDB7] text-gray-800 px-3 py-1 rounded-full font-bold text-xs mb-4">
-                STEP 2
+            <div className="flex flex-col">
+              <div className="text-center">
+                <div className="inline-block bg-[#CCDDB7] text-gray-800 px-3 py-1 rounded-full font-bold text-xs mb-4">
+                  STEP 2
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-4">
+                  Click
+                </h3>
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-4">
-                Click
-              </h3>
-              <div className="flex justify-center">
+              <div className="flex justify-center items-center flex-1">
                 <button className="bg-[#88D18A] text-white font-semibold py-3 px-8 rounded-lg text-lg animate-click-pulse shadow-lg">
                   Generate
                 </button>
