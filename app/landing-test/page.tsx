@@ -114,7 +114,7 @@ export default function LandingTest() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           {/* Left Column - Text */}
           <div>
-            <h1 className="text-gray-900 mb-6" style={{ fontSize: '70px', fontWeight: 900, lineHeight: '1.1' }}>
+            <h1 className="text-gray-900 mb-6" style={{ fontSize: '70px', fontWeight: 900, lineHeight: '1.1', letterSpacing: '-0.02em' }}>
               The super <span className="inline-block">fast</span><br />
               app ideas<br />
               generator!
