@@ -312,12 +312,13 @@ export default function LandingTest() {
           </div>
           
           {/* Animation Lines */}
-          <div className="flex justify-center mb-4 max-w-5xl mx-auto">
+          <div className="flex justify-center mb-4">
             <img 
               key={animationKey}
               src="/lines-circles.svg"
               alt="Processing animation"
-              className="w-full h-24 object-contain"
+              className="w-full max-w-5xl h-24"
+              style={{ objectFit: 'contain' }}
             />
           </div>
           
@@ -342,28 +343,28 @@ export default function LandingTest() {
               3. Top recommendations
             </div>
             <div className="bg-[#CCDDB7] px-4 py-3 rounded-lg text-sm font-semibold text-gray-800">
-              4. SEO keywords
+              4. Suggested SEO keywords
             </div>
             <div className="bg-[#CCDDB7] px-4 py-3 rounded-lg text-sm font-semibold text-gray-800">
-              5. Core features
+              5. Suggested core features to include
             </div>
             <div className="bg-[#CCDDB7] px-4 py-3 rounded-lg text-sm font-semibold text-gray-800">
-              6. Enhanced features
+              6. Suggested enhanced features to include
             </div>
             <div className="bg-[#CCDDB7] px-4 py-3 rounded-lg text-sm font-semibold text-gray-800">
-              7. App description
+              7. Suggested app description
             </div>
             <div className="bg-[#CCDDB7] px-4 py-3 rounded-lg text-sm font-semibold text-gray-800">
-              8. App name ideas
+              8. Suggested app name ideas
             </div>
             <div className="bg-[#CCDDB7] px-4 py-3 rounded-lg text-sm font-semibold text-gray-800">
-              9. Product requirements
+              9. Product Requirements Prompt
             </div>
             <div className="bg-[#CCDDB7] px-4 py-3 rounded-lg text-sm font-semibold text-gray-800">
               10. Similar apps
             </div>
             <div className="bg-[#CCDDB7] px-4 py-3 rounded-lg text-sm font-semibold text-gray-800">
-              11. Pricing model
+              11. Suggested pricing model
             </div>
             <div className="bg-[#CCDDB7] px-4 py-3 rounded-lg text-sm font-semibold text-gray-800">
               12. Time & cost savings
