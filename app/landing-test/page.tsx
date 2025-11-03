@@ -11,11 +11,15 @@ export default function LandingTest() {
   const [message, setMessage] = useState('');
   const [waitlistCount, setWaitlistCount] = useState(0);
   const [showResult, setShowResult] = useState(false);
+  const [animationKey, setAnimationKey] = useState(0);
   const recaptchaRef = useRef<ReCAPTCHA>(null);
   const supabase = createClient();
 
-  // Reset and restart animations
+  // Reset and restart animations on mount
   useEffect(() => {
+    setAnimationKey(Date.now()); // Force SVG re-render
+    setShowResult(false);
+    
     const timer = setTimeout(() => {
       setShowResult(true);
     }, 3000); // Show result after 3 seconds
@@ -310,9 +314,10 @@ export default function LandingTest() {
           {/* Animation Lines */}
           <div className="flex justify-center mb-10">
             <img 
+              key={animationKey}
               src="/lines-circles.svg"
               alt="Processing animation"
-              className="w-full max-w-xl h-24 object-contain"
+              className="w-full max-w-4xl h-32 object-contain"
             />
           </div>
           
