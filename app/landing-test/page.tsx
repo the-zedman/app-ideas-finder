@@ -197,7 +197,7 @@ export default function LandingTest() {
               src="/ideas-devices-medium-compressed.jpg" 
               alt="App Ideas Finder on devices" 
               className="w-full h-auto"
-              style={{ transform: 'scale(1.3)', transformOrigin: 'center' }}
+              style={{ transform: 'scale(1.2)', transformOrigin: 'center' }}
             />
           </div>
         </div>
