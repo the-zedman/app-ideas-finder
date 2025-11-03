@@ -122,12 +122,17 @@ export default function LandingTest() {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 mb-8">
-              <a 
-                href="/appengine" 
-                className="bg-[#88D18A] hover:bg-[#88D18A]/90 text-white px-8 py-4 rounded-lg font-semibold text-lg transition-colors text-center"
-              >
-                Start the generator!
-              </a>
+              <div className="relative">
+                <button 
+                  disabled
+                  className="bg-[#88D18A] text-white px-8 py-4 rounded-lg font-semibold text-lg text-center w-full opacity-75 cursor-not-allowed"
+                >
+                  Start the generator!
+                </button>
+                <div className="absolute -top-2 -right-2 bg-gradient-to-r from-orange-400 to-orange-500 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg animate-pulse">
+                  LAUNCHING SOON
+                </div>
+              </div>
               <a 
                 href="#trending" 
                 className="bg-white hover:bg-gray-50 text-gray-900 px-8 py-4 rounded-lg font-semibold text-lg border-2 border-gray-300 transition-colors text-center"
@@ -139,7 +144,7 @@ export default function LandingTest() {
             {/* Waitlist Section */}
             <div className="border-t border-gray-200 pt-8">
               <p className="text-gray-600 mb-4">
-                Or join the waitlist for early access and exclusive updates:
+                Be among the first to experience an easier way to find app ideas by joining our early access beta group that will be opening to developers, like you, very soon.
               </p>
               
               <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3 mb-4">
@@ -155,7 +160,7 @@ export default function LandingTest() {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="bg-gray-900 hover:bg-gray-800 text-white px-8 py-3 rounded-lg font-semibold transition-colors disabled:opacity-50 whitespace-nowrap"
+                  className="bg-[#88D18A] hover:bg-[#88D18A]/90 text-white px-8 py-3 rounded-lg font-semibold transition-colors disabled:opacity-50 whitespace-nowrap"
                 >
                   {isSubmitting ? 'Joining...' : 'Join the Waitlist'}
                 </button>
