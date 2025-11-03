@@ -272,12 +272,12 @@ export default function LandingTest() {
       {/* How It Works */}
       <section className="py-12 bg-white">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-5xl font-bold text-gray-900 text-center mb-12" style={{ letterSpacing: '-0.02em' }}>
+          <h2 className="text-5xl font-bold text-gray-900 text-center mb-8" style={{ letterSpacing: '-0.02em' }}>
             How it works
           </h2>
           
           {/* Steps Row */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10 max-w-3xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-6 max-w-3xl mx-auto">
             {/* Step 1 */}
             <div className="text-center">
               <div className="inline-block bg-[#CCDDB7] text-gray-800 px-3 py-1 rounded-full font-bold text-xs mb-4">
@@ -312,17 +312,17 @@ export default function LandingTest() {
           </div>
           
           {/* Animation Lines */}
-          <div className="flex justify-center mb-10">
+          <div className="flex justify-center mb-4 max-w-5xl mx-auto">
             <img 
               key={animationKey}
               src="/lines-circles.svg"
               alt="Processing animation"
-              className="w-full max-w-4xl h-32 object-contain"
+              className="w-full h-24 object-contain"
             />
           </div>
           
           {/* Result Text */}
-          <div className={`text-center max-w-4xl mx-auto mb-8 transition-all duration-1000 ${showResult ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+          <div className={`text-center max-w-5xl mx-auto mb-8 transition-all duration-1000 ${showResult ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
             <div className="bg-gradient-to-r from-[#88D18A] to-[#6BC070] text-white px-6 py-4 rounded-2xl shadow-xl">
               <p className="text-xl font-bold">
                 App Ideas Finder has now generates your 12 step detailed app analysis and development action plan
