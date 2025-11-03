@@ -114,8 +114,10 @@ export default function LandingTest() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           {/* Left Column - Text */}
           <div>
-            <h1 className="text-gray-900 mb-6 leading-tight" style={{ fontSize: '70px', fontWeight: 900 }}>
-              The super fast app ideas generator!
+            <h1 className="text-gray-900 mb-6" style={{ fontSize: '70px', fontWeight: 900, lineHeight: '1.1' }}>
+              The super <span className="inline-block">fast</span><br />
+              app ideas<br />
+              generator!
             </h1>
             <p className="text-xl text-gray-600 mb-8">
               Discover your next app idea by analyzing real user feedback from the App Store. Get insights in seconds, not weeks.
