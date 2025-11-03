@@ -1,15 +1,88 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
+import { createClient } from '@/lib/supabase-client';
+import ReCAPTCHA from 'react-google-recaptcha';
 
 export default function LandingTest() {
   const [email, setEmail] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [message, setMessage] = useState('');
+  const [waitlistCount, setWaitlistCount] = useState(0);
+  const recaptchaRef = useRef<ReCAPTCHA>(null);
+  const supabase = createClient();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Fetch waitlist count
+  useEffect(() => {
+    const fetchWaitlistCount = async () => {
+      try {
+        const { count, error } = await supabase
+          .from('waitlist')
+          .select('*', { count: 'exact', head: true });
+
+        if (!error && count !== null) {
+          setWaitlistCount(count);
+        }
+      } catch (err) {
+        console.error('Error fetching waitlist count:', err);
+      }
+    };
+
+    fetchWaitlistCount();
+  }, []);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Handle signup
-    console.log('Email submitted:', email);
+    setIsSubmitting(true);
+    setMessage('');
+
+    try {
+      // Execute reCAPTCHA
+      const recaptchaToken = await recaptchaRef.current?.executeAsync();
+      
+      if (!recaptchaToken) {
+        setMessage('reCAPTCHA verification failed. Please try again.');
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Generate unique unsubscribe token
+      const unsubscribeToken = crypto.randomUUID();
+
+      // Insert email into Supabase
+      const { data, error } = await supabase
+        .from('waitlist')
+        .insert([{ email: email, unsubscribe_token: unsubscribeToken }])
+        .select();
+
+      if (error) {
+        if (error.code === '23505') {
+          setMessage('This email is already on the waitlist!');
+        } else {
+          setMessage('Something went wrong. Please try again.');
+        }
+      } else {
+        // Send confirmation email
+        try {
+          await fetch('/api/send-confirmation', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, unsubscribeToken, recaptchaToken }),
+          });
+        } catch (emailError) {
+          console.error('Error sending confirmation email:', emailError);
+        }
+
+        setMessage('Thanks for joining! Check your email for confirmation.');
+        setEmail('');
+        setWaitlistCount(prev => prev + 1);
+      }
+    } catch (err) {
+      setMessage('Something went wrong. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -48,7 +121,7 @@ export default function LandingTest() {
               Discover your next app idea by analyzing real user feedback from the App Store. Get insights in seconds, not weeks.
             </p>
             
-            <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex flex-col sm:flex-row gap-4 mb-8">
               <a 
                 href="/appengine" 
                 className="bg-[#88D18A] hover:bg-[#88D18A]/90 text-white px-8 py-4 rounded-lg font-semibold text-lg transition-colors text-center"
@@ -61,6 +134,53 @@ export default function LandingTest() {
               >
                 Explore trending apps
               </a>
+            </div>
+            
+            {/* Waitlist Section */}
+            <div className="border-t border-gray-200 pt-8">
+              <p className="text-gray-600 mb-4">
+                Or join the waitlist for early access and exclusive updates:
+              </p>
+              
+              <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3 mb-4">
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Enter your email"
+                  required
+                  disabled={isSubmitting}
+                  className="flex-1 px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-[#88D18A] text-gray-900 disabled:opacity-50"
+                />
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="bg-gray-900 hover:bg-gray-800 text-white px-8 py-3 rounded-lg font-semibold transition-colors disabled:opacity-50 whitespace-nowrap"
+                >
+                  {isSubmitting ? 'Joining...' : 'Join the Waitlist'}
+                </button>
+              </form>
+              
+              {message && (
+                <div className={`text-sm mb-4 ${message.includes('Thanks') ? 'text-green-600' : 'text-red-600'}`}>
+                  {message}
+                </div>
+              )}
+              
+              {waitlistCount > 0 && (
+                <div className="inline-flex items-center gap-2 bg-[#CCDDB7] px-4 py-2 rounded-lg">
+                  <span className="text-sm font-semibold text-gray-800">
+                    🎉 {waitlistCount.toLocaleString()} developers have joined the waitlist
+                  </span>
+                </div>
+              )}
+              
+              {/* Hidden reCAPTCHA */}
+              <ReCAPTCHA
+                ref={recaptchaRef}
+                size="invisible"
+                sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || ''}
+              />
             </div>
           </div>
           
