@@ -131,10 +131,10 @@ export default function LandingTest() {
               <span className="text-xl font-bold text-gray-900">APP IDEAS FINDER</span>
             </div>
             <div className="flex items-center gap-6">
-              <a href="/login" className="text-gray-700 hover:text-gray-900">Sign in</a>
-              <a href="/signup" className="bg-[#88D18A] hover:bg-[#88D18A]/90 text-white px-6 py-2 rounded-lg font-semibold transition-colors">
+              <button disabled className="text-gray-400 cursor-not-allowed">Sign in</button>
+              <button disabled className="bg-gray-300 text-gray-500 px-6 py-2 rounded-lg font-semibold cursor-not-allowed">
                 Sign up
-              </a>
+              </button>
             </div>
           </div>
         </div>
