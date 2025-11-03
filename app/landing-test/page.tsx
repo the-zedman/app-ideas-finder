@@ -12,20 +12,37 @@ export default function LandingTest() {
   const [waitlistCount, setWaitlistCount] = useState(0);
   const [showResult, setShowResult] = useState(false);
   const [animationKey, setAnimationKey] = useState(0);
+  const [isHowItWorksVisible, setIsHowItWorksVisible] = useState(false);
+  const howItWorksRef = useRef<HTMLDivElement>(null);
   const recaptchaRef = useRef<ReCAPTCHA>(null);
   const supabase = createClient();
 
-  // Reset and restart animations on mount
+  // Intersection Observer for scroll-triggered animation
   useEffect(() => {
-    setAnimationKey(Date.now()); // Force SVG re-render
-    setShowResult(false);
-    
-    const timer = setTimeout(() => {
-      setShowResult(true);
-    }, 3000); // Show result after 3 seconds
-    
-    return () => clearTimeout(timer);
-  }, []);
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && !isHowItWorksVisible) {
+            setIsHowItWorksVisible(true);
+            setAnimationKey(Date.now());
+            setShowResult(false);
+            
+            // Show result after animation completes
+            setTimeout(() => {
+              setShowResult(true);
+            }, 3500);
+          }
+        });
+      },
+      { threshold: 0.2 }
+    );
+
+    if (howItWorksRef.current) {
+      observer.observe(howItWorksRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, [isHowItWorksVisible]);
 
   // Fetch waitlist count
   useEffect(() => {
@@ -270,7 +287,7 @@ export default function LandingTest() {
       </section>
 
       {/* How It Works */}
-      <section className="py-12 bg-white">
+      <section ref={howItWorksRef} className="py-12 bg-white">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-5xl font-bold text-gray-900 text-center mb-8" style={{ letterSpacing: '-0.02em' }}>
             How it works
@@ -287,11 +304,13 @@ export default function LandingTest() {
                 Choose the app you want to analyze
               </h3>
               <div className="flex justify-center">
-                <div className="animate-fade-in">
-                  <div className="w-20 h-20 bg-gray-200 rounded-2xl shadow-lg flex items-center justify-center text-4xl">
-                    📱
+                {isHowItWorksVisible && (
+                  <div className="animate-fade-in">
+                    <div className="flex items-center justify-center text-9xl">
+                      📱
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             </div>
             
@@ -312,31 +331,33 @@ export default function LandingTest() {
           </div>
           
           {/* Progress Animation */}
-          <div className="mb-4 max-w-5xl mx-auto px-8">
-            <div className="relative h-24 flex items-center">
-              {/* Growing line */}
-              <div className="absolute left-0 right-0 top-1/2 h-1 bg-gray-200">
-                <div className="h-full bg-[#88D18A] animate-grow-line"></div>
-              </div>
-              
-              {/* Numbered circles */}
-              <div className="relative flex justify-between w-full">
-                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((num, idx) => (
-                  <div 
-                    key={num}
-                    className="flex items-center justify-center w-12 h-12 rounded-full bg-[#88D18A] text-white font-bold text-lg shadow-lg animate-pop-in"
-                    style={{ 
-                      animationDelay: `${2.3 + (idx * 0.092)}s`,
-                      opacity: 0,
-                      animationFillMode: 'forwards'
-                    }}
-                  >
-                    {num}
-                  </div>
-                ))}
+          {isHowItWorksVisible && (
+            <div className="mb-4 max-w-5xl mx-auto px-8">
+              <div className="relative h-24 flex items-center">
+                {/* Growing line */}
+                <div className="absolute left-0 right-0 top-1/2 h-1 bg-gray-200">
+                  <div className="h-full bg-[#88D18A] animate-grow-line"></div>
+                </div>
+                
+                {/* Numbered circles */}
+                <div className="relative flex justify-between w-full">
+                  {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((num, idx) => (
+                    <div 
+                      key={`${animationKey}-${num}`}
+                      className="flex items-center justify-center w-12 h-12 rounded-full bg-[#88D18A] text-white font-bold text-lg shadow-lg animate-pop-in"
+                      style={{ 
+                        animationDelay: `${2.3 + (idx * 0.092)}s`,
+                        opacity: 0,
+                        animationFillMode: 'forwards'
+                      }}
+                    >
+                      {num}
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
-          </div>
+          )}
           
           {/* Result Text */}
           <div className={`text-center max-w-5xl mx-auto mb-8 transition-all duration-1000 ${showResult ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
