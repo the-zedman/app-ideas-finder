@@ -10,8 +10,18 @@ export default function LandingTest() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState('');
   const [waitlistCount, setWaitlistCount] = useState(0);
+  const [showResult, setShowResult] = useState(false);
   const recaptchaRef = useRef<ReCAPTCHA>(null);
   const supabase = createClient();
+
+  // Reset and restart animations
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowResult(true);
+    }, 3000); // Show result after 3 seconds
+    
+    return () => clearTimeout(timer);
+  }, []);
 
   // Fetch waitlist count
   useEffect(() => {
@@ -256,39 +266,37 @@ export default function LandingTest() {
       </section>
 
       {/* How It Works */}
-      <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-5xl font-bold text-gray-900 text-center mb-16" style={{ letterSpacing: '-0.02em' }}>
+      <section className="py-12 bg-white">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-5xl font-bold text-gray-900 text-center mb-12" style={{ letterSpacing: '-0.02em' }}>
             How it works
           </h2>
           
           {/* Steps Row */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-16 max-w-4xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10 max-w-3xl mx-auto">
             {/* Step 1 */}
             <div className="text-center">
-              <div className="inline-block bg-[#CCDDB7] text-gray-800 px-4 py-2 rounded-full font-bold text-sm mb-6">
+              <div className="inline-block bg-[#CCDDB7] text-gray-800 px-3 py-1 rounded-full font-bold text-xs mb-4">
                 STEP 1
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-6">
+              <h3 className="text-xl font-bold text-gray-900 mb-4">
                 Choose the app you want to analyze
               </h3>
               <div className="flex justify-center">
                 <div className="animate-bounce-slow">
-                  <img 
-                    src="https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/57/10/f2/5710f26a-1616-e8e0-1045-67df1d0e59ab/AppIconDefault-0-0-1x_U007ephone-0-1-0-85-220.png/100x100bb.jpg"
-                    alt="Spotify"
-                    className="w-24 h-24 rounded-2xl shadow-lg"
-                  />
+                  <div className="w-20 h-20 bg-gray-200 rounded-2xl shadow-lg flex items-center justify-center text-4xl">
+                    📱
+                  </div>
                 </div>
               </div>
             </div>
             
             {/* Step 2 */}
             <div className="text-center">
-              <div className="inline-block bg-[#CCDDB7] text-gray-800 px-4 py-2 rounded-full font-bold text-sm mb-6">
+              <div className="inline-block bg-[#CCDDB7] text-gray-800 px-3 py-1 rounded-full font-bold text-xs mb-4">
                 STEP 2
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-6">
+              <h3 className="text-xl font-bold text-gray-900 mb-4">
                 Click
               </h3>
               <div className="flex justify-center">
@@ -300,20 +308,60 @@ export default function LandingTest() {
           </div>
           
           {/* Animation Lines */}
-          <div className="flex justify-center mb-16">
+          <div className="flex justify-center mb-10">
             <img 
               src="/lines-circles.svg"
               alt="Processing animation"
-              className="w-full max-w-2xl"
+              className="w-full max-w-xl h-24 object-contain"
             />
           </div>
           
           {/* Result Text */}
-          <div className="text-center max-w-3xl mx-auto">
-            <div className="bg-gradient-to-r from-[#88D18A] to-[#6BC070] text-white px-8 py-6 rounded-2xl shadow-xl">
-              <p className="text-2xl font-bold">
-                App Ideas Finder has now generated your 12 step detailed app analysis and development action plan
+          <div className={`text-center max-w-4xl mx-auto mb-8 transition-all duration-1000 ${showResult ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+            <div className="bg-gradient-to-r from-[#88D18A] to-[#6BC070] text-white px-6 py-4 rounded-2xl shadow-xl">
+              <p className="text-xl font-bold">
+                App Ideas Finder has now generates your 12 step detailed app analysis and development action plan
               </p>
+            </div>
+          </div>
+          
+          {/* 12 Sections Grid */}
+          <div className={`grid grid-cols-1 md:grid-cols-3 gap-3 max-w-5xl mx-auto transition-all duration-1000 delay-300 ${showResult ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+            <div className="bg-[#CCDDB7] px-4 py-3 rounded-lg text-sm font-semibold text-gray-800">
+              1. What people like
+            </div>
+            <div className="bg-[#CCDDB7] px-4 py-3 rounded-lg text-sm font-semibold text-gray-800">
+              2. What users want
+            </div>
+            <div className="bg-[#CCDDB7] px-4 py-3 rounded-lg text-sm font-semibold text-gray-800">
+              3. Top recommendations
+            </div>
+            <div className="bg-[#CCDDB7] px-4 py-3 rounded-lg text-sm font-semibold text-gray-800">
+              4. SEO keywords
+            </div>
+            <div className="bg-[#CCDDB7] px-4 py-3 rounded-lg text-sm font-semibold text-gray-800">
+              5. Core features
+            </div>
+            <div className="bg-[#CCDDB7] px-4 py-3 rounded-lg text-sm font-semibold text-gray-800">
+              6. Enhanced features
+            </div>
+            <div className="bg-[#CCDDB7] px-4 py-3 rounded-lg text-sm font-semibold text-gray-800">
+              7. App description
+            </div>
+            <div className="bg-[#CCDDB7] px-4 py-3 rounded-lg text-sm font-semibold text-gray-800">
+              8. App name ideas
+            </div>
+            <div className="bg-[#CCDDB7] px-4 py-3 rounded-lg text-sm font-semibold text-gray-800">
+              9. Product requirements
+            </div>
+            <div className="bg-[#CCDDB7] px-4 py-3 rounded-lg text-sm font-semibold text-gray-800">
+              10. Similar apps
+            </div>
+            <div className="bg-[#CCDDB7] px-4 py-3 rounded-lg text-sm font-semibold text-gray-800">
+              11. Pricing model
+            </div>
+            <div className="bg-[#CCDDB7] px-4 py-3 rounded-lg text-sm font-semibold text-gray-800">
+              12. Time & cost savings
             </div>
           </div>
         </div>
