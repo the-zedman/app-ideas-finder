@@ -235,11 +235,11 @@ export default function LandingTest() {
       </section>
 
       {/* Benefits Section */}
-      <section className="bg-gray-50 py-16">
+      <section className="bg-gray-50 py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-6 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-4">
             {/* Original Card 1 */}
-            <div className="bg-white rounded-2xl p-6 hover:shadow-md transition-shadow">
+            <div className="bg-white rounded-2xl p-4 hover:shadow-md transition-shadow">
               <div className="text-4xl mb-4">📱</div>
               <h3 className="font-bold text-gray-900 mb-2">iOS App Analysis</h3>
               <p className="text-sm text-gray-600">
@@ -248,7 +248,7 @@ export default function LandingTest() {
             </div>
             
             {/* Original Card 2 */}
-            <div className="bg-white rounded-2xl p-6 hover:shadow-md transition-shadow">
+            <div className="bg-white rounded-2xl p-4 hover:shadow-md transition-shadow">
               <div className="text-4xl mb-4">🤖</div>
               <h3 className="font-bold text-gray-900 mb-2">AI-Powered</h3>
               <p className="text-sm text-gray-600">
@@ -257,7 +257,7 @@ export default function LandingTest() {
             </div>
             
             {/* Original Card 3 */}
-            <div className="bg-white rounded-2xl p-6 hover:shadow-md transition-shadow">
+            <div className="bg-white rounded-2xl p-4 hover:shadow-md transition-shadow">
               <div className="text-4xl mb-4">💡</div>
               <h3 className="font-bold text-gray-900 mb-2">Feature Ideas</h3>
               <p className="text-sm text-gray-600">
@@ -266,7 +266,7 @@ export default function LandingTest() {
             </div>
             
             {/* Original Card 4 */}
-            <div className="bg-white rounded-2xl p-6 hover:shadow-md transition-shadow">
+            <div className="bg-white rounded-2xl p-4 hover:shadow-md transition-shadow">
               <div className="text-4xl mb-4">📊</div>
               <h3 className="font-bold text-gray-900 mb-2">Market Research</h3>
               <p className="text-sm text-gray-600">
@@ -275,7 +275,7 @@ export default function LandingTest() {
             </div>
             
             {/* Original Card 5 */}
-            <div className="bg-white rounded-2xl p-6 hover:shadow-md transition-shadow">
+            <div className="bg-white rounded-2xl p-4 hover:shadow-md transition-shadow">
               <div className="text-4xl mb-4">⚡</div>
               <h3 className="font-bold text-gray-900 mb-2">Save Time</h3>
               <p className="text-sm text-gray-600">
@@ -284,7 +284,7 @@ export default function LandingTest() {
             </div>
             
             {/* New Card 1 */}
-            <div className="bg-white rounded-2xl p-6 hover:shadow-md transition-shadow">
+            <div className="bg-white rounded-2xl p-4 hover:shadow-md transition-shadow">
               <div className="text-4xl mb-4">🔍</div>
               <h3 className="font-bold text-gray-900 mb-2">A Better Way to Be a Creator</h3>
               <p className="text-sm text-gray-600">
@@ -293,7 +293,7 @@ export default function LandingTest() {
             </div>
             
             {/* New Card 2 */}
-            <div className="bg-white rounded-2xl p-6 hover:shadow-md transition-shadow">
+            <div className="bg-white rounded-2xl p-4 hover:shadow-md transition-shadow">
               <div className="text-4xl mb-4">🚀</div>
               <h3 className="font-bold text-gray-900 mb-2">Start Building</h3>
               <p className="text-sm text-gray-600">
@@ -302,7 +302,7 @@ export default function LandingTest() {
             </div>
             
             {/* New Card 3 */}
-            <div className="bg-white rounded-2xl p-6 hover:shadow-md transition-shadow">
+            <div className="bg-white rounded-2xl p-4 hover:shadow-md transition-shadow">
               <div className="text-4xl mb-4">🎯</div>
               <h3 className="font-bold text-gray-900 mb-2">Steal Ideas from Competitors</h3>
               <p className="text-sm text-gray-600">
@@ -311,7 +311,7 @@ export default function LandingTest() {
             </div>
             
             {/* New Card 4 */}
-            <div className="bg-white rounded-2xl p-6 hover:shadow-md transition-shadow">
+            <div className="bg-white rounded-2xl p-4 hover:shadow-md transition-shadow">
               <div className="text-4xl mb-4">💭</div>
               <h3 className="font-bold text-gray-900 mb-2">Break Ideas Paralysis</h3>
               <p className="text-sm text-gray-600">
