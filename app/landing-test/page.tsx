@@ -255,21 +255,100 @@ export default function LandingTest() {
         </div>
       </section>
 
-      {/* Social Proof */}
-      <section className="py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-2xl font-semibold text-gray-900 mb-8">
-            Trusted by developers and entrepreneurs worldwide
+      {/* How It Works */}
+      <section className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-5xl font-bold text-gray-900 text-center mb-16" style={{ letterSpacing: '-0.02em' }}>
+            How it works
           </h2>
-          <div className="flex flex-wrap justify-center items-center gap-8 opacity-50">
-            <div className="text-3xl font-bold text-gray-400">StartupCo</div>
-            <div className="text-3xl font-bold text-gray-400">AppDevs</div>
-            <div className="text-3xl font-bold text-gray-400">InnovateLabs</div>
-            <div className="text-3xl font-bold text-gray-400">TechVentures</div>
-            <div className="text-3xl font-bold text-gray-400">BuildFast</div>
+          
+          {/* Steps Row */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-16 max-w-4xl mx-auto">
+            {/* Step 1 */}
+            <div className="text-center">
+              <div className="inline-block bg-[#CCDDB7] text-gray-800 px-4 py-2 rounded-full font-bold text-sm mb-6">
+                STEP 1
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-6">
+                Choose the app you want to analyze
+              </h3>
+              <div className="flex justify-center">
+                <div className="animate-bounce-slow">
+                  <img 
+                    src="https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/57/10/f2/5710f26a-1616-e8e0-1045-67df1d0e59ab/AppIconDefault-0-0-1x_U007ephone-0-1-0-85-220.png/100x100bb.jpg"
+                    alt="Spotify"
+                    className="w-24 h-24 rounded-2xl shadow-lg"
+                  />
+                </div>
+              </div>
+            </div>
+            
+            {/* Step 2 */}
+            <div className="text-center">
+              <div className="inline-block bg-[#CCDDB7] text-gray-800 px-4 py-2 rounded-full font-bold text-sm mb-6">
+                STEP 2
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-6">
+                Click
+              </h3>
+              <div className="flex justify-center">
+                <button className="bg-[#88D18A] text-white font-semibold py-3 px-8 rounded-lg text-lg animate-click-pulse shadow-lg">
+                  Generate
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          {/* Animation Lines */}
+          <div className="flex justify-center mb-16">
+            <img 
+              src="/lines-circles.svg"
+              alt="Processing animation"
+              className="w-full max-w-2xl"
+            />
+          </div>
+          
+          {/* Result Text */}
+          <div className="text-center max-w-3xl mx-auto">
+            <div className="bg-gradient-to-r from-[#88D18A] to-[#6BC070] text-white px-8 py-6 rounded-2xl shadow-xl">
+              <p className="text-2xl font-bold">
+                App Ideas Finder has now generated your 12 step detailed app analysis and development action plan
+              </p>
+            </div>
           </div>
         </div>
       </section>
+      
+      {/* Add animations to the page */}
+      <style jsx>{`
+        @keyframes bounce-slow {
+          0%, 100% {
+            transform: translateY(0);
+          }
+          50% {
+            transform: translateY(-10px);
+          }
+        }
+        
+        @keyframes click-pulse {
+          0%, 100% {
+            transform: scale(1);
+            box-shadow: 0 10px 25px rgba(136, 209, 138, 0.3);
+          }
+          50% {
+            transform: scale(0.95);
+            box-shadow: 0 5px 15px rgba(136, 209, 138, 0.5);
+          }
+        }
+        
+        .animate-bounce-slow {
+          animation: bounce-slow 2s ease-in-out infinite;
+        }
+        
+        .animate-click-pulse {
+          animation: click-pulse 1.5s ease-in-out infinite;
+        }
+      `}</style>
 
       {/* Footer */}
       <footer className="bg-gray-900 text-gray-300 py-12">
