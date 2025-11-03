@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="800" height="200" viewBox="0 0 800 200" xmlns="http://www.w3.org/2000/svg">
+<svg width="1200" height="200" viewBox="0 0 1200 200" xmlns="http://www.w3.org/2000/svg">
   <style>
     .line {
       stroke: green;
       stroke-width: 4;
       fill: none;
-      stroke-dasharray: 700;
-      stroke-dashoffset: 700;
+      stroke-dasharray: 1100;
+      stroke-dashoffset: 1100;
       animation: drawLine 2.3s ease-out forwards;
     }
 
@@ -17,11 +17,13 @@
     }
   </style>
 
-  <!-- Growing green line from x=50 to x=750 -->
-  <line x1="50" y1="100" x2="750" y2="100" class="line" />
+  <!-- Growing green line from x=50 to x=1150 -->
+  <line x1="50" y1="100" x2="1150" y2="100" class="line" />
 
   <!-- 12 Pistachio coloured circles with white numbers, appearing in order 1 to 12 -->
-  <!-- Spacing: 700px / 11 = 63.636px between centers -->
+  <!-- Spacing: 1100px / 11 = 100px between centers -->
+  
+  <!-- Circle 1 -->
   <g>
     <circle cx="50" cy="100" r="30" fill="#88D18A" opacity="0">
       <animate attributeName="opacity" begin="2.3s" dur="0.115s" to="1" fill="freeze"/>
@@ -35,143 +37,154 @@
     </text>
   </g>
 
+  <!-- Circle 2 -->
   <g>
-    <circle cx="113.636" cy="100" r="30" fill="#88D18A" opacity="0">
+    <circle cx="150" cy="100" r="30" fill="#88D18A" opacity="0">
       <animate attributeName="opacity" begin="2.392s" dur="0.115s" to="1" fill="freeze"/>
       <animateTransform attributeName="transform" type="scale" begin="2.392s" dur="0.345s" from="0" to="1" 
-                        additive="sum" fill="freeze" transform-origin="113.636 100"/>
+                        additive="sum" fill="freeze" transform-origin="150 100"/>
     </circle>
-    <text x="113.636" y="100" font-family="Arial, sans-serif" font-size="36" font-weight="bold" 
+    <text x="150" y="100" font-family="Arial, sans-serif" font-size="36" font-weight="bold" 
           fill="white" text-anchor="middle" dominant-baseline="central" opacity="0">
       2
       <animate attributeName="opacity" begin="2.392s" dur="0.115s" to="1" fill="freeze"/>
     </text>
   </g>
 
+  <!-- Circle 3 -->
   <g>
-    <circle cx="177.272" cy="100" r="30" fill="#88D18A" opacity="0">
+    <circle cx="250" cy="100" r="30" fill="#88D18A" opacity="0">
       <animate attributeName="opacity" begin="2.484s" dur="0.115s" to="1" fill="freeze"/>
       <animateTransform attributeName="transform" type="scale" begin="2.484s" dur="0.345s" from="0" to="1" 
-                        additive="sum" fill="freeze" transform-origin="177.272 100"/>
+                        additive="sum" fill="freeze" transform-origin="250 100"/>
     </circle>
-    <text x="177.272" y="100" font-family="Arial, sans-serif" font-size="36" font-weight="bold" 
+    <text x="250" y="100" font-family="Arial, sans-serif" font-size="36" font-weight="bold" 
           fill="white" text-anchor="middle" dominant-baseline="central" opacity="0">
       3
       <animate attributeName="opacity" begin="2.484s" dur="0.115s" to="1" fill="freeze"/>
     </text>
   </g>
 
+  <!-- Circle 4 -->
   <g>
-    <circle cx="240.908" cy="100" r="30" fill="#88D18A" opacity="0">
+    <circle cx="350" cy="100" r="30" fill="#88D18A" opacity="0">
       <animate attributeName="opacity" begin="2.576s" dur="0.115s" to="1" fill="freeze"/>
       <animateTransform attributeName="transform" type="scale" begin="2.576s" dur="0.345s" from="0" to="1" 
-                        additive="sum" fill="freeze" transform-origin="240.908 100"/>
+                        additive="sum" fill="freeze" transform-origin="350 100"/>
     </circle>
-    <text x="240.908" y="100" font-family="Arial, sans-serif" font-size="36" font-weight="bold" 
+    <text x="350" y="100" font-family="Arial, sans-serif" font-size="36" font-weight="bold" 
           fill="white" text-anchor="middle" dominant-baseline="central" opacity="0">
       4
       <animate attributeName="opacity" begin="2.576s" dur="0.115s" to="1" fill="freeze"/>
     </text>
   </g>
 
+  <!-- Circle 5 -->
   <g>
-    <circle cx="304.544" cy="100" r="30" fill="#88D18A" opacity="0">
+    <circle cx="450" cy="100" r="30" fill="#88D18A" opacity="0">
       <animate attributeName="opacity" begin="2.668s" dur="0.115s" to="1" fill="freeze"/>
       <animateTransform attributeName="transform" type="scale" begin="2.668s" dur="0.345s" from="0" to="1" 
-                        additive="sum" fill="freeze" transform-origin="304.544 100"/>
+                        additive="sum" fill="freeze" transform-origin="450 100"/>
     </circle>
-    <text x="304.544" y="100" font-family="Arial, sans-serif" font-size="36" font-weight="bold" 
+    <text x="450" y="100" font-family="Arial, sans-serif" font-size="36" font-weight="bold" 
           fill="white" text-anchor="middle" dominant-baseline="central" opacity="0">
       5
       <animate attributeName="opacity" begin="2.668s" dur="0.115s" to="1" fill="freeze"/>
     </text>
   </g>
 
+  <!-- Circle 6 -->
   <g>
-    <circle cx="368.180" cy="100" r="30" fill="#88D18A" opacity="0">
+    <circle cx="550" cy="100" r="30" fill="#88D18A" opacity="0">
       <animate attributeName="opacity" begin="2.760s" dur="0.115s" to="1" fill="freeze"/>
       <animateTransform attributeName="transform" type="scale" begin="2.760s" dur="0.345s" from="0" to="1" 
-                        additive="sum" fill="freeze" transform-origin="368.180 100"/>
+                        additive="sum" fill="freeze" transform-origin="550 100"/>
     </circle>
-    <text x="368.180" y="100" font-family="Arial, sans-serif" font-size="36" font-weight="bold" 
+    <text x="550" y="100" font-family="Arial, sans-serif" font-size="36" font-weight="bold" 
           fill="white" text-anchor="middle" dominant-baseline="central" opacity="0">
       6
       <animate attributeName="opacity" begin="2.760s" dur="0.115s" to="1" fill="freeze"/>
     </text>
   </g>
 
+  <!-- Circle 7 -->
   <g>
-    <circle cx="431.816" cy="100" r="30" fill="#88D18A" opacity="0">
+    <circle cx="650" cy="100" r="30" fill="#88D18A" opacity="0">
       <animate attributeName="opacity" begin="2.852s" dur="0.115s" to="1" fill="freeze"/>
       <animateTransform attributeName="transform" type="scale" begin="2.852s" dur="0.345s" from="0" to="1" 
-                        additive="sum" fill="freeze" transform-origin="431.816 100"/>
+                        additive="sum" fill="freeze" transform-origin="650 100"/>
     </circle>
-    <text x="431.816" y="100" font-family="Arial, sans-serif" font-size="36" font-weight="bold" 
+    <text x="650" y="100" font-family="Arial, sans-serif" font-size="36" font-weight="bold" 
           fill="white" text-anchor="middle" dominant-baseline="central" opacity="0">
       7
       <animate attributeName="opacity" begin="2.852s" dur="0.115s" to="1" fill="freeze"/>
     </text>
   </g>
 
+  <!-- Circle 8 -->
   <g>
-    <circle cx="495.452" cy="100" r="30" fill="#88D18A" opacity="0">
+    <circle cx="750" cy="100" r="30" fill="#88D18A" opacity="0">
       <animate attributeName="opacity" begin="2.944s" dur="0.115s" to="1" fill="freeze"/>
       <animateTransform attributeName="transform" type="scale" begin="2.944s" dur="0.345s" from="0" to="1" 
-                        additive="sum" fill="freeze" transform-origin="495.452 100"/>
+                        additive="sum" fill="freeze" transform-origin="750 100"/>
     </circle>
-    <text x="495.452" y="100" font-family="Arial, sans-serif" font-size="36" font-weight="bold" 
+    <text x="750" y="100" font-family="Arial, sans-serif" font-size="36" font-weight="bold" 
           fill="white" text-anchor="middle" dominant-baseline="central" opacity="0">
       8
       <animate attributeName="opacity" begin="2.944s" dur="0.115s" to="1" fill="freeze"/>
     </text>
   </g>
 
+  <!-- Circle 9 -->
   <g>
-    <circle cx="559.088" cy="100" r="30" fill="#88D18A" opacity="0">
+    <circle cx="850" cy="100" r="30" fill="#88D18A" opacity="0">
       <animate attributeName="opacity" begin="3.036s" dur="0.115s" to="1" fill="freeze"/>
       <animateTransform attributeName="transform" type="scale" begin="3.036s" dur="0.345s" from="0" to="1" 
-                        additive="sum" fill="freeze" transform-origin="559.088 100"/>
+                        additive="sum" fill="freeze" transform-origin="850 100"/>
     </circle>
-    <text x="559.088" y="100" font-family="Arial, sans-serif" font-size="36" font-weight="bold" 
+    <text x="850" y="100" font-family="Arial, sans-serif" font-size="36" font-weight="bold" 
           fill="white" text-anchor="middle" dominant-baseline="central" opacity="0">
       9
       <animate attributeName="opacity" begin="3.036s" dur="0.115s" to="1" fill="freeze"/>
     </text>
   </g>
 
+  <!-- Circle 10 -->
   <g>
-    <circle cx="622.724" cy="100" r="30" fill="#88D18A" opacity="0">
+    <circle cx="950" cy="100" r="30" fill="#88D18A" opacity="0">
       <animate attributeName="opacity" begin="3.128s" dur="0.115s" to="1" fill="freeze"/>
       <animateTransform attributeName="transform" type="scale" begin="3.128s" dur="0.345s" from="0" to="1" 
-                        additive="sum" fill="freeze" transform-origin="622.724 100"/>
+                        additive="sum" fill="freeze" transform-origin="950 100"/>
     </circle>
-    <text x="622.724" y="100" font-family="Arial, sans-serif" font-size="36" font-weight="bold" 
+    <text x="950" y="100" font-family="Arial, sans-serif" font-size="36" font-weight="bold" 
           fill="white" text-anchor="middle" dominant-baseline="central" opacity="0">
       10
       <animate attributeName="opacity" begin="3.128s" dur="0.115s" to="1" fill="freeze"/>
     </text>
   </g>
 
+  <!-- Circle 11 -->
   <g>
-    <circle cx="686.360" cy="100" r="30" fill="#88D18A" opacity="0">
+    <circle cx="1050" cy="100" r="30" fill="#88D18A" opacity="0">
       <animate attributeName="opacity" begin="3.220s" dur="0.115s" to="1" fill="freeze"/>
       <animateTransform attributeName="transform" type="scale" begin="3.220s" dur="0.345s" from="0" to="1" 
-                        additive="sum" fill="freeze" transform-origin="686.360 100"/>
+                        additive="sum" fill="freeze" transform-origin="1050 100"/>
     </circle>
-    <text x="686.360" y="100" font-family="Arial, sans-serif" font-size="36" font-weight="bold" 
+    <text x="1050" y="100" font-family="Arial, sans-serif" font-size="36" font-weight="bold" 
           fill="white" text-anchor="middle" dominant-baseline="central" opacity="0">
       11
       <animate attributeName="opacity" begin="3.220s" dur="0.115s" to="1" fill="freeze"/>
     </text>
   </g>
 
+  <!-- Circle 12 -->
   <g>
-    <circle cx="750" cy="100" r="30" fill="#88D18A" opacity="0">
+    <circle cx="1150" cy="100" r="30" fill="#88D18A" opacity="0">
       <animate attributeName="opacity" begin="3.312s" dur="0.115s" to="1" fill="freeze"/>
       <animateTransform attributeName="transform" type="scale" begin="3.312s" dur="0.345s" from="0" to="1" 
-                        additive="sum" fill="freeze" transform-origin="750 100"/>
+                        additive="sum" fill="freeze" transform-origin="1150 100"/>
     </circle>
-    <text x="750" y="100" font-family="Arial, sans-serif" font-size="36" font-weight="bold" 
+    <text x="1150" y="100" font-family="Arial, sans-serif" font-size="36" font-weight="bold" 
           fill="white" text-anchor="middle" dominant-baseline="central" opacity="0">
       12
       <animate attributeName="opacity" begin="3.312s" dur="0.115s" to="1" fill="freeze"/>
