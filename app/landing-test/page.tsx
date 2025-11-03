@@ -27,8 +27,6 @@ export default function LandingTest() {
               <span className="text-xl font-bold text-gray-900">APP IDEAS FINDER</span>
             </div>
             <div className="flex items-center gap-6">
-              <a href="#" className="text-gray-700 hover:text-gray-900">Tools</a>
-              <a href="#" className="text-[#88D18A] font-semibold hover:text-[#88D18A]/80">Go Pro</a>
               <a href="/login" className="text-gray-700 hover:text-gray-900">Sign in</a>
               <a href="/signup" className="bg-[#88D18A] hover:bg-[#88D18A]/90 text-white px-6 py-2 rounded-lg font-semibold transition-colors">
                 Sign up
@@ -50,7 +48,7 @@ export default function LandingTest() {
               Discover your next app idea by analyzing real user feedback from the App Store. Get insights in seconds, not weeks.
             </p>
             
-            <div className="flex flex-col sm:flex-row gap-4 mb-8">
+            <div className="flex flex-col sm:flex-row gap-4">
               <a 
                 href="/appengine" 
                 className="bg-[#88D18A] hover:bg-[#88D18A]/90 text-white px-8 py-4 rounded-lg font-semibold text-lg transition-colors text-center"
@@ -63,12 +61,6 @@ export default function LandingTest() {
               >
                 Explore trending apps
               </a>
-            </div>
-            
-            {/* Product Hunt Badge */}
-            <div className="inline-flex items-center gap-2 bg-orange-50 border border-orange-200 px-4 py-2 rounded-lg">
-              <span className="text-2xl">🏆</span>
-              <span className="text-sm font-semibold text-orange-700">#1 Product of the Month</span>
             </div>
           </div>
           
@@ -198,7 +190,7 @@ export default function LandingTest() {
           </div>
           
           <div className="border-t border-gray-800 mt-8 pt-8 flex justify-between items-center">
-            <p className="text-sm">© 2025 App Ideas Finder. Let's build something amazing!</p>
+            <p className="text-sm">© 2025 App Ideas Finder. Using AI to better mankind.</p>
             <div className="flex gap-4">
               <a href="#" className="hover:text-white">Twitter</a>
               <a href="#" className="hover:text-white">LinkedIn</a>
