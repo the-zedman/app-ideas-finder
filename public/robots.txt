@@ -1,0 +1,18 @@
+# App Ideas Finder - Robots.txt
+
+User-agent: *
+Allow: /
+
+# Allow important pages
+Allow: /pricing
+Allow: /contact
+Allow: /privacy-policy
+Allow: /terms-of-service
+
+# Disallow admin and archive pages
+Disallow: /admin
+Disallow: /archive-waitlist-v1
+
+# Sitemap
+Sitemap: https://www.appideasfinder.com/sitemap.xml
+
