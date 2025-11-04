@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server';
-import * as aws from '@aws-sdk/client-ses';
+import { SESClient, SendEmailCommand } from '@aws-sdk/client-ses';
 
-const ses = new aws.SES({
-  region: process.env.AWS_REGION || 'us-east-1',
+const sesClient = new SESClient({
+  region: 'ap-southeast-2', // Asia Pacific (Sydney)
   credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID || '',
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || '',
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
   },
 });
 
@@ -49,8 +49,8 @@ export async function POST(request: Request) {
     }
 
     // Email to admin (info@appideasfinder.com)
-    const emailParams: aws.SendEmailCommandInput = {
-      Source: process.env.AWS_SES_SENDER_EMAIL || '',
+    const emailParams = {
+      Source: 'App Ideas Finder <info@appideasfinder.com>',
       Destination: {
         ToAddresses: ['info@appideasfinder.com'],
       },
@@ -150,12 +150,12 @@ ${message}
       },
     };
 
-    const sendEmailCommand = new aws.SendEmailCommand(emailParams);
-    await ses.send(sendEmailCommand);
+    const sendEmailCommand = new SendEmailCommand(emailParams);
+    await sesClient.send(sendEmailCommand);
 
     // Send confirmation email to user
-    const confirmationParams: aws.SendEmailCommandInput = {
-      Source: process.env.AWS_SES_SENDER_EMAIL || '',
+    const confirmationParams = {
+      Source: 'App Ideas Finder <info@appideasfinder.com>',
       Destination: {
         ToAddresses: [email],
       },
@@ -254,8 +254,8 @@ The App Ideas Finder Team
       },
     };
 
-    const sendConfirmationCommand = new aws.SendEmailCommand(confirmationParams);
-    await ses.send(sendConfirmationCommand);
+    const sendConfirmationCommand = new SendEmailCommand(confirmationParams);
+    await sesClient.send(sendConfirmationCommand);
 
     return NextResponse.json({ success: true });
   } catch (error) {
