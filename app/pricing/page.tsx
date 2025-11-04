@@ -31,7 +31,7 @@ export default function Pricing() {
       </header>
 
       {/* Hero Section */}
-      <section className="py-4 bg-gradient-to-b from-gray-50 to-white">
+      <section className="py-2 bg-gradient-to-b from-gray-50 to-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-5xl font-bold text-gray-900 mb-4">Simple, Transparent Pricing</h1>
           <p className="text-xl text-gray-600 mb-8">
@@ -322,8 +322,8 @@ export default function Pricing() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-[#88D18A]">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <section className="bg-[#88D18A]">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 text-center">
           <h2 className="text-4xl font-bold text-white mb-4">Ready to Get Started?</h2>
           <p className="text-xl text-white/90 mb-8">
             Join the family of developers using App Ideas Finder to build better apps
