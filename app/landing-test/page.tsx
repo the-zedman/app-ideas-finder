@@ -126,7 +126,7 @@ export default function LandingTest() {
               <img 
                 src="/App Ideas Finder - logo - 200x200.png" 
                 alt="App Ideas Finder" 
-                className="h-8 w-8"
+                className="h-8 w-8 rounded-lg"
               />
               <span className="text-xl font-bold text-gray-900">APP IDEAS FINDER</span>
             </div>
