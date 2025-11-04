@@ -12,7 +12,7 @@ export default function Pricing() {
       <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <Link href="/landing-test" className="flex items-center gap-2">
+            <Link href="/" className="flex items-center gap-2">
               <img 
                 src="/App Ideas Finder - logo - 200x200.png" 
                 alt="App Ideas Finder" 
@@ -22,7 +22,7 @@ export default function Pricing() {
             </Link>
             <div className="flex items-center gap-6">
               <Link href="/contact" className="text-gray-700 hover:text-gray-900">Contact</Link>
-              <Link href="/landing-test" className="bg-[#88D18A] hover:bg-[#88D18A]/90 text-white px-6 py-2 rounded-lg font-semibold transition-colors">
+              <Link href="/" className="bg-[#88D18A] hover:bg-[#88D18A]/90 text-white px-6 py-2 rounded-lg font-semibold transition-colors">
                 Get Started
               </Link>
             </div>
@@ -102,7 +102,7 @@ export default function Pricing() {
               </ul>
 
               <div className="text-center">
-                <Link href="/landing-test" className="block w-full bg-[#88D18A] hover:bg-[#88D18A]/90 text-white font-semibold py-3 px-6 rounded-lg transition-colors">
+                <Link href="//" className="block w-full bg-[#88D18A] hover:bg-[#88D18A]/90 text-white font-semibold py-3 px-6 rounded-lg transition-colors">
                   Start Trial
                 </Link>
                 <p className="text-xs text-gray-500 mt-3">Converts to Core after 3 days unless cancelled</p>
@@ -155,7 +155,7 @@ export default function Pricing() {
                 <p className="text-xs text-gray-500 mb-4">
                   ${billingCycle === 'monthly' ? '0.52' : '0.44'} per search
                 </p>
-                <Link href="/landing-test" className="block w-full bg-[#88D18A] hover:bg-[#88D18A]/90 text-white font-semibold py-3 px-6 rounded-lg transition-colors">
+                <Link href="//" className="block w-full bg-[#88D18A] hover:bg-[#88D18A]/90 text-white font-semibold py-3 px-6 rounded-lg transition-colors">
                   Get Started
                 </Link>
               </div>
@@ -222,7 +222,7 @@ export default function Pricing() {
                 <p className="text-xs text-gray-500 mb-4">
                   ${billingCycle === 'monthly' ? '0.35' : '0.30'} per search
                 </p>
-                <Link href="/landing-test" className="block w-full bg-[#88D18A] hover:bg-[#88D18A]/90 text-white font-semibold py-3 px-6 rounded-lg transition-colors">
+                <Link href="//" className="block w-full bg-[#88D18A] hover:bg-[#88D18A]/90 text-white font-semibold py-3 px-6 rounded-lg transition-colors">
                   Get Started
                 </Link>
               </div>
@@ -272,7 +272,7 @@ export default function Pricing() {
                   <div className="text-sm text-gray-500 text-center mt-1">one-time payment</div>
                   <div className="text-xs text-gray-400 text-center mt-1">$0.58 per search</div>
                 </div>
-                <Link href="/landing-test" className="px-8 py-3 bg-[#88D18A] hover:bg-[#88D18A]/90 text-white font-semibold rounded-lg transition-colors whitespace-nowrap">
+                <Link href="//" className="px-8 py-3 bg-[#88D18A] hover:bg-[#88D18A]/90 text-white font-semibold rounded-lg transition-colors whitespace-nowrap">
                   Purchase Search Pack
                 </Link>
               </div>
@@ -327,7 +327,7 @@ export default function Pricing() {
           <p className="text-xl text-white/90 mb-8">
             Join the family of developers using App Ideas Finder to build better apps
           </p>
-          <Link href="/landing-test" className="inline-block bg-white hover:bg-gray-100 text-[#88D18A] font-semibold py-3 px-8 rounded-lg transition-colors text-lg">
+          <Link href="//" className="inline-block bg-white hover:bg-gray-100 text-[#88D18A] font-semibold py-3 px-8 rounded-lg transition-colors text-lg">
             Start Your Free Trial
           </Link>
         </div>
