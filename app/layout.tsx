@@ -98,6 +98,13 @@ export default function RootLayout({
     <html lang="en">
       <head>
         <link rel="canonical" href="https://www.appideasfinder.com" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+        <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png" />
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="App Ideas Finder" />
+        <meta name="mobile-web-app-capable" content="yes" />
       </head>
       <body className={`${inter.variable} antialiased`}>{children}</body>
     </html>
