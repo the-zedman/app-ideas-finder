@@ -1,4 +1,3 @@
-import Image from 'next/image';
 import Link from 'next/link';
 
 export default function PrivacyPolicy() {
@@ -9,10 +8,8 @@ export default function PrivacyPolicy() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <Link href="/landing-test" className="flex items-center gap-2">
-              <Image 
-                src="/app-icon.png" 
-                width={32} 
-                height={32} 
+              <img 
+                src="/App Ideas Finder - logo - 200x200.png" 
                 alt="App Ideas Finder" 
                 className="h-8 w-8"
               />
@@ -152,7 +149,7 @@ export default function PrivacyPolicy() {
               If you have any questions about this privacy policy, please contact us at:
             </p>
             <p className="text-gray-700 leading-relaxed mt-4">
-              Email: <a href="mailto:privacy@appideasfinder.com" className="text-[#88D18A] hover:underline">privacy@appideasfinder.com</a>
+              Email: <a href="mailto:info@appideasfinder.com" className="text-[#88D18A] hover:underline">info@appideasfinder.com</a>
             </p>
           </section>
         </div>
