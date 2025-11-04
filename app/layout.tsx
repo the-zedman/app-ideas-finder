@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import GoogleAnalytics from "@/components/GoogleAnalytics";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -106,7 +107,10 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-title" content="App Ideas Finder" />
         <meta name="mobile-web-app-capable" content="yes" />
       </head>
-      <body className={`${inter.variable} antialiased`}>{children}</body>
+      <body className={`${inter.variable} antialiased`}>
+        <GoogleAnalytics />
+        {children}
+      </body>
     </html>
   );
 }
