@@ -39,18 +39,20 @@ export default function Pricing() {
           </p>
 
           {/* Billing Toggle */}
-          <div className="flex items-center justify-center gap-4 mb-12">
+          <div className="flex items-center justify-center gap-4">
             <span className={`text-lg font-semibold ${billingCycle === 'monthly' ? 'text-gray-900' : 'text-gray-400'}`}>
               Monthly
             </span>
             <button
               onClick={() => setBillingCycle(billingCycle === 'monthly' ? 'annual' : 'monthly')}
-              className="relative w-16 h-8 bg-gray-300 rounded-full transition-colors"
-              style={{ backgroundColor: billingCycle === 'annual' ? '#88D18A' : '#e5e7eb' }}
+              className={`relative inline-flex h-8 w-14 items-center rounded-full transition-colors ${
+                billingCycle === 'annual' ? 'bg-[#88D18A]' : 'bg-gray-300'
+              }`}
             >
-              <div
-                className="absolute top-1 left-1 w-6 h-6 bg-white rounded-full transition-transform"
-                style={{ transform: billingCycle === 'annual' ? 'translateX(32px)' : 'translateX(0)' }}
+              <span
+                className={`inline-block h-6 w-6 transform rounded-full bg-white transition-transform ${
+                  billingCycle === 'annual' ? 'translate-x-7' : 'translate-x-1'
+                }`}
               />
             </button>
             <span className={`text-lg font-semibold ${billingCycle === 'annual' ? 'text-gray-900' : 'text-gray-400'}`}>
@@ -99,7 +101,7 @@ export default function Pricing() {
 
               <div className="text-center">
                 <p className="text-xs text-gray-500 mb-4">$0.10 per search</p>
-                <Link href="/landing-test" className="block w-full bg-gray-900 hover:bg-gray-800 text-white font-semibold py-3 px-6 rounded-lg transition-colors">
+                <Link href="/landing-test" className="block w-full bg-[#88D18A] hover:bg-[#88D18A]/90 text-white font-semibold py-3 px-6 rounded-lg transition-colors">
                   Start Trial
                 </Link>
                 <p className="text-xs text-gray-500 mt-3">Converts to Core after 3 days unless cancelled</p>
@@ -162,7 +164,7 @@ export default function Pricing() {
             <div className="bg-white border-2 border-[#88D18A] rounded-2xl p-8 hover:shadow-lg transition-shadow relative">
               {/* Most Popular Badge */}
               <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                <span className="bg-[#3B82F6] text-white text-xs font-bold px-4 py-1 rounded-full">
+                <span className="bg-[#88D18A] text-white text-xs font-bold px-4 py-1 rounded-full">
                   MOST POPULAR
                 </span>
               </div>
@@ -209,6 +211,10 @@ export default function Pricing() {
                   <span className="text-[#88D18A] text-xl">✓</span>
                   <span className="text-gray-700">Early access to new features</span>
                 </li>
+                <li className="flex items-start gap-3">
+                  <span className="text-[#88D18A] text-xl">✓</span>
+                  <span className="text-gray-700">Downloadable PDF reports</span>
+                </li>
               </ul>
 
               <div className="text-center">
@@ -226,45 +232,49 @@ export default function Pricing() {
 
       {/* Search Packs */}
       <section className="py-12 bg-gray-50">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-8">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="mb-6">
             <h2 className="text-3xl font-bold text-gray-900 mb-2">Need More Searches?</h2>
-            <p className="text-gray-600">Purchase additional search packs that never expire</p>
+            <p className="text-gray-600">Purchase additional searches that never expire and work with any plan.</p>
           </div>
 
-          <div className="bg-white border-2 border-gray-200 rounded-2xl p-8 max-w-md mx-auto">
-            <div className="text-center mb-6">
-              <h3 className="text-2xl font-bold text-gray-900 mb-2">Search Pack</h3>
-              <div className="mb-4">
-                <span className="text-4xl font-bold text-gray-900">$30</span>
-                <span className="text-gray-600"> one-time</span>
+          <div className="bg-white rounded-2xl p-8 border border-gray-200 shadow-sm">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-8">
+              <div className="flex-1">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="text-4xl">📦</div>
+                  <div>
+                    <h3 className="text-2xl font-bold text-gray-900">Search Pack</h3>
+                    <p className="text-gray-600">One-time purchase, never expires</p>
+                  </div>
+                </div>
+                
+                <ul className="space-y-2">
+                  <li className="flex items-center gap-2 text-gray-700">
+                    <span className="text-[#88D18A] font-bold">✓</span>
+                    <span>50 additional searches</span>
+                  </li>
+                  <li className="flex items-center gap-2 text-gray-700">
+                    <span className="text-[#88D18A] font-bold">✓</span>
+                    <span>No expiration date - use anytime</span>
+                  </li>
+                  <li className="flex items-center gap-2 text-gray-700">
+                    <span className="text-[#88D18A] font-bold">✓</span>
+                    <span>Compatible with all subscription plans</span>
+                  </li>
+                </ul>
               </div>
-            </div>
-
-            <ul className="space-y-4 mb-8">
-              <li className="flex items-start gap-3">
-                <span className="text-[#88D18A] text-xl">✓</span>
-                <span className="text-gray-700"><strong>50 additional searches</strong></span>
-              </li>
-              <li className="flex items-start gap-3">
-                <span className="text-[#88D18A] text-xl">✓</span>
-                <span className="text-gray-700">Searches never expire</span>
-              </li>
-              <li className="flex items-start gap-3">
-                <span className="text-[#88D18A] text-xl">✓</span>
-                <span className="text-gray-700">Add to any plan</span>
-              </li>
-              <li className="flex items-start gap-3">
-                <span className="text-[#88D18A] text-xl">✓</span>
-                <span className="text-gray-700">Purchase multiple packs</span>
-              </li>
-            </ul>
-
-            <div className="text-center">
-              <p className="text-xs text-gray-500 mb-4">$0.60 per search</p>
-              <Link href="/landing-test" className="block w-full bg-gray-900 hover:bg-gray-800 text-white font-semibold py-3 px-6 rounded-lg transition-colors">
-                Buy Search Pack
-              </Link>
+              
+              <div className="flex flex-col items-center gap-4">
+                <div>
+                  <div className="text-5xl font-bold text-gray-900">$29</div>
+                  <div className="text-sm text-gray-500 text-center mt-1">one-time payment</div>
+                  <div className="text-xs text-gray-400 text-center mt-1">$0.58 per search</div>
+                </div>
+                <Link href="/landing-test" className="px-8 py-3 bg-[#88D18A] hover:bg-[#88D18A]/90 text-white font-semibold rounded-lg transition-colors whitespace-nowrap">
+                  Purchase Search Pack
+                </Link>
+              </div>
             </div>
           </div>
         </div>
