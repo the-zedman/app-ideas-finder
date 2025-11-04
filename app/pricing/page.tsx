@@ -50,8 +50,11 @@ export default function Pricing() {
               }`}
             >
               <span
-                className="inline-block h-6 w-6 transform rounded-full bg-white shadow-md transition-transform duration-200 ease-in-out"
-                style={{ transform: billingCycle === 'annual' ? 'translateX(1.75rem)' : 'translateX(0.25rem)' }}
+                className="inline-block h-6 w-6 transform rounded-full shadow-lg transition-transform duration-200 ease-in-out"
+                style={{ 
+                  transform: billingCycle === 'annual' ? 'translateX(1.75rem)' : 'translateX(0.25rem)',
+                  backgroundColor: '#FFFFFF'
+                }}
               />
             </button>
             <span className={`text-lg font-semibold ${billingCycle === 'annual' ? 'text-gray-900' : 'text-gray-400'}`}>
