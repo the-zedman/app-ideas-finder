@@ -695,7 +695,7 @@ export default function LandingTest() {
           
           {/* Subheading */}
           <p className="text-2xl text-white font-semibold mb-8">
-            Join 12,000+ developers who are building smarter, not harder.
+            Join developers who are building smarter, not harder.
           </p>
           
           {/* Email Capture Form */}
@@ -740,10 +740,6 @@ export default function LandingTest() {
           
           {/* Social Proof Points */}
           <div className="mt-8 flex flex-wrap justify-center gap-6 text-white/90 text-sm">
-            <div className="flex items-center gap-2">
-              <span className="text-yellow-400">✓</span>
-              <span>No credit card required</span>
-            </div>
             <div className="flex items-center gap-2">
               <span className="text-yellow-400">✓</span>
               <span>Early access pricing</span>
