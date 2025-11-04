@@ -225,10 +225,10 @@ export default function LandingTest() {
           {/* Right Column - Image */}
           <div className="relative -mr-20">
             <img 
-              src="/ideas-devices-medium-compressed.jpg" 
+              src="/ideas-devices-compressed.png" 
               alt="App Ideas Finder on devices" 
               className="w-full h-auto"
-              style={{ transform: 'scale(1.2)', transformOrigin: 'center' }}
+              style={{ transform: 'scale(2.4)', transformOrigin: 'center' }}
             />
           </div>
         </div>
