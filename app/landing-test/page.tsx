@@ -367,7 +367,7 @@ export default function LandingTest() {
                 Discover Customer Pain Points
               </div>
               <div className="text-3xl">=</div>
-              <div className="bg-white text-[#88D18A] px-6 py-4 rounded-xl font-black">
+              <div className="bg-yellow-400 text-gray-900 px-6 py-4 rounded-xl font-black shadow-lg">
                 Your 1% Edge
               </div>
             </div>
@@ -657,6 +657,111 @@ export default function LandingTest() {
           animation: pop-in 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
         }
       `}</style>
+
+      {/* Final CTA Section */}
+      <section className="py-20 bg-gradient-to-br from-[#88D18A] via-[#6BC070] to-[#88D18A] relative overflow-hidden">
+        {/* Background Pattern */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-0 left-0 w-96 h-96 bg-white rounded-full blur-3xl"></div>
+          <div className="absolute bottom-0 right-0 w-96 h-96 bg-white rounded-full blur-3xl"></div>
+        </div>
+        
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+          {/* Badge */}
+          <div className="inline-block bg-yellow-400 text-gray-900 px-4 py-2 rounded-full text-sm font-black mb-6 shadow-lg">
+            ⚡ YOUR COMPETITIVE EDGE STARTS HERE
+          </div>
+          
+          {/* Main Headline */}
+          <h2 className="text-5xl md:text-6xl font-black text-white mb-6" style={{ letterSpacing: '-0.02em' }}>
+            Stop Guessing.<br />Start Winning.
+          </h2>
+          
+          {/* Value Props */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border-2 border-white/30">
+              <div className="text-4xl mb-3">🎯</div>
+              <p className="text-white font-bold text-lg">Find What Competitors Miss</p>
+            </div>
+            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border-2 border-white/30">
+              <div className="text-4xl mb-3">💡</div>
+              <p className="text-white font-bold text-lg">Discover Hidden Opportunities</p>
+            </div>
+            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border-2 border-white/30">
+              <div className="text-4xl mb-3">🚀</div>
+              <p className="text-white font-bold text-lg">Build Your 1% Edge</p>
+            </div>
+          </div>
+          
+          {/* Subheading */}
+          <p className="text-2xl text-white font-semibold mb-8">
+            Join 12,000+ developers who are building smarter, not harder.
+          </p>
+          
+          {/* Email Capture Form */}
+          <form onSubmit={handleSubmit} className="max-w-2xl mx-auto mb-6">
+            <div className="flex flex-col sm:flex-row gap-4">
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Enter your email to get early access"
+                required
+                disabled={isSubmitting}
+                className="flex-1 px-6 py-4 rounded-xl text-lg border-2 border-white/30 bg-white/10 backdrop-blur-sm text-white placeholder-white/70 focus:outline-none focus:border-yellow-400 focus:bg-white/20 transition-all disabled:opacity-50"
+              />
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="px-8 py-4 bg-yellow-400 hover:bg-yellow-300 text-gray-900 font-black rounded-xl text-lg shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 whitespace-nowrap"
+              >
+                {isSubmitting ? 'Joining...' : 'Join the Waitlist →'}
+              </button>
+            </div>
+          </form>
+          
+          {/* Status Message */}
+          {message && (
+            <div className={`max-w-2xl mx-auto mb-4 p-4 rounded-xl ${
+              message.includes('already') || message.includes('wrong')
+                ? 'bg-red-500/20 border-2 border-red-300 text-white'
+                : 'bg-white/20 border-2 border-white/30 text-white'
+            }`}>
+              {message}
+            </div>
+          )}
+          
+          {/* Waitlist Count */}
+          <div className="bg-white/10 backdrop-blur-sm border-2 border-white/30 rounded-full px-6 py-3 inline-block">
+            <p className="text-white font-semibold">
+              🔥 <span className="font-black text-yellow-400">{waitlistCount.toLocaleString()}</span> developers already on the waitlist
+            </p>
+          </div>
+          
+          {/* Social Proof Points */}
+          <div className="mt-8 flex flex-wrap justify-center gap-6 text-white/90 text-sm">
+            <div className="flex items-center gap-2">
+              <span className="text-yellow-400">✓</span>
+              <span>No credit card required</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-yellow-400">✓</span>
+              <span>Early access pricing</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-yellow-400">✓</span>
+              <span>Cancel anytime</span>
+            </div>
+          </div>
+        </div>
+        
+        {/* Hidden reCAPTCHA */}
+        <ReCAPTCHA
+          ref={recaptchaRef}
+          size="invisible"
+          sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || ''}
+        />
+      </section>
 
       {/* Footer */}
       <footer className="bg-gray-900 text-gray-300 py-12">
