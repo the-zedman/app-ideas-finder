@@ -553,7 +553,7 @@ export default function LandingTest() {
                 <li><a href="/billing" className="hover:text-white">Pricing</a></li>
                 <li><a href="/terms-of-service" className="hover:text-white">Terms of Service</a></li>
                 <li><a href="/privacy-policy" className="hover:text-white">Privacy Policy</a></li>
-                <li><a href="#" className="hover:text-white">Contact</a></li>
+                <li><a href="/contact" className="hover:text-white">Contact</a></li>
               </ul>
             </div>
           </div>
