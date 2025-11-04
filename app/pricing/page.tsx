@@ -31,7 +31,7 @@ export default function Pricing() {
       </header>
 
       {/* Hero Section */}
-      <section className="py-16 bg-gradient-to-b from-gray-50 to-white">
+      <section className="py-8 bg-gradient-to-b from-gray-50 to-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-5xl font-bold text-gray-900 mb-4">Simple, Transparent Pricing</h1>
           <p className="text-xl text-gray-600 mb-8">
@@ -45,12 +45,12 @@ export default function Pricing() {
             </span>
             <button
               onClick={() => setBillingCycle(billingCycle === 'monthly' ? 'annual' : 'monthly')}
-              className={`relative inline-flex h-8 w-14 items-center rounded-full transition-colors ${
+              className={`relative inline-flex h-8 w-14 items-center rounded-full transition-colors duration-200 ease-in-out ${
                 billingCycle === 'annual' ? 'bg-[#88D18A]' : 'bg-gray-300'
               }`}
             >
               <span
-                className={`inline-block h-6 w-6 transform rounded-full bg-white transition-transform ${
+                className={`inline-block h-6 w-6 transform rounded-full bg-white shadow-md transition-transform duration-200 ease-in-out ${
                   billingCycle === 'annual' ? 'translate-x-7' : 'translate-x-1'
                 }`}
               />
