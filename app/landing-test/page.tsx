@@ -679,15 +679,15 @@ export default function LandingTest() {
           
           {/* Value Props */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div className="bg-white rounded-2xl p-6 shadow-lg">
+            <div className="bg-white rounded-2xl p-6 shadow-lg" style={{ backgroundColor: '#FFFFFF' }}>
               <div className="text-4xl mb-3">🎯</div>
               <p className="text-gray-900 font-bold text-lg">Find What Competitors Miss</p>
             </div>
-            <div className="bg-white rounded-2xl p-6 shadow-lg">
+            <div className="bg-white rounded-2xl p-6 shadow-lg" style={{ backgroundColor: '#FFFFFF' }}>
               <div className="text-4xl mb-3">💡</div>
               <p className="text-gray-900 font-bold text-lg">Discover Hidden Opportunities</p>
             </div>
-            <div className="bg-white rounded-2xl p-6 shadow-lg">
+            <div className="bg-white rounded-2xl p-6 shadow-lg" style={{ backgroundColor: '#FFFFFF' }}>
               <div className="text-4xl mb-3">🚀</div>
               <p className="text-gray-900 font-bold text-lg">Build Your 1% Edge</p>
             </div>
@@ -709,6 +709,7 @@ export default function LandingTest() {
                 required
                 disabled={isSubmitting}
                 className="flex-1 px-6 py-4 rounded-xl text-lg border-2 border-white/30 bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:border-yellow-400 transition-all disabled:opacity-50 shadow-lg"
+                style={{ backgroundColor: '#FFFFFF', color: '#111827' }}
               />
               <button
                 type="submit"
@@ -732,7 +733,7 @@ export default function LandingTest() {
           )}
           
           {/* Waitlist Count */}
-          <div className="bg-white rounded-full px-6 py-3 inline-block shadow-lg">
+          <div className="bg-white rounded-full px-6 py-3 inline-block shadow-lg" style={{ backgroundColor: '#FFFFFF' }}>
             <p className="text-gray-900 font-semibold">
               🔥 <span className="font-black text-[#88D18A]">{waitlistCount.toLocaleString()}</span> developers already on the waitlist
             </p>
