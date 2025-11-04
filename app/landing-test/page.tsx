@@ -679,17 +679,17 @@ export default function LandingTest() {
           
           {/* Value Props */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border-2 border-white/30">
+            <div className="bg-white rounded-2xl p-6 shadow-lg">
               <div className="text-4xl mb-3">🎯</div>
-              <p className="text-white font-bold text-lg">Find What Competitors Miss</p>
+              <p className="text-gray-900 font-bold text-lg">Find What Competitors Miss</p>
             </div>
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border-2 border-white/30">
+            <div className="bg-white rounded-2xl p-6 shadow-lg">
               <div className="text-4xl mb-3">💡</div>
-              <p className="text-white font-bold text-lg">Discover Hidden Opportunities</p>
+              <p className="text-gray-900 font-bold text-lg">Discover Hidden Opportunities</p>
             </div>
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border-2 border-white/30">
+            <div className="bg-white rounded-2xl p-6 shadow-lg">
               <div className="text-4xl mb-3">🚀</div>
-              <p className="text-white font-bold text-lg">Build Your 1% Edge</p>
+              <p className="text-gray-900 font-bold text-lg">Build Your 1% Edge</p>
             </div>
           </div>
           
@@ -708,7 +708,7 @@ export default function LandingTest() {
                 placeholder="Enter your email to get early access"
                 required
                 disabled={isSubmitting}
-                className="flex-1 px-6 py-4 rounded-xl text-lg border-2 border-white/30 bg-white/10 backdrop-blur-sm text-white placeholder-white/70 focus:outline-none focus:border-yellow-400 focus:bg-white/20 transition-all disabled:opacity-50"
+                className="flex-1 px-6 py-4 rounded-xl text-lg border-2 border-white/30 bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:border-yellow-400 transition-all disabled:opacity-50 shadow-lg"
               />
               <button
                 type="submit"
@@ -732,9 +732,9 @@ export default function LandingTest() {
           )}
           
           {/* Waitlist Count */}
-          <div className="bg-white/10 backdrop-blur-sm border-2 border-white/30 rounded-full px-6 py-3 inline-block">
-            <p className="text-white font-semibold">
-              🔥 <span className="font-black text-yellow-400">{waitlistCount.toLocaleString()}</span> developers already on the waitlist
+          <div className="bg-white rounded-full px-6 py-3 inline-block shadow-lg">
+            <p className="text-gray-900 font-semibold">
+              🔥 <span className="font-black text-[#88D18A]">{waitlistCount.toLocaleString()}</span> developers already on the waitlist
             </p>
           </div>
           
