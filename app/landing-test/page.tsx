@@ -658,7 +658,7 @@ export default function LandingTest() {
         }
       `}</style>
 
-      {/* Final CTA Section */}
+      {/* Final CTA Section - White backgrounds on all elements */}
       <section className="py-20 bg-gradient-to-br from-[#88D18A] via-[#6BC070] to-[#88D18A] relative overflow-hidden">
         {/* Background Pattern */}
         <div className="absolute inset-0 opacity-10">
