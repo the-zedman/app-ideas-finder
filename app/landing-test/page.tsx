@@ -234,6 +234,150 @@ export default function LandingTest() {
         </div>
       </section>
 
+      {/* The 1% Edge Theory Section */}
+      <section className="py-16 bg-gradient-to-br from-gray-50 via-white to-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Main Heading */}
+          <div className="text-center mb-12">
+            <div className="inline-block bg-[#88D18A] text-white px-4 py-2 rounded-full text-sm font-bold mb-4">
+              THE SCIENCE OF WINNING
+            </div>
+            <h2 className="text-5xl font-black text-gray-900 mb-4" style={{ letterSpacing: '-0.02em' }}>
+              You Don't Need to Be Perfect.<br />You Just Need to Be 1% Better.
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              The most successful apps aren't built from scratch—they're built by learning from competitors' mistakes and customers' frustrations.
+            </p>
+          </div>
+
+          {/* The Theory */}
+          <div className="bg-white rounded-3xl shadow-2xl p-8 md:p-12 mb-12">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+              <div>
+                <div className="text-6xl mb-6">🎯</div>
+                <h3 className="text-3xl font-bold text-gray-900 mb-4">The Competitive Intelligence Advantage</h3>
+                <p className="text-lg text-gray-700 mb-4">
+                  In 2004, Clayton Christensen (Harvard Business School) discovered that <strong>84% of successful products</strong> didn't invent new categories—they simply improved existing ones by listening to what customers complained about.
+                </p>
+                <p className="text-lg text-gray-700 mb-4">
+                  Steve Jobs famously said: <em>"Good artists copy, great artists steal."</em> Apple didn't invent smartphones, MP3 players, or tablets—they made them <strong>marginally better</strong> by fixing what competitors got wrong.
+                </p>
+                <div className="bg-[#88D18A]/10 border-l-4 border-[#88D18A] p-4 rounded-r-lg">
+                  <p className="text-gray-800 font-semibold">
+                    "The best way to predict the future is to look at what's broken today." — Peter Thiel, PayPal & Palantir Founder
+                  </p>
+                </div>
+              </div>
+              
+              <div className="space-y-6">
+                {/* Stat Card 1 */}
+                <div className="bg-gradient-to-br from-[#88D18A] to-[#6BC070] text-white p-6 rounded-2xl shadow-lg transform hover:scale-105 transition-transform">
+                  <div className="text-5xl font-black mb-2">84%</div>
+                  <p className="text-sm opacity-90">of billion-dollar startups improved existing solutions rather than creating new markets</p>
+                  <p className="text-xs mt-2 opacity-75">— CB Insights, 2023</p>
+                </div>
+                
+                {/* Stat Card 2 */}
+                <div className="bg-gradient-to-br from-blue-500 to-blue-600 text-white p-6 rounded-2xl shadow-lg transform hover:scale-105 transition-transform">
+                  <div className="text-5xl font-black mb-2">72%</div>
+                  <p className="text-sm opacity-90">of users will switch to a competitor if their current app fails to address their top complaint</p>
+                  <p className="text-xs mt-2 opacity-75">— Forrester Research, 2024</p>
+                </div>
+                
+                {/* Stat Card 3 */}
+                <div className="bg-gradient-to-br from-purple-500 to-purple-600 text-white p-6 rounded-2xl shadow-lg transform hover:scale-105 transition-transform">
+                  <div className="text-5xl font-black mb-2">1%</div>
+                  <p className="text-sm opacity-90">improvement in user experience can increase conversion rates by up to 400%</p>
+                  <p className="text-xs mt-2 opacity-75">— Nielsen Norman Group</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Real-World Examples */}
+          <div className="mb-12">
+            <h3 className="text-3xl font-bold text-gray-900 text-center mb-8">Real Companies. Real Results.</h3>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {/* Example 1: Slack */}
+              <div className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-shadow">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="text-4xl">💬</div>
+                  <div>
+                    <h4 className="text-xl font-bold text-gray-900">Slack</h4>
+                    <p className="text-sm text-gray-500">vs. HipChat, Skype</p>
+                  </div>
+                </div>
+                <p className="text-gray-700 mb-3">
+                  Slack analyzed <strong>thousands of reviews</strong> complaining about clunky interfaces and poor search in competing tools.
+                </p>
+                <div className="bg-[#CCDDB7] p-3 rounded-lg">
+                  <p className="text-sm font-semibold text-gray-800">The 1% Edge:</p>
+                  <p className="text-sm text-gray-700">Better search + cleaner UI = $27.7B valuation</p>
+                </div>
+              </div>
+
+              {/* Example 2: Notion */}
+              <div className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-shadow">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="text-4xl">📝</div>
+                  <div>
+                    <h4 className="text-xl font-bold text-gray-900">Notion</h4>
+                    <p className="text-sm text-gray-500">vs. Evernote, OneNote</p>
+                  </div>
+                </div>
+                <p className="text-gray-700 mb-3">
+                  Users complained about <strong>inflexibility</strong> and fragmented tools. Notion listened.
+                </p>
+                <div className="bg-[#CCDDB7] p-3 rounded-lg">
+                  <p className="text-sm font-semibold text-gray-800">The 1% Edge:</p>
+                  <p className="text-sm text-gray-700">All-in-one workspace = 30M+ users in 4 years</p>
+                </div>
+              </div>
+
+              {/* Example 3: Superhuman */}
+              <div className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-shadow">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="text-4xl">⚡</div>
+                  <div>
+                    <h4 className="text-xl font-bold text-gray-900">Superhuman</h4>
+                    <p className="text-sm text-gray-500">vs. Gmail, Outlook</p>
+                  </div>
+                </div>
+                <p className="text-gray-700 mb-3">
+                  Found that power users wanted <strong>keyboard shortcuts</strong> and speed that Gmail didn't offer.
+                </p>
+                <div className="bg-[#CCDDB7] p-3 rounded-lg">
+                  <p className="text-sm font-semibold text-gray-800">The 1% Edge:</p>
+                  <p className="text-sm text-gray-700">Speed-first email = $30/month premium pricing</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* The Formula */}
+          <div className="bg-gradient-to-r from-[#88D18A] to-[#6BC070] rounded-3xl p-8 md:p-12 text-white text-center">
+            <h3 className="text-3xl font-bold mb-6">The Winning Formula</h3>
+            <div className="flex flex-col md:flex-row items-center justify-center gap-4 text-xl md:text-2xl font-bold mb-6">
+              <div className="bg-white/20 px-6 py-4 rounded-xl backdrop-blur-sm">
+                Find Competitor Weaknesses
+              </div>
+              <div className="text-3xl">+</div>
+              <div className="bg-white/20 px-6 py-4 rounded-xl backdrop-blur-sm">
+                Discover Customer Pain Points
+              </div>
+              <div className="text-3xl">=</div>
+              <div className="bg-white text-[#88D18A] px-6 py-4 rounded-xl font-black">
+                Your 1% Edge
+              </div>
+            </div>
+            <p className="text-xl opacity-90 max-w-3xl mx-auto">
+              You don't need a revolutionary idea. You need to be <strong>marginally better</strong> at solving problems your competitors ignore. That's where App Ideas Finder comes in.
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* Benefits Section */}
       <section className="bg-gray-50 py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
