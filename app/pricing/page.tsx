@@ -31,7 +31,7 @@ export default function Pricing() {
       </header>
 
       {/* Hero Section */}
-      <section className="py-8 bg-gradient-to-b from-gray-50 to-white">
+      <section className="py-4 bg-gradient-to-b from-gray-50 to-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-5xl font-bold text-gray-900 mb-4">Simple, Transparent Pricing</h1>
           <p className="text-xl text-gray-600 mb-8">
@@ -50,9 +50,8 @@ export default function Pricing() {
               }`}
             >
               <span
-                className={`inline-block h-6 w-6 transform rounded-full bg-white shadow-md transition-transform duration-200 ease-in-out ${
-                  billingCycle === 'annual' ? 'translate-x-7' : 'translate-x-1'
-                }`}
+                className="inline-block h-6 w-6 transform rounded-full bg-white shadow-md transition-transform duration-200 ease-in-out"
+                style={{ transform: billingCycle === 'annual' ? 'translateX(1.75rem)' : 'translateX(0.25rem)' }}
               />
             </button>
             <span className={`text-lg font-semibold ${billingCycle === 'annual' ? 'text-gray-900' : 'text-gray-400'}`}>
@@ -324,7 +323,7 @@ export default function Pricing() {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-4xl font-bold text-white mb-4">Ready to Get Started?</h2>
           <p className="text-xl text-white/90 mb-8">
-            Join thousands of developers using App Ideas Finder to build better apps
+            Join the family of developers using App Ideas Finder to build better apps
           </p>
           <Link href="/landing-test" className="inline-block bg-white hover:bg-gray-100 text-[#88D18A] font-semibold py-3 px-8 rounded-lg transition-colors text-lg">
             Start Your Free Trial
