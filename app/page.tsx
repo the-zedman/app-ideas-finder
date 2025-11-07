@@ -9,18 +9,23 @@ import ReCAPTCHA from 'react-google-recaptcha';
 function FlipDigit({ value, label }: { value: number; label?: string }) {
   const [currentValue, setCurrentValue] = useState(value);
   const [isFlipping, setIsFlipping] = useState(false);
+  const prevValueRef = useRef(value);
   
   useEffect(() => {
-    if (value !== currentValue) {
+    if (value !== prevValueRef.current) {
       setIsFlipping(true);
-      setTimeout(() => {
+      const timer = setTimeout(() => {
         setCurrentValue(value);
         setIsFlipping(false);
+        prevValueRef.current = value;
       }, 300);
+      
+      return () => clearTimeout(timer);
     }
-  }, [value, currentValue]);
+  }, [value]);
   
-  const displayValue = String(value).padStart(2, '0');
+  const displayValue = String(currentValue).padStart(2, '0');
+  const nextValue = String(value).padStart(2, '0');
   
   return (
     <div className="flex flex-col items-center">
@@ -41,10 +46,10 @@ function FlipDigit({ value, label }: { value: number; label?: string }) {
           {isFlipping && (
             <>
               <div className="flip-card-front-top">
-                <span className="flip-digit-text">{String(currentValue).padStart(2, '0')}</span>
+                <span className="flip-digit-text">{displayValue}</span>
               </div>
               <div className="flip-card-back-bottom">
-                <span className="flip-digit-text">{displayValue}</span>
+                <span className="flip-digit-text">{nextValue}</span>
               </div>
             </>
           )}
@@ -69,36 +74,38 @@ function FlipDigit({ value, label }: { value: number; label?: string }) {
 // Countdown Timer Component
 function CountdownTimer() {
   // Fixed launch date - November 21, 2025 at midnight UTC
-  const LAUNCH_DATE = new Date('2025-11-21T00:00:00Z').getTime();
+  const launchDate = new Date('2025-11-21T00:00:00Z');
   
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0 });
   
   useEffect(() => {
     const calculateTimeLeft = () => {
-      const now = new Date().getTime();
-      const difference = LAUNCH_DATE - now;
+      const now = new Date();
+      const difference = launchDate.getTime() - now.getTime();
       
       if (difference > 0) {
-        return {
-          days: Math.floor(difference / (1000 * 60 * 60 * 24)),
-          hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
-          minutes: Math.floor((difference / 1000 / 60) % 60),
-        };
+        const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((difference / (1000 * 60 * 60)) % 24);
+        const minutes = Math.floor((difference / 1000 / 60) % 60);
+        
+        return { days, hours, minutes };
       }
       
       return { days: 0, hours: 0, minutes: 0 };
     };
     
     // Set initial value immediately
-    setTimeLeft(calculateTimeLeft());
+    const initial = calculateTimeLeft();
+    setTimeLeft(initial);
     
-    // Update every second
+    // Update every minute (60000ms) for performance, or every second for testing
     const timer = setInterval(() => {
-      setTimeLeft(calculateTimeLeft());
-    }, 1000);
+      const newTime = calculateTimeLeft();
+      setTimeLeft(newTime);
+    }, 60000); // Update every minute
     
     return () => clearInterval(timer);
-  }, [LAUNCH_DATE]);
+  }, []);
   
   return (
     <div className="mb-8 flex flex-col items-center">
