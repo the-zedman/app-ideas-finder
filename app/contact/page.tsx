@@ -138,6 +138,16 @@ export default function Contact() {
               <h3 className="font-semibold text-gray-900 mb-2">Quick Links</h3>
               <ul className="space-y-2 text-gray-600">
                 <li>
+                  <Link href="/pricing" className="hover:text-[#88D18A]">
+                    Pricing
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/affiliate" className="hover:text-[#88D18A]">
+                    Affiliate Program
+                  </Link>
+                </li>
+                <li>
                   <Link href="/privacy-policy" className="hover:text-[#88D18A]">
                     Privacy Policy
                   </Link>
@@ -145,11 +155,6 @@ export default function Contact() {
                 <li>
                   <Link href="/terms-of-service" className="hover:text-[#88D18A]">
                     Terms of Service
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/billing" className="hover:text-[#88D18A]">
-                    Pricing
                   </Link>
                 </li>
               </ul>
