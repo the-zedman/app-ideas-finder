@@ -5,6 +5,120 @@ import Image from 'next/image';
 import { createClient } from '@/lib/supabase-client';
 import ReCAPTCHA from 'react-google-recaptcha';
 
+// Flip Clock Digit Component
+function FlipDigit({ value, label }: { value: number; label?: string }) {
+  const [currentValue, setCurrentValue] = useState(value);
+  const [isFlipping, setIsFlipping] = useState(false);
+  
+  useEffect(() => {
+    if (value !== currentValue) {
+      setIsFlipping(true);
+      setTimeout(() => {
+        setCurrentValue(value);
+        setIsFlipping(false);
+      }, 300);
+    }
+  }, [value, currentValue]);
+  
+  const displayValue = String(value).padStart(2, '0');
+  
+  return (
+    <div className="flex flex-col items-center">
+      <div className="relative perspective-1000">
+        <div className={`flip-card ${isFlipping ? 'flipping' : ''}`}>
+          {/* Top half */}
+          <div className="flip-card-top">
+            <span className="flip-digit-text">{displayValue}</span>
+            <div className="flip-card-divider"></div>
+          </div>
+          
+          {/* Bottom half */}
+          <div className="flip-card-bottom">
+            <span className="flip-digit-text">{displayValue}</span>
+          </div>
+          
+          {/* Flipping animation elements */}
+          {isFlipping && (
+            <>
+              <div className="flip-card-front-top">
+                <span className="flip-digit-text">{String(currentValue).padStart(2, '0')}</span>
+              </div>
+              <div className="flip-card-back-bottom">
+                <span className="flip-digit-text">{displayValue}</span>
+              </div>
+            </>
+          )}
+        </div>
+        
+        {/* Screws for vintage look */}
+        <div className="absolute top-1 left-1 w-2 h-2 bg-gray-600 rounded-full shadow-inner"></div>
+        <div className="absolute top-1 right-1 w-2 h-2 bg-gray-600 rounded-full shadow-inner"></div>
+        <div className="absolute bottom-1 left-1 w-2 h-2 bg-gray-600 rounded-full shadow-inner"></div>
+        <div className="absolute bottom-1 right-1 w-2 h-2 bg-gray-600 rounded-full shadow-inner"></div>
+      </div>
+      
+      {label && (
+        <span className="text-xs font-bold text-gray-700 mt-3 uppercase tracking-wider">
+          {label}
+        </span>
+      )}
+    </div>
+  );
+}
+
+// Countdown Timer Component
+function CountdownTimer() {
+  const calculateTimeLeft = () => {
+    // Set launch date to 14 days from now
+    const launchDate = new Date();
+    launchDate.setDate(launchDate.getDate() + 14);
+    
+    const now = new Date();
+    const difference = launchDate.getTime() - now.getTime();
+    
+    if (difference > 0) {
+      return {
+        days: Math.floor(difference / (1000 * 60 * 60 * 24)),
+        hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
+        minutes: Math.floor((difference / 1000 / 60) % 60),
+      };
+    }
+    
+    return { days: 0, hours: 0, minutes: 0 };
+  };
+  
+  const [timeLeft, setTimeLeft] = useState(calculateTimeLeft());
+  
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTimeLeft(calculateTimeLeft());
+    }, 1000);
+    
+    return () => clearInterval(timer);
+  }, []);
+  
+  return (
+    <div className="mb-8 flex flex-col items-center">
+      <div className="text-center mb-4">
+        <h3 className="text-2xl font-black text-gray-900 mb-1 tracking-tight">
+          🚀 COUNTDOWN TO LAUNCH
+        </h3>
+        <p className="text-sm text-gray-600 font-semibold">
+          Get ready for something amazing
+        </p>
+      </div>
+      
+      <div className="flex gap-4 justify-center items-center">
+        <FlipDigit value={timeLeft.days} label="DAYS" />
+        <div className="text-5xl font-bold text-gray-800 mb-8">:</div>
+        <FlipDigit value={timeLeft.hours} label="HOURS" />
+        <div className="text-5xl font-bold text-gray-800 mb-8">:</div>
+        <FlipDigit value={timeLeft.minutes} label="MINUTES" />
+      </div>
+    </div>
+  );
+}
+
 export default function LandingTest() {
   const [email, setEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -173,6 +287,9 @@ export default function LandingTest() {
                 Explore trending apps
               </a>
             </div>
+
+            {/* Countdown Timer */}
+            <CountdownTimer />
             
             {/* Waitlist Section */}
             <div className="border-t border-gray-200 pt-8">
@@ -641,6 +758,24 @@ export default function LandingTest() {
           }
         }
         
+        @keyframes flip-top {
+          0% {
+            transform: rotateX(0deg);
+          }
+          100% {
+            transform: rotateX(-90deg);
+          }
+        }
+        
+        @keyframes flip-bottom {
+          0% {
+            transform: rotateX(90deg);
+          }
+          100% {
+            transform: rotateX(0deg);
+          }
+        }
+        
         .animate-fade-in {
           animation: fade-in 0.8s ease-out forwards;
         }
@@ -655,6 +790,119 @@ export default function LandingTest() {
         
         .animate-pop-in {
           animation: pop-in 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+        }
+      `}</style>
+      
+      {/* Flip Clock Styles */}
+      <style jsx global>{`
+        .perspective-1000 {
+          perspective: 1000px;
+        }
+        
+        .flip-card {
+          position: relative;
+          width: 100px;
+          height: 120px;
+          font-size: 64px;
+          font-weight: 900;
+          border-radius: 8px;
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+          background: linear-gradient(to bottom, #2d2d2d 0%, #1a1a1a 50%, #0d0d0d 50%, #000000 100%);
+        }
+        
+        .flip-card-top,
+        .flip-card-bottom {
+          position: absolute;
+          width: 100%;
+          height: 50%;
+          overflow: hidden;
+          background: linear-gradient(to bottom, #2d2d2d, #1a1a1a);
+        }
+        
+        .flip-card-top {
+          top: 0;
+          border-radius: 8px 8px 0 0;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .flip-card-bottom {
+          bottom: 0;
+          border-radius: 0 0 8px 8px;
+          background: linear-gradient(to bottom, #0d0d0d, #000000);
+        }
+        
+        .flip-card-divider {
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          height: 2px;
+          background: linear-gradient(to right, transparent, rgba(0, 0, 0, 0.8), transparent);
+        }
+        
+        .flip-digit-text {
+          position: absolute;
+          width: 100%;
+          height: 200%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: #fff;
+          text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+        }
+        
+        .flip-card-top .flip-digit-text {
+          top: 0;
+        }
+        
+        .flip-card-bottom .flip-digit-text {
+          top: -100%;
+        }
+        
+        .flip-card-front-top,
+        .flip-card-back-bottom {
+          position: absolute;
+          width: 100%;
+          height: 50%;
+          overflow: hidden;
+          backface-visibility: hidden;
+          transform-origin: bottom;
+        }
+        
+        .flip-card-front-top {
+          top: 0;
+          background: linear-gradient(to bottom, #2d2d2d, #1a1a1a);
+          border-radius: 8px 8px 0 0;
+          animation: flip-top 0.3s ease-in forwards;
+          z-index: 2;
+        }
+        
+        .flip-card-back-bottom {
+          bottom: 0;
+          background: linear-gradient(to bottom, #0d0d0d, #000000);
+          border-radius: 0 0 8px 8px;
+          transform: rotateX(90deg);
+          transform-origin: top;
+          animation: flip-bottom 0.3s 0.3s ease-out forwards;
+        }
+        
+        .flip-card-front-top .flip-digit-text {
+          top: 0;
+          color: #fff;
+        }
+        
+        .flip-card-back-bottom .flip-digit-text {
+          top: -100%;
+          color: #fff;
+        }
+        
+        @media (max-width: 640px) {
+          .flip-card {
+            width: 70px;
+            height: 84px;
+            font-size: 44px;
+          }
         }
       `}</style>
 
