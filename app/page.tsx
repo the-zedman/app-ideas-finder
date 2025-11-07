@@ -46,10 +46,11 @@ function CountdownTimer() {
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
   
   useEffect(() => {
+    // Calculate launch date ONCE - exactly 14 days from when component mounts
+    const launchDate = new Date(Date.now() + (14 * 24 * 60 * 60 * 1000));
+    
     const updateCountdown = () => {
-      // Calculate launch date - exactly 14 days from now
       const now = new Date();
-      const launchDate = new Date(now.getTime() + (14 * 24 * 60 * 60 * 1000));
       const difference = launchDate.getTime() - now.getTime();
       
       if (difference > 0) {
