@@ -71,34 +71,34 @@ function CountdownTimer() {
   // Fixed launch date - November 21, 2025 at midnight UTC
   const LAUNCH_DATE = new Date('2025-11-21T00:00:00Z').getTime();
   
-  const calculateTimeLeft = () => {
-    const now = new Date().getTime();
-    const difference = LAUNCH_DATE - now;
-    
-    if (difference > 0) {
-      return {
-        days: Math.floor(difference / (1000 * 60 * 60 * 24)),
-        hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
-        minutes: Math.floor((difference / 1000 / 60) % 60),
-      };
-    }
-    
-    return { days: 0, hours: 0, minutes: 0 };
-  };
-  
-  const [timeLeft, setTimeLeft] = useState({ days: 13, hours: 23, minutes: 59 });
-  const [mounted, setMounted] = useState(false);
+  const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0 });
   
   useEffect(() => {
-    setMounted(true);
+    const calculateTimeLeft = () => {
+      const now = new Date().getTime();
+      const difference = LAUNCH_DATE - now;
+      
+      if (difference > 0) {
+        return {
+          days: Math.floor(difference / (1000 * 60 * 60 * 24)),
+          hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
+          minutes: Math.floor((difference / 1000 / 60) % 60),
+        };
+      }
+      
+      return { days: 0, hours: 0, minutes: 0 };
+    };
+    
+    // Set initial value immediately
     setTimeLeft(calculateTimeLeft());
     
+    // Update every second
     const timer = setInterval(() => {
       setTimeLeft(calculateTimeLeft());
     }, 1000);
     
     return () => clearInterval(timer);
-  }, []);
+  }, [LAUNCH_DATE]);
   
   return (
     <div className="mb-8 flex flex-col items-center">
