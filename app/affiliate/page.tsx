@@ -44,7 +44,7 @@ export default function AffiliatePage() {
               Get Your Affiliate Link →
             </Link>
             <div className="text-white/90 text-sm sm:text-base">
-              Already a member? <Link href="/homezone" className="underline font-semibold hover:text-yellow-400">Go to Dashboard</Link>
+              Already a member? <Link href="/" className="underline font-semibold hover:text-yellow-400">Go to Dashboard</Link>
             </div>
           </div>
         </div>
