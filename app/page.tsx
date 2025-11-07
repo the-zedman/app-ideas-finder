@@ -68,13 +68,12 @@ function FlipDigit({ value, label }: { value: number; label?: string }) {
 
 // Countdown Timer Component
 function CountdownTimer() {
+  // Fixed launch date - November 21, 2025 at midnight UTC
+  const LAUNCH_DATE = new Date('2025-11-21T00:00:00Z').getTime();
+  
   const calculateTimeLeft = () => {
-    // Set launch date to 14 days from now
-    const launchDate = new Date();
-    launchDate.setDate(launchDate.getDate() + 14);
-    
-    const now = new Date();
-    const difference = launchDate.getTime() - now.getTime();
+    const now = new Date().getTime();
+    const difference = LAUNCH_DATE - now;
     
     if (difference > 0) {
       return {
@@ -87,9 +86,13 @@ function CountdownTimer() {
     return { days: 0, hours: 0, minutes: 0 };
   };
   
-  const [timeLeft, setTimeLeft] = useState(calculateTimeLeft());
+  const [timeLeft, setTimeLeft] = useState({ days: 13, hours: 23, minutes: 59 });
+  const [mounted, setMounted] = useState(false);
   
   useEffect(() => {
+    setMounted(true);
+    setTimeLeft(calculateTimeLeft());
+    
     const timer = setInterval(() => {
       setTimeLeft(calculateTimeLeft());
     }, 1000);
@@ -255,7 +258,7 @@ export default function LandingTest() {
       </header>
 
       {/* Hero Section */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
           {/* Left Column - Text */}
           <div>
@@ -354,7 +357,7 @@ export default function LandingTest() {
       </section>
 
       {/* The 1% Edge Theory Section */}
-      <section className="py-16 bg-gradient-to-br from-gray-50 via-white to-gray-50">
+      <section className="pt-8 pb-16 bg-gradient-to-br from-gray-50 via-white to-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Main Heading */}
           <div className="text-center mb-12">
