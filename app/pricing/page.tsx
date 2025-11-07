@@ -357,7 +357,13 @@ export default function Pricing() {
 
             <div className="bg-gray-50 rounded-lg p-6">
               <h3 className="font-bold text-gray-900 mb-2">What's the affiliate program?</h3>
-              <p className="text-gray-700">All users get a unique affiliate code. For every paying subscriber who uses your link, you receive 25 bonus searches on your next billing cycle.</p>
+              <p className="text-gray-700 mb-3">All users get a unique affiliate link and code. Earn <strong>25% cash commission</strong> on every referral:</p>
+              <ul className="list-disc pl-6 space-y-1 text-sm text-gray-700">
+                <li>$9.75-$19.75 per monthly subscription</li>
+                <li>$99.75-$199.75 per annual subscription</li>
+                <li>$7.25 per Search Pack purchase</li>
+              </ul>
+              <p className="text-gray-700 mt-3 text-sm">Commissions paid within 7 days after the referred customer's first month (if they remain active). <Link href="/affiliate" className="text-[#88D18A] hover:underline font-semibold">Learn more →</Link></p>
             </div>
 
             <div className="bg-gray-50 rounded-lg p-6">
