@@ -237,7 +237,7 @@ export default function LandingTest() {
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 sm:pt-20 pb-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-start">
           {/* Mobile Image - Shows first on mobile */}
-          <div className="lg:hidden relative mb-6">
+          <div className="lg:hidden relative mb-4">
             <img 
               src="/ideas-devices-compressed.png" 
               alt="App Ideas Finder on devices" 
@@ -248,9 +248,9 @@ export default function LandingTest() {
           {/* Left Column - Text */}
           <div>
             <h1 className="text-gray-900 mb-4 sm:mb-6 text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-black leading-tight" style={{ letterSpacing: '-0.02em' }}>
-              The super <span className="inline-block">fast</span><br />
-              app ideas<br />
-              generator!
+              <span className="block sm:inline">The super fast</span>{' '}
+              <span className="block sm:inline">app ideas</span>{' '}
+              <span className="block sm:inline">generator!</span>
             </h1>
             <p className="text-base sm:text-lg lg:text-xl text-gray-600 mb-6 sm:mb-8">
               Discover your next app idea by analyzing real user feedback from the App Store. Get insights in seconds, not weeks.
@@ -313,10 +313,12 @@ export default function LandingTest() {
               )}
               
               {waitlistCount > 0 && (
-                <div className="inline-flex items-center gap-2 bg-[#CCDDB7] px-4 py-2 rounded-lg">
-                  <span className="text-sm font-semibold text-gray-800">
-                    🎉 {waitlistCount.toLocaleString()} developers have joined the waitlist
-                  </span>
+                <div className="flex justify-center">
+                  <div className="inline-flex items-center gap-2 bg-[#CCDDB7] px-4 py-2 rounded-lg">
+                    <span className="text-sm font-semibold text-gray-800">
+                      🎉 {waitlistCount.toLocaleString()} developers have joined the waitlist
+                    </span>
+                  </div>
                 </div>
               )}
               
@@ -489,94 +491,6 @@ export default function LandingTest() {
         </div>
       </section>
 
-      {/* Benefits Section */}
-      <section className="bg-gray-50 py-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-4">
-            {/* Original Card 1 */}
-            <div className="bg-white rounded-2xl p-4 hover:shadow-md transition-shadow">
-              <div className="text-4xl mb-4">📱</div>
-              <h3 className="font-bold text-gray-900 mb-2">iOS App Analysis</h3>
-              <p className="text-sm text-gray-600">
-                Analyze any iOS app on the App Store instantly.
-              </p>
-            </div>
-            
-            {/* Original Card 2 */}
-            <div className="bg-white rounded-2xl p-4 hover:shadow-md transition-shadow">
-              <div className="text-4xl mb-4">🤖</div>
-              <h3 className="font-bold text-gray-900 mb-2">AI-Powered</h3>
-              <p className="text-sm text-gray-600">
-                Advanced AI analyzes hundreds of reviews in seconds.
-              </p>
-            </div>
-            
-            {/* Original Card 3 */}
-            <div className="bg-white rounded-2xl p-4 hover:shadow-md transition-shadow">
-              <div className="text-4xl mb-4">💡</div>
-              <h3 className="font-bold text-gray-900 mb-2">Feature Ideas</h3>
-              <p className="text-sm text-gray-600">
-                Get core features and enhancement suggestions.
-              </p>
-            </div>
-            
-            {/* Original Card 4 */}
-            <div className="bg-white rounded-2xl p-4 hover:shadow-md transition-shadow">
-              <div className="text-4xl mb-4">📊</div>
-              <h3 className="font-bold text-gray-900 mb-2">Market Research</h3>
-              <p className="text-sm text-gray-600">
-                Understand user sentiment and market opportunities.
-              </p>
-            </div>
-            
-            {/* Original Card 5 */}
-            <div className="bg-white rounded-2xl p-4 hover:shadow-md transition-shadow">
-              <div className="text-4xl mb-4">⚡</div>
-              <h3 className="font-bold text-gray-900 mb-2">Save Time</h3>
-              <p className="text-sm text-gray-600">
-                Get insights that would take days in just seconds.
-              </p>
-            </div>
-            
-            {/* New Card 1 */}
-            <div className="bg-white rounded-2xl p-4 hover:shadow-md transition-shadow">
-              <div className="text-4xl mb-4">🔍</div>
-              <h3 className="font-bold text-gray-900 mb-2">A Better Way to Be a Creator</h3>
-              <p className="text-sm text-gray-600">
-                Discover what's working in the market and find opportunities your competitors are missing.
-              </p>
-            </div>
-            
-            {/* New Card 2 */}
-            <div className="bg-white rounded-2xl p-4 hover:shadow-md transition-shadow">
-              <div className="text-4xl mb-4">🚀</div>
-              <h3 className="font-bold text-gray-900 mb-2">Start Building</h3>
-              <p className="text-sm text-gray-600">
-                Get actionable insights and resources to turn your ideas into reality.
-              </p>
-            </div>
-            
-            {/* New Card 3 */}
-            <div className="bg-white rounded-2xl p-4 hover:shadow-md transition-shadow">
-              <div className="text-4xl mb-4">🎯</div>
-              <h3 className="font-bold text-gray-900 mb-2">Steal Ideas from Competitors</h3>
-              <p className="text-sm text-gray-600">
-                See what users love about competing apps and what they're desperately asking for.
-              </p>
-            </div>
-            
-            {/* New Card 4 */}
-            <div className="bg-white rounded-2xl p-4 hover:shadow-md transition-shadow">
-              <div className="text-4xl mb-4">💭</div>
-              <h3 className="font-bold text-gray-900 mb-2">Break Ideas Paralysis</h3>
-              <p className="text-sm text-gray-600">
-                Stop overthinking. Get data-driven validation and clear direction for your next app.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* How It Works */}
       <section ref={howItWorksRef} className="py-8 sm:py-12 bg-white">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -700,6 +614,94 @@ export default function LandingTest() {
             </div>
             <div className="bg-[#CCDDB7] px-4 py-3 rounded-lg text-sm font-semibold text-gray-800">
               12. Time & cost savings
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Benefits Section */}
+      <section className="bg-gray-50 py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-4">
+            {/* Original Card 1 */}
+            <div className="bg-white rounded-2xl p-4 hover:shadow-md transition-shadow">
+              <div className="text-4xl mb-4">📱</div>
+              <h3 className="font-bold text-gray-900 mb-2">iOS App Analysis</h3>
+              <p className="text-sm text-gray-600">
+                Analyze any iOS app on the App Store instantly.
+              </p>
+            </div>
+            
+            {/* Original Card 2 */}
+            <div className="bg-white rounded-2xl p-4 hover:shadow-md transition-shadow">
+              <div className="text-4xl mb-4">🤖</div>
+              <h3 className="font-bold text-gray-900 mb-2">AI-Powered</h3>
+              <p className="text-sm text-gray-600">
+                Advanced AI analyzes hundreds of reviews in seconds.
+              </p>
+            </div>
+            
+            {/* Original Card 3 */}
+            <div className="bg-white rounded-2xl p-4 hover:shadow-md transition-shadow">
+              <div className="text-4xl mb-4">💡</div>
+              <h3 className="font-bold text-gray-900 mb-2">Feature Ideas</h3>
+              <p className="text-sm text-gray-600">
+                Get core features and enhancement suggestions.
+              </p>
+            </div>
+            
+            {/* Original Card 4 */}
+            <div className="bg-white rounded-2xl p-4 hover:shadow-md transition-shadow">
+              <div className="text-4xl mb-4">📊</div>
+              <h3 className="font-bold text-gray-900 mb-2">Market Research</h3>
+              <p className="text-sm text-gray-600">
+                Understand user sentiment and market opportunities.
+              </p>
+            </div>
+            
+            {/* Original Card 5 */}
+            <div className="bg-white rounded-2xl p-4 hover:shadow-md transition-shadow">
+              <div className="text-4xl mb-4">⚡</div>
+              <h3 className="font-bold text-gray-900 mb-2">Save Time</h3>
+              <p className="text-sm text-gray-600">
+                Get insights that would take days in just seconds.
+              </p>
+            </div>
+            
+            {/* New Card 1 */}
+            <div className="bg-white rounded-2xl p-4 hover:shadow-md transition-shadow">
+              <div className="text-4xl mb-4">🔍</div>
+              <h3 className="font-bold text-gray-900 mb-2">A Better Way to Be a Creator</h3>
+              <p className="text-sm text-gray-600">
+                Discover what's working in the market and find opportunities your competitors are missing.
+              </p>
+            </div>
+            
+            {/* New Card 2 */}
+            <div className="bg-white rounded-2xl p-4 hover:shadow-md transition-shadow">
+              <div className="text-4xl mb-4">🚀</div>
+              <h3 className="font-bold text-gray-900 mb-2">Start Building</h3>
+              <p className="text-sm text-gray-600">
+                Get actionable insights and resources to turn your ideas into reality.
+              </p>
+            </div>
+            
+            {/* New Card 3 */}
+            <div className="bg-white rounded-2xl p-4 hover:shadow-md transition-shadow">
+              <div className="text-4xl mb-4">🎯</div>
+              <h3 className="font-bold text-gray-900 mb-2">Steal Ideas from Competitors</h3>
+              <p className="text-sm text-gray-600">
+                See what users love about competing apps and what they're desperately asking for.
+              </p>
+            </div>
+            
+            {/* New Card 4 */}
+            <div className="bg-white rounded-2xl p-4 hover:shadow-md transition-shadow">
+              <div className="text-4xl mb-4">💭</div>
+              <h3 className="font-bold text-gray-900 mb-2">Break Ideas Paralysis</h3>
+              <p className="text-sm text-gray-600">
+                Stop overthinking. Get data-driven validation and clear direction for your next app.
+              </p>
             </div>
           </div>
         </div>
