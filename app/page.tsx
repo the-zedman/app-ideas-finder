@@ -90,16 +90,19 @@ function CountdownTimer() {
       </div>
       
       <div className="flex gap-4 justify-center items-center">
-        <FlipDigit value={timeLeft.days} label="DAYS" />
+        <FlipDigit key={`days-${timeLeft.days}`} value={timeLeft.days} label="DAYS" />
         <div className="text-5xl font-bold text-gray-800 mb-8">:</div>
-        <FlipDigit value={timeLeft.hours} label="HOURS" />
+        <FlipDigit key={`hours-${timeLeft.hours}`} value={timeLeft.hours} label="HOURS" />
         <div className="text-5xl font-bold text-gray-800 mb-8">:</div>
-        <FlipDigit value={timeLeft.minutes} label="MINUTES" />
+        <FlipDigit key={`minutes-${timeLeft.minutes}`} value={timeLeft.minutes} label="MINUTES" />
       </div>
       
       {/* Debug info - remove later */}
       <div className="text-xs text-gray-400 mt-2">
         Last update: {currentTime}
+      </div>
+      <div className="text-xs text-gray-500 mt-1">
+        Values: D:{timeLeft.days} H:{timeLeft.hours} M:{timeLeft.minutes}
       </div>
     </div>
   );
