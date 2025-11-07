@@ -7,30 +7,12 @@ import ReCAPTCHA from 'react-google-recaptcha';
 
 // Flip Clock Digit Component
 function FlipDigit({ value, label }: { value: number; label?: string }) {
-  const [currentValue, setCurrentValue] = useState(value);
-  const [isFlipping, setIsFlipping] = useState(false);
-  const prevValueRef = useRef(value);
-  
-  useEffect(() => {
-    if (value !== prevValueRef.current) {
-      setIsFlipping(true);
-      const timer = setTimeout(() => {
-        setCurrentValue(value);
-        setIsFlipping(false);
-        prevValueRef.current = value;
-      }, 300);
-      
-      return () => clearTimeout(timer);
-    }
-  }, [value]);
-  
-  const displayValue = String(currentValue).padStart(2, '0');
-  const nextValue = String(value).padStart(2, '0');
+  const displayValue = String(value).padStart(2, '0');
   
   return (
     <div className="flex flex-col items-center">
       <div className="relative perspective-1000">
-        <div className={`flip-card ${isFlipping ? 'flipping' : ''}`}>
+        <div className="flip-card">
           {/* Top half */}
           <div className="flip-card-top">
             <span className="flip-digit-text">{displayValue}</span>
@@ -41,18 +23,6 @@ function FlipDigit({ value, label }: { value: number; label?: string }) {
           <div className="flip-card-bottom">
             <span className="flip-digit-text">{displayValue}</span>
           </div>
-          
-          {/* Flipping animation elements */}
-          {isFlipping && (
-            <>
-              <div className="flip-card-front-top">
-                <span className="flip-digit-text">{displayValue}</span>
-              </div>
-              <div className="flip-card-back-bottom">
-                <span className="flip-digit-text">{nextValue}</span>
-              </div>
-            </>
-          )}
         </div>
         
         {/* Screws for vintage look */}
@@ -73,38 +43,39 @@ function FlipDigit({ value, label }: { value: number; label?: string }) {
 
 // Countdown Timer Component
 function CountdownTimer() {
-  // Fixed launch date - November 21, 2025 at midnight UTC
-  const launchDate = new Date('2025-11-21T00:00:00Z');
-  
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0 });
+  const [currentTime, setCurrentTime] = useState('');
   
   useEffect(() => {
-    const calculateTimeLeft = () => {
+    const updateCountdown = () => {
+      // Fixed launch date - November 21, 2025 at midnight UTC
+      const launchDate = new Date('2025-11-21T00:00:00Z');
       const now = new Date();
       const difference = launchDate.getTime() - now.getTime();
+      
+      // Debug: log current time
+      setCurrentTime(now.toISOString());
       
       if (difference > 0) {
         const days = Math.floor(difference / (1000 * 60 * 60 * 24));
         const hours = Math.floor((difference / (1000 * 60 * 60)) % 24);
-        const minutes = Math.floor((difference / 1000 / 60) % 60);
+        const minutes = Math.floor((difference / (1000 * 60)) % 60);
+        const seconds = Math.floor((difference / 1000) % 60);
         
-        return { days, hours, minutes };
+        setTimeLeft({ days, hours, minutes });
+        console.log('Countdown updated:', { days, hours, minutes, seconds });
+      } else {
+        setTimeLeft({ days: 0, hours: 0, minutes: 0 });
       }
-      
-      return { days: 0, hours: 0, minutes: 0 };
     };
     
-    // Set initial value immediately
-    const initial = calculateTimeLeft();
-    setTimeLeft(initial);
+    // Update immediately
+    updateCountdown();
     
-    // Update every minute (60000ms) for performance, or every second for testing
-    const timer = setInterval(() => {
-      const newTime = calculateTimeLeft();
-      setTimeLeft(newTime);
-    }, 60000); // Update every minute
+    // Update every second so we can see it change
+    const interval = setInterval(updateCountdown, 1000);
     
-    return () => clearInterval(timer);
+    return () => clearInterval(interval);
   }, []);
   
   return (
@@ -124,6 +95,11 @@ function CountdownTimer() {
         <FlipDigit value={timeLeft.hours} label="HOURS" />
         <div className="text-5xl font-bold text-gray-800 mb-8">:</div>
         <FlipDigit value={timeLeft.minutes} label="MINUTES" />
+      </div>
+      
+      {/* Debug info - remove later */}
+      <div className="text-xs text-gray-400 mt-2">
+        Last update: {currentTime}
       </div>
     </div>
   );
