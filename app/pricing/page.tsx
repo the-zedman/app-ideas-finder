@@ -11,18 +11,18 @@ export default function Pricing() {
       {/* Header */}
       <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
+          <div className="flex justify-between items-center h-14 sm:h-16">
             <Link href="/" className="flex items-center gap-2">
               <img 
                 src="/App Ideas Finder - logo - 200x200.png" 
                 alt="App Ideas Finder" 
-                className="h-8 w-8 rounded-lg"
+                className="h-7 w-7 sm:h-8 sm:w-8 rounded-lg"
               />
-              <span className="text-xl font-bold text-gray-900">APP IDEAS FINDER</span>
+              <span className="text-sm sm:text-lg lg:text-xl font-bold text-gray-900">APP IDEAS FINDER</span>
             </Link>
-            <div className="flex items-center gap-6">
-              <Link href="/contact" className="text-gray-700 hover:text-gray-900">Contact</Link>
-              <Link href="/" className="bg-[#88D18A] hover:bg-[#88D18A]/90 text-white px-6 py-2 rounded-lg font-semibold transition-colors">
+            <div className="flex items-center gap-3 sm:gap-6">
+              <Link href="/contact" className="text-gray-700 hover:text-gray-900 text-sm sm:text-base">Contact</Link>
+              <Link href="/" className="bg-[#88D18A] hover:bg-[#88D18A]/90 text-white px-3 sm:px-6 py-1.5 sm:py-2 rounded-lg font-semibold transition-colors text-sm sm:text-base">
                 Get Started
               </Link>
             </div>
@@ -31,10 +31,10 @@ export default function Pricing() {
       </header>
 
       {/* Hero Section */}
-      <section className="py-2 bg-gradient-to-b from-gray-50 to-white">
+      <section className="py-8 sm:py-12 bg-gradient-to-b from-gray-50 to-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-5xl font-bold text-gray-900 mb-4">Simple, Transparent Pricing</h1>
-          <p className="text-xl text-gray-600 mb-8">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-3 sm:mb-4">Simple, Transparent Pricing</h1>
+          <p className="text-base sm:text-lg lg:text-xl text-gray-600 mb-6 sm:mb-8 max-w-3xl mx-auto px-4">
             Choose the plan that works best for you. All plans include full access to our AI-powered analysis.
           </p>
 
@@ -232,11 +232,11 @@ export default function Pricing() {
       </section>
 
       {/* Search Packs */}
-      <section className="py-12 bg-gray-50">
+      <section className="py-8 sm:py-12 bg-gray-50">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="mb-6">
-            <h2 className="text-3xl font-bold text-gray-900 mb-2">Need More Searches?</h2>
-            <p className="text-gray-600">Purchase additional searches that never expire and work with any plan.</p>
+          <div className="mb-6 text-center sm:text-left">
+            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Need More Searches?</h2>
+            <p className="text-sm sm:text-base text-gray-600">Purchase additional searches that never expire and work with any plan.</p>
           </div>
 
           <div className="bg-white rounded-2xl p-8 border border-gray-200 shadow-sm">
@@ -282,9 +282,9 @@ export default function Pricing() {
       </section>
 
       {/* FAQ Section */}
-      <section className="py-16 bg-white">
+      <section className="py-8 sm:py-12 lg:py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-gray-900 text-center mb-12">Frequently Asked Questions</h2>
+          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 text-center mb-8 sm:mb-12">Frequently Asked Questions</h2>
           
           <div className="space-y-6">
             <div className="bg-gray-50 rounded-lg p-6">
@@ -321,10 +321,10 @@ export default function Pricing() {
       </section>
 
       {/* CTA Section */}
-      <section className="bg-[#88D18A] py-8">
+      <section className="bg-[#88D18A] py-8 sm:py-12">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-4xl font-bold text-white mb-4">Ready to Get Started?</h2>
-          <p className="text-xl text-white/90 mb-8">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-3 sm:mb-4">Ready to Get Started?</h2>
+          <p className="text-base sm:text-lg lg:text-xl text-white/90 mb-6 sm:mb-8 px-4">
             Join the family of developers using App Ideas Finder to build better apps
           </p>
           <Link href="//" className="inline-block bg-white hover:bg-gray-100 text-[#88D18A] font-semibold py-3 px-8 rounded-lg transition-colors text-lg">

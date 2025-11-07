@@ -6,27 +6,27 @@ export default function PrivacyPolicy() {
       {/* Header */}
       <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
+          <div className="flex justify-between items-center h-14 sm:h-16">
             <Link href="//" className="flex items-center gap-2">
               <img 
                 src="/App Ideas Finder - logo - 200x200.png" 
                 alt="App Ideas Finder" 
-                className="h-8 w-8 rounded-lg"
+                className="h-7 w-7 sm:h-8 sm:w-8 rounded-lg"
               />
-              <span className="text-xl font-bold text-gray-900">APP IDEAS FINDER</span>
+              <span className="text-sm sm:text-lg lg:text-xl font-bold text-gray-900">APP IDEAS FINDER</span>
             </Link>
           </div>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <h1 className="text-4xl font-bold text-gray-900 mb-2">Privacy Policy</h1>
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+        <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">Privacy Policy</h1>
         <p className="text-gray-600 mb-8">Last updated: November 3, 2025</p>
 
-        <div className="prose prose-gray max-w-none space-y-8">
+        <div className="prose prose-gray max-w-none space-y-6 sm:space-y-8">
           <section>
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">1. Introduction</h2>
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-3 sm:mb-4">1. Introduction</h2>
             <p className="text-gray-700 leading-relaxed">
               Welcome to App Ideas Finder ("we," "our," or "us"). We respect your privacy and are committed to protecting your personal data. This privacy policy explains how we collect, use, and safeguard your information when you use our service.
             </p>
