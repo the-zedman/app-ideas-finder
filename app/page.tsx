@@ -43,18 +43,14 @@ function FlipDigit({ value, label }: { value: number; label?: string }) {
 
 // Countdown Timer Component
 function CountdownTimer() {
-  const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0 });
-  const [currentTime, setCurrentTime] = useState('');
+  const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
   
   useEffect(() => {
     const updateCountdown = () => {
-      // Fixed launch date - November 21, 2025 at midnight UTC
-      const launchDate = new Date('2025-11-21T00:00:00Z');
+      // Calculate launch date - exactly 14 days from now
       const now = new Date();
+      const launchDate = new Date(now.getTime() + (14 * 24 * 60 * 60 * 1000));
       const difference = launchDate.getTime() - now.getTime();
-      
-      // Debug: log current time
-      setCurrentTime(now.toISOString());
       
       if (difference > 0) {
         const days = Math.floor(difference / (1000 * 60 * 60 * 24));
@@ -62,17 +58,16 @@ function CountdownTimer() {
         const minutes = Math.floor((difference / (1000 * 60)) % 60);
         const seconds = Math.floor((difference / 1000) % 60);
         
-        setTimeLeft({ days, hours, minutes });
-        console.log('Countdown updated:', { days, hours, minutes, seconds });
+        setTimeLeft({ days, hours, minutes, seconds });
       } else {
-        setTimeLeft({ days: 0, hours: 0, minutes: 0 });
+        setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
       }
     };
     
     // Update immediately
     updateCountdown();
     
-    // Update every second so we can see it change
+    // Update every second
     const interval = setInterval(updateCountdown, 1000);
     
     return () => clearInterval(interval);
@@ -95,14 +90,8 @@ function CountdownTimer() {
         <FlipDigit key={`hours-${timeLeft.hours}`} value={timeLeft.hours} label="HOURS" />
         <div className="text-5xl font-bold text-gray-800 mb-8">:</div>
         <FlipDigit key={`minutes-${timeLeft.minutes}`} value={timeLeft.minutes} label="MINUTES" />
-      </div>
-      
-      {/* Debug info - remove later */}
-      <div className="text-xs text-gray-400 mt-2">
-        Last update: {currentTime}
-      </div>
-      <div className="text-xs text-gray-500 mt-1">
-        Values: D:{timeLeft.days} H:{timeLeft.hours} M:{timeLeft.minutes}
+        <div className="text-5xl font-bold text-gray-800 mb-8">:</div>
+        <FlipDigit key={`seconds-${timeLeft.seconds}`} value={timeLeft.seconds} label="SECONDS" />
       </div>
     </div>
   );
