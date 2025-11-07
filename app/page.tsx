@@ -46,8 +46,8 @@ function CountdownTimer() {
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
   
   useEffect(() => {
-    // Calculate launch date ONCE - exactly 14 days from when component mounts
-    const launchDate = new Date(Date.now() + (14 * 24 * 60 * 60 * 1000));
+    // Fixed launch date: November 21, 2025 at 4:00 PM Sydney time (AEDT = UTC+11)
+    const launchDate = new Date('2025-11-21T16:00:00+11:00');
     
     const updateCountdown = () => {
       const now = new Date();
