@@ -287,9 +287,6 @@ export default function LandingTest() {
                 Explore trending apps
               </a>
             </div>
-
-            {/* Countdown Timer */}
-            <CountdownTimer />
             
             {/* Waitlist Section */}
             <div className="border-t border-gray-200 pt-8">
@@ -344,9 +341,14 @@ export default function LandingTest() {
             <img 
               src="/ideas-devices-compressed.png" 
               alt="App Ideas Finder on devices" 
-              className="w-full h-auto"
+              className="w-full h-auto mb-8"
               style={{ transform: 'scale(1.2)', transformOrigin: 'center' }}
             />
+            
+            {/* Countdown Timer */}
+            <div className="flex justify-center mt-8">
+              <CountdownTimer />
+            </div>
           </div>
         </div>
       </section>
