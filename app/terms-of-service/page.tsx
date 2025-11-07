@@ -165,13 +165,45 @@ export default function TermsOfService() {
           <section>
             <h2 className="text-2xl font-bold text-gray-900 mb-4">11. Affiliate Program</h2>
             <p className="text-gray-700 leading-relaxed mb-4">
-              All users are automatically enrolled in our affiliate program and receive a unique affiliate code. Terms include:
+              All users are automatically enrolled in our affiliate program and receive a unique affiliate code and link. Terms include:
             </p>
+            
+            <h3 className="text-xl font-semibold text-gray-900 mb-3 mt-6">11.1 Commission Structure</h3>
+            <ul className="list-disc pl-6 space-y-2 text-gray-700 mb-4">
+              <li><strong>Commission Rate:</strong> 25% of the first payment from referred customers</li>
+              <li><strong>Eligible Transactions:</strong>
+                <ul className="list-disc pl-6 space-y-1 mt-2">
+                  <li>Monthly subscriptions (Core: $9.75, Prime: $19.75)</li>
+                  <li>Annual subscriptions (Core: $99.75, Prime: $199.75)</li>
+                  <li>Search Pack purchases ($7.25 per pack)</li>
+                </ul>
+              </li>
+              <li><strong>Payment Timeline:</strong>
+                <ul className="list-disc pl-6 space-y-1 mt-2">
+                  <li>Subscriptions: Paid within 7 days after referred customer completes their first 30 days</li>
+                  <li>Search Packs: Paid within 7 days of purchase</li>
+                </ul>
+              </li>
+              <li><strong>Payment Methods:</strong> Commissions paid via Stripe or PayPal</li>
+            </ul>
+
+            <h3 className="text-xl font-semibold text-gray-900 mb-3 mt-6">11.2 Commission Eligibility</h3>
+            <ul className="list-disc pl-6 space-y-2 text-gray-700 mb-4">
+              <li>Referred customer must remain active through their entire first 30 days</li>
+              <li>If referred customer cancels or requests refund within 30 days, no commission is paid</li>
+              <li>Commissions are one-time per customer (not recurring)</li>
+              <li>Self-referrals are not eligible for commission</li>
+              <li>Referred customer must be a new customer (not an existing user with a new account)</li>
+            </ul>
+
+            <h3 className="text-xl font-semibold text-gray-900 mb-3 mt-6">11.3 Program Rules</h3>
             <ul className="list-disc pl-6 space-y-2 text-gray-700">
-              <li>You earn 25 bonus searches for each paying subscriber who uses your affiliate link</li>
-              <li>Bonuses are credited to your account after the referred user completes their first paid month</li>
-              <li>We reserve the right to void bonuses obtained through fraudulent means</li>
-              <li>Affiliate benefits may be modified or terminated at any time</li>
+              <li>We reserve the right to void commissions obtained through fraudulent means</li>
+              <li>Prohibited activities include: spam, fake accounts, stolen credit cards, misleading claims</li>
+              <li>We may withhold payment pending investigation of suspicious activity</li>
+              <li>Affiliate accounts may be terminated for violations</li>
+              <li>Affiliate program terms and commission rates may be modified at any time</li>
+              <li>We reserve the right to terminate the affiliate program at any time</li>
             </ul>
           </section>
 

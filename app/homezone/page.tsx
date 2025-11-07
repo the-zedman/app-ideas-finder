@@ -15,6 +15,7 @@ export default function HomeZone() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [usageData, setUsageData] = useState<any>(null);
   const [recentAnalyses, setRecentAnalyses] = useState<any[]>([]);
+  const [affiliateData, setAffiliateData] = useState<any>(null);
   const [popularApps, setPopularApps] = useState<any[]>([
     { name: 'Instagram', id: '389801252', icon: '' },
     { name: 'Uber', id: '368677368', icon: '' },
@@ -61,6 +62,33 @@ export default function HomeZone() {
           .limit(5);
         
         setRecentAnalyses(analyses || []);
+        
+        // Fetch affiliate data
+        const { data: affiliateInfo } = await supabase
+          .from('user_affiliates')
+          .select('*')
+          .eq('user_id', user.id)
+          .single();
+        
+        if (affiliateInfo) {
+          // Fetch commission stats
+          const { data: commissions } = await supabase
+            .from('affiliate_commissions')
+            .select('*')
+            .eq('affiliate_user_id', user.id);
+          
+          const pending = commissions?.filter(c => c.status === 'pending').reduce((sum, c) => sum + parseFloat(c.commission_amount), 0) || 0;
+          const approved = commissions?.filter(c => c.status === 'approved').reduce((sum, c) => sum + parseFloat(c.commission_amount), 0) || 0;
+          const paid = commissions?.filter(c => c.status === 'paid').reduce((sum, c) => sum + parseFloat(c.commission_amount), 0) || 0;
+          
+          setAffiliateData({
+            ...affiliateInfo,
+            pendingAmount: pending,
+            approvedAmount: approved,
+            paidAmount: paid,
+            recentCommissions: commissions?.slice(0, 5) || []
+          });
+        }
         
         // Fetch popular app icons from iTunes API
         fetchPopularAppIcons();
@@ -345,6 +373,127 @@ export default function HomeZone() {
                 <p className="text-white/90">You have unlimited searches - enjoy!</p>
               </div>
               <div className="text-5xl">∞</div>
+            </div>
+          </div>
+        )}
+
+        {/* Affiliate Dashboard */}
+        {affiliateData && (
+          <div className="bg-gradient-to-br from-[#88D18A]/10 to-[#6BC070]/10 rounded-2xl p-6 sm:p-8 mb-8 border-2 border-[#88D18A]/20">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-1">💰 Affiliate Program</h3>
+                <p className="text-gray-600">Earn 25% commission on every referral</p>
+              </div>
+              <Link 
+                href="/affiliate" 
+                className="text-sm text-[#88D18A] hover:underline font-semibold"
+              >
+                Full Details →
+              </Link>
+            </div>
+
+            {/* Stats Grid */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+              <div className="bg-white rounded-lg p-4 border border-gray-200">
+                <div className="text-xs text-gray-600 mb-1">Total Referrals</div>
+                <div className="text-2xl font-bold text-gray-900">{affiliateData.total_referrals || 0}</div>
+              </div>
+              
+              <div className="bg-white rounded-lg p-4 border border-gray-200">
+                <div className="text-xs text-gray-600 mb-1">Paying Referrals</div>
+                <div className="text-2xl font-bold text-gray-900">{affiliateData.paying_referrals || 0}</div>
+              </div>
+              
+              <div className="bg-white rounded-lg p-4 border border-gray-200">
+                <div className="text-xs text-gray-600 mb-1">Pending Commission</div>
+                <div className="text-2xl font-bold text-yellow-600">
+                  ${(affiliateData.pendingAmount || 0).toFixed(2)}
+                </div>
+              </div>
+              
+              <div className="bg-white rounded-lg p-4 border border-gray-200">
+                <div className="text-xs text-gray-600 mb-1">Total Earned</div>
+                <div className="text-2xl font-bold text-[#88D18A]">
+                  ${((affiliateData.total_commission_earned || 0) + (affiliateData.paidAmount || 0)).toFixed(2)}
+                </div>
+              </div>
+            </div>
+
+            {/* Affiliate Link */}
+            <div className="bg-white rounded-lg p-6 border border-gray-200 mb-4">
+              <div className="flex items-center justify-between mb-3">
+                <label className="text-sm font-semibold text-gray-900">Your Affiliate Link</label>
+                <button
+                  onClick={() => {
+                    const link = `${window.location.origin}?ref=${affiliateData.affiliate_code}`;
+                    navigator.clipboard.writeText(link);
+                    alert('Copied to clipboard!');
+                  }}
+                  className="text-sm bg-[#88D18A] hover:bg-[#88D18A]/90 text-white px-4 py-2 rounded-lg font-semibold"
+                >
+                  Copy Link
+                </button>
+              </div>
+              <div className="bg-gray-50 rounded-lg p-3 font-mono text-sm text-gray-700 break-all border border-gray-200">
+                {typeof window !== 'undefined' ? `${window.location.origin}?ref=${affiliateData.affiliate_code}` : `...?ref=${affiliateData.affiliate_code}`}
+              </div>
+            </div>
+
+            {/* Affiliate Code */}
+            <div className="bg-white rounded-lg p-6 border border-gray-200">
+              <div className="flex items-center justify-between mb-3">
+                <label className="text-sm font-semibold text-gray-900">Your Affiliate Code</label>
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(affiliateData.affiliate_code);
+                    alert('Copied to clipboard!');
+                  }}
+                  className="text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg font-semibold"
+                >
+                  Copy Code
+                </button>
+              </div>
+              <div className="bg-gray-50 rounded-lg p-3 font-mono text-xl font-bold text-gray-900 text-center border border-gray-200">
+                {affiliateData.affiliate_code}
+              </div>
+              <p className="text-xs text-gray-500 mt-2 text-center">
+                Users can enter this code during signup
+              </p>
+            </div>
+
+            {/* Commission Breakdown */}
+            {affiliateData.recentCommissions && affiliateData.recentCommissions.length > 0 && (
+              <div className="mt-6">
+                <h4 className="text-sm font-semibold text-gray-900 mb-3">Recent Commissions</h4>
+                <div className="space-y-2">
+                  {affiliateData.recentCommissions.map((commission: any) => (
+                    <div key={commission.id} className="bg-white rounded-lg p-3 border border-gray-200 flex justify-between items-center text-sm">
+                      <div>
+                        <span className={`px-2 py-1 rounded text-xs font-semibold ${
+                          commission.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                          commission.status === 'approved' ? 'bg-blue-100 text-blue-800' :
+                          'bg-green-100 text-green-800'
+                        }`}>
+                          {commission.status}
+                        </span>
+                        <span className="ml-2 text-gray-600">{commission.transaction_type}</span>
+                      </div>
+                      <div className="font-bold text-[#88D18A]">
+                        ${parseFloat(commission.commission_amount).toFixed(2)}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Help Text */}
+            <div className="mt-6 bg-blue-50 rounded-lg p-4 border border-blue-200">
+              <p className="text-sm text-gray-700">
+                <strong>How it works:</strong> Share your link or code with other developers. When they subscribe, 
+                you earn 25% commission paid within 7 days after their first month (if they stay active).
+              </p>
             </div>
           </div>
         )}

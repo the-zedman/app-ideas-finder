@@ -231,6 +231,54 @@ export default function Pricing() {
         </div>
       </section>
 
+      {/* Affiliate Program Callout */}
+      <section className="py-8 bg-white border-y border-gray-200">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6 sm:gap-8 bg-gradient-to-r from-[#88D18A]/10 to-[#6BC070]/10 rounded-2xl p-6 sm:p-8">
+            <div className="flex-1">
+              <div className="flex items-center gap-3 mb-3">
+                <span className="text-3xl sm:text-4xl">💰</span>
+                <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">Earn With Our Affiliate Program</h3>
+              </div>
+              <p className="text-sm sm:text-base lg:text-lg text-gray-700 mb-4">
+                All users get access to our affiliate program. <strong>Earn 25% commission</strong> on every referral - up to $199.75 per annual subscription.
+              </p>
+              <ul className="space-y-2 text-sm sm:text-base text-gray-700">
+                <li className="flex items-center gap-2">
+                  <span className="text-[#88D18A] font-bold">✓</span>
+                  <span>$9.75-$19.75 per monthly subscription</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="text-[#88D18A] font-bold">✓</span>
+                  <span>$99.75-$199.75 per annual subscription</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="text-[#88D18A] font-bold">✓</span>
+                  <span>$7.25 per Search Pack sold</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="text-[#88D18A] font-bold">✓</span>
+                  <span>Paid within 7 days</span>
+                </li>
+              </ul>
+            </div>
+            
+            <div className="flex flex-col items-center gap-4">
+              <div className="text-center">
+                <div className="text-4xl sm:text-5xl font-bold text-[#88D18A] mb-2">25%</div>
+                <div className="text-xs sm:text-sm text-gray-600">Commission Rate</div>
+              </div>
+              <Link 
+                href="/affiliate" 
+                className="px-6 sm:px-8 py-3 bg-[#88D18A] hover:bg-[#88D18A]/90 text-white font-semibold rounded-lg transition-colors whitespace-nowrap text-sm sm:text-base"
+              >
+                Learn More About Affiliates
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Search Packs */}
       <section className="py-8 sm:py-12 bg-gray-50">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
