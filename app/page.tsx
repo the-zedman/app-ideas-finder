@@ -75,23 +75,23 @@ function CountdownTimer() {
   }, []);
   
   return (
-    <div className="mb-8 flex flex-col items-center">
-      <div className="text-center mb-4">
-        <h3 className="text-2xl font-black text-gray-900 mb-1 tracking-tight">
+    <div className="mb-4 sm:mb-8 flex flex-col items-center">
+      <div className="text-center mb-3 sm:mb-4">
+        <h3 className="text-lg sm:text-xl lg:text-2xl font-black text-gray-900 mb-1 tracking-tight">
           🚀 COUNTDOWN TO LAUNCH
         </h3>
-        <p className="text-sm text-gray-600 font-semibold">
+        <p className="text-xs sm:text-sm text-gray-600 font-semibold">
           Get ready for something amazing
         </p>
       </div>
       
-      <div className="flex gap-4 justify-center items-center">
+      <div className="flex gap-2 sm:gap-3 lg:gap-4 justify-center items-center flex-wrap">
         <FlipDigit key={`days-${timeLeft.days}`} value={timeLeft.days} label="DAYS" />
-        <div className="text-5xl font-bold text-gray-800 mb-8">:</div>
+        <div className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-800 mb-6 sm:mb-8">:</div>
         <FlipDigit key={`hours-${timeLeft.hours}`} value={timeLeft.hours} label="HOURS" />
-        <div className="text-5xl font-bold text-gray-800 mb-8">:</div>
+        <div className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-800 mb-6 sm:mb-8">:</div>
         <FlipDigit key={`minutes-${timeLeft.minutes}`} value={timeLeft.minutes} label="MINUTES" />
-        <div className="text-5xl font-bold text-gray-800 mb-8">:</div>
+        <div className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-800 mb-6 sm:mb-8">:</div>
         <FlipDigit key={`seconds-${timeLeft.seconds}`} value={timeLeft.seconds} label="SECONDS" />
       </div>
     </div>
@@ -214,18 +214,18 @@ export default function LandingTest() {
       {/* Header */}
       <header className="border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
+          <div className="flex justify-between items-center h-14 sm:h-16">
             <div className="flex items-center gap-2">
               <img 
                 src="/App Ideas Finder - logo - 200x200.png" 
                 alt="App Ideas Finder" 
-                className="h-8 w-8 rounded-lg"
+                className="h-7 w-7 sm:h-8 sm:w-8 rounded-lg"
               />
-              <span className="text-xl font-bold text-gray-900">APP IDEAS FINDER</span>
+              <span className="text-sm sm:text-lg lg:text-xl font-bold text-gray-900">APP IDEAS FINDER</span>
             </div>
-            <div className="flex items-center gap-6">
-              <button disabled className="text-gray-400 cursor-not-allowed">Sign in</button>
-              <button disabled className="bg-gray-300 text-gray-500 px-6 py-2 rounded-lg font-semibold cursor-not-allowed">
+            <div className="flex items-center gap-3 sm:gap-6">
+              <button disabled className="text-gray-400 cursor-not-allowed text-sm sm:text-base">Sign in</button>
+              <button disabled className="bg-gray-300 text-gray-500 px-3 sm:px-6 py-1.5 sm:py-2 rounded-lg font-semibold cursor-not-allowed text-sm sm:text-base">
                 Sign up
               </button>
             </div>
@@ -234,42 +234,42 @@ export default function LandingTest() {
       </header>
 
       {/* Hero Section */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 sm:pt-20 pb-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-start">
           {/* Left Column - Text */}
           <div>
-            <h1 className="text-gray-900 mb-6" style={{ fontSize: '70px', fontWeight: 900, lineHeight: '1.1', letterSpacing: '-0.02em' }}>
+            <h1 className="text-gray-900 mb-4 sm:mb-6 text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-black leading-tight" style={{ letterSpacing: '-0.02em' }}>
               The super <span className="inline-block">fast</span><br />
               app ideas<br />
               generator!
             </h1>
-            <p className="text-xl text-gray-600 mb-8">
+            <p className="text-base sm:text-lg lg:text-xl text-gray-600 mb-6 sm:mb-8">
               Discover your next app idea by analyzing real user feedback from the App Store. Get insights in seconds, not weeks.
             </p>
             
-            <div className="flex flex-col sm:flex-row gap-4 mb-8">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-6 sm:mb-8">
               <div className="relative">
                 <button 
                   disabled
-                  className="bg-[#88D18A] text-white px-8 py-4 rounded-lg font-semibold text-lg text-center w-full opacity-75 cursor-not-allowed"
+                  className="bg-[#88D18A] text-white px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-semibold text-base sm:text-lg text-center w-full opacity-75 cursor-not-allowed"
                 >
                   Start the generator!
                 </button>
-                <div className="absolute -top-2 -right-2 bg-gradient-to-r from-orange-400 to-orange-500 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg animate-pulse">
+                <div className="absolute -top-2 -right-2 bg-gradient-to-r from-orange-400 to-orange-500 text-white px-2 sm:px-3 py-1 rounded-full text-xs font-bold shadow-lg animate-pulse">
                   LAUNCHING SOON
                 </div>
               </div>
               <a 
                 href="#trending" 
-                className="bg-white hover:bg-gray-50 text-gray-900 px-8 py-4 rounded-lg font-semibold text-lg border-2 border-gray-300 transition-colors text-center"
+                className="bg-white hover:bg-gray-50 text-gray-900 px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-semibold text-base sm:text-lg border-2 border-gray-300 transition-colors text-center"
               >
                 Explore trending apps
               </a>
             </div>
             
             {/* Waitlist Section */}
-            <div className="border-t border-gray-200 pt-8">
-              <p className="text-gray-600 mb-4">
+            <div className="border-t border-gray-200 pt-6 sm:pt-8">
+              <p className="text-sm sm:text-base text-gray-600 mb-4">
                 Be among the first to experience an easier way to find app ideas by joining our early access beta group that will be opening to developers, like you, very soon.
               </p>
               
@@ -316,16 +316,15 @@ export default function LandingTest() {
           </div>
           
           {/* Right Column - Image */}
-          <div className="relative -mr-20">
+          <div className="relative lg:-mr-20 mt-8 lg:mt-0">
             <img 
               src="/ideas-devices-compressed.png" 
               alt="App Ideas Finder on devices" 
-              className="w-full h-auto mb-8"
-              style={{ transform: 'scale(1.2)', transformOrigin: 'center' }}
+              className="w-full h-auto mb-4 sm:mb-8 lg:scale-120 lg:origin-center"
             />
             
             {/* Countdown Timer */}
-            <div className="flex justify-center mt-8">
+            <div className="flex justify-center mt-4 sm:mt-8">
               <CountdownTimer />
             </div>
           </div>
@@ -340,20 +339,20 @@ export default function LandingTest() {
             <div className="inline-block bg-[#88D18A] text-white px-4 py-2 rounded-full text-sm font-bold mb-4">
               THE SCIENCE OF WINNING
             </div>
-            <h2 className="text-5xl font-black text-gray-900 mb-4" style={{ letterSpacing: '-0.02em' }}>
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-gray-900 mb-4 px-4" style={{ letterSpacing: '-0.02em' }}>
               You Don't Need to Be Perfect.<br />You Just Need to Be 1% Better.
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className="text-base sm:text-lg lg:text-xl text-gray-600 max-w-3xl mx-auto px-4">
               The most successful apps aren't built from scratch—they're built by learning from competitors' mistakes and customers' frustrations.
             </p>
           </div>
 
           {/* The Theory */}
-          <div className="bg-white rounded-3xl shadow-2xl p-8 md:p-12 mb-12">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+          <div className="bg-white rounded-2xl sm:rounded-3xl shadow-2xl p-6 sm:p-8 md:p-12 mb-8 sm:mb-12">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 sm:gap-12 items-center">
               <div>
-                <div className="text-6xl mb-6">🎯</div>
-                <h3 className="text-3xl font-bold text-gray-900 mb-4">The Competitive Intelligence Advantage</h3>
+                <div className="text-4xl sm:text-6xl mb-4 sm:mb-6">🎯</div>
+                <h3 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3 sm:mb-4">The Competitive Intelligence Advantage</h3>
                 <p className="text-lg text-gray-700 mb-4">
                   In 2004, Clayton Christensen (Harvard Business School) discovered that <strong>84% of successful products</strong> didn't invent new categories—they simply improved existing ones by listening to what customers complained about.
                 </p>
@@ -393,8 +392,8 @@ export default function LandingTest() {
           </div>
 
           {/* Real-World Examples */}
-          <div className="mb-12">
-            <h3 className="text-3xl font-bold text-gray-900 text-center mb-8">Real Companies. Real Results.</h3>
+          <div className="mb-8 sm:mb-12">
+            <h3 className="text-2xl sm:text-3xl font-bold text-gray-900 text-center mb-6 sm:mb-8 px-4">Real Companies. Real Results.</h3>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {/* Example 1: Slack */}
@@ -454,9 +453,9 @@ export default function LandingTest() {
           </div>
 
           {/* The Formula */}
-          <div className="bg-gradient-to-r from-[#88D18A] to-[#6BC070] rounded-3xl p-8 md:p-12 text-white text-center">
-            <h3 className="text-3xl font-bold mb-6">The Winning Formula</h3>
-            <div className="flex flex-col md:flex-row items-center justify-center gap-4 text-xl md:text-2xl font-bold mb-6">
+          <div className="bg-gradient-to-r from-[#88D18A] to-[#6BC070] rounded-2xl sm:rounded-3xl p-6 sm:p-8 md:p-12 text-white text-center">
+            <h3 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6">The Winning Formula</h3>
+            <div className="flex flex-col md:flex-row items-center justify-center gap-3 sm:gap-4 text-lg sm:text-xl md:text-2xl font-bold mb-4 sm:mb-6">
               <div className="bg-white/20 px-6 py-4 rounded-xl backdrop-blur-sm">
                 Find Competitor Weaknesses
               </div>
@@ -469,7 +468,7 @@ export default function LandingTest() {
                 Your 1% Edge
               </div>
             </div>
-            <p className="text-xl opacity-90 max-w-3xl mx-auto">
+            <p className="text-base sm:text-lg lg:text-xl opacity-90 max-w-3xl mx-auto px-4">
               You don't need a revolutionary idea. You need to be <strong>marginally better</strong> at solving problems your competitors ignore. That's where App Ideas Finder comes in.
             </p>
           </div>
@@ -565,9 +564,9 @@ export default function LandingTest() {
       </section>
 
       {/* How It Works */}
-      <section ref={howItWorksRef} className="py-12 bg-white">
+      <section ref={howItWorksRef} className="py-8 sm:py-12 bg-white">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-5xl font-bold text-gray-900 text-center mb-8" style={{ letterSpacing: '-0.02em' }}>
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 text-center mb-6 sm:mb-8" style={{ letterSpacing: '-0.02em' }}>
             How it works
           </h2>
           
@@ -880,15 +879,23 @@ export default function LandingTest() {
         
         @media (max-width: 640px) {
           .flip-card {
-            width: 70px;
-            height: 84px;
-            font-size: 44px;
+            width: 60px;
+            height: 72px;
+            font-size: 36px;
+          }
+        }
+        
+        @media (min-width: 641px) and (max-width: 1024px) {
+          .flip-card {
+            width: 80px;
+            height: 96px;
+            font-size: 52px;
           }
         }
       `}</style>
 
       {/* Final CTA Section - White backgrounds on all elements */}
-      <section className="py-20 bg-gradient-to-br from-[#88D18A] via-[#6BC070] to-[#88D18A] relative overflow-hidden">
+      <section className="py-12 sm:py-16 lg:py-20 bg-gradient-to-br from-[#88D18A] via-[#6BC070] to-[#88D18A] relative overflow-hidden">
         {/* Background Pattern */}
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-0 left-0 w-96 h-96 bg-white rounded-full blur-3xl"></div>
@@ -902,7 +909,7 @@ export default function LandingTest() {
           </div>
           
           {/* Main Headline */}
-          <h2 className="text-5xl md:text-6xl font-black text-white mb-6" style={{ letterSpacing: '-0.02em' }}>
+          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white mb-4 sm:mb-6" style={{ letterSpacing: '-0.02em' }}>
             Stop Guessing.<br />Start Winning.
           </h2>
           
@@ -923,7 +930,7 @@ export default function LandingTest() {
           </div>
           
           {/* Subheading */}
-          <p className="text-2xl text-white font-semibold mb-8">
+          <p className="text-lg sm:text-xl lg:text-2xl text-white font-semibold mb-6 sm:mb-8 px-4">
             Join developers who are building smarter, not harder.
           </p>
           
