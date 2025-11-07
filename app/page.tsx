@@ -81,7 +81,7 @@ function CountdownTimer() {
           🚀 COUNTDOWN TO LAUNCH
         </h3>
         <p className="text-xs sm:text-sm text-gray-600 font-semibold">
-          Get ready for something amazing
+          Early access beta opens soon—be first in line!
         </p>
       </div>
       
@@ -236,6 +236,15 @@ export default function LandingTest() {
       {/* Hero Section */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 sm:pt-20 pb-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-start">
+          {/* Mobile Image - Shows first on mobile */}
+          <div className="lg:hidden relative mb-6">
+            <img 
+              src="/ideas-devices-compressed.png" 
+              alt="App Ideas Finder on devices" 
+              className="w-full h-auto"
+            />
+          </div>
+          
           {/* Left Column - Text */}
           <div>
             <h1 className="text-gray-900 mb-4 sm:mb-6 text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-black leading-tight" style={{ letterSpacing: '-0.02em' }}>
@@ -261,10 +270,15 @@ export default function LandingTest() {
               </div>
               <a 
                 href="#trending" 
-                className="bg-white hover:bg-gray-50 text-gray-900 px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-semibold text-base sm:text-lg border-2 border-gray-300 transition-colors text-center"
+                className="hidden sm:flex bg-white hover:bg-gray-50 text-gray-900 px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-semibold text-base sm:text-lg border-2 border-gray-300 transition-colors text-center items-center justify-center"
               >
                 Explore trending apps
               </a>
+            </div>
+            
+            {/* Mobile Countdown - Shows after buttons on mobile only */}
+            <div className="lg:hidden mb-6">
+              <CountdownTimer />
             </div>
             
             {/* Waitlist Section */}
@@ -315,15 +329,15 @@ export default function LandingTest() {
             </div>
           </div>
           
-          {/* Right Column - Image */}
-          <div className="relative lg:-mr-20 mt-8 lg:mt-0">
+          {/* Right Column - Image and Countdown (Desktop only) */}
+          <div className="hidden lg:block relative lg:-mr-20">
             <img 
               src="/ideas-devices-compressed.png" 
               alt="App Ideas Finder on devices" 
               className="w-full h-auto mb-4 sm:mb-8 lg:scale-120 lg:origin-center"
             />
             
-            {/* Countdown Timer */}
+            {/* Desktop Countdown Timer */}
             <div className="flex justify-center mt-4 sm:mt-8">
               <CountdownTimer />
             </div>
