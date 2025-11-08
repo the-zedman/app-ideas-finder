@@ -139,9 +139,9 @@ export async function POST(request: Request) {
         items.forEach((item: any) => {
           checkPageBreak(15);
           const priority = item.priority || 'Low';
-          const color = priority === 'High' ? [220, 53, 69] : priority === 'Medium' ? [255, 193, 7] : [40, 167, 69];
+          const color: [number, number, number] = priority === 'High' ? [220, 53, 69] : priority === 'Medium' ? [255, 193, 7] : [40, 167, 69];
           
-          doc.setTextColor(...color);
+          doc.setTextColor(color[0], color[1], color[2]);
           doc.setFont('helvetica', 'bold');
           doc.text(`• ${priority} Priority:`, 25, yPosition);
           
