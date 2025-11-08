@@ -55,13 +55,18 @@ export default function HomeZone() {
         setUsageData(usage);
         
         // Fetch recent analyses
-        const { data: analyses } = await supabase
+        const { data: analyses, error: analysesError } = await supabase
           .from('user_analyses')
-          .select('id, app_name, app_icon_url, created_at')
+          .select('*')
           .eq('user_id', user.id)
           .order('created_at', { ascending: false })
           .limit(5);
         
+        if (analysesError) {
+          console.error('Error fetching analyses:', analysesError);
+        }
+        
+        console.log('📊 Recent analyses fetched:', analyses?.length || 0);
         setRecentAnalyses(analyses || []);
         
         // Fetch affiliate data

@@ -1544,15 +1544,18 @@ Keep each section concise and focused. Do not include revenue projections.`;
               console.error('Error saving analysis:', saveError);
             } else {
               console.log('✅ Analysis saved to database with cost:', finalApiCost);
-              
-              // Increment usage counter
-              try {
-                await fetch('/api/subscription/increment-usage', {
-                  method: 'POST'
-                });
-              } catch (usageError) {
-                console.error('Failed to increment usage:', usageError);
-              }
+            }
+            
+            // Increment usage counter (regardless of save success - user used a search)
+            try {
+              console.log('📊 Incrementing usage counter...');
+              const usageResponse = await fetch('/api/subscription/increment-usage', {
+                method: 'POST'
+              });
+              const usageData = await usageResponse.json();
+              console.log('✅ Usage incremented:', usageData);
+            } catch (usageError) {
+              console.error('❌ Failed to increment usage:', usageError);
             }
           }
         }
