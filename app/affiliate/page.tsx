@@ -365,7 +365,7 @@ export default function AffiliatePage() {
       {/* Footer */}
       <footer className="bg-gray-900 text-gray-300 py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-1 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start mb-8">
             <div>
               <h3 className="font-bold text-white mb-4">Company</h3>
               <ul className="space-y-2 text-sm">
@@ -376,14 +376,15 @@ export default function AffiliatePage() {
                 <li><a href="/contact" className="hover:text-white">Contact</a></li>
               </ul>
             </div>
-          </div>
-          
-          {/* Badges Section */}
-          <div className="border-t border-gray-800 mt-8 pt-8">
-            <div className="flex flex-wrap justify-center gap-4 mb-8">
-              <a href="https://huzzler.so/products/J8grXvhghC/app-ideas-finder?utm_source=huzzler_product_website&utm_medium=badge&utm_campaign=badge" target="_blank" rel="noopener noreferrer" className="hover:opacity-80 transition-opacity">
-                <img alt="Featured on Huzzler" src="https://huzzler.so/assets/images/embeddable-badges/featured.png" className="h-12" />
-              </a>
+            
+            {/* Badges Section */}
+            <div className="flex flex-col items-start md:items-end">
+              <h3 className="font-bold text-white mb-4">Featured On</h3>
+              <div className="flex flex-wrap gap-4">
+                <a href="https://huzzler.so/products/J8grXvhghC/app-ideas-finder?utm_source=huzzler_product_website&utm_medium=badge&utm_campaign=badge" target="_blank" rel="noopener noreferrer" className="hover:opacity-80 transition-opacity">
+                  <img alt="Featured on Huzzler" src="https://huzzler.so/assets/images/embeddable-badges/featured.png" className="h-12" />
+                </a>
+              </div>
             </div>
           </div>
           
