@@ -1060,8 +1060,17 @@ export default function LandingTest() {
             </div>
           </div>
           
-          <div className="border-t border-gray-800 mt-8 pt-8 flex justify-between items-center">
-            <p className="text-sm">© 2025 App Ideas Finder. Elevating humanity, one algorithm at a time.</p>
+          {/* Badges Section */}
+          <div className="border-t border-gray-800 mt-8 pt-8">
+            <div className="flex flex-wrap justify-center gap-4 mb-8">
+              <a href="https://huzzler.so/products/J8grXvhghC/app-ideas-finder?utm_source=huzzler_product_website&utm_medium=badge&utm_campaign=badge" target="_blank" rel="noopener noreferrer" className="hover:opacity-80 transition-opacity">
+                <img alt="Featured on Huzzler" src="https://huzzler.so/assets/images/embeddable-badges/featured.png" className="h-12" />
+              </a>
+            </div>
+          </div>
+          
+          <div className="border-t border-gray-800 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <p className="text-sm text-center sm:text-left">© 2025 App Ideas Finder. Elevating humanity, one algorithm at a time.</p>
             <div className="flex gap-4">
               <a href="https://x.com/appideasfinder" target="_blank" rel="noopener noreferrer" className="hover:text-white">
                 𝕏
