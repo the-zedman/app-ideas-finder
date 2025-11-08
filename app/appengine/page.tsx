@@ -601,7 +601,7 @@ function AppEngineContent() {
       model: model,
       messages: messages,
       temperature: 0.2,
-      max_tokens: 3000
+      max_tokens: 5000
     };
     const headers = {
       'Content-Type': 'application/json',
