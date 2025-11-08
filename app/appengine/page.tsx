@@ -207,11 +207,36 @@ function AppEngineContent() {
     
     // Split by lines and process each line
     const lines = text.split('\n');
-    const processedLines = lines.map((line: string) => {
+    let inList = false;
+    const processedLines: string[] = [];
+    
+    lines.forEach((line: string, index: number) => {
       // Handle headings (### 1. Title -> bold title)
-      if (line.startsWith('### ')) {
-        const headingText = line.replace(/^### \d+\.\s*/, '').trim();
-        return `<div style="font-weight: bold; font-size: 16px; margin: 12px 0 8px 0; color: #1f2937;">${headingText}</div>`;
+      if (line.startsWith('### ') || line.startsWith('## ')) {
+        if (inList) {
+          processedLines.push('</ul>');
+          inList = false;
+        }
+        const headingText = line.replace(/^###?\s*\d*\.?\s*/, '').trim();
+        processedLines.push(`<div style="font-weight: bold; font-size: 18px; margin: 16px 0 8px 0; color: #1f2937;">${headingText}</div>`);
+        return;
+      }
+      
+      // Handle list items (- item)
+      if (line.trim().startsWith('- ')) {
+        if (!inList) {
+          processedLines.push('<ul style="margin: 8px 0; padding-left: 24px; list-style: disc;">');
+          inList = true;
+        }
+        const listText = line.trim().substring(2).replace(/\*\*(.*?)\*\*/g, '<strong style="font-weight: bold;">$1</strong>');
+        processedLines.push(`<li style="margin: 4px 0; line-height: 1.6; color: #374151;">${listText}</li>`);
+        return;
+      }
+      
+      // Close list if we're no longer in list items
+      if (inList && !line.trim().startsWith('- ')) {
+        processedLines.push('</ul>');
+        inList = false;
       }
       
       // Handle bold text (**text** -> bold text)
@@ -219,11 +244,16 @@ function AppEngineContent() {
       
       // Handle regular lines
       if (line.trim()) {
-        return `<div style="margin: 4px 0; line-height: 1.5;">${boldText}</div>`;
+        processedLines.push(`<div style="margin: 4px 0; line-height: 1.6; color: #374151;">${boldText}</div>`);
+      } else {
+        processedLines.push('<div style="margin: 8px 0;"></div>'); // Empty line spacing
       }
-      
-      return '<div style="margin: 8px 0;"></div>'; // Empty line spacing
     });
+    
+    // Close list if still open at end
+    if (inList) {
+      processedLines.push('</ul>');
+    }
     
     return processedLines.join('');
   };
