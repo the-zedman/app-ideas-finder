@@ -228,130 +228,101 @@ function AppEngineContent() {
     return processedLines.join('');
   };
 
-  const createRollupBar = (section: string, number: number, title: string, gradient: string) => {
+  const createRollupBar = (section: string, number: number, title: string, icon: string) => {
     const isExpanded = expandedRollup === section;
     const status = rollupStatuses[section] || 'RESEARCH UNDERWAY';
     const content = rollupContent[section];
-    
-    // Bar background colors based on status (only affect the bar visuals)
-    // Researching: #CCDDB7 (Tea Green)
-    // Done: #88D18A (Pistachio)
-    const barBackground = status === 'DONE' ? '#88D18A' : '#CCDDB7';
+    const isDone = status === 'DONE';
     
     return (
-      <div key={section} className="rollup-bar" id={`rollup-${section}`} data-section={section}
-           style={{
-             marginBottom: '8px',
-             borderRadius: '12px',
-             overflow: 'hidden',
-             boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-             transition: 'all 0.3s ease',
-             background: barBackground
-           }}>
-        <div className="rollup-header" 
-             style={{
-               display: 'flex',
-               justifyContent: 'space-between',
-               alignItems: 'center',
-               padding: '16px 20px',
-               cursor: 'pointer',
-               transition: 'all 0.3s ease',
-               userSelect: 'none',
-               background: barBackground,
-               color: 'white'
-             }}
-             onClick={(e) => {
-               e.preventDefault();
-               setExpandedRollup(isExpanded ? null : section);
-             }}>
-          <div className="rollup-title" 
-               style={{
-                 display: 'flex',
-                 alignItems: 'center',
-                 gap: '12px',
-                 flex: 1
-               }}>
-            <span className="rollup-number" 
-                  style={{
-                    fontWeight: 'bold',
-                    fontSize: '16px',
-                    minWidth: '24px'
-                  }}>{number}.</span>
-            <span className="rollup-name" 
-                  style={{
-                    fontWeight: 600,
-                    fontSize: '16px',
-                    flex: 1
-                  }}>{title}</span>
-            <span className={`rollup-status ${status === 'RESEARCH UNDERWAY' ? 'researching' : ''}`}
-                  style={{
-                    fontSize: '12px',
-                    fontWeight: 600,
-                    padding: '4px 8px',
-                    borderRadius: '12px',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.5px',
-                    background: 'rgba(255,255,255,0.2)',
-                    color: 'white',
-                    animation: status === 'RESEARCH UNDERWAY' ? 'pulse 1.5s ease-in-out infinite' : 'none'
-                  }}>
-              {status}
-            </span>
-          </div>
-          <div className={`rollup-icon ${isExpanded ? 'expanded' : ''}`}
-               style={{
-                 fontSize: '18px',
-                 fontWeight: 'bold',
-                 transition: 'transform 0.3s ease',
-                 minWidth: '24px',
-                 textAlign: 'center',
-                 transform: isExpanded ? 'rotate(45deg)' : 'none'
-               }}>
-            {isExpanded ? '−' : 
-             status === 'DONE' ? '+' : '⟳'}
+      <div 
+        key={section} 
+        className="rollup-bar mb-4 rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 border border-gray-200"
+        id={`rollup-${section}`} 
+        data-section={section}
+      >
+        <div 
+          className={`rollup-header cursor-pointer transition-all duration-300 ${isDone ? 'bg-white' : 'bg-gray-50'}`}
+          onClick={(e) => {
+            e.preventDefault();
+            setExpandedRollup(isExpanded ? null : section);
+          }}
+        >
+          <div className="flex justify-between items-center p-5">
+            <div className="flex items-center gap-4 flex-1">
+              {/* Icon */}
+              <div className={`flex items-center justify-center w-10 h-10 rounded-xl ${
+                isDone ? 'bg-[#88D18A]' : 'bg-gray-300'
+              } text-white text-xl flex-shrink-0`}>
+                {icon}
+              </div>
+              
+              {/* Number and Title */}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-baseline gap-2 mb-1">
+                  <span className="text-sm font-bold text-gray-500">Section {number}</span>
+                  {isDone && (
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-green-100 text-green-800 text-xs font-semibold rounded-full">
+                      <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/>
+                      </svg>
+                      Complete
+                    </span>
+                  )}
+                  {!isDone && (
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-yellow-100 text-yellow-800 text-xs font-semibold rounded-full animate-pulse">
+                      <svg className="w-3 h-3 animate-spin" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Analyzing...
+                    </span>
+                  )}
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900 truncate">{title}</h3>
+              </div>
+            </div>
+            
+            {/* Expand Icon */}
+            <div className={`ml-4 flex-shrink-0 transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`}>
+              <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </div>
           </div>
         </div>
         {isExpanded && (
-          <div className="rollup-content" id={`content-${section}`}
-               style={{
-                 padding: '16px 20px 16px 20px',
-                 background: '#fafbfc',
-                 borderTop: '1px solid #e1e5e9'
-               }}>
+          <div className="rollup-content bg-gray-50 p-6 border-t border-gray-200" id={`content-${section}`}>
             {section === 'keywords' ? (
               <div className="flex flex-wrap gap-2">
                 {content?.map((keyword: string, i: number) => (
-                  <span key={i} className="bg-blue-100 px-2 py-1 rounded text-xs text-gray-700">
-                    {keyword}
+                  <span key={i} className="bg-blue-50 border border-blue-200 px-3 py-1.5 rounded-lg text-sm text-blue-900 font-medium hover:bg-blue-100 transition-colors">
+                    #{keyword}
                   </span>
                 ))}
               </div>
             ) : section === 'backlog' ? (
-              <div>
+              <div className="space-y-3">
                 {content?.map((item: any, i: number) => {
-                  const priorityColor = item.priority === 'High' ? '#dc3545' : 
-                                       item.priority === 'Medium' ? '#ffc107' : '#28a745';
+                  const priorityStyles = item.priority === 'High' 
+                    ? 'border-red-400 bg-red-50' 
+                    : item.priority === 'Medium' 
+                    ? 'border-yellow-400 bg-yellow-50' 
+                    : 'border-green-400 bg-green-50';
+                  
+                  const priorityTextColor = item.priority === 'High'
+                    ? 'text-red-700'
+                    : item.priority === 'Medium'
+                    ? 'text-yellow-700'
+                    : 'text-green-700';
                   
                   return (
-                    <div key={i} style={{
-                      padding: '8px 12px',
-                      borderLeft: `4px solid ${priorityColor}`,
-                      margin: '8px 0',
-                      background: '#f8f9fa',
-                      borderRadius: '4px'
-                    }}>
-                      <div style={{
-                        fontWeight: 600,
-                        color: priorityColor,
-                        fontSize: '12px',
-                        textTransform: 'uppercase'
-                      }}>
+                    <div key={i} className={`${priorityStyles} border-l-4 p-4 rounded-r-lg`}>
+                      <div className={`${priorityTextColor} text-xs font-bold uppercase mb-2 flex items-center gap-2`}>
+                        <span className="inline-block w-2 h-2 rounded-full bg-current"></span>
                         {item.priority} Priority
                       </div>
-                      <div style={{
-                        marginTop: '4px',
-                        color: '#333'
-                      }}>
+                      <div className="text-gray-800 text-sm leading-relaxed">
                         {item.content}
                       </div>
                     </div>
@@ -359,32 +330,25 @@ function AppEngineContent() {
                 })}
               </div>
             ) : section === 'description' ? (
-              <div style={{
-                fontSize: '14px',
-                lineHeight: '1.6',
-                color: '#374151',
-                whiteSpace: 'pre-wrap'
-              }}>
-                {content?.[0]}
+              <div className="prose prose-gray max-w-none">
+                <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
+                  {content?.[0]}
+                </p>
               </div>
             ) : section === 'prp' || section === 'pricing' ? (
-              <div style={{
-                fontSize: '14px',
-                lineHeight: '1.6',
-                color: '#374151'
-              }}
+              <div className="prose prose-gray max-w-none text-gray-700 leading-relaxed"
                 dangerouslySetInnerHTML={{ __html: parseMarkdownContent(content?.[0] || '') }}
               />
             ) : section === 'names' ? (
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-3">
                 {content?.map((name: string, i: number) => (
-                  <span key={i} className="bg-green-100 px-3 py-2 rounded text-sm text-gray-700 font-medium">
+                  <span key={i} className="bg-[#88D18A]/10 border-2 border-[#88D18A] px-4 py-2 rounded-xl text-base text-gray-900 font-semibold hover:bg-[#88D18A]/20 transition-colors">
                     {name}
                   </span>
                 ))}
               </div>
             ) : section === 'similar' ? (
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', justifyContent: 'space-between' }}>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {content?.map((app: any, i: number) => {
                   const name = app.trackName || 'Unknown App';
                   const developer = app.artistName || 'Unknown Developer';
@@ -393,88 +357,60 @@ function AppEngineContent() {
                   const icon = app.artworkUrl100 || '';
                   const storeUrl = app.trackViewUrl || '#';
                   const genre = app.primaryGenreName || 'Unknown Genre';
-                  const description = app.description ? app.description.substring(0, 150) + '...' : 'No description available';
+                  const description = app.description ? app.description.substring(0, 120) + '...' : 'No description available';
                   
                   return (
-                    <div key={i} style={{
-                      width: 'calc(33.333% - 11px)',
-                      background: '#fff',
-                      border: '1px solid #e5e7eb',
-                      borderRadius: '8px',
-                      padding: '12px',
-                      textAlign: 'center'
-                    }}>
-                      {icon && (
-                        <img src={icon} alt={name} style={{
-                          width: '60px',
-                          height: '60px',
-                          borderRadius: '12px',
-                          margin: '0 auto 8px',
-                          display: 'block'
-                        }} />
-                      )}
-                      <h4 style={{ margin: '0 0 4px', fontSize: '14px', fontWeight: '600', color: '#111' }}>
-                        {name}
-                      </h4>
-                      <p style={{ margin: '0 0 4px', fontSize: '12px', color: '#666' }}>
-                        {developer}
-                      </p>
-                      <p style={{ margin: '0 0 4px', fontSize: '12px', color: '#666' }}>
-                        {genre}
-                      </p>
-                      <p style={{ margin: '0 0 8px', fontSize: '12px' }}>
-                        <span style={{ color: '#ff9500' }}>★</span> {rating} ({ratingCount})
-                      </p>
-                      <p style={{ margin: '0 0 8px', fontSize: '11px', lineHeight: '1.4', color: '#555', textAlign: 'left' }}>
+                    <div key={i} className="bg-white border border-gray-200 rounded-xl p-4 hover:shadow-md transition-all duration-200">
+                      <div className="flex flex-col items-center text-center mb-3">
+                        {icon && (
+                          <img 
+                            src={icon} 
+                            alt={name}
+                            className="w-16 h-16 rounded-2xl mb-3 shadow-sm"
+                          />
+                        )}
+                        <h4 className="font-semibold text-gray-900 mb-1 text-sm line-clamp-2">{name}</h4>
+                        <p className="text-xs text-gray-600 mb-1">{developer}</p>
+                        <p className="text-xs text-gray-500 mb-2">{genre}</p>
+                        <div className="flex items-center gap-1 text-xs">
+                          <span className="text-yellow-500">★</span>
+                          <span className="font-semibold text-gray-700">{rating}</span>
+                          <span className="text-gray-400">({ratingCount})</span>
+                        </div>
+                      </div>
+                      <p className="text-xs text-gray-600 leading-relaxed mb-3 line-clamp-3">
                         {description}
                       </p>
-                      <a href={storeUrl} target="_blank" rel="noopener noreferrer" style={{
-                        display: 'inline-block',
-                        background: '#0366d6',
-                        color: '#fff',
-                        textDecoration: 'none',
-                        padding: '6px 12px',
-                        borderRadius: '4px',
-                        fontSize: '12px'
-                      }}>
-                        View in Store
+                      <a 
+                        href={storeUrl} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="block text-center bg-[#88D18A] hover:bg-[#88D18A]/90 text-white text-xs font-semibold py-2 px-4 rounded-lg transition-colors"
+                      >
+                        View in App Store
                       </a>
                     </div>
                   );
                 })}
               </div>
             ) : (
-              <ul id={`${section}List`} style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+              <ul className="space-y-2">
                 {content?.map((item: string, i: number) => {
                   // Parse markdown bold formatting (**text**)
                   const parseMarkdown = (text: string) => {
                     return text.split(/(\*\*.*?\*\*)/).map((part, index) => {
                       if (part.startsWith('**') && part.endsWith('**')) {
                         const boldText = part.slice(2, -2);
-                        return <strong key={index} style={{ fontWeight: 'bold' }}>{boldText}</strong>;
+                        return <strong key={index} className="font-bold text-gray-900">{boldText}</strong>;
                       }
                       return part;
                     });
                   };
 
                   return (
-                    <li key={i} style={{ 
-                      marginBottom: '4px', 
-                      paddingLeft: '16px', 
-                      position: 'relative',
-                      fontSize: '14px',
-                      lineHeight: '1.4',
-                      color: '#374151'
-                    }}>
-                      <span style={{
-                        position: 'absolute',
-                        left: '0',
-                        top: '0',
-                        color: '#6B7280',
-                        fontSize: '16px',
-                        fontWeight: 'bold'
-                      }}>•</span>
-                      {parseMarkdown(item)}
+                    <li key={i} className="flex items-start gap-3 text-sm leading-relaxed text-gray-700">
+                      <span className="text-[#88D18A] font-bold text-lg flex-shrink-0 mt-0.5">•</span>
+                      <span className="flex-1">{parseMarkdown(item)}</span>
                     </li>
                   );
                 })}
@@ -1886,79 +1822,78 @@ Keep each section concise and focused. Do not include revenue projections.`;
                     </div>
                   )}
                   
-                  {createRollupBar('likes', 1, 'What people like about the TARGET app', 'linear-gradient(135deg, #462403, #592D04)')}
-                  {createRollupBar('dislikes', 2, 'What Users Want (and Don’t Want) from the TARGET App', 'linear-gradient(135deg, #592D04, #6C3604)')}
-                  {createRollupBar('recommendations', 3, 'Top recommendations', 'linear-gradient(135deg, #6C3604, #7E4005)')}
-                  {createRollupBar('keywords', 4, 'Suggested keywords for your app', 'linear-gradient(135deg, #7E4005, #914906)')}
-                  {createRollupBar('definitely', 5, 'Core features to include in your app', 'linear-gradient(135deg, #914906, #A77445)')}
-                  {createRollupBar('backlog', 6, 'New and additional features to include in your app', 'linear-gradient(135deg, #A77445, #B65C07)')}
-                  {createRollupBar('description', 7, 'Suggested description for your app', 'linear-gradient(135deg, #B65C07, #C86508)')}
-                  {createRollupBar('names', 8, 'Suggested names for your app', 'linear-gradient(135deg, #C86508, #DB6E09)')}
-                  {createRollupBar('prp', 9, 'PRP (Product Requirements Prompt) for your app', 'linear-gradient(135deg, #DB6E09, #E07109)')}
-                  {createRollupBar('similar', 10, 'Similar Apps', 'linear-gradient(135deg, #E07109, #F0790A)')}
-                  {createRollupBar('pricing', 11, 'Suggested pricing model for your app', 'linear-gradient(135deg, #F0790A, #FF8A1A)')}
+                  {createRollupBar('likes', 1, 'What people like about the TARGET app', '👍')}
+                  {createRollupBar('dislikes', 2, 'What Users Want (and Don't Want) from the TARGET App', '💭')}
+                  {createRollupBar('recommendations', 3, 'Top recommendations', '⭐')}
+                  {createRollupBar('keywords', 4, 'Suggested keywords for your app', '🔍')}
+                  {createRollupBar('definitely', 5, 'Core features to include in your app', '🎯')}
+                  {createRollupBar('backlog', 6, 'New and additional features to include in your app', '✨')}
+                  {createRollupBar('description', 7, 'Suggested description for your app', '📝')}
+                  {createRollupBar('names', 8, 'Suggested names for your app', '💡')}
+                  {createRollupBar('prp', 9, 'PRP (Product Requirements Prompt) for your app', '📋')}
+                  {createRollupBar('similar', 10, 'Similar Apps', '📱')}
+                  {createRollupBar('pricing', 11, 'Suggested pricing model for your app', '💰')}
                   
                   {/* Section 12: Time & Cost Savings */}
                   {analysisMetrics.reviewCount > 0 && (() => {
                     const status = rollupStatuses['savings'] || 'RESEARCH UNDERWAY';
-                    const barBackground = status === 'DONE' ? '#88D18A' : '#CCDDB7';
+                    const isDone = status === 'DONE';
+                    const isExpanded = expandedRollup === 'savings';
                     
                     return (
-                      <div className="rollup-bar" style={{
-                        marginBottom: '8px',
-                        borderRadius: '12px',
-                        overflow: 'hidden',
-                        boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-                        background: barBackground
-                      }}>
-                        <div className="rollup-header" 
-                             style={{
-                               display: 'flex',
-                               justifyContent: 'space-between',
-                               alignItems: 'center',
-                               padding: '16px 20px',
-                               cursor: 'pointer',
-                               transition: 'all 0.3s ease',
-                               userSelect: 'none',
-                               background: barBackground,
-                               color: 'white'
-                             }}
-                             onClick={(e) => {
-                               e.preventDefault();
-                               setExpandedRollup(expandedRollup === 'savings' ? null : 'savings');
-                             }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1 }}>
-                            <span style={{ fontWeight: 'bold', fontSize: '16px', minWidth: '24px' }}>12.</span>
-                            <span style={{ fontWeight: 600, fontSize: '16px', flex: 1 }}>Time & Cost Savings Analysis</span>
-                            <span style={{
-                              fontSize: '12px',
-                              fontWeight: 600,
-                              padding: '4px 8px',
-                              borderRadius: '12px',
-                              textTransform: 'uppercase',
-                              letterSpacing: '0.5px',
-                              background: 'rgba(255,255,255,0.2)',
-                              color: 'white',
-                              animation: status === 'RESEARCH UNDERWAY' ? 'pulse 1.5s ease-in-out infinite' : 'none'
-                            }}>{status}</span>
-                          </div>
-                          <div style={{
-                            fontSize: '18px',
-                            fontWeight: 'bold',
-                            transition: 'transform 0.3s ease',
-                            minWidth: '24px',
-                            textAlign: 'center',
-                            transform: expandedRollup === 'savings' ? 'rotate(45deg)' : 'none'
-                          }}>
-                            {expandedRollup === 'savings' ? '−' : status === 'DONE' ? '+' : '⟳'}
+                      <div className="rollup-bar mb-4 rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 border border-gray-200">
+                        <div 
+                          className={`rollup-header cursor-pointer transition-all duration-300 ${isDone ? 'bg-white' : 'bg-gray-50'}`}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            setExpandedRollup(isExpanded ? null : 'savings');
+                          }}
+                        >
+                          <div className="flex justify-between items-center p-5">
+                            <div className="flex items-center gap-4 flex-1">
+                              {/* Icon */}
+                              <div className={`flex items-center justify-center w-10 h-10 rounded-xl ${
+                                isDone ? 'bg-[#88D18A]' : 'bg-gray-300'
+                              } text-white text-xl flex-shrink-0`}>
+                                ⏱️
+                              </div>
+                              
+                              {/* Number and Title */}
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-baseline gap-2 mb-1">
+                                  <span className="text-sm font-bold text-gray-500">Section 12</span>
+                                  {isDone && (
+                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-green-100 text-green-800 text-xs font-semibold rounded-full">
+                                      <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/>
+                                      </svg>
+                                      Complete
+                                    </span>
+                                  )}
+                                  {!isDone && (
+                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-yellow-100 text-yellow-800 text-xs font-semibold rounded-full animate-pulse">
+                                      <svg className="w-3 h-3 animate-spin" fill="none" viewBox="0 0 24 24">
+                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                      </svg>
+                                      Analyzing...
+                                    </span>
+                                  )}
+                                </div>
+                                <h3 className="text-lg font-semibold text-gray-900 truncate">Time & Cost Savings Analysis</h3>
+                              </div>
+                            </div>
+                            
+                            {/* Expand Icon */}
+                            <div className={`ml-4 flex-shrink-0 transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`}>
+                              <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                              </svg>
+                            </div>
                           </div>
                         </div>
-                        {expandedRollup === 'savings' && (
-                        <div style={{
-                          padding: '20px',
-                          background: '#fafbfc',
-                          borderTop: '1px solid #e1e5e9'
-                        }}>
+                        {isExpanded && (
+                        <div className="rollup-content bg-gray-50 p-6 border-t border-gray-200">
                           {(() => {
                             // Constants for calculations
                             const WORDS_PER_MINUTE_READING = 200;
