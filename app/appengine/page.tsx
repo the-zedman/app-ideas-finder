@@ -1823,7 +1823,7 @@ Keep each section concise and focused. Do not include revenue projections.`;
                   )}
                   
                   {createRollupBar('likes', 1, 'What people like about the TARGET app', '👍')}
-                  {createRollupBar('dislikes', 2, 'What Users Want (and Don't Want) from the TARGET App', '💭')}
+                  {createRollupBar('dislikes', 2, "What Users Want (and Don't Want) from the TARGET App", '💭')}
                   {createRollupBar('recommendations', 3, 'Top recommendations', '⭐')}
                   {createRollupBar('keywords', 4, 'Suggested keywords for your app', '🔍')}
                   {createRollupBar('definitely', 5, 'Core features to include in your app', '🎯')}
