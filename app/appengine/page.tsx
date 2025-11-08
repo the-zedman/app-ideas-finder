@@ -365,7 +365,28 @@ function AppEngineContent() {
                   {content?.[0]}
                 </p>
               </div>
-            ) : section === 'prp' || section === 'pricing' ? (
+            ) : section === 'prp' ? (
+              <div>
+                <div className="prose prose-gray max-w-none text-gray-700 leading-relaxed mb-4"
+                  dangerouslySetInnerHTML={{ __html: parseMarkdownContent(content?.[0] || '') }}
+                />
+                <button
+                  onClick={() => {
+                    const fullText = content?.[0] || '';
+                    const splitIndex = fullText.indexOf('---');
+                    const promptText = splitIndex !== -1 ? fullText.substring(splitIndex + 3).trim() : fullText;
+                    navigator.clipboard.writeText(promptText);
+                    alert('PRP prompt copied to clipboard! 📋');
+                  }}
+                  className="flex items-center gap-2 bg-[#88D18A] hover:bg-[#88D18A]/90 text-white px-6 py-3 rounded-lg font-semibold transition-colors shadow-md hover:shadow-lg"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                  </svg>
+                  Copy Prompt to Clipboard
+                </button>
+              </div>
+            ) : section === 'pricing' ? (
               <div className="prose prose-gray max-w-none text-gray-700 leading-relaxed"
                 dangerouslySetInnerHTML={{ __html: parseMarkdownContent(content?.[0] || '') }}
               />
@@ -1573,11 +1594,70 @@ Keep each section concise and focused. Do not include revenue projections.`;
 
   return (
     <div className="min-h-screen bg-white">
-      <style jsx>{`
+      <style jsx global>{`
         @keyframes pulse {
           0%, 100% { opacity: 1; }
           50% { opacity: 0.6; }
         }
+        
+        @keyframes scale-in {
+          0% {
+            transform: scale(0);
+            opacity: 0;
+          }
+          50% {
+            transform: scale(1.1);
+          }
+          100% {
+            transform: scale(1);
+            opacity: 1;
+          }
+        }
+        
+        @keyframes check-draw {
+          0% {
+            stroke-dasharray: 50;
+            stroke-dashoffset: 50;
+          }
+          100% {
+            stroke-dasharray: 50;
+            stroke-dashoffset: 0;
+          }
+        }
+        
+        @keyframes fade-in-up {
+          0% {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          100% {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        
+        .animate-scale-in {
+          animation: scale-in 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+        }
+        
+        .animate-check-draw {
+          animation: check-draw 0.5s 0.3s ease-out forwards;
+        }
+        
+        .animate-fade-in-up {
+          animation: fade-in-up 0.6s ease-out forwards;
+        }
+        
+        .animation-delay-200 {
+          animation-delay: 0.2s;
+          opacity: 0;
+        }
+        
+        .animation-delay-400 {
+          animation-delay: 0.4s;
+          opacity: 0;
+        }
+        
         .rollup-header:hover {
           transform: translateY(-1px);
           box-shadow: 0 4px 12px rgba(0,0,0,0.15);
@@ -2076,6 +2156,86 @@ Keep each section concise and focused. Do not include revenue projections.`;
                       </div>
                     );
                   })()}
+                </div>
+              )}
+
+              {/* Completion Animation */}
+              {showRollups && rollupStatuses['savings'] === 'DONE' && (
+                <div className="mt-12 mb-8">
+                  {/* Animated Checkmark */}
+                  <div className="flex justify-center mb-6">
+                    <div className="relative">
+                      <div className="w-24 h-24 rounded-full bg-gradient-to-br from-[#88D18A] to-[#6BC070] flex items-center justify-center shadow-2xl animate-scale-in">
+                        <svg className="w-16 h-16 text-white animate-check-draw" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                        </svg>
+                      </div>
+                      <div className="absolute inset-0 rounded-full bg-[#88D18A] animate-ping opacity-20"></div>
+                    </div>
+                  </div>
+                  
+                  {/* Completion Message */}
+                  <div className="text-center mb-8">
+                    <h2 className="text-3xl sm:text-4xl font-black text-gray-900 mb-3 animate-fade-in-up">
+                      🎉 Analysis Complete!
+                    </h2>
+                    <p className="text-lg sm:text-xl text-gray-600 mb-6 animate-fade-in-up animation-delay-200">
+                      Your comprehensive 12-section app analysis is ready
+                    </p>
+                    
+                    {/* Download PDF Button */}
+                    <button
+                      onClick={async () => {
+                        try {
+                          // Get affiliate data
+                          const { data: affiliateInfo } = await supabase
+                            .from('user_affiliates')
+                            .select('affiliate_code')
+                            .eq('user_id', user?.id)
+                            .single();
+                          
+                          const response = await fetch('/api/generate-pdf', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                              appMeta,
+                              rollupContent,
+                              analysisMetrics,
+                              costTracking,
+                              affiliateCode: affiliateInfo?.affiliate_code || 'SIGNUP',
+                              userEmail: user?.email
+                            })
+                          });
+                          
+                          if (response.ok) {
+                            const blob = await response.blob();
+                            const url = window.URL.createObjectURL(blob);
+                            const a = document.createElement('a');
+                            a.href = url;
+                            a.download = `${appMeta?.trackName || 'app'}-analysis-${new Date().toISOString().split('T')[0]}.pdf`;
+                            document.body.appendChild(a);
+                            a.click();
+                            window.URL.revokeObjectURL(url);
+                            document.body.removeChild(a);
+                          } else {
+                            alert('Failed to generate PDF. Please try again.');
+                          }
+                        } catch (error) {
+                          console.error('PDF generation error:', error);
+                          alert('Error generating PDF. Please try again.');
+                        }
+                      }}
+                      className="inline-flex items-center gap-3 bg-gradient-to-r from-[#88D18A] to-[#6BC070] hover:shadow-2xl text-white px-8 py-4 rounded-xl font-bold text-lg transition-all transform hover:scale-105 shadow-xl animate-fade-in-up animation-delay-400"
+                    >
+                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                      Download Full Analysis as PDF
+                    </button>
+                  </div>
+                  
+                  {/* Divider */}
+                  <div className="border-t border-gray-300 my-8"></div>
                 </div>
               )}
 
