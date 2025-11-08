@@ -29,7 +29,7 @@ export async function POST() {
     
     // Get current usage record
     const now = new Date();
-    const { data: usage } = await supabaseAdmin
+    let { data: usage } = await supabaseAdmin
       .from('monthly_usage')
       .select('*')
       .eq('user_id', user.id)
@@ -37,8 +37,45 @@ export async function POST() {
       .gte('period_end', now.toISOString())
       .maybeSingle();
     
+    // If no usage record exists, create one
     if (!usage) {
-      return NextResponse.json({ error: 'No usage record found' }, { status: 404 });
+      console.log('📝 No usage record found, creating one...');
+      
+      // Get user's subscription to determine search limit
+      const { data: subscription } = await supabaseAdmin
+        .from('user_subscriptions')
+        .select('*, subscription_plans(*)')
+        .eq('user_id', user.id)
+        .single();
+      
+      const searchesLimit = subscription?.subscription_plans?.monthly_searches || 0;
+      
+      // Create usage record for current month
+      const periodStart = new Date(now.getFullYear(), now.getMonth(), 1);
+      const periodEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
+      
+      const { data: newUsage, error: createError } = await supabaseAdmin
+        .from('monthly_usage')
+        .insert({
+          user_id: user.id,
+          period_start: periodStart.toISOString(),
+          period_end: periodEnd.toISOString(),
+          searches_used: 0,
+          searches_limit: searchesLimit
+        })
+        .select()
+        .single();
+      
+      if (createError || !newUsage) {
+        console.error('❌ Failed to create usage record:', createError);
+        return NextResponse.json({ 
+          error: 'Failed to create usage record', 
+          message: createError?.message 
+        }, { status: 500 });
+      }
+      
+      console.log('✅ Created new usage record');
+      usage = newUsage;
     }
     
     // Check if user has unlimited access
