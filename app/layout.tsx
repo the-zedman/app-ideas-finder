@@ -106,6 +106,7 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="apple-mobile-web-app-title" content="App Ideas Finder" />
         <meta name="mobile-web-app-capable" content="yes" />
+        <script src="https://analytics.ahrefs.com/analytics.js" data-key="DoJjtOGOv5wvDAPtNehvqw" async></script>
       </head>
       <body className={`${inter.variable} antialiased`}>
         <GoogleAnalytics />
