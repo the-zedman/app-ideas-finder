@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase-client';
 import CryptoJS from 'crypto-js';
+import Footer from '@/components/Footer';
 
 // Types
 interface AppMeta {
@@ -2322,6 +2323,8 @@ Keep each section concise and focused. Do not include revenue projections.`;
           </div>
         </div>
       </main>
+
+      <Footer />
     </div>
   );
 }

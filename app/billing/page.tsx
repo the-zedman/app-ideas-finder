@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase-client';
+import Footer from '@/components/Footer';
 
 export default function BillingPage() {
   const [user, setUser] = useState<any>(null);
@@ -495,6 +496,8 @@ export default function BillingPage() {
           </div>
         </div>
       )}
+
+      <Footer />
     </div>
   );
 }

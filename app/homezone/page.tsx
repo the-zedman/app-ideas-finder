@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { createClient } from '@/lib/supabase-client';
 import type { User } from '@supabase/supabase-js';
 import CryptoJS from 'crypto-js';
+import Footer from '@/components/Footer';
 
 export default function HomeZone() {
   const router = useRouter();
@@ -613,27 +614,6 @@ export default function HomeZone() {
           </div>
         )}
 
-        {/* Suggested Next Steps (Returning Users) */}
-        {!isFirstTime && (
-          <div className="bg-white rounded-2xl p-8 mb-8 border border-gray-200 shadow-sm">
-            <h3 className="text-xl font-bold text-gray-900 mb-4">🔥 Suggested Next Steps</h3>
-            <div className="space-y-3">
-              <div className="flex items-center gap-3 text-gray-700">
-                <span className="text-2xl">•</span>
-                <span>Analyze a competitor in your space</span>
-              </div>
-              <div className="flex items-center gap-3 text-gray-700">
-                <span className="text-2xl">•</span>
-                <span>Compare multiple apps to find patterns</span>
-              </div>
-              <div className="flex items-center gap-3 text-gray-700">
-                <span className="text-2xl">•</span>
-                <span>Explore trending apps for inspiration</span>
-              </div>
-            </div>
-          </div>
-        )}
-
         {/* Affiliate Dashboard */}
         {affiliateData && (
           <div className="bg-gradient-to-br from-[#88D18A]/10 to-[#6BC070]/10 rounded-2xl p-6 sm:p-8 mb-8 border-2 border-[#88D18A]/20">
@@ -773,6 +753,8 @@ export default function HomeZone() {
           </div>
         )}
       </main>
+
+      <Footer />
     </div>
   );
 }

@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase-client';
 import type { User } from '@supabase/supabase-js';
+import Footer from '@/components/Footer';
 
 export default function AnalysesHistory() {
   const router = useRouter();
@@ -325,6 +326,8 @@ export default function AnalysesHistory() {
           )}
         </div>
       </main>
+
+      <Footer />
     </div>
   );
 }
