@@ -276,6 +276,7 @@ function AppEngineContent() {
           className={`rollup-header cursor-pointer transition-all duration-300 ${isDone ? 'bg-white' : 'bg-gray-50'}`}
           onClick={(e) => {
             e.preventDefault();
+            e.stopPropagation();
             setExpandedRollup(isExpanded ? null : section);
           }}
         >
@@ -2045,7 +2046,7 @@ Keep each section concise and focused. Do not include revenue projections.`;
                   {createRollupBar('keywords', 3, 'Suggested keywords for your app', '🔍')}
                   {createRollupBar('definitely', 4, 'Core features to include in your app', '🎯')}
                   {createRollupBar('backlog', 5, 'New and additional features to include in your app', '✨')}
-                  {createRollupBar('recommendations', 6, '💎 Strategic Recommendations & Insights', '⭐')}
+                  {createRollupBar('recommendations', 6, 'Strategic Recommendations & Insights', '⭐')}
                   {createRollupBar('description', 7, 'Suggested description for your app', '📝')}
                   {createRollupBar('names', 8, 'Suggested names for your app', '💡')}
                   {createRollupBar('prp', 9, 'PRP (Product Requirements Prompt) for your app', '📋')}
@@ -2098,7 +2099,7 @@ Keep each section concise and focused. Do not include revenue projections.`;
                                     </span>
                                   )}
                                 </div>
-                                <h3 className="text-lg font-semibold text-gray-900 truncate">💎 Value Delivered: Time & Money Saved</h3>
+                                <h3 className="text-lg font-semibold text-gray-900 truncate">Value Delivered: Time & Money Saved</h3>
                               </div>
                             </div>
                             
