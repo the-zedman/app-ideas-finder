@@ -212,14 +212,27 @@ function AppEngineContent() {
     const processedLines: string[] = [];
     
     lines.forEach((line: string, index: number) => {
-      // Handle headings (### 1. Title -> bold title)
-      if (line.startsWith('### ') || line.startsWith('## ')) {
+      // Handle headings (####, ###, ##, or # heading)
+      const headingMatch = line.match(/^(#{1,4})\s+(.+)$/);
+      if (headingMatch) {
         if (inList) {
           processedLines.push('</ul>');
           inList = false;
         }
-        const headingText = line.replace(/^###?\s*\d*\.?\s*/, '').trim();
-        processedLines.push(`<div style="font-weight: bold; font-size: 18px; margin: 16px 0 8px 0; color: #1f2937;">${headingText}</div>`);
+        
+        const hashCount = headingMatch[1].length;
+        const headingText = headingMatch[2].replace(/^\d*\.?\s*/, '').trim();
+        
+        // Different styles for different heading levels
+        const headingStyles: {[key: number]: string} = {
+          1: 'font-weight: bold; font-size: 24px; margin: 24px 0 12px 0; color: #111827; border-bottom: 2px solid #88D18A; padding-bottom: 8px;',
+          2: 'font-weight: bold; font-size: 20px; margin: 20px 0 10px 0; color: #1f2937;',
+          3: 'font-weight: bold; font-size: 18px; margin: 16px 0 8px 0; color: #374151;',
+          4: 'font-weight: 600; font-size: 16px; margin: 12px 0 6px 0; color: #4b5563;'
+        };
+        
+        const style = headingStyles[hashCount] || headingStyles[3];
+        processedLines.push(`<div style="${style}">${headingText}</div>`);
         return;
       }
       
@@ -428,6 +441,10 @@ function AppEngineContent() {
                 })}
               </div>
             ) : section === 'pricing' ? (
+              <div className="prose prose-gray max-w-none text-gray-700 leading-relaxed"
+                dangerouslySetInnerHTML={{ __html: parseMarkdownContent(content?.[0] || '') }}
+              />
+            ) : section === 'viability' ? (
               <div className="prose prose-gray max-w-none text-gray-700 leading-relaxed"
                 dangerouslySetInnerHTML={{ __html: parseMarkdownContent(content?.[0] || '') }}
               />
