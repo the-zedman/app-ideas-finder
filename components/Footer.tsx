@@ -21,6 +21,9 @@ export default function Footer() {
               <a href="https://huzzler.so/products/J8grXvhghC/app-ideas-finder?utm_source=huzzler_product_website&utm_medium=badge&utm_campaign=badge" target="_blank" rel="noopener noreferrer" className="hover:opacity-80 transition-opacity">
                 <img alt="Featured on Huzzler" src="https://huzzler.so/assets/images/embeddable-badges/featured.png" className="h-12" />
               </a>
+              <a href="https://indiewait.com/waitlist/app-ideas-finder" target="_blank" rel="noopener noreferrer" className="hover:opacity-80 transition-opacity">
+                <img alt="Featured on IndieWait" src="/featured-on-indiewait.png" className="h-12" />
+              </a>
             </div>
           </div>
         </div>
