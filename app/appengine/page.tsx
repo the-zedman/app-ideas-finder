@@ -1994,7 +1994,7 @@ Keep each section concise and focused. Do not include revenue projections.`;
                                     </span>
                                   )}
                                 </div>
-                                <h3 className="text-lg font-semibold text-gray-900 truncate">Time & Cost Savings Analysis</h3>
+                                <h3 className="text-lg font-semibold text-gray-900 truncate">💎 Value Delivered: Time & Money Saved</h3>
                               </div>
                             </div>
                             
@@ -2047,6 +2047,25 @@ Keep each section concise and focused. Do not include revenue projections.`;
                             
                             return (
                               <div style={{ fontSize: '14px', lineHeight: '1.6', color: '#374151' }}>
+                                {/* Intro explaining what this section shows */}
+                                <div style={{
+                                  background: 'linear-gradient(135deg, #e0f2f7, #b2ebf2)',
+                                  padding: '16px',
+                                  borderRadius: '8px',
+                                  marginBottom: '20px',
+                                  border: '2px solid #4dd0e1'
+                                }}>
+                                  <div style={{ fontSize: '16px', fontWeight: 'bold', color: '#006064', marginBottom: '8px' }}>
+                                    🎯 What App Ideas Finder Just Did For You
+                                  </div>
+                                  <div style={{ fontSize: '14px', color: '#00838f', lineHeight: '1.6' }}>
+                                    This analysis automatically processed <strong>{analysisMetrics.reviewCount.toLocaleString()} real user reviews</strong>, 
+                                    extracted actionable insights, and generated comprehensive reports across 12 sections—all in minutes. 
+                                    Doing this manually would have taken <strong>{totalManualHours.toFixed(1)} hours</strong> and cost 
+                                    <strong> ${manualAnalysisCost.toFixed(2)}</strong>. Below is what we saved you:
+                                  </div>
+                                </div>
+                                
                                 <div style={{ 
                                   display: 'grid', 
                                   gridTemplateColumns: 'repeat(2, 1fr)', 
@@ -2115,19 +2134,28 @@ Keep each section concise and focused. Do not include revenue projections.`;
                                 
                                 <div style={{
                                   background: 'linear-gradient(135deg, #88D18A, #6BC070)',
-                                  padding: '20px',
-                                  borderRadius: '8px',
+                                  padding: '24px',
+                                  borderRadius: '12px',
                                   color: 'white',
-                                  marginBottom: '16px'
+                                  marginBottom: '16px',
+                                  boxShadow: '0 4px 12px rgba(136, 209, 138, 0.3)'
                                 }}>
-                                  <div style={{ fontSize: '14px', marginBottom: '8px', opacity: 0.9 }}>
-                                    💰 Total Cost Savings
+                                  <div style={{ fontSize: '16px', marginBottom: '12px', opacity: 0.95, fontWeight: '600' }}>
+                                    💰 Total Money Saved By Using App Ideas Finder
                                   </div>
-                                  <div style={{ fontSize: '36px', fontWeight: 'bold' }}>
+                                  <div style={{ fontSize: '48px', fontWeight: 'bold', marginBottom: '8px' }}>
                                     ${totalSavings.toFixed(2)}
                                   </div>
-                                  <div style={{ fontSize: '12px', opacity: 0.8, marginTop: '8px' }}>
-                                    Manual analysis: ${manualAnalysisCost.toFixed(2)} @${ANALYSIS_HOURLY_RATE}/hr
+                                  <div style={{ fontSize: '14px', opacity: 0.9, marginTop: '12px', background: 'rgba(255,255,255,0.2)', padding: '8px', borderRadius: '6px' }}>
+                                    <div style={{ marginBottom: '4px' }}>
+                                      <strong>What it would cost you:</strong> ${manualAnalysisCost.toFixed(2)}
+                                    </div>
+                                    <div style={{ marginBottom: '4px' }}>
+                                      <strong>What you paid:</strong> ${aiCost.toFixed(2)}
+                                    </div>
+                                    <div style={{ fontSize: '12px', opacity: 0.8, marginTop: '8px' }}>
+                                      Based on ${ANALYSIS_HOURLY_RATE}/hr professional analyst rate × {totalManualHours.toFixed(1)} hours of manual work
+                                    </div>
                                   </div>
                                 </div>
                                 
