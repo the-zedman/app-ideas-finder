@@ -2144,18 +2144,10 @@ Keep each section concise and focused. Do not include revenue projections.`;
                                     💰 Total Money Saved By Using App Ideas Finder
                                   </div>
                                   <div style={{ fontSize: '48px', fontWeight: 'bold', marginBottom: '8px' }}>
-                                    ${totalSavings.toFixed(2)}
+                                    ${manualAnalysisCost.toFixed(2)}
                                   </div>
                                   <div style={{ fontSize: '14px', opacity: 0.9, marginTop: '12px', background: 'rgba(255,255,255,0.2)', padding: '8px', borderRadius: '6px' }}>
-                                    <div style={{ marginBottom: '4px' }}>
-                                      <strong>What it would cost you:</strong> ${manualAnalysisCost.toFixed(2)}
-                                    </div>
-                                    <div style={{ marginBottom: '4px' }}>
-                                      <strong>What you paid:</strong> ${aiCost.toFixed(2)}
-                                    </div>
-                                    <div style={{ fontSize: '12px', opacity: 0.8, marginTop: '8px' }}>
-                                      Based on ${ANALYSIS_HOURLY_RATE}/hr professional analyst rate × {totalManualHours.toFixed(1)} hours of manual work
-                                    </div>
+                                    Based on ${ANALYSIS_HOURLY_RATE}/hr professional analyst rate × {totalManualHours.toFixed(1)} hours of manual work
                                   </div>
                                 </div>
                                 
