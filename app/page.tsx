@@ -550,7 +550,7 @@ export default function LandingTest() {
                 
                 {/* Numbered circles */}
                 <div className="relative flex justify-between w-full">
-                  {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((num, idx) => (
+                  {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13].map((num, idx) => (
                     <div 
                       key={`${animationKey}-${num}`}
                       className="flex items-center justify-center w-12 h-12 rounded-full bg-[#88D18A] text-white font-bold text-lg shadow-lg animate-pop-in"
@@ -572,7 +572,7 @@ export default function LandingTest() {
           <div className={`text-center max-w-5xl mx-auto mb-8 transition-all duration-1000 ${showResult ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
             <div className="bg-gradient-to-r from-[#88D18A] to-[#6BC070] text-white px-6 py-4 rounded-2xl shadow-xl">
               <p className="text-xl font-bold">
-                App Ideas Finder has now generates your 12 step detailed app analysis and development action plan
+                App Ideas Finder has now generated your comprehensive 13-section business opportunity analysis
               </p>
             </div>
           </div>
@@ -610,10 +610,13 @@ export default function LandingTest() {
               10. Similar apps analysis
             </div>
             <div className="bg-[#CCDDB7] px-4 py-3 rounded-lg text-sm font-semibold text-gray-800">
-              11. Pricing model suggestions
+              11. Pricing & revenue projections
             </div>
             <div className="bg-[#CCDDB7] px-4 py-3 rounded-lg text-sm font-semibold text-gray-800">
-              12. Time & money saved
+              12. Market viability & business case
+            </div>
+            <div className="bg-[#CCDDB7] px-4 py-3 rounded-lg text-sm font-semibold text-gray-800">
+              13. Time & money saved
             </div>
           </div>
         </div>

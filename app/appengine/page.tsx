@@ -884,43 +884,51 @@ Generate 15-20 app names, one per line, without numbers or bullet points.`;
   };
 
   // Generate AI-powered strategic recommendations based on all analysis
-  const buildRecommendationsPrompt = (appMeta: AppMeta, likes: string[], dislikes: string[], keywords: string[], definitelyInclude: string[], backlog: any[]) => {
+  const buildRecommendationsPrompt = (appMeta: AppMeta, likes: string[], dislikes: string[], keywords: string[], definitelyInclude: string[], backlog: any[], ratingsCount: number) => {
     const appName = appMeta?.trackName || appMeta?.collectionName || 'this app';
     const likesText = likes.join('\n• ');
     const dislikesText = dislikes.join('\n• ');
     const keywordsText = keywords.join(', ');
     const definitelyIncludeText = definitelyInclude.join('\n• ');
     const backlogText = backlog.map((item: any) => item.content).join('\n• ');
+    const estimatedDownloads = `${(ratingsCount * 100).toLocaleString()} - ${(ratingsCount * 200).toLocaleString()}`;
     
     const prompt = `You are a product strategy consultant analyzing user feedback for ${appName} to guide the development of a competing or improved app.
 
-CONTEXT:
+MARKET VALIDATION:
 App Being Analyzed: ${appName}
-User Loves: 
+• Total Ratings: ${ratingsCount.toLocaleString()} (lifetime engagement)
+• Estimated Downloads: ${estimatedDownloads} (based on industry-standard ratios)
+• Market Status: PROVEN - This is a validated market with real users and sustained demand
+
+USER INTELLIGENCE:
+What Users Love: 
 • ${likesText}
 
-User Hates/Wants:
+What Users Hate/Want:
 • ${dislikesText}
 
 Market Keywords: ${keywordsText}
 
-Planned Core Features:
+YOUR PLANNED APP:
+Core Features:
 • ${definitelyIncludeText}
 
-Planned Additional Features:
+Additional Features:
 • ${backlogText}
 
 TASK:
-Provide 8-10 strategic, actionable recommendations for building a successful app in this space. Cover these areas:
+Provide 8-10 strategic, actionable recommendations for building a successful app in this PROVEN market. Include market-sizing insights where relevant. Cover these areas:
 
-1. **Development Priorities** - What to build first and why
-2. **Market Positioning** - How to differentiate and position the app
-3. **Innovation Opportunities** - Novel features or approaches users haven't articulated but would love
-4. **Monetization Strategy** - Pricing model, free vs paid features based on user sentiment
-5. **Technical Decisions** - Architecture choices based on user complaints (performance, offline, etc)
-6. **UX/UI Priorities** - Critical design decisions based on feedback
-7. **Launch Strategy** - Target audience, MVP scope, beta testing approach
-8. **Competitive Advantages** - Specific ways to beat competitors based on gaps identified
+1. **Market Opportunity** - Quantify the opportunity (% of dissatisfied users, potential user acquisition)
+2. **Development Priorities** - What to build first and why (with impact estimates)
+3. **Market Positioning** - How to differentiate and capture market share
+4. **Innovation Opportunities** - Novel features or approaches users haven't articulated but would love
+5. **Monetization Strategy** - Pricing model with user acquisition and conversion estimates
+6. **Technical Decisions** - Architecture choices based on user complaints (performance, offline, etc)
+7. **UX/UI Priorities** - Critical design decisions based on feedback
+8. **Launch Strategy** - Target user segment, MVP scope, realistic first-year goals
+9. **Competitive Advantages** - Specific ways to beat competitors and capture their dissatisfied users
 
 IMPORTANT FORMATTING:
 Each recommendation MUST follow this exact format:
@@ -990,40 +998,163 @@ Format as a comprehensive prompt that an AI developer can use to start building 
     return [{role:'user', content: prompt}];
   };
 
+  // Generate comprehensive market viability and business case analysis
+  const buildMarketViabilityPrompt = (appMeta: AppMeta, likes: string[], dislikes: string[], keywords: string[], definitelyInclude: string[], backlog: any[], similarApps: any[], ratingsCount: number, reviewCount: number) => {
+    const appName = appMeta?.trackName || 'target app';
+    const likesText = likes.join('\n• ');
+    const dislikesText = dislikes.join('\n• ');
+    const definitelyIncludeText = definitelyInclude.join(', ');
+    const backlogText = backlog.map((item: any) => item.content).join(', ');
+    
+    // Format competitor data
+    const competitorAnalysis = similarApps.map((app: any) => 
+      `• ${app.trackName}: ${app.formattedPrice || 'Free'}, ${app.averageUserRating || 'N/A'}★ (${app.userRatingCount?.toLocaleString() || 'N/A'} ratings)`
+    ).join('\n');
+    
+    const prompt = `You are a market analyst providing a comprehensive business viability assessment for a new app concept based on analyzing ${appName}.
+
+MARKET DATA:
+Target App: ${appName}
+• Total Ratings: ${ratingsCount.toLocaleString()} (lifetime engagement)
+• Recent Reviews Analyzed: ${reviewCount}
+• Estimated Downloads: Based on industry-standard 100:1 ratio, approximately ${(ratingsCount * 100).toLocaleString()} - ${(ratingsCount * 200).toLocaleString()} lifetime downloads
+
+USER SENTIMENT ANALYSIS:
+What Users Love:
+• ${likesText}
+
+What Users Want/Hate:
+• ${dislikesText}
+
+COMPETITIVE LANDSCAPE:
+${competitorAnalysis}
+
+PLANNED FEATURES FOR NEW APP:
+Core: ${definitelyIncludeText}
+Additional: ${backlogText}
+
+REQUIRED OUTPUT - Provide comprehensive market viability analysis covering:
+
+**1. Total Addressable Market (TAM)**
+- Market size estimation based on download data and category
+- Growth trends and trajectory
+- Market maturity assessment
+
+**2. Serviceable Available Market (SAM)**  
+- Realistic market segment you can reach
+- User segments most frustrated with current solutions (from review analysis)
+- Percentage of TAM that matches your target profile
+
+**3. Serviceable Obtainable Market (SOM)**
+- Realistic first-year capture rate
+- Monthly download projections (conservative/realistic/optimistic)
+- Conversion rate estimates based on solving key pain points
+
+**4. Competitive Analysis**
+- Competitor strengths and weaknesses (from ratings/pricing)
+- Market gaps and opportunities
+- Your competitive advantages based on feature analysis
+
+**5. Revenue Potential**
+- User acquisition potential per month
+- Expected conversion rates (freemium to paid, if applicable)
+- MRR and ARR projections for Year 1
+- Break-even analysis
+
+**6. Risk Assessment**
+- Market risks (saturation, competitor response)
+- Technical risks (from user complaints about complexity)
+- Business risks (pricing sensitivity, churn indicators)
+- Mitigation strategies
+
+**7. Go-to-Market Strategy**
+- Target user segment to launch with
+- Key messaging based on competitor weaknesses
+- Launch timeline recommendations
+- Success metrics to track
+
+**8. Validation Signals**
+- Why this market is proven and viable
+- Evidence of sustained demand
+- User willingness to pay indicators from reviews
+- Signs this is a real opportunity vs a saturated market
+
+Be specific with numbers, percentages, and data-driven projections. Reference the actual review feedback where relevant.`;
+
+    return [{role: 'user', content: prompt}];
+  };
+
   // Generate pricing model based on similar apps and app features
-  const buildPricingModelPrompt = (appMeta: AppMeta, definitelyInclude: string[], backlog: any[], keywords: string[], description: string, appNames: string[], similarApps: any[]) => {
+  const buildPricingModelPrompt = (appMeta: AppMeta, definitelyInclude: string[], backlog: any[], keywords: string[], description: string, appNames: string[], similarApps: any[], likes: string[], dislikes: string[], ratingsCount: number) => {
     const definitelyIncludeText = definitelyInclude.join(', ');
     const backlogText = backlog.map((item: any) => item.content).join(', ');
     const keywordsText = keywords.join(', ');
     const appNamesText = appNames.join(', ');
+    const likesText = likes.join(', ');
+    const dislikesText = dislikes.join(', ');
     
     // Format similar apps data
     const similarAppsText = similarApps.map((app: any) => 
-      `${app.trackName} - ${app.formattedPrice || 'Free'} - ${app.averageUserRating || 'N/A'}★ - ${app.description ? app.description.substring(0, 200) + '...' : 'No description'}`
+      `${app.trackName} - ${app.formattedPrice || 'Free'} - ${app.averageUserRating || 'N/A'}★ (${app.userRatingCount?.toLocaleString() || 'N/A'} ratings) - ${app.description ? app.description.substring(0, 200) + '...' : 'No description'}`
     ).join('\n');
     
-    const prompt = `Based on the analysis of similar apps and the new app features, suggest an appropriate pricing model and specific prices in USD.
+    const prompt = `You are a pricing strategist creating a comprehensive monetization strategy and business case for a new app.
 
-New App Description: ${description}
-
-Features to definitely include: ${definitelyIncludeText}
-
-Backlog items to address: ${backlogText}
-
+NEW APP CONCEPT:
+Description: ${description}
+Core Features: ${definitelyIncludeText}
+Additional Features: ${backlogText}
 Keywords: ${keywordsText}
+Suggested Names: ${appNamesText}
 
-Similar Apps and their pricing:
+MARKET INTELLIGENCE:
+Target App Ratings: ${ratingsCount.toLocaleString()} (indicates ${(ratingsCount * 100).toLocaleString()} - ${(ratingsCount * 200).toLocaleString()} estimated downloads)
+
+USER SENTIMENT FROM ${ratingsCount.toLocaleString()} RATINGS:
+Loves: ${likesText}
+Hates/Wants: ${dislikesText}
+
+COMPETITIVE PRICING LANDSCAPE:
 ${similarAppsText}
 
-Create a concise pricing strategy that considers the value proposition and compares against similar apps. Provide:
+REQUIRED OUTPUT - Provide comprehensive pricing and revenue analysis:
 
-1. **Executive Summary** - Brief overview of the pricing recommendation
-2. **Recommended Pricing Model** - (Free, Paid, Freemium, Subscription, etc.)
-3. **Specific Price Points** - Exact USD prices for different tiers
-4. **Rationale** - Why this pricing strategy makes sense
-5. **Comparison** - How it compares to similar apps
+**1. Competitive Pricing Intelligence**
+- Analysis of competitor pricing strategies
+- Price sensitivity indicators from user reviews (mentions of "expensive", "worth it", etc.)
+- Market positioning opportunities (premium vs budget)
 
-Keep each section concise and focused. Do not include revenue projections.`;
+**2. Recommended Pricing Strategy**
+- Primary model (Free, Freemium, Paid, Subscription, One-time, Hybrid)
+- Specific price points for each tier
+- Feature distribution across tiers (what's free vs paid)
+- Rationale for each pricing decision
+
+**3. Willingness-to-Pay Analysis**
+- Features users will pay for (from positive reviews)
+- Features that must be free (table stakes)
+- Price thresholds mentioned in reviews
+- Value perception indicators
+
+**4. Revenue Projections (Year 1)**
+- Conservative scenario (1-2% market capture, 10-15% conversion)
+- Realistic scenario (3-5% market capture, 15-25% conversion)
+- Optimistic scenario (8-10% market capture, 25-35% conversion)
+- Include monthly and annual revenue projections with clear assumptions
+
+**5. Monetization Do's and Don'ts**
+- What to avoid based on competitor review complaints
+- Pricing patterns that work in this category
+- Upsell and cross-sell opportunities
+- Churn risk indicators from reviews
+
+**6. Launch Pricing Strategy**
+- Initial pricing for launch (introductory offers?)
+- Early adopter benefits
+- Price optimization timeline
+- A/B testing recommendations
+
+Be specific with dollar amounts, percentages, and calculations. Reference actual user feedback about pricing where available.`;
 
     return [{role:'user', content: prompt}];
   };
@@ -1167,20 +1298,21 @@ Keep each section concise and focused. Do not include revenue projections.`;
     setRollupContent({
       likes: cached.likes,
       dislikes: cached.dislikes,
-      recommendations: cached.recommendations,
       keywords: cached.keywords,
       definitely: cached.definitely_include,
       backlog: cached.backlog,
+      recommendations: cached.recommendations,
       description: cached.description ? [cached.description] : [],
       names: cached.app_names,
       prp: cached.prp ? [cached.prp] : [],
       similar: cached.similar_apps,
-      pricing: cached.pricing_model ? [cached.pricing_model] : []
+      pricing: cached.pricing_model ? [cached.pricing_model] : [],
+      viability: cached.market_viability ? [cached.market_viability] : []
     });
     
     // Set all rollup statuses to DONE
     const statuses: {[key: string]: string} = {};
-    ['likes', 'dislikes', 'recommendations', 'keywords', 'definitely', 'backlog', 'description', 'names', 'prp', 'similar', 'pricing', 'savings'].forEach(key => {
+    ['likes', 'dislikes', 'keywords', 'definitely', 'backlog', 'recommendations', 'description', 'names', 'prp', 'similar', 'pricing', 'viability', 'savings'].forEach(key => {
       statuses[key] = 'DONE';
     });
     setRollupStatuses(statuses);
@@ -1278,7 +1410,7 @@ Keep each section concise and focused. Do not include revenue projections.`;
     });
     
     // Initialize rollup statuses - match HTML exactly
-    const sections = ['likes', 'dislikes', 'recommendations', 'keywords', 'definitely', 'backlog', 'description', 'names', 'prp', 'similar', 'pricing', 'savings'];
+    const sections = ['likes', 'dislikes', 'keywords', 'definitely', 'backlog', 'recommendations', 'description', 'names', 'prp', 'similar', 'pricing', 'viability', 'savings'];
     const initialStatuses: {[key: string]: string} = {};
     sections.forEach(section => {
       initialStatuses[section] = 'RESEARCH UNDERWAY';
@@ -1471,7 +1603,8 @@ Keep each section concise and focused. Do not include revenue projections.`;
       setStatus('Generating strategic recommendations...');
       let recommendationsArray: string[] = [];
       try {
-        const recommendationsMessages = buildRecommendationsPrompt(appMetaData, finalParsed.likes, finalParsed.dislikes, keywordsArray, definitelyIncludeFeatures, backlogItems);
+        const ratingsCount = appMetaData.userRatingCount || 0;
+        const recommendationsMessages = buildRecommendationsPrompt(appMetaData, finalParsed.likes, finalParsed.dislikes, keywordsArray, definitelyIncludeFeatures, backlogItems, ratingsCount);
         const recommendationsResponse = await callAI(grokApiKey, recommendationsMessages, 'grok', 'grok-4-fast-reasoning', costAccumulator);
         
         if (recommendationsResponse && recommendationsResponse.trim()) {
@@ -1554,12 +1687,13 @@ Keep each section concise and focused. Do not include revenue projections.`;
         console.error('Error searching for similar apps:', error);
       }
 
-      // Generate pricing model
-      setStatus('Analyzing pricing models...');
+      // Generate comprehensive pricing and revenue analysis (NOW SECTION 11)
+      setStatus('Analyzing pricing strategy and revenue potential...');
       let pricingContent: string = '';
       try {
         // Use the local variables that were just generated
-        const pricingMessages = buildPricingModelPrompt(appMetaData, definitelyIncludeFeatures, backlogItems, keywordsArray, description, appNames, similarApps);
+        const ratingsCount = appMetaData.userRatingCount || 0;
+        const pricingMessages = buildPricingModelPrompt(appMetaData, definitelyIncludeFeatures, backlogItems, keywordsArray, description, appNames, similarApps, finalParsed.likes, finalParsed.dislikes, ratingsCount);
         const pricingResponse = await callAI(grokApiKey, pricingMessages, 'grok', 'grok-4-fast-reasoning', costAccumulator);
         
         if (pricingResponse && pricingResponse.trim()) {
@@ -1571,7 +1705,25 @@ Keep each section concise and focused. Do not include revenue projections.`;
         console.error('Error generating pricing model:', error);
       }
 
-      // Calculate final analysis time and manual task estimates
+      // Generate Market Viability Analysis (NEW SECTION 12 - Business Opportunity Validator)
+      setStatus('Generating market viability and business opportunity analysis...');
+      let marketViabilityContent: string = '';
+      try {
+        const ratingsCount = appMetaData.userRatingCount || 0;
+        const reviewCount = reviews.length;
+        const marketViabilityMessages = buildMarketViabilityPrompt(appMetaData, finalParsed.likes, finalParsed.dislikes, keywordsArray, definitelyIncludeFeatures, backlogItems, similarApps, ratingsCount, reviewCount);
+        const marketViabilityResponse = await callAI(grokApiKey, marketViabilityMessages, 'grok', 'grok-4-fast-reasoning', costAccumulator);
+        
+        if (marketViabilityResponse && marketViabilityResponse.trim()) {
+          marketViabilityContent = marketViabilityResponse.trim();
+          setRollupStatuses(prev => ({ ...prev, viability: 'DONE' }));
+          setRollupContent(prev => ({ ...prev, viability: [marketViabilityContent] }));
+        }
+      } catch (error) {
+        console.error('Error generating market viability:', error);
+      }
+
+      // Calculate final analysis time and manual task estimates (NOW SECTION 13)
       const endTime = Date.now();
       const analysisTimeSeconds = (endTime - startTime) / 1000;
       
@@ -1637,7 +1789,8 @@ Keep each section concise and focused. Do not include revenue projections.`;
                 app_names: appNames,
                 prp: prpContent,
                 similar_apps: similarApps,
-                pricing_model: pricingContent
+                pricing_model: pricingContent,
+                market_viability: marketViabilityContent
               });
             
             if (saveError) {
@@ -2051,9 +2204,10 @@ Keep each section concise and focused. Do not include revenue projections.`;
                   {createRollupBar('names', 8, 'Suggested names for your app', '💡')}
                   {createRollupBar('prp', 9, 'PRP (Product Requirements Prompt) for your app', '📋')}
                   {createRollupBar('similar', 10, 'Similar Apps', '📱')}
-                  {createRollupBar('pricing', 11, 'Suggested pricing model for your app', '💰')}
+                  {createRollupBar('pricing', 11, 'Pricing Strategy & Revenue Projections', '💰')}
+                  {createRollupBar('viability', 12, 'Market Viability & Business Opportunity Analysis', '📊')}
                   
-                  {/* Section 12: Time & Cost Savings */}
+                  {/* Section 13: Time & Cost Savings */}
                   {analysisMetrics.reviewCount > 0 && (() => {
                     const status = rollupStatuses['savings'] || 'RESEARCH UNDERWAY';
                     const isDone = status === 'DONE';
@@ -2080,7 +2234,7 @@ Keep each section concise and focused. Do not include revenue projections.`;
                               {/* Number and Title */}
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-baseline gap-2 mb-1">
-                                  <span className="text-sm font-bold text-gray-500">Section 12</span>
+                                  <span className="text-sm font-bold text-gray-500">Section 13</span>
                                   {isDone && (
                                     <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-green-100 text-green-800 text-xs font-semibold rounded-full">
                                       <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
