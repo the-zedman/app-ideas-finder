@@ -16,6 +16,7 @@ export default function HomeZone() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [usageData, setUsageData] = useState<any>(null);
   const [recentAnalyses, setRecentAnalyses] = useState<any[]>([]);
+  const [totalAnalysesCount, setTotalAnalysesCount] = useState(0);
   const [affiliateData, setAffiliateData] = useState<any>(null);
   const [isAffiliateExpanded, setIsAffiliateExpanded] = useState(false);
   const [popularApps, setPopularApps] = useState<any[]>([
@@ -55,7 +56,15 @@ export default function HomeZone() {
         const usage = await usageResponse.json();
         setUsageData(usage);
         
-        // Fetch recent analyses
+        // Fetch total count of analyses
+        const { count: totalCount } = await supabase
+          .from('user_analyses')
+          .select('*', { count: 'exact', head: true })
+          .eq('user_id', user.id);
+        
+        setTotalAnalysesCount(totalCount || 0);
+        
+        // Fetch recent analyses (last 5)
         const { data: analyses, error: analysesError } = await supabase
           .from('user_analyses')
           .select('*')
@@ -475,14 +484,20 @@ export default function HomeZone() {
         {recentAnalyses.length > 0 && (
           <div className="bg-white rounded-2xl p-8 mb-8 border border-gray-200 shadow-sm">
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-2xl font-bold text-gray-900">📊 Your Recent Analyses</h3>
-              <button
-                onClick={() => router.push('/appengine')}
-                disabled={!usageData?.canSearch}
-                className="bg-[#88D18A] hover:bg-[#88D18A]/90 text-white font-semibold py-2 px-6 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                + Analyze Another App
-              </button>
+              <div>
+                <h3 className="text-2xl font-bold text-gray-900">📊 Your Recent Analyses</h3>
+                <p className="text-sm text-gray-600 mt-1">
+                  Showing your last {recentAnalyses.length} of {totalAnalysesCount} {totalAnalysesCount === 1 ? 'analysis' : 'analyses'}
+                </p>
+              </div>
+              {totalAnalysesCount > 5 && (
+                <button
+                  onClick={() => router.push('/analyses')}
+                  className="text-[#88D18A] hover:text-[#88D18A]/80 font-semibold transition-colors flex items-center gap-1"
+                >
+                  View All →
+                </button>
+              )}
             </div>
 
             {recentAnalyses.length > 0 ? (
