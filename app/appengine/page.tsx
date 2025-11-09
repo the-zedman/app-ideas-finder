@@ -843,12 +843,63 @@ Generate 15-20 app names, one per line, without numbers or bullet points.`;
     return [{role:'user', content: prompt}];
   };
 
+  // Generate AI-powered strategic recommendations based on all analysis
+  const buildRecommendationsPrompt = (appMeta: AppMeta, likes: string[], dislikes: string[], keywords: string[], definitelyInclude: string[], backlog: any[]) => {
+    const appName = appMeta?.trackName || appMeta?.collectionName || 'this app';
+    const likesText = likes.join('\n• ');
+    const dislikesText = dislikes.join('\n• ');
+    const keywordsText = keywords.join(', ');
+    const definitelyIncludeText = definitelyInclude.join('\n• ');
+    const backlogText = backlog.map((item: any) => item.content).join('\n• ');
+    
+    const prompt = `You are a product strategy consultant analyzing user feedback for ${appName} to guide the development of a competing or improved app.
+
+CONTEXT:
+App Being Analyzed: ${appName}
+User Loves: 
+• ${likesText}
+
+User Hates/Wants:
+• ${dislikesText}
+
+Market Keywords: ${keywordsText}
+
+Planned Core Features:
+• ${definitelyIncludeText}
+
+Planned Additional Features:
+• ${backlogText}
+
+TASK:
+Provide 8-10 strategic, actionable recommendations for building a successful app in this space. Cover these areas:
+
+1. **Development Priorities** - What to build first and why
+2. **Market Positioning** - How to differentiate and position the app
+3. **Innovation Opportunities** - Novel features or approaches users haven't articulated but would love
+4. **Monetization Strategy** - Pricing model, free vs paid features based on user sentiment
+5. **Technical Decisions** - Architecture choices based on user complaints (performance, offline, etc)
+6. **UX/UI Priorities** - Critical design decisions based on feedback
+7. **Launch Strategy** - Target audience, MVP scope, beta testing approach
+8. **Competitive Advantages** - Specific ways to beat competitors based on gaps identified
+
+Make each recommendation:
+- Specific and actionable (not generic advice)
+- Data-driven (reference the actual user feedback)
+- Strategic (explain the "why" behind each)
+- Prioritized (indicate urgency/importance)
+
+Format as a numbered list with brief explanations.`;
+
+    return [{role: 'user', content: prompt}];
+  };
+
   // Generate PRP (Product Requirements Prompt) for AI development
-  const buildPRPPrompt = (appMeta: AppMeta, definitelyInclude: string[], backlog: any[], keywords: string[], description: string, appNames: string[]) => {
+  const buildPRPPrompt = (appMeta: AppMeta, definitelyInclude: string[], backlog: any[], keywords: string[], description: string, appNames: string[], recommendations: string[]) => {
     const definitelyIncludeText = definitelyInclude.join(', ');
     const backlogText = backlog.map((item: any) => item.content).join(', ');
     const keywordsText = keywords.join(', ');
     const appNamesText = appNames.join(', ');
+    const recommendationsText = recommendations.join('\n');
     
     const prompt = `Create a comprehensive Product Requirements Prompt (PRP) that a developer can use to prompt an AI to build this app.
 
@@ -862,14 +913,19 @@ Keywords: ${keywordsText}
 
 Potential app names: ${appNamesText}
 
+Strategic Recommendations:
+${recommendationsText}
+
 Create a detailed PRP that includes:
-- Clear project overview and objectives
-- Detailed feature specifications
+- Clear project overview and objectives aligned with the strategic recommendations
+- Detailed feature specifications (prioritized based on the recommendations)
 - User experience requirements
-- Technical requirements and constraints
+- Technical requirements and constraints (informed by the recommendations)
 - Success metrics and goals
-- Development phases and priorities
+- Development phases and priorities (following the recommended approach)
 - User stories and use cases
+
+Integrate the strategic recommendations throughout the PRP to ensure the development plan is data-driven and strategically sound. Reference specific recommendations where relevant.
 
 Format as a comprehensive prompt that an AI developer can use to start building the app. Make it detailed, actionable, and comprehensive.`;
 
@@ -1259,65 +1315,28 @@ Keep each section concise and focused. Do not include revenue projections.`;
           .filter((line: string) => line.length > 0);
       }
       
-      // Generate recommendations
-      const recommendations: string[] = [];
-      if (dislikes.length > 0) {
-        const lowerDislikes = dislikes.join(' ').toLowerCase();
-        if (lowerDislikes.includes('bug') || lowerDislikes.includes('crash') || lowerDislikes.includes('error')) {
-          recommendations.push('Fix bugs and improve app stability');
-        }
-        if (lowerDislikes.includes('slow') || lowerDislikes.includes('performance')) {
-          recommendations.push('Optimize app performance and speed');
-        }
-        if (lowerDislikes.includes('expensive') || lowerDislikes.includes('price') || lowerDislikes.includes('cost')) {
-          recommendations.push('Review pricing strategy and offer more affordable options');
-        }
-        if (lowerDislikes.includes('interface') || lowerDislikes.includes('ui') || lowerDislikes.includes('design')) {
-          recommendations.push('Improve user interface and design');
-        }
-        if (lowerDislikes.includes('feature') || lowerDislikes.includes('functionality')) {
-          recommendations.push('Add missing features and functionality');
-        }
-        if (lowerDislikes.includes('support') || lowerDislikes.includes('help')) {
-          recommendations.push('Enhance customer support and help system');
-        }
-      }
-      
-      // Add general recommendations if needed
-      while (recommendations.length < 3) {
-        if (recommendations.length === 0) {
-          recommendations.push('Continue improving overall app quality');
-        } else if (recommendations.length === 1) {
-          recommendations.push('Maintain current positive user experience');
-        } else {
-          recommendations.push('Regular user feedback collection and implementation');
-        }
-      }
-      
       const finalParsed: ParsedResults = {
         ai_description: text,
         likes: likes.length > 0 ? likes : ["No specific likes identified"],
         dislikes: dislikes.length > 0 ? dislikes : ["No specific dislikes identified"],
         sentiment: likes.length > dislikes.length * 2 ? "Mostly Positive" : dislikes.length > likes.length * 2 ? "Mostly Negative" : "Mixed",
-        recommendations: recommendations
+        recommendations: [] // Will be generated later with AI
       };
 
       setAnalysisResults(finalParsed);
       
-      // Update rollup statuses - mark first 3 as done
+      // Update rollup statuses - mark first 2 as done (recommendations moved to Section 6)
       setRollupStatuses(prev => ({
         ...prev,
         likes: 'DONE',
-        dislikes: 'DONE', 
-        recommendations: 'DONE'
+        dislikes: 'DONE'
       }));
       
       // Store content for rollups
       setRollupContent(prev => ({
         ...prev,
         likes: finalParsed.likes,
-        dislikes: finalParsed.dislikes,
-        recommendations: finalParsed.recommendations
+        dislikes: finalParsed.dislikes
       }));
 
       // Generate keywords
@@ -1390,7 +1409,29 @@ Keep each section concise and focused. Do not include revenue projections.`;
         console.error('Error generating backlog items:', error);
       }
 
-      // Generate app description
+      // Generate AI-powered strategic recommendations (NEW SECTION 6)
+      setStatus('Generating strategic recommendations...');
+      let recommendationsArray: string[] = [];
+      try {
+        const recommendationsMessages = buildRecommendationsPrompt(appMetaData, finalParsed.likes, finalParsed.dislikes, keywordsArray, definitelyIncludeFeatures, backlogItems);
+        const recommendationsResponse = await callAI(grokApiKey, recommendationsMessages, 'grok', 'grok-4-fast-reasoning', costAccumulator);
+        
+        if (recommendationsResponse && recommendationsResponse.trim()) {
+          // Parse recommendations from numbered list
+          const lines = recommendationsResponse.split('\n').filter((line: string) => line.trim().length > 0);
+          recommendationsArray = lines
+            .filter((line: string) => /^\d+\./.test(line.trim())) // Only lines starting with numbers
+            .map((line: string) => line.replace(/^\d+\.\s*/, '').trim())
+            .filter((rec: string) => rec.length > 0);
+          
+          setRollupStatuses(prev => ({ ...prev, recommendations: 'DONE' }));
+          setRollupContent(prev => ({ ...prev, recommendations: recommendationsArray }));
+        }
+      } catch (error) {
+        console.error('Error generating recommendations:', error);
+      }
+
+      // Generate app description (NOW SECTION 7)
       setStatus('Generating app description...');
       let description: string = '';
       try {
@@ -1427,12 +1468,12 @@ Keep each section concise and focused. Do not include revenue projections.`;
         console.error('Error generating app names:', error);
       }
 
-      // Generate PRP
+      // Generate PRP (NOW SECTION 10 - includes recommendations)
       setStatus('Generating product requirements prompt...');
       let prpContent: string = '';
       try {
-        // Use the local variables that were just generated
-        const prpMessages = buildPRPPrompt(appMetaData, definitelyIncludeFeatures, backlogItems, keywordsArray, description, appNames);
+        // Use the local variables that were just generated, including recommendations
+        const prpMessages = buildPRPPrompt(appMetaData, definitelyIncludeFeatures, backlogItems, keywordsArray, description, appNames, recommendationsArray);
         const prpResponse = await callAI(grokApiKey, prpMessages, 'grok', 'grok-4-fast-reasoning', costAccumulator);
         
         if (prpResponse && prpResponse.trim()) {
@@ -1530,7 +1571,7 @@ Keep each section concise and focused. Do not include revenue projections.`;
                 api_cost: finalApiCost,
                 likes: finalParsed.likes,
                 dislikes: finalParsed.dislikes,
-                recommendations: finalParsed.recommendations,
+                recommendations: recommendationsArray,
                 keywords: keywordsArray,
                 definitely_include: definitelyIncludeFeatures,
                 backlog: backlogItems,
@@ -1944,10 +1985,10 @@ Keep each section concise and focused. Do not include revenue projections.`;
                   
                   {createRollupBar('likes', 1, 'What people like about the TARGET app', '👍')}
                   {createRollupBar('dislikes', 2, "What Users Want (and Don't Want) from the TARGET App", '💭')}
-                  {createRollupBar('recommendations', 3, 'Top recommendations', '⭐')}
-                  {createRollupBar('keywords', 4, 'Suggested keywords for your app', '🔍')}
-                  {createRollupBar('definitely', 5, 'Core features to include in your app', '🎯')}
-                  {createRollupBar('backlog', 6, 'New and additional features to include in your app', '✨')}
+                  {createRollupBar('keywords', 3, 'Suggested keywords for your app', '🔍')}
+                  {createRollupBar('definitely', 4, 'Core features to include in your app', '🎯')}
+                  {createRollupBar('backlog', 5, 'New and additional features to include in your app', '✨')}
+                  {createRollupBar('recommendations', 6, '💎 Strategic Recommendations & Insights', '⭐')}
                   {createRollupBar('description', 7, 'Suggested description for your app', '📝')}
                   {createRollupBar('names', 8, 'Suggested names for your app', '💡')}
                   {createRollupBar('prp', 9, 'PRP (Product Requirements Prompt) for your app', '📋')}
