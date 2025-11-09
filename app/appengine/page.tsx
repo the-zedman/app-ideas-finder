@@ -1689,9 +1689,6 @@ Keep each section concise and focused. Do not include revenue projections.`;
               <a href="/appengine" className="text-[#3D405B] font-semibold">
                 App Engine
               </a>
-              <a href="/billing" className="text-gray-600 hover:text-[#3D405B] transition-colors">
-                Billing
-              </a>
             </nav>
 
             {/* Profile Dropdown */}
@@ -1749,6 +1746,15 @@ Keep each section concise and focused. Do not include revenue projections.`;
                           🔐 Admin Dashboard
                         </button>
                       )}
+                      <button
+                        onClick={() => {
+                          setShowProfileMenu(false);
+                          router.push('/analyses');
+                        }}
+                        className="w-full text-left px-4 py-3 rounded-lg hover:bg-gray-50 text-gray-900 transition-colors"
+                      >
+                        📊 Analysis History
+                      </button>
                       <button
                         onClick={() => {
                           setShowProfileMenu(false);
