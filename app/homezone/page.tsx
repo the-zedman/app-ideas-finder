@@ -608,7 +608,6 @@ export default function HomeZone() {
                 </div>
               </div>
             </div>
-          </div>
         </div>
 
         {/* Recent Analyses */}
