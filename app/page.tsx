@@ -586,34 +586,34 @@ export default function LandingTest() {
               2. What users want
             </div>
             <div className="bg-[#CCDDB7] px-4 py-3 rounded-lg text-sm font-semibold text-gray-800">
-              3. Top recommendations
+              3. SEO keywords
             </div>
             <div className="bg-[#CCDDB7] px-4 py-3 rounded-lg text-sm font-semibold text-gray-800">
-              4. Suggested SEO keywords
+              4. Core features to include
             </div>
             <div className="bg-[#CCDDB7] px-4 py-3 rounded-lg text-sm font-semibold text-gray-800">
-              5. Suggested core features to include
+              5. Additional features to include
             </div>
             <div className="bg-[#CCDDB7] px-4 py-3 rounded-lg text-sm font-semibold text-gray-800">
-              6. Suggested enhanced features to include
+              6. Strategic recommendations
             </div>
             <div className="bg-[#CCDDB7] px-4 py-3 rounded-lg text-sm font-semibold text-gray-800">
-              7. Suggested app description
+              7. App description
             </div>
             <div className="bg-[#CCDDB7] px-4 py-3 rounded-lg text-sm font-semibold text-gray-800">
-              8. Suggested app name ideas
+              8. App name ideas
             </div>
             <div className="bg-[#CCDDB7] px-4 py-3 rounded-lg text-sm font-semibold text-gray-800">
               9. Product Requirements Prompt
             </div>
             <div className="bg-[#CCDDB7] px-4 py-3 rounded-lg text-sm font-semibold text-gray-800">
-              10. Similar apps
+              10. Similar apps analysis
             </div>
             <div className="bg-[#CCDDB7] px-4 py-3 rounded-lg text-sm font-semibold text-gray-800">
-              11. Suggested pricing model
+              11. Pricing model suggestions
             </div>
             <div className="bg-[#CCDDB7] px-4 py-3 rounded-lg text-sm font-semibold text-gray-800">
-              12. Time & cost savings
+              12. Time & money saved
             </div>
           </div>
         </div>

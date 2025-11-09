@@ -387,6 +387,45 @@ function AppEngineContent() {
                   Copy Prompt to Clipboard
                 </button>
               </div>
+            ) : section === 'recommendations' ? (
+              <div className="space-y-3">
+                {content?.map((item: string, i: number) => {
+                  // Parse: [PRIORITY] Title: Description
+                  const priorityMatch = item.match(/^\[(CRITICAL|HIGH|MEDIUM)\]\s*(.+?):\s*(.+)$/);
+                  if (!priorityMatch) return null;
+                  
+                  const [, priority, title, description] = priorityMatch;
+                  
+                  // Priority styling
+                  const priorityStyles = priority === 'CRITICAL' 
+                    ? 'border-red-500 bg-red-50' 
+                    : priority === 'HIGH' 
+                    ? 'border-orange-400 bg-orange-50' 
+                    : 'border-blue-400 bg-blue-50';
+                  
+                  const priorityBadgeColor = priority === 'CRITICAL'
+                    ? 'bg-red-500 text-white'
+                    : priority === 'HIGH'
+                    ? 'bg-orange-500 text-white'
+                    : 'bg-blue-500 text-white';
+                  
+                  return (
+                    <div key={i} className={`${priorityStyles} border-l-4 p-4 rounded-r-lg shadow-sm hover:shadow-md transition-shadow`}>
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className={`${priorityBadgeColor} text-xs font-bold uppercase px-2 py-1 rounded`}>
+                          {priority}
+                        </span>
+                        <span className="font-bold text-gray-900 text-base">
+                          {title}
+                        </span>
+                      </div>
+                      <div className="text-gray-700 text-sm leading-relaxed font-normal pl-0">
+                        {description}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             ) : section === 'pricing' ? (
               <div className="prose prose-gray max-w-none text-gray-700 leading-relaxed"
                 dangerouslySetInnerHTML={{ __html: parseMarkdownContent(content?.[0] || '') }}
@@ -882,13 +921,31 @@ Provide 8-10 strategic, actionable recommendations for building a successful app
 7. **Launch Strategy** - Target audience, MVP scope, beta testing approach
 8. **Competitive Advantages** - Specific ways to beat competitors based on gaps identified
 
-Make each recommendation:
-- Specific and actionable (not generic advice)
-- Data-driven (reference the actual user feedback)
-- Strategic (explain the "why" behind each)
-- Prioritized (indicate urgency/importance)
+IMPORTANT FORMATTING:
+Each recommendation MUST follow this exact format:
+[CRITICAL] Category Title: One clear sentence explaining the strategic recommendation with specific reasoning and data references from the user feedback.
 
-Format as a numbered list with brief explanations.`;
+Or:
+[HIGH] Category Title: One clear sentence explaining the strategic recommendation with specific reasoning and data references from the user feedback.
+
+Or:
+[MEDIUM] Category Title: One clear sentence explaining the strategic recommendation with specific reasoning and data references from the user feedback.
+
+Priority levels:
+- [CRITICAL] = Must do first, blocking issue or huge opportunity
+- [HIGH] = Should do early, significant impact
+- [MEDIUM] = Important but can be phased in later
+
+Requirements:
+- Start each line with priority tag: [CRITICAL], [HIGH], or [MEDIUM]
+- Make the explanation a FULL SENTENCE (15-25 words) that's specific and actionable
+- Reference actual user feedback data where possible
+- Sort from highest to lowest priority (all CRITICAL first, then HIGH, then MEDIUM)
+- Be specific, not generic
+
+Example format:
+[CRITICAL] Offline Functionality: Implement offline sync immediately as it was mentioned in 47 reviews and competitors lack robust offline support, giving you a major differentiator.
+[HIGH] Privacy-First Positioning: Market as privacy-focused alternative since 82% of negative reviews mention data concerns and users are actively seeking alternatives.`;
 
     return [{role: 'user', content: prompt}];
   };
@@ -1417,11 +1474,11 @@ Keep each section concise and focused. Do not include revenue projections.`;
         const recommendationsResponse = await callAI(grokApiKey, recommendationsMessages, 'grok', 'grok-4-fast-reasoning', costAccumulator);
         
         if (recommendationsResponse && recommendationsResponse.trim()) {
-          // Parse recommendations from numbered list
+          // Parse recommendations - they're already formatted with [PRIORITY] tags
           const lines = recommendationsResponse.split('\n').filter((line: string) => line.trim().length > 0);
           recommendationsArray = lines
-            .filter((line: string) => /^\d+\./.test(line.trim())) // Only lines starting with numbers
-            .map((line: string) => line.replace(/^\d+\.\s*/, '').trim())
+            .filter((line: string) => /^\[(CRITICAL|HIGH|MEDIUM)\]/.test(line.trim())) // Lines with priority tags
+            .map((line: string) => line.trim())
             .filter((rec: string) => rec.length > 0);
           
           setRollupStatuses(prev => ({ ...prev, recommendations: 'DONE' }));
