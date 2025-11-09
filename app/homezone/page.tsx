@@ -17,6 +17,7 @@ export default function HomeZone() {
   const [usageData, setUsageData] = useState<any>(null);
   const [recentAnalyses, setRecentAnalyses] = useState<any[]>([]);
   const [affiliateData, setAffiliateData] = useState<any>(null);
+  const [isAffiliateExpanded, setIsAffiliateExpanded] = useState(false);
   const [popularApps, setPopularApps] = useState<any[]>([
     { name: 'Instagram', id: '389801252', icon: '' },
     { name: 'Uber', id: '368677368', icon: '' },
@@ -387,8 +388,21 @@ export default function HomeZone() {
         {affiliateData && (
           <div className="bg-gradient-to-br from-[#88D18A]/10 to-[#6BC070]/10 rounded-2xl p-6 sm:p-8 mb-8 border-2 border-[#88D18A]/20">
             <div className="flex items-center justify-between mb-6">
-              <div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-1">💰 Affiliate Program</h3>
+              <div className="flex-1">
+                <button
+                  onClick={() => setIsAffiliateExpanded(!isAffiliateExpanded)}
+                  className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+                >
+                  <h3 className="text-2xl font-bold text-gray-900">💰 Affiliate Program</h3>
+                  <svg 
+                    className={`w-6 h-6 text-gray-600 transition-transform ${isAffiliateExpanded ? 'rotate-180' : ''}`}
+                    fill="none" 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
                 <p className="text-gray-600">Earn 25% commission on every referral</p>
               </div>
               <Link 
@@ -399,8 +413,11 @@ export default function HomeZone() {
               </Link>
             </div>
 
-            {/* Stats Grid */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+            {/* Collapsible Content */}
+            {isAffiliateExpanded && (
+              <>
+                {/* Stats Grid */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
               <div className="bg-white rounded-lg p-4 border border-gray-200">
                 <div className="text-xs text-gray-600 mb-1">Total Referrals</div>
                 <div className="text-2xl font-bold text-gray-900">{affiliateData.total_referrals || 0}</div>
@@ -501,16 +518,19 @@ export default function HomeZone() {
                 you earn 25% commission paid within 7 days after their first month (if they stay active).
               </p>
             </div>
+              </>
+            )}
           </div>
         )}
 
-        {/* Quick Start (First Time Users) */}
-        {isFirstTime && (
-          <div className="bg-white rounded-2xl p-8 mb-8">
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <h3 className="text-2xl font-bold text-gray-900">🚀 Analyze Your First App</h3>
-              </div>
+        {/* Quick Start - Analyze App */}
+        <div className="bg-white rounded-2xl p-8 mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h3 className="text-2xl font-bold text-gray-900">
+                🚀 {isFirstTime ? 'Analyze Your First App' : 'Analyze Another App'}
+              </h3>
+            </div>
               <button
                 onClick={fetchPopularAppIcons}
                 className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
@@ -589,10 +609,10 @@ export default function HomeZone() {
               </div>
             </div>
           </div>
-        )}
+        </div>
 
-        {/* Recent Analyses (Returning Users) */}
-        {!isFirstTime && (
+        {/* Recent Analyses */}
+        {recentAnalyses.length > 0 && (
           <div className="bg-white rounded-2xl p-8 mb-8 border border-gray-200 shadow-sm">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-2xl font-bold text-gray-900">📊 Your Recent Analyses</h3>
