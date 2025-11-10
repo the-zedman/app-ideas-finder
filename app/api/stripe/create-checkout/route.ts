@@ -25,10 +25,26 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
     }
     
-    const { priceId, planType, successUrl, cancelUrl } = await request.json();
+    const { priceId: clientPriceId, planType, successUrl, cancelUrl } = await request.json();
+    
+    // Map plan type to price ID from environment variables
+    const priceIdMap: { [key: string]: string } = {
+      'trial': process.env.STRIPE_PRICE_TRIAL || '',
+      'core_monthly': process.env.STRIPE_PRICE_CORE_MONTHLY || '',
+      'core_annual': process.env.STRIPE_PRICE_CORE_ANNUAL || '',
+      'prime_monthly': process.env.STRIPE_PRICE_PRIME_MONTHLY || '',
+      'prime_annual': process.env.STRIPE_PRICE_PRIME_ANNUAL || '',
+      'search_pack': process.env.STRIPE_PRICE_SEARCH_PACK || '',
+    };
+    
+    // Use client-provided priceId if available, otherwise look up by plan type
+    const priceId = clientPriceId || priceIdMap[planType];
     
     if (!priceId) {
-      return NextResponse.json({ error: 'Price ID required' }, { status: 400 });
+      return NextResponse.json({ 
+        error: 'Price ID not configured', 
+        details: `No price ID found for plan type: ${planType}` 
+      }, { status: 400 });
     }
     
     // Get or create Stripe customer
