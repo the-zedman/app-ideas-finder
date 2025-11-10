@@ -81,12 +81,18 @@ export async function GET(request: Request) {
       const fullName = `${firstName} ${lastName}`.trim();
       const displayName = fullName || authUser?.email?.split('@')[0] || 'Unknown';
       
+      // Calculate lifetime spend (simplified - should come from actual payment records)
+      // For now, using current plan price as estimate
+      const currentPrice = sub.subscription_plans?.price || 0;
+      const lifetimeSpend = sub.status === 'active' || sub.status === 'trial' ? currentPrice : 0;
+      
       return {
         ...sub,
         user_email: authUser?.email || 'unknown',
         user_name: displayName,
         searches_used: usage?.searches_used || 0,
-        searches_limit: usage?.searches_limit || sub.subscription_plans?.searches_per_month || 0
+        searches_limit: usage?.searches_limit || sub.subscription_plans?.searches_per_month || 0,
+        lifetime_spend: lifetimeSpend
       };
     }) || [];
     

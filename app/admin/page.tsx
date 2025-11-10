@@ -183,10 +183,17 @@ export default function AdminDashboard() {
               <div className="text-sm text-gray-600">View all app analyses</div>
             </a>
             <a
+              href="/admin/revenue"
+              className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow border-green-300"
+            >
+              <div className="text-lg font-semibold text-green-900 mb-2">💰 Revenue Analytics</div>
+              <div className="text-sm text-green-600">MRR, ARR, and revenue insights</div>
+            </a>
+            <a
               href="/admin/costs"
               className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow"
             >
-              <div className="text-lg font-semibold text-gray-900 mb-2">💰 API Usage & Costs</div>
+              <div className="text-lg font-semibold text-gray-900 mb-2">📊 API Usage & Costs</div>
               <div className="text-sm text-gray-600">Track API spending and usage</div>
             </a>
             <a

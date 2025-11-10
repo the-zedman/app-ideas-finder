@@ -207,6 +207,7 @@ export default function AdminSubscriptionsPage() {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Plan</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Usage</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Lifetime Spend</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Period End</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
               </tr>
@@ -228,6 +229,9 @@ export default function AdminSubscriptionsPage() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     {sub.searches_used} / {sub.searches_limit === -1 ? '∞' : sub.searches_limit}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-green-600">
+                    ${(sub.lifetime_spend || 0).toFixed(2)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {sub.current_period_end ? new Date(sub.current_period_end).toLocaleDateString() : 'N/A'}
