@@ -81,7 +81,7 @@ export async function POST(request: Request) {
     doc.setFontSize(10);
     doc.setTextColor(60, 60, 60);
     doc.setFont('helvetica', 'italic');
-    const summaryText = 'This comprehensive 12-section analysis provides actionable insights for building a successful app based on real user feedback from the App Store.';
+    const summaryText = 'This comprehensive 13-section analysis provides actionable insights for building a successful app based on real user feedback from the App Store.';
     const splitSummary = doc.splitTextToSize(summaryText, pageWidth - 50);
     doc.text(splitSummary, 25, yPosition);
     

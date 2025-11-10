@@ -2337,7 +2337,7 @@ Be specific with dollar amounts, percentages, and calculations. Reference actual
                                   </div>
                                   <div style={{ fontSize: '14px', color: '#00838f', lineHeight: '1.6' }}>
                                     This analysis automatically processed <strong>{analysisMetrics.reviewCount.toLocaleString()} real user reviews</strong>, 
-                                    extracted actionable insights, and generated comprehensive reports across 12 sections—all in minutes. 
+                                    extracted actionable insights, and generated comprehensive reports across 13 sections—all in minutes. 
                                     Doing this manually would have taken <strong>{totalManualHours.toFixed(1)} hours</strong> and cost 
                                     <strong> ${manualAnalysisCost.toFixed(2)}</strong>. Below is what we saved you:
                                   </div>
@@ -2481,7 +2481,7 @@ Be specific with dollar amounts, percentages, and calculations. Reference actual
                       🎉 Analysis Complete!
                     </h2>
                     <p className="text-lg sm:text-xl text-gray-600 mb-6 animate-fade-in-up animation-delay-200">
-                      Your comprehensive 12-section app analysis is ready
+                      Your comprehensive 13-section app analysis is ready
                     </p>
                     
                     {/* Download PDF Button */}

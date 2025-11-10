@@ -552,7 +552,7 @@ export default function LandingTest() {
             </div>
           </div>
           
-          {/* 12 Sections Grid */}
+          {/* 13 Sections Grid */}
           <div className={`grid grid-cols-1 md:grid-cols-3 gap-3 max-w-5xl mx-auto transition-all duration-1000 delay-300 ${showResult ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
             <div className="bg-[#CCDDB7] px-4 py-3 rounded-lg text-sm font-semibold text-gray-800">
               1. What people like

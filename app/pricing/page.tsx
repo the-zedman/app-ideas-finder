@@ -93,7 +93,7 @@ export default function Pricing() {
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="text-[#88D18A] text-xl">✓</span>
-                  <span className="text-gray-700">12-section detailed reports</span>
+                  <span className="text-gray-700">13-section detailed reports</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="text-[#88D18A] text-xl">✓</span>
@@ -139,7 +139,7 @@ export default function Pricing() {
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="text-[#88D18A] text-xl">✓</span>
-                  <span className="text-gray-700">12-section detailed reports</span>
+                  <span className="text-gray-700">13-section detailed reports</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="text-[#88D18A] text-xl">✓</span>
@@ -198,7 +198,7 @@ export default function Pricing() {
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="text-[#88D18A] text-xl">✓</span>
-                  <span className="text-gray-700">12-section detailed reports</span>
+                  <span className="text-gray-700">13-section detailed reports</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="text-[#88D18A] text-xl">✓</span>
