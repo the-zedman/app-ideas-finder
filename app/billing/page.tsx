@@ -294,16 +294,16 @@ export default function BillingPage() {
                   ${billingInterval === 'monthly' ? '39' : '399'}
                 </div>
                 <div className="text-gray-600">per {billingInterval === 'monthly' ? 'month' : 'year'}</div>
-                <div className="text-sm text-gray-500 mt-2">75 searches/month</div>
+                <div className="text-sm text-gray-500 mt-2">73 searches/month</div>
                 <div className="text-xs text-gray-400 mt-1">
-                  ${billingInterval === 'monthly' ? '0.52' : '0.44'} per search
+                  ${billingInterval === 'monthly' ? '0.53' : '0.46'} per search
                 </div>
               </div>
               
               <ul className="space-y-3 mb-6">
                 <li className="flex items-start gap-2">
                   <span className="text-green-500 font-bold">✓</span>
-                  <span className="text-gray-700">75 app analyses per month</span>
+                  <span className="text-gray-700">73 app analyses per month</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-green-500 font-bold">✓</span>
@@ -356,16 +356,16 @@ export default function BillingPage() {
                   ${billingInterval === 'monthly' ? '79' : '799'}
                 </div>
                 <div className="text-gray-600">per {billingInterval === 'monthly' ? 'month' : 'year'}</div>
-                <div className="text-sm text-gray-500 mt-2">225 searches/month</div>
+                <div className="text-sm text-gray-500 mt-2">227 searches/month</div>
                 <div className="text-xs text-gray-400 mt-1">
-                  ${billingInterval === 'monthly' ? '0.35' : '0.30'} per search
+                  ${billingInterval === 'monthly' ? '0.35' : '0.29'} per search
                 </div>
               </div>
               
               <ul className="space-y-3 mb-6">
                 <li className="flex items-start gap-2">
                   <span className="text-green-500 font-bold">✓</span>
-                  <span className="text-gray-700">225 app analyses per month</span>
+                  <span className="text-gray-700">227 app analyses per month</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-green-500 font-bold">✓</span>

@@ -14,10 +14,10 @@ CREATE TABLE IF NOT EXISTS public.subscription_plans (
 -- Insert default plans
 INSERT INTO public.subscription_plans (id, name, searches_per_month, price_monthly, price_annual) VALUES
   ('trial', 'Trial', 10, 1.00, NULL),
-  ('core_monthly', 'Core (Monthly)', 75, 39.00, NULL),
-  ('core_annual', 'Core (Annual)', 75, NULL, 399.00),
-  ('prime_monthly', 'Prime (Monthly)', 225, 79.00, NULL),
-  ('prime_annual', 'Prime (Annual)', 225, NULL, 799.00),
+  ('core_monthly', 'Core (Monthly)', 73, 39.00, NULL),
+  ('core_annual', 'Core (Annual)', 73, NULL, 399.00),
+  ('prime_monthly', 'Prime (Monthly)', 227, 79.00, NULL),
+  ('prime_annual', 'Prime (Annual)', 227, NULL, 799.00),
   ('free_unlimited', 'Free Unlimited', -1, 0.00, NULL)
 ON CONFLICT (id) DO NOTHING;
 

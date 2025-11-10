@@ -131,7 +131,7 @@ export default function Pricing() {
               <ul className="space-y-4 mb-8">
                 <li className="flex items-start gap-3">
                   <span className="text-[#88D18A] text-xl">✓</span>
-                  <span className="text-gray-700"><strong>75 searches</strong> per month</span>
+                  <span className="text-gray-700"><strong>73 searches</strong> per month</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="text-[#88D18A] text-xl">✓</span>
@@ -190,7 +190,7 @@ export default function Pricing() {
               <ul className="space-y-4 mb-8">
                 <li className="flex items-start gap-3">
                   <span className="text-[#88D18A] text-xl">✓</span>
-                  <span className="text-gray-700"><strong>225 searches</strong> per month</span>
+                  <span className="text-gray-700"><strong>227 searches</strong> per month</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="text-[#88D18A] text-xl">✓</span>

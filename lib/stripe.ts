@@ -29,14 +29,14 @@ export const PLAN_DETAILS = {
   },
   core_monthly: {
     name: 'Core (Monthly)',
-    searches: 75,
+    searches: 73,
     price: 39.00,
     interval: 'month',
     priceId: STRIPE_PRICES.CORE_MONTHLY,
   },
   core_annual: {
     name: 'Core (Annual)',
-    searches: 75,
+    searches: 73,
     price: 399.00,
     interval: 'year',
     savings: 69,
@@ -44,14 +44,14 @@ export const PLAN_DETAILS = {
   },
   prime_monthly: {
     name: 'Prime (Monthly)',
-    searches: 225,
+    searches: 227,
     price: 79.00,
     interval: 'month',
     priceId: STRIPE_PRICES.PRIME_MONTHLY,
   },
   prime_annual: {
     name: 'Prime (Annual)',
-    searches: 225,
+    searches: 227,
     price: 799.00,
     interval: 'year',
     savings: 149,
