@@ -166,6 +166,25 @@ export async function GET(request: Request) {
     // Calculate ARPU (Average Revenue Per User)
     const arpu = totalCustomers > 0 ? mrr / totalCustomers : 0;
     
+    // Calculate next calendar month's projected revenue
+    const nextMonthStart = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+    const nextMonthEnd = new Date(now.getFullYear(), now.getMonth() + 2, 0, 23, 59, 59);
+    const nextMonthName = nextMonthStart.toLocaleString('en-US', { month: 'long', year: 'numeric' });
+    
+    let nextMonthProjectedRevenue = 0;
+    if (activeSubscriptions) {
+      activeSubscriptions.forEach((sub: any) => {
+        if (sub.current_period_end) {
+          const renewalDate = new Date(sub.current_period_end);
+          // If renewal date falls in next calendar month, count full price
+          if (renewalDate >= nextMonthStart && renewalDate <= nextMonthEnd) {
+            const price = sub.subscription_plans?.price || 0;
+            nextMonthProjectedRevenue += price;
+          }
+        }
+      });
+    }
+    
     // Get recent high-value customers
     const { data: highValueCustomers } = await supabaseAdmin
       .from('user_subscriptions')
@@ -187,6 +206,8 @@ export async function GET(request: Request) {
       weeklyRevenue: parseFloat(weeklyRevenue.toFixed(2)),
       monthlyRevenue: parseFloat(monthlyRevenue.toFixed(2)),
       yearlyRevenue: parseFloat(yearlyRevenue.toFixed(2)),
+      nextMonthProjectedRevenue: parseFloat(nextMonthProjectedRevenue.toFixed(2)),
+      nextMonthName,
       totalCustomers,
       totalSubscribers,
       activeSubscriptions: activeSubscriptions?.length || 0,

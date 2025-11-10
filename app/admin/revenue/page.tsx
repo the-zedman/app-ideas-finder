@@ -124,7 +124,7 @@ export default function AdminRevenuePage() {
         {/* Key Metrics */}
         <div className="mb-8">
           <h2 className="text-2xl font-bold text-gray-900 mb-4">💰 Key Revenue Metrics</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
             {/* Current Period Revenue */}
             <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl p-6 shadow-lg" style={{ color: 'white' }}>
               <div className="text-sm font-semibold mb-2" style={{ color: 'white', opacity: 0.9 }}>
@@ -168,6 +168,19 @@ export default function AdminRevenuePage() {
               </div>
               <div className="text-sm" style={{ color: 'white', opacity: 0.75 }}>
                 Total all-time revenue
+              </div>
+            </div>
+
+            {/* Next Month Projected */}
+            <div className="bg-gradient-to-br from-cyan-500 to-cyan-600 rounded-2xl p-6 shadow-lg" style={{ color: 'white' }}>
+              <div className="text-sm font-semibold mb-2" style={{ color: 'white', opacity: 0.9 }}>
+                {revenueData?.nextMonthName || 'Next Month'} Projected
+              </div>
+              <div className="text-4xl font-bold mb-1" style={{ color: 'white' }}>
+                {formatCurrency(revenueData?.nextMonthProjectedRevenue || 0)}
+              </div>
+              <div className="text-sm" style={{ color: 'white', opacity: 0.75 }}>
+                Based on renewal dates
               </div>
             </div>
           </div>
