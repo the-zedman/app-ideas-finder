@@ -328,7 +328,9 @@ export default function BillingPage() {
                 <button
                   onClick={() => handleCheckout(
                     billingInterval === 'monthly' ? 'core_monthly' : 'core_annual',
-                    billingInterval === 'monthly' ? 'price_core_monthly' : 'price_core_annual'
+                    billingInterval === 'monthly' 
+                      ? process.env.NEXT_PUBLIC_STRIPE_PRICE_CORE_MONTHLY || ''
+                      : process.env.NEXT_PUBLIC_STRIPE_PRICE_CORE_ANNUAL || ''
                   )}
                   disabled={processingCheckout}
                   className="w-full py-3 bg-[#88D18A] hover:bg-[#88D18A]/90 text-white font-semibold rounded-lg transition-colors disabled:opacity-50"
@@ -390,7 +392,9 @@ export default function BillingPage() {
                 <button
                   onClick={() => handleCheckout(
                     billingInterval === 'monthly' ? 'prime_monthly' : 'prime_annual',
-                    billingInterval === 'monthly' ? 'price_prime_monthly' : 'price_prime_annual'
+                    billingInterval === 'monthly' 
+                      ? process.env.NEXT_PUBLIC_STRIPE_PRICE_PRIME_MONTHLY || ''
+                      : process.env.NEXT_PUBLIC_STRIPE_PRICE_PRIME_ANNUAL || ''
                   )}
                   disabled={processingCheckout}
                   className="w-full py-3 bg-[#88D18A] hover:bg-[#88D18A]/90 text-white font-semibold rounded-lg transition-colors disabled:opacity-50"
@@ -441,7 +445,7 @@ export default function BillingPage() {
                   <div className="text-xs text-gray-400 text-center mt-1">$0.58 per search</div>
                 </div>
                 <button
-                  onClick={() => handleCheckout('search_pack', 'price_search_pack')}
+                  onClick={() => handleCheckout('search_pack', process.env.NEXT_PUBLIC_STRIPE_PRICE_SEARCH_PACK || '')}
                   disabled={processingCheckout}
                   className="px-8 py-3 bg-[#88D18A] hover:bg-[#88D18A]/90 text-white font-semibold rounded-lg transition-colors disabled:opacity-50 whitespace-nowrap"
                 >

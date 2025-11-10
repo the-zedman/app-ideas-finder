@@ -10,12 +10,12 @@ export const stripe = process.env.STRIPE_SECRET_KEY
 
 // Stripe Price IDs - these will be created in Stripe Dashboard
 export const STRIPE_PRICES = {
-  TRIAL: process.env.STRIPE_PRICE_TRIAL!, // $1 one-time
-  CORE_MONTHLY: process.env.STRIPE_PRICE_CORE_MONTHLY!, // $39/month
-  CORE_ANNUAL: process.env.STRIPE_PRICE_CORE_ANNUAL!, // $399/year
-  PRIME_MONTHLY: process.env.STRIPE_PRICE_PRIME_MONTHLY!, // $79/month
-  PRIME_ANNUAL: process.env.STRIPE_PRICE_PRIME_ANNUAL!, // $799/year
-  SEARCH_PACK: process.env.STRIPE_PRICE_SEARCH_PACK!, // Search pack pricing (to be determined)
+  TRIAL: process.env.STRIPE_PRICE_TRIAL || '', // $1 one-time
+  CORE_MONTHLY: process.env.STRIPE_PRICE_CORE_MONTHLY || '', // $39/month
+  CORE_ANNUAL: process.env.STRIPE_PRICE_CORE_ANNUAL || '', // $399/year
+  PRIME_MONTHLY: process.env.STRIPE_PRICE_PRIME_MONTHLY || '', // $79/month
+  PRIME_ANNUAL: process.env.STRIPE_PRICE_PRIME_ANNUAL || '', // $799/year
+  SEARCH_PACK: process.env.STRIPE_PRICE_SEARCH_PACK || '', // Search pack pricing (to be determined)
 };
 
 // Plan details
