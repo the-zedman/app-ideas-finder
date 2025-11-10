@@ -183,7 +183,9 @@ export default function AdminRevenuePage() {
               <div className="text-3xl font-bold text-gray-900 mb-1">
                 {revenueData?.totalCustomers || 0}
               </div>
-              <div className="text-sm text-gray-500">All-time</div>
+              <div className="text-sm text-gray-500">
+                All signups ({revenueData?.totalSubscribers || 0} with subscriptions)
+              </div>
             </div>
 
             {/* Active Subscriptions */}

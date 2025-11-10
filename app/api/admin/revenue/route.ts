@@ -86,6 +86,11 @@ export async function GET(request: Request) {
     
     arr = mrr * 12;
     
+    // Get total users from profiles (all signed up users)
+    const { count: totalUsersCount } = await supabaseAdmin
+      .from('profiles')
+      .select('*', { count: 'exact', head: true });
+    
     // Get total lifetime revenue (placeholder - should come from actual payment records)
     const { data: allSubscriptions } = await supabaseAdmin
       .from('user_subscriptions')
@@ -98,7 +103,8 @@ export async function GET(request: Request) {
       `);
     
     let lifetimeRevenue = 0;
-    let totalCustomers = 0;
+    let totalCustomers = totalUsersCount || 0;
+    let totalSubscribers = 0;
     const customerSet = new Set();
     
     if (allSubscriptions) {
@@ -110,7 +116,7 @@ export async function GET(request: Request) {
           lifetimeRevenue += price;
         }
       });
-      totalCustomers = customerSet.size;
+      totalSubscribers = customerSet.size;
     }
     
     // Get new customers (last 30 days)
@@ -182,6 +188,7 @@ export async function GET(request: Request) {
       monthlyRevenue: parseFloat(monthlyRevenue.toFixed(2)),
       yearlyRevenue: parseFloat(yearlyRevenue.toFixed(2)),
       totalCustomers,
+      totalSubscribers,
       activeSubscriptions: activeSubscriptions?.length || 0,
       newCustomers: uniqueNewCustomers,
       churnedCustomers: churnedCount,
