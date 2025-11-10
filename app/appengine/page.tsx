@@ -1794,6 +1794,7 @@ Be specific with dollar amounts, percentages, and calculations. Reference actual
                 app_developer: appMetaData.artistName,
                 app_icon_url: appMetaData.artworkUrl100,
                 review_count: reviews.length,
+                ratings_count: appMetaData.userRatingCount || 0,
                 analysis_time_seconds: analysisTimeSeconds,
                 api_cost: finalApiCost,
                 likes: finalParsed.likes,
