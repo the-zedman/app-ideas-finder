@@ -178,6 +178,22 @@ export default function BillingPage() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Test Mode Banner */}
+        {process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY?.includes('test') && (
+          <div className="bg-yellow-50 border-2 border-yellow-400 rounded-lg p-4 mb-6">
+            <div className="flex items-center gap-3">
+              <div className="text-2xl">⚠️</div>
+              <div>
+                <div className="font-bold text-yellow-900">Stripe Test Mode Active</div>
+                <div className="text-sm text-yellow-700">
+                  Use test card: <code className="bg-yellow-100 px-2 py-0.5 rounded">4242 4242 4242 4242</code> | 
+                  Any future date | Any 3-digit CVC | Any ZIP code
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+        
         {/* Current Subscription Card */}
         <div className="bg-white rounded-2xl p-8 mb-8 border border-gray-200 shadow-sm">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">Current Subscription</h2>

@@ -102,10 +102,10 @@ export default function Pricing() {
               </ul>
 
               <div className="text-center">
-                <Link href="//" className="block w-full bg-[#88D18A] hover:bg-[#88D18A]/90 text-white font-semibold py-3 px-6 rounded-lg transition-colors">
-                  Start Trial
-                </Link>
-                <p className="text-xs text-gray-500 mt-3">Converts to Core after 3 days unless cancelled</p>
+                <button disabled className="block w-full bg-gray-300 text-gray-500 font-semibold py-3 px-6 rounded-lg cursor-not-allowed">
+                  Coming Soon
+                </button>
+                <p className="text-xs text-gray-500 mt-3">Sign up at launch for special early-bird pricing</p>
               </div>
             </div>
 
@@ -155,9 +155,9 @@ export default function Pricing() {
                 <p className="text-xs text-gray-500 mb-4">
                   ${billingCycle === 'monthly' ? '0.52' : '0.44'} per search
                 </p>
-                <Link href="//" className="block w-full bg-[#88D18A] hover:bg-[#88D18A]/90 text-white font-semibold py-3 px-6 rounded-lg transition-colors">
-                  Get Started
-                </Link>
+                <button disabled className="block w-full bg-gray-300 text-gray-500 font-semibold py-3 px-6 rounded-lg cursor-not-allowed">
+                  Coming Soon
+                </button>
               </div>
             </div>
 
@@ -222,9 +222,9 @@ export default function Pricing() {
                 <p className="text-xs text-gray-500 mb-4">
                   ${billingCycle === 'monthly' ? '0.35' : '0.30'} per search
                 </p>
-                <Link href="//" className="block w-full bg-[#88D18A] hover:bg-[#88D18A]/90 text-white font-semibold py-3 px-6 rounded-lg transition-colors">
-                  Get Started
-                </Link>
+                <button disabled className="block w-full bg-gray-300 text-gray-500 font-semibold py-3 px-6 rounded-lg cursor-not-allowed">
+                  Coming Soon
+                </button>
               </div>
             </div>
           </div>
