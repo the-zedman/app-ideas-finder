@@ -127,46 +127,46 @@ export default function AdminRevenuePage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {/* Current Period Revenue */}
             <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl p-6 text-white shadow-lg">
-              <div className="text-sm font-semibold mb-2 opacity-90">
+              <div className="text-sm font-semibold mb-2 text-white opacity-90">
                 {timeframe.charAt(0).toUpperCase() + timeframe.slice(1)}ly Revenue
               </div>
-              <div className="text-4xl font-bold mb-1">
+              <div className="text-4xl font-bold mb-1 text-white">
                 {formatCurrency(getCurrentRevenue())}
               </div>
-              <div className="text-sm opacity-75">
+              <div className="text-sm text-white opacity-75">
                 Estimated for current {timeframe}
               </div>
             </div>
 
             {/* MRR */}
             <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-2xl p-6 text-white shadow-lg">
-              <div className="text-sm font-semibold mb-2 opacity-90">MRR</div>
-              <div className="text-4xl font-bold mb-1">
+              <div className="text-sm font-semibold mb-2 text-white opacity-90">MRR</div>
+              <div className="text-4xl font-bold mb-1 text-white">
                 {formatCurrency(revenueData?.mrr || 0)}
               </div>
-              <div className="text-sm opacity-75">
+              <div className="text-sm text-white opacity-75">
                 Monthly Recurring Revenue
               </div>
             </div>
 
             {/* ARR */}
             <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl p-6 text-white shadow-lg">
-              <div className="text-sm font-semibold mb-2 opacity-90">ARR</div>
-              <div className="text-4xl font-bold mb-1">
+              <div className="text-sm font-semibold mb-2 text-white opacity-90">ARR</div>
+              <div className="text-4xl font-bold mb-1 text-white">
                 {formatCurrency(revenueData?.arr || 0)}
               </div>
-              <div className="text-sm opacity-75">
+              <div className="text-sm text-white opacity-75">
                 Annual Recurring Revenue
               </div>
             </div>
 
             {/* Lifetime Revenue */}
             <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl p-6 text-white shadow-lg">
-              <div className="text-sm font-semibold mb-2 opacity-90">Lifetime Revenue</div>
-              <div className="text-4xl font-bold mb-1">
+              <div className="text-sm font-semibold mb-2 text-white opacity-90">Lifetime Revenue</div>
+              <div className="text-4xl font-bold mb-1 text-white">
                 {formatCurrency(revenueData?.lifetimeRevenue || 0)}
               </div>
-              <div className="text-sm opacity-75">
+              <div className="text-sm text-white opacity-75">
                 Total all-time revenue
               </div>
             </div>
