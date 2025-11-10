@@ -53,7 +53,7 @@ Go to https://dashboard.stripe.com/products and create:
 
 ### 4. Search Pack
 - **Name**: Search Pack
-- **Description**: 50 additional searches (never expires)
+- **Description**: 53 additional searches (never expires)
 - **Price**: $29.00 USD (one-time payment)
 - Copy the Price ID to `STRIPE_PRICE_SEARCH_PACK`
 
@@ -87,9 +87,9 @@ stripe listen --forward-to localhost:3000/api/webhooks/stripe
 ## Pricing Summary
 
 - **Trial**: $1 (3 days, 10 searches) → auto-converts to Core Monthly
-- **Core Monthly**: $39/month (75 searches)
-- **Core Annual**: $399/year (75 searches, save $69)
-- **Prime Monthly**: $79/month (225 searches)
-- **Prime Annual**: $799/year (225 searches, save $149)
-- **Search Pack**: $29 (50 searches, never expires)
+- **Core Monthly**: $39/month (73 searches)
+- **Core Annual**: $399/year (73 searches, save $69)
+- **Prime Monthly**: $79/month (227 searches)
+- **Prime Annual**: $799/year (227 searches, save $149)
+- **Search Pack**: $29 (53 searches, never expires)
 

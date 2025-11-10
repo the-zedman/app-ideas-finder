@@ -421,7 +421,7 @@ export default function BillingPage() {
                 <ul className="space-y-2 mb-4">
                   <li className="flex items-center gap-2 text-gray-700">
                     <span className="text-green-500 font-bold">✓</span>
-                    <span>50 additional searches</span>
+                    <span>53 additional searches</span>
                   </li>
                   <li className="flex items-center gap-2 text-gray-700">
                     <span className="text-green-500 font-bold">✓</span>
@@ -438,7 +438,7 @@ export default function BillingPage() {
                 <div>
                   <div className="text-5xl font-bold text-gray-900">$29</div>
                   <div className="text-sm text-gray-500 text-center mt-1">one-time payment</div>
-                  <div className="text-xs text-gray-400 text-center mt-1">$0.58 per search</div>
+                  <div className="text-xs text-gray-400 text-center mt-1">$0.55 per search</div>
                 </div>
                 <button
                   onClick={() => handleCheckout('search_pack', '')} // Server will look up the price ID

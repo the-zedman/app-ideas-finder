@@ -301,7 +301,7 @@ export default function Pricing() {
                 <ul className="space-y-2">
                   <li className="flex items-center gap-2 text-gray-700">
                     <span className="text-[#88D18A] font-bold">✓</span>
-                    <span>50 additional searches</span>
+                    <span>53 additional searches</span>
                   </li>
                   <li className="flex items-center gap-2 text-gray-700">
                     <span className="text-[#88D18A] font-bold">✓</span>

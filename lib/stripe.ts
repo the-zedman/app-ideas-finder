@@ -59,7 +59,7 @@ export const PLAN_DETAILS = {
   },
   search_pack: {
     name: 'Search Pack',
-    searches: 50,
+    searches: 53,
     price: 29.00, // Suggested pricing
     priceId: STRIPE_PRICES.SEARCH_PACK,
   },
