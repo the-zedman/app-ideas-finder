@@ -102,13 +102,15 @@ CREATE POLICY "Admins can manage all payouts"
     )
   );
 
--- RLS Policies for user_affiliates (update existing)
-CREATE POLICY IF NOT EXISTS "Users can view own affiliate data"
+-- RLS Policies for user_affiliates (drop and recreate to avoid conflicts)
+DROP POLICY IF EXISTS "Users can view own affiliate data" ON public.user_affiliates;
+CREATE POLICY "Users can view own affiliate data"
   ON public.user_affiliates
   FOR SELECT
   USING (auth.uid() = user_id);
 
-CREATE POLICY IF NOT EXISTS "Users can update own payment info"
+DROP POLICY IF EXISTS "Users can update own payment info" ON public.user_affiliates;
+CREATE POLICY "Users can update own payment info"
   ON public.user_affiliates
   FOR UPDATE
   USING (auth.uid() = user_id)
