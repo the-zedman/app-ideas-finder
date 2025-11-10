@@ -13,7 +13,7 @@ export default function AnalysesHistory() {
   const [filteredAnalyses, setFilteredAnalyses] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
-  const [sortField, setSortField] = useState<'created_at' | 'app_name' | 'review_count'>('created_at');
+  const [sortField, setSortField] = useState<'created_at' | 'app_name' | 'review_count' | 'ratings_count'>('created_at');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
   
   const supabase = createClient();
@@ -169,6 +169,8 @@ export default function AnalysesHistory() {
                 <option value="app_name-desc">Name (Z-A)</option>
                 <option value="review_count-desc">Most Reviews</option>
                 <option value="review_count-asc">Least Reviews</option>
+                <option value="ratings_count-desc">Most Ratings</option>
+                <option value="ratings_count-asc">Least Ratings</option>
               </select>
             </div>
           </div>
@@ -183,6 +185,7 @@ export default function AnalysesHistory() {
                     <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">App</th>
                     <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700 hidden sm:table-cell">Developer</th>
                     <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700 hidden md:table-cell">Reviews</th>
+                    <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700 hidden lg:table-cell">Ratings</th>
                     <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Date</th>
                     <th className="text-right py-3 px-4 text-sm font-semibold text-gray-700">Actions</th>
                   </tr>
@@ -220,6 +223,9 @@ export default function AnalysesHistory() {
                       </td>
                       <td className="py-3 px-4 text-sm text-gray-600 hidden md:table-cell">
                         {analysis.review_count?.toLocaleString() || 0}
+                      </td>
+                      <td className="py-3 px-4 text-sm text-gray-600 hidden lg:table-cell">
+                        {analysis.ratings_count?.toLocaleString() || 'N/A'}
                       </td>
                       <td className="py-3 px-4 text-sm text-gray-600">
                         <div>
