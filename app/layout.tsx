@@ -48,7 +48,7 @@ export const metadata: Metadata = {
     description: 'Discover your competitive edge. Analyze any iOS app, uncover what users want, and find what competitors miss. AI-powered insights from hundreds of reviews in seconds.',
     images: [
       {
-        url: '/og-image.png',
+        url: '/og-image.png?v=2',
         width: 1200,
         height: 630,
         alt: 'App Ideas Finder - Find Your 1% Edge',
@@ -61,7 +61,7 @@ export const metadata: Metadata = {
     creator: '@appideasfinder',
     title: 'App Ideas Finder - AI-Powered App Analysis & Competitive Intelligence',
     description: 'Discover your competitive edge. Analyze any iOS app, uncover what users want, and find what competitors miss.',
-    images: ['/og-image.png'],
+    images: ['/og-image.png?v=2'],
   },
   robots: {
     index: true,
