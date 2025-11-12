@@ -908,14 +908,12 @@ Generate 15-20 app names, one per line, without numbers or bullet points.`;
     const keywordsText = keywords.join(', ');
     const definitelyIncludeText = definitelyInclude.join('\n• ');
     const backlogText = backlog.map((item: any) => item.content).join('\n• ');
-    const estimatedDownloads = `${(ratingsCount * 100).toLocaleString()} - ${(ratingsCount * 200).toLocaleString()}`;
     
     const prompt = `You are a product strategy consultant analyzing user feedback for ${appName} to guide the development of a competing or improved app.
 
 MARKET VALIDATION:
 App Being Analyzed: ${appName}
-• Total Ratings: ${ratingsCount.toLocaleString()} (lifetime engagement)
-• Estimated Downloads: ${estimatedDownloads} (based on industry-standard ratios)
+• User Engagement: ${ratingsCount.toLocaleString()} ratings (indicates active, engaged user base)
 • Market Status: PROVEN - This is a validated market with real users and sustained demand
 
 USER INTELLIGENCE:
@@ -935,16 +933,16 @@ Additional Features:
 • ${backlogText}
 
 TASK:
-Provide 8-10 strategic, actionable recommendations for building a successful app in this PROVEN market. Include market-sizing insights where relevant. Cover these areas:
+Provide 8-10 strategic, actionable recommendations for building a successful app in this PROVEN market. Focus on qualitative insights from user feedback. Cover these areas:
 
-1. **Market Opportunity** - Quantify the opportunity (% of dissatisfied users, potential user acquisition)
-2. **Development Priorities** - What to build first and why (with impact estimates)
-3. **Market Positioning** - How to differentiate and capture market share
+1. **Market Opportunity** - Identify the strongest pain points and opportunities based on user sentiment
+2. **Development Priorities** - What to build first and why based on user complaints and requests
+3. **Market Positioning** - How to differentiate based on what users love/hate about competitors
 4. **Innovation Opportunities** - Novel features or approaches users haven't articulated but would love
-5. **Monetization Strategy** - Pricing model with user acquisition and conversion estimates
+5. **Monetization Strategy** - Pricing approach based on competitive landscape and user feedback about pricing
 6. **Technical Decisions** - Architecture choices based on user complaints (performance, offline, etc)
 7. **UX/UI Priorities** - Critical design decisions based on feedback
-8. **Launch Strategy** - Target user segment, MVP scope, realistic first-year goals
+8. **Launch Strategy** - Target user segment, MVP scope, and go-to-market approach
 9. **Competitive Advantages** - Specific ways to beat competitors and capture their dissatisfied users
 
 IMPORTANT FORMATTING:
@@ -1030,11 +1028,11 @@ Format as a comprehensive prompt that an AI developer can use to start building 
     
     const prompt = `You are a market analyst providing a comprehensive business viability assessment for a new app concept based on analyzing ${appName}.
 
-MARKET DATA:
+MARKET VALIDATION DATA:
 Target App: ${appName}
-• Total Ratings: ${ratingsCount.toLocaleString()} (lifetime engagement)
-• Recent Reviews Analyzed: ${reviewCount}
-• Estimated Downloads: Based on industry-standard 100:1 ratio, approximately ${(ratingsCount * 100).toLocaleString()} - ${(ratingsCount * 200).toLocaleString()} lifetime downloads
+• User Engagement: ${ratingsCount.toLocaleString()} ratings (indicates active user base and market validation)
+• Recent Reviews Analyzed: ${reviewCount} (real user feedback)
+• Market Status: The existence of ${ratingsCount.toLocaleString()} engaged users proves this is a validated market with sustained demand
 
 USER SENTIMENT ANALYSIS:
 What Users Love:
@@ -1053,19 +1051,19 @@ Additional: ${backlogText}
 REQUIRED OUTPUT - Provide comprehensive market viability analysis covering:
 
 **1. Total Addressable Market (TAM)**
-- Market size estimation based on download data and category
-- Growth trends and trajectory
+- Market size estimation based on app category and industry research
+- Growth trends and trajectory for this category
 - Market maturity assessment
 
 **2. Serviceable Available Market (SAM)**  
-- Realistic market segment you can reach
+- Realistic market segment you can reach based on positioning
 - User segments most frustrated with current solutions (from review analysis)
-- Percentage of TAM that matches your target profile
+- Specific pain points that represent capturable market opportunity
 
 **3. Serviceable Obtainable Market (SOM)**
-- Realistic first-year capture rate
-- Monthly download projections (conservative/realistic/optimistic)
-- Conversion rate estimates based on solving key pain points
+- Realistic market capture potential based on addressing user pain points
+- Target user segments for launch (based on strongest complaints)
+- Competitive positioning strategy to win users from ${appName}
 
 **4. Competitive Analysis**
 - Competitor strengths and weaknesses (from ratings/pricing)
@@ -1073,10 +1071,10 @@ REQUIRED OUTPUT - Provide comprehensive market viability analysis covering:
 - Your competitive advantages based on feature analysis
 
 **5. Revenue Potential**
-- User acquisition potential per month
-- Expected conversion rates (freemium to paid, if applicable)
-- MRR and ARR projections for Year 1
-- Break-even analysis
+- Pricing strategy based on competitive analysis
+- Expected conversion rates based on similar apps in category
+- Realistic Year 1 revenue scenarios (conservative/realistic/optimistic)
+- Key revenue drivers and monetization approach
 
 **6. Risk Assessment**
 - Market risks (saturation, competitor response)
@@ -1096,7 +1094,7 @@ REQUIRED OUTPUT - Provide comprehensive market viability analysis covering:
 - User willingness to pay indicators from reviews
 - Signs this is a real opportunity vs a saturated market
 
-Be specific with numbers, percentages, and data-driven projections. Reference the actual review feedback where relevant.`;
+Base your analysis on the actual user feedback data, competitive landscape, and category trends. Avoid speculative download or revenue projections that can't be validated. Focus on qualitative market signals and positioning opportunities.`;
 
     return [{role: 'user', content: prompt}];
   };
@@ -1125,7 +1123,7 @@ Keywords: ${keywordsText}
 Suggested Names: ${appNamesText}
 
 MARKET INTELLIGENCE:
-Target App Ratings: ${ratingsCount.toLocaleString()} (indicates ${(ratingsCount * 100).toLocaleString()} - ${(ratingsCount * 200).toLocaleString()} estimated downloads)
+Target App Engagement: ${ratingsCount.toLocaleString()} ratings (indicates an engaged user base and validated market)
 
 USER SENTIMENT FROM ${ratingsCount.toLocaleString()} RATINGS:
 Loves: ${likesText}
@@ -1153,11 +1151,11 @@ REQUIRED OUTPUT - Provide comprehensive pricing and revenue analysis:
 - Price thresholds mentioned in reviews
 - Value perception indicators
 
-**4. Revenue Projections (Year 1)**
-- Conservative scenario (1-2% market capture, 10-15% conversion)
-- Realistic scenario (3-5% market capture, 15-25% conversion)
-- Optimistic scenario (8-10% market capture, 25-35% conversion)
-- Include monthly and annual revenue projections with clear assumptions
+**4. Revenue Strategy & Scenarios**
+- Conservative scenario: Based on slow organic growth and low conversion rates
+- Realistic scenario: Based on moderate marketing effort and category-typical conversion
+- Optimistic scenario: Based on strong product-market fit and viral growth
+- Focus on revenue drivers (pricing × conversion × retention) rather than speculative user counts
 
 **5. Monetization Do's and Don'ts**
 - What to avoid based on competitor review complaints
@@ -1171,7 +1169,7 @@ REQUIRED OUTPUT - Provide comprehensive pricing and revenue analysis:
 - Price optimization timeline
 - A/B testing recommendations
 
-Be specific with dollar amounts, percentages, and calculations. Reference actual user feedback about pricing where available.`;
+Base recommendations on competitive pricing data and actual user feedback about pricing. Keep revenue projections grounded in realistic assumptions about conversion rates and growth for new apps in this category.`;
 
     return [{role:'user', content: prompt}];
   };
