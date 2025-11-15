@@ -2561,16 +2561,16 @@ Base recommendations on competitive pricing data and actual user feedback about 
                   
                   {createRollupBar('likes', 1, 'What people like about the TARGET app', '👍')}
                   {createRollupBar('dislikes', 2, "What Users Want (and Don't Want) from the TARGET App", '💭')}
-                  {createRollupBar('keywords', 3, 'Suggested keywords for your app', '🔍')}
-                  {createRollupBar('definitely', 4, 'Core features to include in your app', '🎯')}
-                  {createRollupBar('backlog', 5, 'New and additional features to include in your app', '✨')}
-                  {createRollupBar('recommendations', 6, 'Strategic Recommendations & Insights', '⭐')}
-                  {createRollupBar('description', 7, 'Suggested description for your app', '📝')}
-                  {createRollupBar('names', 8, 'Suggested names for your app', '💡')}
-                  {createRollupBar('prp', 9, 'PRP (Product Requirements Prompt) for your app', '📋')}
+                  {createRollupBar('keywords', 3, 'Suggested keywords for your new app', '🔍')}
+                  {createRollupBar('definitely', 4, 'Core features to include in your new app', '🎯')}
+                  {createRollupBar('backlog', 5, 'New and additional features to include in your new app', '✨')}
+                  {createRollupBar('recommendations', 6, 'Strategic Recommendations & Insights for your new app', '⭐')}
+                  {createRollupBar('description', 7, 'Suggested description for your new app', '📝')}
+                  {createRollupBar('names', 8, 'Suggested names for your new app', '💡')}
+                  {createRollupBar('prp', 9, 'PRP (Product Requirements Prompt) for your new app', '📋')}
                   {createRollupBar('similar', 10, 'Similar Apps', '📱')}
-                  {createRollupBar('pricing', 11, 'Pricing Strategy & Revenue Projections', '💰')}
-                  {createRollupBar('viability', 12, 'Market Viability & Business Opportunity Analysis', '📊')}
+                  {createRollupBar('pricing', 11, 'Pricing Strategy & Revenue Projections for your new app', '💰')}
+                  {createRollupBar('viability', 12, 'Market Viability & Business Opportunity Analysis for your new app', '📊')}
                   
                   {/* Section 13: Time & Cost Savings */}
                   {analysisMetrics.reviewCount > 0 && (() => {
