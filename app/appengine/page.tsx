@@ -111,7 +111,7 @@ function ShareableResultsCard({
   appMeta: AppMeta; 
   rollupContent: {[key: string]: any}; 
   analysisMetrics: any;
-  shareCardRef: React.RefObject<HTMLDivElement>;
+  shareCardRef: React.RefObject<HTMLDivElement | null>;
 }) {
   const [isSharing, setIsSharing] = useState(false);
   
