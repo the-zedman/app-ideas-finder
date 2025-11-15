@@ -331,7 +331,7 @@ export default function HomeZone() {
           <p className="text-gray-600 text-lg">
             {isFirstTime 
               ? "Let's find your next app idea. Analyze your first app below!" 
-              : "Ready to discover more app opportunities?"}
+              : "Ready to discover more app opportunities for you to build?"}
           </p>
         </div>
 
@@ -461,29 +461,6 @@ export default function HomeZone() {
               >
                 Go to App Ideas Engine →
               </button>
-            </div>
-
-            {/* What You'll Discover */}
-            <div className="mt-8 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-6">
-              <h4 className="font-semibold text-gray-900 mb-4">💡 What You'll Discover</h4>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-gray-700">
-                <div className="flex items-start gap-2">
-                  <span className="text-green-600 font-bold">✓</span>
-                  <span>What users love (keep these features)</span>
-                </div>
-                <div className="flex items-start gap-2">
-                  <span className="text-green-600 font-bold">✓</span>
-                  <span>What they hate (avoid these mistakes)</span>
-                </div>
-                <div className="flex items-start gap-2">
-                  <span className="text-green-600 font-bold">✓</span>
-                  <span>Missing features (your opportunity)</span>
-                </div>
-                <div className="flex items-start gap-2">
-                  <span className="text-green-600 font-bold">✓</span>
-                  <span>App names, pricing strategy & more</span>
-                </div>
-              </div>
             </div>
         </div>
 
@@ -645,7 +622,7 @@ export default function HomeZone() {
                 href="/affiliate" 
                 className="text-sm text-[#88D18A] hover:underline font-semibold"
               >
-                Full Details →
+                Program Details →
               </Link>
             </div>
 
