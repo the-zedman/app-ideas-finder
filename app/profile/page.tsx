@@ -251,36 +251,27 @@ export default function ProfilePage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 px-4 py-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <button
-              onClick={() => router.back()}
-              className="p-2 -ml-2 rounded-full hover:bg-gray-100 transition-colors"
-            >
-              <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-            </button>
-            <div className="flex items-center space-x-2">
-              <Image
-                src="/App Ideas Finder - logo - 200x200.png"
-                alt="App Ideas Finder Logo"
-                width={32}
-                height={32}
-                className="rounded-md"
+      <header className="bg-white border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <div className="flex items-center gap-4">
+              <img 
+                src="/App Ideas Finder - logo - 200x200.png" 
+                alt="App Ideas Finder" 
+                className="h-8 w-8 rounded-lg"
               />
-              <h1 className="text-2xl font-bold text-gray-900">Profile</h1>
+              <a href="/homezone" className="text-xl font-bold text-[#3D405B] hover:text-gray-700">
+                App Ideas Finder
+              </a>
+              <span className="text-gray-400">/</span>
+              <h1 className="text-xl font-bold text-gray-900">Profile</h1>
+            </div>
+            <div className="flex items-center gap-4">
+              <a href="/homezone" className="text-gray-600 hover:text-gray-900">Back to Dashboard</a>
             </div>
           </div>
-          <button
-            onClick={() => router.push('/homezone')}
-            className="px-4 py-2 bg-[#88D18A] text-white rounded-lg font-medium hover:bg-[#88D18A]/90 transition-colors"
-          >
-            Back to HomeZone
-          </button>
         </div>
-      </div>
+      </header>
 
       <div className="px-4 py-6">
         {/* Navigation Tabs */}

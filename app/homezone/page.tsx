@@ -302,7 +302,7 @@ export default function HomeZone() {
                       }}
                       className="w-full text-left px-4 py-3 rounded-lg hover:bg-gray-50 text-gray-900 transition-colors"
                     >
-                      Profile Settings
+                      👤 Profile Settings
                     </button>
                     <button
                       onClick={() => {
