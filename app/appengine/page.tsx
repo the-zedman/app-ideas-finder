@@ -631,7 +631,12 @@ function AppEngineContent() {
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
+            const currentScroll = window.scrollY;
             setExpandedRollup(isExpanded ? null : section);
+            // Prevent scroll jump by restoring scroll position after state update
+            setTimeout(() => {
+              window.scrollTo(0, currentScroll);
+            }, 0);
           }}
         >
           <div className="flex justify-between items-center p-5">
