@@ -169,8 +169,7 @@ export default function BillingPage() {
               <h1 className="text-xl font-bold text-gray-900">Billing & Subscription</h1>
             </div>
             <div className="flex items-center gap-4">
-              <a href="/homezone" className="text-gray-600 hover:text-gray-900">Back to Home</a>
-              <button onClick={handleLogout} className="text-red-600 hover:text-red-700">Sign Out</button>
+              <a href="/homezone" className="text-gray-600 hover:text-gray-900">Back to Dashboard</a>
             </div>
           </div>
         </div>
