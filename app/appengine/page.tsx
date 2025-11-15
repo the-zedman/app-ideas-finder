@@ -787,13 +787,47 @@ function AppEngineContent() {
                 })}
               </div>
             ) : section === 'pricing' ? (
-              <div className="prose prose-gray max-w-none text-gray-700 leading-relaxed"
-                dangerouslySetInnerHTML={{ __html: parseMarkdownContent(content?.[0] || '') }}
-              />
+              <div>
+                <div className="prose prose-gray max-w-none text-gray-700 leading-relaxed"
+                  dangerouslySetInnerHTML={{ __html: parseMarkdownContent(content?.[0] || '') }}
+                />
+                <div className="mt-6 p-4 bg-yellow-50 border-l-4 border-yellow-400 rounded-r-lg">
+                  <div className="flex items-start">
+                    <div className="flex-shrink-0">
+                      <svg className="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    <div className="ml-3">
+                      <p className="text-sm text-yellow-800 font-semibold mb-1">Important Disclaimer</p>
+                      <p className="text-sm text-yellow-700">
+                        All pricing recommendations, revenue projections, and monetization strategies presented in this analysis are estimates based on available data and industry research. These figures are provided for informational purposes only and should not be considered as financial advice or guarantees. Actual results may vary significantly. You should conduct your own thorough due diligence, market research, and financial analysis before making any business decisions or investments. Market conditions, competition, and user behavior can change rapidly, and past performance does not guarantee future results.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
             ) : section === 'viability' ? (
-              <div className="prose prose-gray max-w-none text-gray-700 leading-relaxed"
-                dangerouslySetInnerHTML={{ __html: parseMarkdownContent(content?.[0] || '') }}
-              />
+              <div>
+                <div className="prose prose-gray max-w-none text-gray-700 leading-relaxed"
+                  dangerouslySetInnerHTML={{ __html: parseMarkdownContent(content?.[0] || '') }}
+                />
+                <div className="mt-6 p-4 bg-yellow-50 border-l-4 border-yellow-400 rounded-r-lg">
+                  <div className="flex items-start">
+                    <div className="flex-shrink-0">
+                      <svg className="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    <div className="ml-3">
+                      <p className="text-sm text-yellow-800 font-semibold mb-1">Important Disclaimer</p>
+                      <p className="text-sm text-yellow-700">
+                        All market size estimates (TAM, SAM, SOM), revenue projections, and business opportunity assessments presented in this analysis are estimates based on available data and industry research. These figures are provided for informational purposes only and should not be considered as financial advice or guarantees. Actual results may vary significantly. You should conduct your own thorough due diligence, market research, and financial analysis before making any business decisions or investments. Market conditions, competition, and user behavior can change rapidly, and past performance does not guarantee future results.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
             ) : section === 'names' ? (
               <div className="flex flex-wrap gap-3">
                 {content?.map((name: string, i: number) => (
@@ -1402,14 +1436,18 @@ REQUIRED OUTPUT - Provide comprehensive market viability analysis covering:
 - Market maturity assessment
 
 **2. Serviceable Available Market (SAM)**  
-- Realistic market segment you can reach based on positioning
+- **IMPORTANT: SAM refers to the total addressable market size across the entire app sector/category, not just this specific app. Be extremely conservative - most app categories represent a fraction of the total app market.**
+- Realistic market segment size within the broader app category that could potentially be reached
 - User segments most frustrated with current solutions (from review analysis)
 - Specific pain points that represent capturable market opportunity
+- **Keep estimates realistic - most app categories represent $10M-$100M total market size, not billions**
 
 **3. Serviceable Obtainable Market (SOM)**
-- Realistic market capture potential based on addressing user pain points
+- **IMPORTANT: SOM refers to the realistic market share you could capture within the broader app sector, not just from the target app. Be extremely conservative - new apps typically capture 0.1%-1% of their category market.**
+- Realistic market capture potential within the broader app category (typically 0.1%-1% for new apps)
 - Target user segments for launch (based on strongest complaints)
 - Competitive positioning strategy to win users from ${appName}
+- **Keep estimates realistic - new apps typically capture $10K-$500K in market share, not millions**
 
 **4. Competitive Analysis**
 - Competitor strengths and weaknesses (from ratings/pricing)
@@ -1420,7 +1458,7 @@ REQUIRED OUTPUT - Provide comprehensive market viability analysis covering:
 - Pricing strategy based on competitive analysis
 - Expected conversion rates based on similar apps in category
 - Realistic Year 1 revenue scenarios (conservative/realistic/optimistic)
-- **CRITICAL: Revenue estimates must be VERY conservative. Most apps generate far less revenue than expected. Use Sensor Tower data when available (typically $1K-$10K/month for most apps). If no Sensor Tower data, assume Year 1 revenue is typically $5K-$60K total, not per month. Be extremely conservative - divide any optimistic estimates by 10x.**
+- **CRITICAL: Revenue estimates must be VERY conservative. Most apps generate far less revenue than expected. Industry data shows most apps make $1K-$10K/month. Year 1 revenue for new apps is typically $5K-$60K total, not per month. Be extremely conservative in all estimates.**
 - Key revenue drivers and monetization approach
 
 **6. Risk Assessment**
@@ -1441,7 +1479,9 @@ REQUIRED OUTPUT - Provide comprehensive market viability analysis covering:
 - User willingness to pay indicators from reviews
 - Signs this is a real opportunity vs a saturated market
 
-Base your analysis on the actual user feedback data, competitive landscape, and category trends. **CRITICAL FOR REVENUE ESTIMATES: Be EXTREMELY conservative. Most apps make $1K-$10K/month. Year 1 revenue for new apps is typically $5K-$60K TOTAL, not per month. If Sensor Tower data shows <$5K/month for similar apps, use that as your realistic baseline. Divide any optimistic estimates by 10x. Most apps never reach $100K/year.** Avoid speculative download or revenue projections that can't be validated. Focus on qualitative market signals and positioning opportunities.`;
+Base your analysis on the actual user feedback data, competitive landscape, and category trends. **CRITICAL FOR REVENUE ESTIMATES: Be EXTREMELY conservative. Most apps make $1K-$10K/month. Year 1 revenue for new apps is typically $5K-$60K TOTAL, not per month. Most apps never reach $100K/year.** Avoid speculative download or revenue projections that can't be validated. Focus on qualitative market signals and positioning opportunities.
+
+**IMPORTANT DISCLAIMER TO INCLUDE: All market size estimates, revenue projections, and business opportunity assessments presented in this analysis are estimates based on available data and industry research. These figures are provided for informational purposes only and should not be considered as financial advice or guarantees. Actual results may vary significantly. Users should conduct their own thorough due diligence, market research, and financial analysis before making any business decisions or investments. Market conditions, competition, and user behavior can change rapidly, and past performance does not guarantee future results.`;
 
     return [{role: 'user', content: prompt}];
   };
@@ -1499,12 +1539,12 @@ REQUIRED OUTPUT - Provide comprehensive pricing and revenue analysis:
 - Value perception indicators
 
 **4. Revenue Strategy & Scenarios**
-- **CRITICAL: All revenue estimates must be EXTREMELY conservative. Most apps make $1K-$10K/month according to Sensor Tower data. Year 1 revenue for new apps is typically $5K-$60K TOTAL, not per month.**
+- **CRITICAL: All revenue estimates must be EXTREMELY conservative. Industry data shows most apps make $1K-$10K/month. Year 1 revenue for new apps is typically $5K-$60K TOTAL, not per month.**
 - Conservative scenario: Based on slow organic growth and low conversion rates. Typically $5K-$15K total Year 1 revenue for a new app.
 - Realistic scenario: Based on moderate marketing effort and category-typical conversion. Typically $15K-$40K total Year 1 revenue.
 - Optimistic scenario: Based on strong product-market fit and viral growth. Typically $40K-$100K total Year 1 revenue. **Never exceed $100K for Year 1 unless the target app has 1M+ downloads and proven revenue.**
 - Focus on revenue drivers (pricing × conversion × retention) rather than speculative user counts
-- **If you see Sensor Tower data showing <$5K/month, use that as the realistic baseline. Most apps never reach $100K/year.**
+- **Most apps never reach $100K/year. Be realistic and conservative in all estimates.**
 
 **5. Monetization Do's and Don'ts**
 - What to avoid based on competitor review complaints
@@ -1518,7 +1558,9 @@ REQUIRED OUTPUT - Provide comprehensive pricing and revenue analysis:
 - Price optimization timeline
 - A/B testing recommendations
 
-Base recommendations on competitive pricing data and actual user feedback about pricing. **MOST IMPORTANTLY: Revenue projections must be EXTREMELY conservative. The vast majority of apps generate $1K-$10K/month. Year 1 revenue for new apps is typically $5K-$60K TOTAL. If Sensor Tower shows <$5K/month for similar apps, use that as your realistic baseline. Divide any optimistic estimates by 10x. Most apps never reach $100K/year revenue.**`;
+Base recommendations on competitive pricing data and actual user feedback about pricing. **MOST IMPORTANTLY: Revenue projections must be EXTREMELY conservative. The vast majority of apps generate $1K-$10K/month. Year 1 revenue for new apps is typically $5K-$60K TOTAL. Most apps never reach $100K/year revenue. Be realistic and conservative in all estimates.**
+
+**IMPORTANT DISCLAIMER TO INCLUDE: All pricing recommendations, revenue projections, and monetization strategies presented in this analysis are estimates based on available data and industry research. These figures are provided for informational purposes only and should not be considered as financial advice or guarantees. Actual results may vary significantly. Users should conduct their own thorough due diligence, market research, and financial analysis before making any business decisions or investments. Market conditions, competition, and user behavior can change rapidly, and past performance does not guarantee future results.**`;
 
     return [{role:'user', content: prompt}];
   };
