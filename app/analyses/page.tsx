@@ -110,20 +110,21 @@ export default function AnalysesHistory() {
       <header className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-4">
               <img 
                 src="/App Ideas Finder - logo - 200x200.png" 
                 alt="App Ideas Finder" 
-                className="h-8 w-8"
+                className="h-8 w-8 rounded-lg"
               />
-              <h1 className="text-xl font-bold text-[#3D405B]">App Ideas Finder</h1>
+              <a href="/homezone" className="text-xl font-bold text-[#3D405B] hover:text-gray-700">
+                App Ideas Finder
+              </a>
+              <span className="text-gray-400">/</span>
+              <h1 className="text-xl font-bold text-gray-900">Analysis History</h1>
             </div>
-            <button
-              onClick={() => router.push('/homezone')}
-              className="text-gray-600 hover:text-[#3D405B] transition-colors font-medium"
-            >
-              ← Back to Dashboard
-            </button>
+            <div className="flex items-center gap-4">
+              <a href="/homezone" className="text-gray-600 hover:text-gray-900">Back to Dashboard</a>
+            </div>
           </div>
         </div>
       </header>
