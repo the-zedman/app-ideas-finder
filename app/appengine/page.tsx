@@ -2883,7 +2883,7 @@ Base recommendations on competitive pricing data and actual user feedback about 
                   {/* Shareable Results Card - Hidden for now */}
                   {false && appMeta && Object.keys(rollupContent).length > 0 && (
                     <ShareableResultsCard
-                      appMeta={appMeta}
+                      appMeta={appMeta as AppMeta}
                       rollupContent={rollupContent}
                       analysisMetrics={analysisMetrics}
                       shareCardRef={shareCardRef}
