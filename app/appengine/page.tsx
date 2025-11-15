@@ -1440,14 +1440,14 @@ REQUIRED OUTPUT - Provide comprehensive market viability analysis covering:
 - Realistic market segment size within the broader app category that could potentially be reached
 - User segments most frustrated with current solutions (from review analysis)
 - Specific pain points that represent capturable market opportunity
-- **Keep estimates realistic - most app categories represent $10M-$100M total market size, not billions**
+- **Keep estimates realistic - most app categories represent $10M-$100M USD total market size, not billions. Always include "USD" when mentioning dollar amounts.**
 
 **3. Serviceable Obtainable Market (SOM)**
 - **IMPORTANT: SOM refers to the realistic market share you could capture within the broader app sector, not just from the target app. Be extremely conservative - new apps typically capture 0.1%-1% of their category market.**
 - Realistic market capture potential within the broader app category (typically 0.1%-1% for new apps)
 - Target user segments for launch (based on strongest complaints)
 - Competitive positioning strategy to win users from ${appName}
-- **Keep estimates realistic - new apps typically capture $10K-$500K in market share, not millions**
+- **Keep estimates realistic - new apps typically capture $10K-$500K USD in market share, not millions. Always include "USD" when mentioning dollar amounts.**
 
 **4. Competitive Analysis**
 - Competitor strengths and weaknesses (from ratings/pricing)
@@ -1458,7 +1458,7 @@ REQUIRED OUTPUT - Provide comprehensive market viability analysis covering:
 - Pricing strategy based on competitive analysis
 - Expected conversion rates based on similar apps in category
 - Realistic Year 1 revenue scenarios (conservative/realistic/optimistic)
-- **CRITICAL: Revenue estimates must be VERY conservative. Most apps generate far less revenue than expected. Industry data shows most apps make $1K-$10K/month. Year 1 revenue for new apps is typically $5K-$60K total, not per month. Be extremely conservative in all estimates.**
+- **CRITICAL: Revenue estimates must be VERY conservative. Most apps generate far less revenue than expected. Industry data shows most apps make $1K-$10K USD/month. Year 1 revenue for new apps is typically $5K-$60K USD total, not per month. Be extremely conservative in all estimates. Always include "USD" when mentioning dollar amounts.**
 - Key revenue drivers and monetization approach
 
 **6. Risk Assessment**
@@ -1479,9 +1479,7 @@ REQUIRED OUTPUT - Provide comprehensive market viability analysis covering:
 - User willingness to pay indicators from reviews
 - Signs this is a real opportunity vs a saturated market
 
-Base your analysis on the actual user feedback data, competitive landscape, and category trends. **CRITICAL FOR REVENUE ESTIMATES: Be EXTREMELY conservative. Most apps make $1K-$10K/month. Year 1 revenue for new apps is typically $5K-$60K TOTAL, not per month. Most apps never reach $100K/year.** Avoid speculative download or revenue projections that can't be validated. Focus on qualitative market signals and positioning opportunities.
-
-**IMPORTANT DISCLAIMER TO INCLUDE: All market size estimates, revenue projections, and business opportunity assessments presented in this analysis are estimates based on available data and industry research. These figures are provided for informational purposes only and should not be considered as financial advice or guarantees. Actual results may vary significantly. Users should conduct their own thorough due diligence, market research, and financial analysis before making any business decisions or investments. Market conditions, competition, and user behavior can change rapidly, and past performance does not guarantee future results.`;
+Base your analysis on the actual user feedback data, competitive landscape, and category trends. **CRITICAL FOR REVENUE ESTIMATES: Be EXTREMELY conservative. Most apps make $1K-$10K USD/month. Year 1 revenue for new apps is typically $5K-$60K USD TOTAL, not per month. Most apps never reach $100K USD/year. Always include "USD" when mentioning dollar amounts.** Avoid speculative download or revenue projections that can't be validated. Focus on qualitative market signals and positioning opportunities.`;
 
     return [{role: 'user', content: prompt}];
   };
@@ -1539,12 +1537,12 @@ REQUIRED OUTPUT - Provide comprehensive pricing and revenue analysis:
 - Value perception indicators
 
 **4. Revenue Strategy & Scenarios**
-- **CRITICAL: All revenue estimates must be EXTREMELY conservative. Industry data shows most apps make $1K-$10K/month. Year 1 revenue for new apps is typically $5K-$60K TOTAL, not per month.**
-- Conservative scenario: Based on slow organic growth and low conversion rates. Typically $5K-$15K total Year 1 revenue for a new app.
-- Realistic scenario: Based on moderate marketing effort and category-typical conversion. Typically $15K-$40K total Year 1 revenue.
-- Optimistic scenario: Based on strong product-market fit and viral growth. Typically $40K-$100K total Year 1 revenue. **Never exceed $100K for Year 1 unless the target app has 1M+ downloads and proven revenue.**
+- **CRITICAL: All revenue estimates must be EXTREMELY conservative. Industry data shows most apps make $1K-$10K USD/month. Year 1 revenue for new apps is typically $5K-$60K USD TOTAL, not per month. Always include "USD" when mentioning dollar amounts.**
+- Conservative scenario: Based on slow organic growth and low conversion rates. Typically $5K-$15K USD total Year 1 revenue for a new app.
+- Realistic scenario: Based on moderate marketing effort and category-typical conversion. Typically $15K-$40K USD total Year 1 revenue.
+- Optimistic scenario: Based on strong product-market fit and viral growth. Typically $40K-$100K USD total Year 1 revenue. **Never exceed $100K USD for Year 1 unless the target app has 1M+ downloads and proven revenue.**
 - Focus on revenue drivers (pricing × conversion × retention) rather than speculative user counts
-- **Most apps never reach $100K/year. Be realistic and conservative in all estimates.**
+- **Most apps never reach $100K USD/year. Be realistic and conservative in all estimates.**
 
 **5. Monetization Do's and Don'ts**
 - What to avoid based on competitor review complaints
@@ -1558,9 +1556,7 @@ REQUIRED OUTPUT - Provide comprehensive pricing and revenue analysis:
 - Price optimization timeline
 - A/B testing recommendations
 
-Base recommendations on competitive pricing data and actual user feedback about pricing. **MOST IMPORTANTLY: Revenue projections must be EXTREMELY conservative. The vast majority of apps generate $1K-$10K/month. Year 1 revenue for new apps is typically $5K-$60K TOTAL. Most apps never reach $100K/year revenue. Be realistic and conservative in all estimates.**
-
-**IMPORTANT DISCLAIMER TO INCLUDE: All pricing recommendations, revenue projections, and monetization strategies presented in this analysis are estimates based on available data and industry research. These figures are provided for informational purposes only and should not be considered as financial advice or guarantees. Actual results may vary significantly. Users should conduct their own thorough due diligence, market research, and financial analysis before making any business decisions or investments. Market conditions, competition, and user behavior can change rapidly, and past performance does not guarantee future results.**`;
+Base recommendations on competitive pricing data and actual user feedback about pricing. **MOST IMPORTANTLY: Revenue projections must be EXTREMELY conservative. The vast majority of apps generate $1K-$10K USD/month. Year 1 revenue for new apps is typically $5K-$60K USD TOTAL. Most apps never reach $100K USD/year revenue. Be realistic and conservative in all estimates. Always include "USD" when mentioning dollar amounts.**`;
 
     return [{role:'user', content: prompt}];
   };
