@@ -12,6 +12,45 @@ declare module 'jspdf' {
   }
 }
 
+// Helper to clean text from HTML and markdown
+const cleanText = (text: string): string => {
+  if (!text) return '';
+  return text
+    .replace(/<[^>]*>/g, '') // Remove HTML tags
+    .replace(/\*\*(.*?)\*\*/g, '$1') // Remove markdown bold
+    .replace(/\*(.*?)\*/g, '$1') // Remove markdown italic
+    .replace(/---/g, '') // Remove markdown separators
+    .replace(/###\s*/g, '') // Remove markdown headings
+    .replace(/##\s*/g, '')
+    .replace(/#\s*/g, '')
+    .replace(/\[(.*?)\]\(.*?\)/g, '$1') // Remove markdown links
+    .trim();
+};
+
+// Helper to parse markdown content into formatted text
+const parseMarkdownContent = (text: string): string[] => {
+  if (!text) return [];
+  
+  const lines = text.split('\n');
+  const result: string[] = [];
+  
+  lines.forEach((line) => {
+    const cleaned = cleanText(line);
+    if (cleaned.trim()) {
+      // Handle bullet points
+      if (cleaned.trim().startsWith('•') || cleaned.trim().startsWith('-') || cleaned.trim().startsWith('*')) {
+        result.push(cleaned.trim());
+      } else if (cleaned.trim().match(/^\d+\./)) {
+        result.push(cleaned.trim());
+      } else {
+        result.push(cleaned);
+      }
+    }
+  });
+  
+  return result;
+};
+
 export async function POST(request: Request) {
   try {
     const { appMeta, rollupContent, analysisMetrics, affiliateCode, userEmail } = await request.json();
@@ -23,12 +62,35 @@ export async function POST(request: Request) {
     
     // Helper function to add new page if needed
     const checkPageBreak = (neededSpace: number = 20) => {
-      if (yPosition + neededSpace > pageHeight - 20) {
+      if (yPosition + neededSpace > pageHeight - 30) {
         doc.addPage();
         yPosition = 20;
         return true;
       }
       return false;
+    };
+    
+    // Helper to add header on each page (except cover)
+    const addHeader = () => {
+      // Logo area
+      doc.setFillColor(136, 209, 138); // #88D18A
+      doc.rect(0, 0, pageWidth, 25, 'F');
+      
+      // Logo text (since we can't easily add images in server-side PDF)
+      doc.setFontSize(16);
+      doc.setTextColor(255, 255, 255);
+      doc.setFont('helvetica', 'bold');
+      doc.text('APP IDEAS FINDER', 20, 15);
+      
+      doc.setFontSize(8);
+      doc.setFont('helvetica', 'normal');
+      doc.text('www.appideasfinder.com', pageWidth - 20, 15, { align: 'right' });
+      
+      // Report title
+      doc.setFontSize(10);
+      doc.text('App Ideas Analysis Report', 20, 22);
+      
+      yPosition = 35;
     };
     
     // Helper to add footer on each page
@@ -43,82 +105,116 @@ export async function POST(request: Request) {
     // === COVER PAGE ===
     // Header with logo area
     doc.setFillColor(136, 209, 138); // #88D18A
-    doc.rect(0, 0, pageWidth, 40, 'F');
+    doc.rect(0, 0, pageWidth, 50, 'F');
     
-    doc.setFontSize(28);
+    doc.setFontSize(32);
     doc.setTextColor(255, 255, 255);
     doc.setFont('helvetica', 'bold');
     doc.text('APP IDEAS FINDER', pageWidth / 2, 25, { align: 'center' });
     
-    // App Name and Info
-    yPosition = 60;
-    doc.setFontSize(24);
-    doc.setTextColor(40, 40, 40);
-    doc.setFont('helvetica', 'bold');
-    doc.text(`Analysis Report: ${appMeta?.trackName || 'Unknown App'}`, 20, yPosition, { maxWidth: pageWidth - 40 });
-    
-    yPosition += 15;
     doc.setFontSize(12);
     doc.setFont('helvetica', 'normal');
+    doc.text('www.appideasfinder.com', pageWidth / 2, 35, { align: 'center' });
+    
+    // Report Title
+    yPosition = 65;
+    doc.setFontSize(20);
+    doc.setTextColor(40, 40, 40);
+    doc.setFont('helvetica', 'bold');
+    doc.text('App Ideas Analysis Report', pageWidth / 2, yPosition, { align: 'center' });
+    
+    yPosition += 25;
+    
+    // App Details Box
+    doc.setFillColor(250, 250, 250);
+    doc.setDrawColor(200, 200, 200);
+    doc.roundedRect(20, yPosition, pageWidth - 40, 60, 3, 3, 'FD');
+    
+    yPosition += 10;
+    
+    // App Name
+    doc.setFontSize(18);
+    doc.setTextColor(40, 40, 40);
+    doc.setFont('helvetica', 'bold');
+    const appName = appMeta?.trackName || 'Unknown App';
+    const appNameLines = doc.splitTextToSize(appName, pageWidth - 80);
+    doc.text(appNameLines, 30, yPosition);
+    yPosition += appNameLines.length * 7 + 5;
+    
+    // App Icon placeholder (we'll add a note since we can't easily fetch images server-side)
+    doc.setFontSize(9);
     doc.setTextColor(100, 100, 100);
-    doc.text(`Developer: ${appMeta?.artistName || 'Unknown'}`, 20, yPosition);
+    doc.setFont('helvetica', 'italic');
+    doc.text('📱 App Icon', 30, yPosition);
     
     yPosition += 8;
-    doc.text(`Rating: ${appMeta?.averageUserRating?.toFixed(1) || 'N/A'} ★ (${appMeta?.userRatingCount?.toLocaleString() || 0} ratings)`, 20, yPosition);
     
-    yPosition += 8;
-    doc.text(`Analysis Date: ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}`, 20, yPosition);
+    // App Details
+    doc.setFontSize(10);
+    doc.setTextColor(60, 60, 60);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`Developer: ${appMeta?.artistName || 'Unknown'}`, 30, yPosition);
+    yPosition += 6;
     
-    yPosition += 8;
-    doc.text(`Reviews Analyzed: ${analysisMetrics?.reviewCount?.toLocaleString() || 0}`, 20, yPosition);
+    const rating = appMeta?.averageUserRating?.toFixed(1) || 'N/A';
+    const ratingCount = appMeta?.userRatingCount?.toLocaleString() || '0';
+    doc.text(`Rating: ${rating} ★ (${ratingCount} ratings)`, 30, yPosition);
+    yPosition += 6;
+    
+    doc.text(`Reviews Analyzed: ${analysisMetrics?.reviewCount?.toLocaleString() || 0}`, 30, yPosition);
+    yPosition += 6;
+    
+    doc.text(`Analysis Date: ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}`, 30, yPosition);
     
     // Summary Box
     yPosition += 20;
     doc.setFillColor(240, 250, 245);
-    doc.roundedRect(20, yPosition, pageWidth - 40, 35, 3, 3, 'F');
+    doc.setDrawColor(136, 209, 138);
+    doc.roundedRect(20, yPosition, pageWidth - 40, 30, 3, 3, 'FD');
     
     yPosition += 8;
     doc.setFontSize(10);
     doc.setTextColor(60, 60, 60);
-    doc.setFont('helvetica', 'italic');
+    doc.setFont('helvetica', 'normal');
     const summaryText = 'This comprehensive 13-section analysis provides actionable insights for building a successful app based on real user feedback from the App Store.';
     const splitSummary = doc.splitTextToSize(summaryText, pageWidth - 50);
     doc.text(splitSummary, 25, yPosition);
     
     // === SECTIONS START ===
     doc.addPage();
-    yPosition = 20;
+    addHeader();
     
     const sections = [
-      { key: 'likes', title: '1. What People Like About the App', icon: '👍' },
-      { key: 'dislikes', title: "2. What Users Want (and Don't Want)", icon: '💭' },
-      { key: 'recommendations', title: '3. Top Recommendations', icon: '⭐' },
-      { key: 'keywords', title: '4. Suggested Keywords', icon: '🔍' },
-      { key: 'definitely', title: '5. Core Features to Include', icon: '🎯' },
-      { key: 'backlog', title: '6. Additional Features', icon: '✨' },
-      { key: 'description', title: '7. Suggested App Description', icon: '📝' },
-      { key: 'names', title: '8. Suggested App Names', icon: '💡' },
-      { key: 'prp', title: '9. Product Requirements Prompt', icon: '📋' },
+      { key: 'likes', title: '1. What People Like About the TARGET App', icon: '👍' },
+      { key: 'dislikes', title: "2. What Users Want (and Don't Want) from the TARGET App", icon: '💭' },
+      { key: 'keywords', title: '3. Suggested Keywords for Your New App', icon: '🔍' },
+      { key: 'definitely', title: '4. Core Features to Include in Your New App', icon: '🎯' },
+      { key: 'backlog', title: '5. New and Additional Features to Include in Your New App', icon: '✨' },
+      { key: 'recommendations', title: '6. Strategic Recommendations & Insights for Your New App', icon: '⭐' },
+      { key: 'description', title: '7. Suggested Description for Your New App', icon: '📝' },
+      { key: 'names', title: '8. Suggested Names for Your New App', icon: '💡' },
+      { key: 'prp', title: '9. PRP (Product Requirements Prompt) for Your New App', icon: '📋' },
       { key: 'similar', title: '10. Similar Apps', icon: '📱' },
-      { key: 'pricing', title: '11. Suggested Pricing Model', icon: '💰' },
+      { key: 'pricing', title: '11. Pricing Strategy & Revenue Projections for Your New App', icon: '💰' },
+      { key: 'viability', title: '12. Market Viability & Business Opportunity Analysis for Your New App', icon: '📊' },
     ];
     
     sections.forEach((section, index) => {
       const content = rollupContent[section.key];
       if (!content || content.length === 0) return;
       
-      checkPageBreak(30);
+      checkPageBreak(35);
       
       // Section Header
       doc.setFillColor(136, 209, 138);
-      doc.roundedRect(20, yPosition, pageWidth - 40, 12, 2, 2, 'F');
+      doc.roundedRect(20, yPosition, pageWidth - 40, 10, 2, 2, 'F');
       
-      doc.setFontSize(14);
+      doc.setFontSize(13);
       doc.setTextColor(255, 255, 255);
       doc.setFont('helvetica', 'bold');
-      doc.text(`${section.icon} ${section.title}`, 25, yPosition + 8);
+      doc.text(`${section.icon} ${section.title}`, 25, yPosition + 7);
       
-      yPosition += 18;
+      yPosition += 15;
       
       // Section Content
       doc.setFontSize(10);
@@ -126,7 +222,7 @@ export async function POST(request: Request) {
       doc.setFont('helvetica', 'normal');
       
       if (section.key === 'keywords' || section.key === 'names') {
-        // Display as tags
+        // Display as comma-separated tags
         const tags = Array.isArray(content) ? content : [];
         const tagText = tags.join(', ');
         const splitText = doc.splitTextToSize(tagText, pageWidth - 50);
@@ -137,49 +233,88 @@ export async function POST(request: Request) {
         // Display with priorities
         const items = Array.isArray(content) ? content : [];
         items.forEach((item: any) => {
-          checkPageBreak(15);
+          checkPageBreak(20);
           const priority = item.priority || 'Low';
-          const color: [number, number, number] = priority === 'High' ? [220, 53, 69] : priority === 'Medium' ? [255, 193, 7] : [40, 167, 69];
+          const priorityColor: [number, number, number] = 
+            priority === 'High' ? [220, 53, 69] : 
+            priority === 'Medium' ? [255, 193, 7] : 
+            [40, 167, 69];
           
-          doc.setTextColor(color[0], color[1], color[2]);
+          doc.setTextColor(priorityColor[0], priorityColor[1], priorityColor[2]);
           doc.setFont('helvetica', 'bold');
-          doc.text(`• ${priority} Priority:`, 25, yPosition);
+          doc.text(`[${priority} Priority]`, 25, yPosition);
           
           doc.setTextColor(60, 60, 60);
           doc.setFont('helvetica', 'normal');
-          const contentText = doc.splitTextToSize(item.content, pageWidth - 55);
-          doc.text(contentText, 30, yPosition + 5);
+          const contentText = doc.splitTextToSize(item.content || '', pageWidth - 55);
+          doc.text(contentText, 25, yPosition + 5);
           yPosition += contentText.length * 5 + 8;
         });
         
       } else if (section.key === 'similar') {
-        // Display similar apps
+        // Display similar apps as cards
         const apps = Array.isArray(content) ? content : [];
-        apps.slice(0, 6).forEach((app: any) => {
-          checkPageBreak(20);
-          doc.setFont('helvetica', 'bold');
-          doc.text(`• ${app.trackName || 'Unknown'}`, 25, yPosition);
+        apps.slice(0, 9).forEach((app: any, idx: number) => {
+          checkPageBreak(25);
           
+          // Card background
+          doc.setFillColor(250, 250, 250);
+          doc.setDrawColor(220, 220, 220);
+          doc.roundedRect(25, yPosition, pageWidth - 50, 20, 2, 2, 'FD');
+          
+          // App icon placeholder
+          doc.setFontSize(8);
+          doc.setTextColor(150, 150, 150);
+          doc.text('📱', 28, yPosition + 8);
+          
+          // App name
+          doc.setFontSize(11);
+          doc.setTextColor(40, 40, 40);
+          doc.setFont('helvetica', 'bold');
+          const appName = app.trackName || 'Unknown App';
+          const appNameLines = doc.splitTextToSize(appName, pageWidth - 80);
+          doc.text(appNameLines, 35, yPosition + 6);
+          
+          // Developer
+          doc.setFontSize(9);
           doc.setFont('helvetica', 'normal');
-          yPosition += 5;
-          doc.text(`  ${app.artistName || 'Unknown Developer'}`, 27, yPosition);
-          yPosition += 5;
-          doc.text(`  ★ ${app.averageUserRating?.toFixed(1) || 'N/A'} (${app.userRatingCount?.toLocaleString() || 0} ratings)`, 27, yPosition);
-          yPosition += 8;
+          doc.setTextColor(100, 100, 100);
+          doc.text(app.artistName || 'Unknown Developer', 35, yPosition + 12);
+          
+          // Rating and price
+          const rating = app.averageUserRating?.toFixed(1) || 'N/A';
+          const ratingCount = app.userRatingCount?.toLocaleString() || '0';
+          const price = app.formattedPrice || 'Free';
+          doc.text(`★ ${rating} (${ratingCount}) • ${price}`, 35, yPosition + 17);
+          
+          yPosition += 25;
         });
         
-      } else if (section.key === 'prp' || section.key === 'pricing' || section.key === 'description') {
-        // Long form content
+      } else if (section.key === 'prp' || section.key === 'pricing' || section.key === 'description' || section.key === 'viability') {
+        // Long form content - parse markdown properly
         const text = Array.isArray(content) ? content[0] : content;
         if (text) {
-          // Remove markdown and HTML
-          const cleanText = text.replace(/<[^>]*>/g, '').replace(/\*\*(.*?)\*\*/g, '$1').replace(/---/g, '');
-          const splitText = doc.splitTextToSize(cleanText, pageWidth - 50);
+          const parsedLines = parseMarkdownContent(text);
           
-          splitText.forEach((line: string) => {
+          parsedLines.forEach((line: string) => {
             checkPageBreak(10);
-            doc.text(line, 25, yPosition);
-            yPosition += 5;
+            
+            // Handle headings
+            if (line.match(/^[A-Z][A-Z\s]+$/)) {
+              doc.setFontSize(11);
+              doc.setFont('helvetica', 'bold');
+              doc.setTextColor(40, 40, 40);
+              doc.text(line, 25, yPosition);
+              yPosition += 7;
+            } else {
+              // Regular text
+              doc.setFontSize(10);
+              doc.setFont('helvetica', 'normal');
+              doc.setTextColor(60, 60, 60);
+              const splitLine = doc.splitTextToSize(line, pageWidth - 50);
+              doc.text(splitLine, 25, yPosition);
+              yPosition += splitLine.length * 5;
+            }
           });
           yPosition += 5;
         }
@@ -188,59 +323,59 @@ export async function POST(request: Request) {
         // Regular bullet lists
         const items = Array.isArray(content) ? content : [];
         items.forEach((item: string) => {
-          checkPageBreak(15);
-          // Remove markdown bold
-          const cleanItem = item.replace(/\*\*(.*?)\*\*/g, '$1');
+          checkPageBreak(12);
+          const cleanItem = cleanText(item);
           const splitItem = doc.splitTextToSize(`• ${cleanItem}`, pageWidth - 55);
           doc.text(splitItem, 25, yPosition);
-          yPosition += splitItem.length * 5 + 3;
+          yPosition += splitItem.length * 5 + 2;
         });
       }
       
-      yPosition += 10;
+      yPosition += 8;
     });
     
-    // === TIME & COST SAVINGS (Section 12) ===
-    doc.addPage();
-    yPosition = 20;
-    
-    doc.setFillColor(136, 209, 138);
-    doc.roundedRect(20, yPosition, pageWidth - 40, 12, 2, 2, 'F');
-    doc.setFontSize(14);
-    doc.setTextColor(255, 255, 255);
-    doc.setFont('helvetica', 'bold');
-    doc.text('⏱️ 12. Time & Cost Savings Analysis', 25, yPosition + 8);
-    
-    yPosition += 20;
-    doc.setFontSize(10);
-    doc.setTextColor(60, 60, 60);
-    doc.setFont('helvetica', 'normal');
-    doc.text(`AI Analysis completed in seconds, saving significant time and cost compared to manual analysis.`, 25, yPosition);
+    // === TIME & COST SAVINGS (Section 13) ===
+    if (analysisMetrics?.reviewCount > 0) {
+      checkPageBreak(30);
+      
+      doc.setFillColor(136, 209, 138);
+      doc.roundedRect(20, yPosition, pageWidth - 40, 10, 2, 2, 'F');
+      doc.setFontSize(13);
+      doc.setTextColor(255, 255, 255);
+      doc.setFont('helvetica', 'bold');
+      doc.text('⏱️ 13. Time & Cost Savings Analysis', 25, yPosition + 7);
+      
+      yPosition += 15;
+      doc.setFontSize(10);
+      doc.setTextColor(60, 60, 60);
+      doc.setFont('helvetica', 'normal');
+      doc.text(`AI Analysis completed in seconds, saving significant time and cost compared to manual analysis.`, 25, yPosition);
+      yPosition += 10;
+      
+      if (analysisMetrics?.manualTaskHours) {
+        doc.text(`Estimated manual analysis time: ${analysisMetrics.manualTaskHours.toFixed(1)} hours`, 25, yPosition);
+      }
+    }
     
     // === AFFILIATE SECTION ===
     doc.addPage();
-    yPosition = 20;
+    addHeader();
     
     // Header
-    doc.setFillColor(255, 138, 26); // Orange
-    doc.roundedRect(20, yPosition, pageWidth - 40, 25, 3, 3, 'F');
+    doc.setFillColor(136, 209, 138);
+    doc.roundedRect(20, yPosition, pageWidth - 40, 12, 2, 2, 'F');
     
-    yPosition += 8;
     doc.setFontSize(16);
     doc.setTextColor(255, 255, 255);
     doc.setFont('helvetica', 'bold');
-    doc.text('💰 Earn With App Ideas Finder', 25, yPosition);
-    
-    yPosition += 7;
-    doc.setFontSize(11);
-    doc.setFont('helvetica', 'normal');
-    doc.text('Join our affiliate program and earn 25% commission', 25, yPosition);
+    doc.text('💰 Earn With App Ideas Finder', 25, yPosition + 8);
     
     yPosition += 20;
     
     // Affiliate Details Box
     doc.setFillColor(250, 250, 250);
-    doc.roundedRect(20, yPosition, pageWidth - 40, 50, 3, 3, 'F');
+    doc.setDrawColor(136, 209, 138);
+    doc.roundedRect(20, yPosition, pageWidth - 40, 50, 3, 3, 'FD');
     
     yPosition += 10;
     doc.setFontSize(12);
@@ -260,16 +395,21 @@ export async function POST(request: Request) {
     yPosition += 15;
     doc.setFontSize(10);
     doc.setTextColor(100, 100, 100);
-    const affiliateText = 'Share this link and earn commissions: $9.75-$199.75 per referral! Visit www.appideasfinder.com/affiliate for full details.';
+    const affiliateText = 'Share this link and earn commissions: $9.75-$199.75 USD per referral! Visit www.appideasfinder.com/affiliate for full details.';
     const splitAffiliate = doc.splitTextToSize(affiliateText, pageWidth - 50);
     doc.text(splitAffiliate, 25, yPosition);
     
-    // Add footer to all pages
+    // Add header and footer to all pages
     const totalPages = doc.getNumberOfPages();
-    for (let i = 1; i <= totalPages; i++) {
+    for (let i = 2; i <= totalPages; i++) {
       doc.setPage(i);
+      addHeader();
       addFooter(i, totalPages);
     }
+    
+    // Add footer to cover page
+    doc.setPage(1);
+    addFooter(1, totalPages);
     
     // Generate PDF as buffer
     const pdfBuffer = Buffer.from(doc.output('arraybuffer'));
@@ -277,7 +417,7 @@ export async function POST(request: Request) {
     return new NextResponse(pdfBuffer, {
       headers: {
         'Content-Type': 'application/pdf',
-        'Content-Disposition': `attachment; filename="app-analysis-${appMeta?.trackName || 'report'}.pdf"`,
+        'Content-Disposition': `attachment; filename="app-analysis-${appMeta?.trackName?.replace(/[^a-z0-9]/gi, '-') || 'report'}.pdf"`,
       },
     });
     
@@ -286,4 +426,3 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Failed to generate PDF' }, { status: 500 });
   }
 }
-
