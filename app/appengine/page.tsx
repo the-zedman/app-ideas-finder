@@ -134,46 +134,55 @@ function ShareableResultsCard({
   const ratingsCount = appMeta.userRatingCount || 0;
   const averageRating = appMeta.averageUserRating || 0;
   
+  // Helper to safely convert to string
+  const safeString = (value: any): string => {
+    if (typeof value === 'string') return value;
+    if (Array.isArray(value)) return value.map(v => safeString(v)).join('\n');
+    if (value && typeof value === 'object') return JSON.stringify(value);
+    return String(value || '');
+  };
+  
+  // Helper to safely get array
+  const safeArray = (value: any): any[] => {
+    if (Array.isArray(value)) return value;
+    if (value) return [value];
+    return [];
+  };
+  
   // Extract new app name (first suggested name)
-  const appNames = Array.isArray(rollupContent.names) 
-    ? rollupContent.names 
-    : (rollupContent.names ? [rollupContent.names] : []);
-  const newAppName = appNames.length > 0 ? appNames[0] : 'Your New App';
+  const appNames = safeArray(rollupContent.names);
+  const newAppName = appNames.length > 0 ? safeString(appNames[0]) : 'Your New App';
   
   // Extract description
-  const descriptionContent = Array.isArray(rollupContent.description) 
-    ? rollupContent.description.join('\n') 
-    : rollupContent.description || '';
-  const descriptionSummary = descriptionContent.substring(0, 150) + (descriptionContent.length > 150 ? '...' : '');
+  const descriptionContent = safeString(rollupContent.description);
+  const descriptionSummary = descriptionContent.length > 150 
+    ? descriptionContent.substring(0, 150) + '...' 
+    : descriptionContent;
   
   // Extract key opportunities (keywords)
-  const keywordsArray = Array.isArray(rollupContent.keywords) 
-    ? rollupContent.keywords 
-    : (rollupContent.keywords ? [rollupContent.keywords] : []);
-  const keyOpportunities = keywordsArray.slice(0, 5).filter(k => k && k.trim().length > 0);
+  const keywordsArray = safeArray(rollupContent.keywords);
+  const keyOpportunities = keywordsArray
+    .slice(0, 5)
+    .map(k => safeString(k))
+    .filter(k => k.trim().length > 0);
   
   // Extract market opportunity from viability
-  const viabilityContent = Array.isArray(rollupContent.viability) 
-    ? rollupContent.viability.join('\n') 
-    : rollupContent.viability || '';
+  const viabilityContent = safeString(rollupContent.viability);
   const marketOpportunity = extractSummary(viabilityContent, 'Market|TAM|SAM|SOM', 120);
   
   // Extract innovation opportunities from backlog/definitely include
-  const definitelyInclude = Array.isArray(rollupContent.definitely) 
-    ? rollupContent.definitely 
-    : (rollupContent.definitely ? [rollupContent.definitely] : []);
-  const backlog = Array.isArray(rollupContent.backlog) 
-    ? rollupContent.backlog 
-    : (rollupContent.backlog ? [rollupContent.backlog] : []);
-  const innovationOpportunities = [...definitelyInclude.slice(0, 3), ...backlog.slice(0, 2)].filter(i => i && i.trim().length > 0).slice(0, 4);
+  const definitelyInclude = safeArray(rollupContent.definitely);
+  const backlog = safeArray(rollupContent.backlog);
+  const innovationOpportunities = [...definitelyInclude.slice(0, 3), ...backlog.slice(0, 2)]
+    .map(i => safeString(i))
+    .filter(i => i.trim().length > 0)
+    .slice(0, 4);
   
   // Extract launch strategy from viability
   const launchStrategy = extractSummary(viabilityContent, 'Go-to-Market|Launch|Strategy', 120);
   
   // Extract monetization strategy from pricing
-  const pricingContent = Array.isArray(rollupContent.pricing) 
-    ? rollupContent.pricing.join('\n') 
-    : rollupContent.pricing || '';
+  const pricingContent = safeString(rollupContent.pricing);
   const monetizationStrategy = extractSummary(pricingContent, 'Pricing|Monetization|Revenue', 120);
   
   // Extract willingness to pay from pricing
