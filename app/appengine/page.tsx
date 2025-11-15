@@ -1074,6 +1074,7 @@ REQUIRED OUTPUT - Provide comprehensive market viability analysis covering:
 - Pricing strategy based on competitive analysis
 - Expected conversion rates based on similar apps in category
 - Realistic Year 1 revenue scenarios (conservative/realistic/optimistic)
+- **CRITICAL: Revenue estimates must be VERY conservative. Most apps generate far less revenue than expected. Use Sensor Tower data when available (typically $1K-$10K/month for most apps). If no Sensor Tower data, assume Year 1 revenue is typically $5K-$60K total, not per month. Be extremely conservative - divide any optimistic estimates by 10x.**
 - Key revenue drivers and monetization approach
 
 **6. Risk Assessment**
@@ -1094,7 +1095,7 @@ REQUIRED OUTPUT - Provide comprehensive market viability analysis covering:
 - User willingness to pay indicators from reviews
 - Signs this is a real opportunity vs a saturated market
 
-Base your analysis on the actual user feedback data, competitive landscape, and category trends. Avoid speculative download or revenue projections that can't be validated. Focus on qualitative market signals and positioning opportunities.`;
+Base your analysis on the actual user feedback data, competitive landscape, and category trends. **CRITICAL FOR REVENUE ESTIMATES: Be EXTREMELY conservative. Most apps make $1K-$10K/month. Year 1 revenue for new apps is typically $5K-$60K TOTAL, not per month. If Sensor Tower data shows <$5K/month for similar apps, use that as your realistic baseline. Divide any optimistic estimates by 10x. Most apps never reach $100K/year.** Avoid speculative download or revenue projections that can't be validated. Focus on qualitative market signals and positioning opportunities.`;
 
     return [{role: 'user', content: prompt}];
   };
@@ -1152,10 +1153,12 @@ REQUIRED OUTPUT - Provide comprehensive pricing and revenue analysis:
 - Value perception indicators
 
 **4. Revenue Strategy & Scenarios**
-- Conservative scenario: Based on slow organic growth and low conversion rates
-- Realistic scenario: Based on moderate marketing effort and category-typical conversion
-- Optimistic scenario: Based on strong product-market fit and viral growth
+- **CRITICAL: All revenue estimates must be EXTREMELY conservative. Most apps make $1K-$10K/month according to Sensor Tower data. Year 1 revenue for new apps is typically $5K-$60K TOTAL, not per month.**
+- Conservative scenario: Based on slow organic growth and low conversion rates. Typically $5K-$15K total Year 1 revenue for a new app.
+- Realistic scenario: Based on moderate marketing effort and category-typical conversion. Typically $15K-$40K total Year 1 revenue.
+- Optimistic scenario: Based on strong product-market fit and viral growth. Typically $40K-$100K total Year 1 revenue. **Never exceed $100K for Year 1 unless the target app has 1M+ downloads and proven revenue.**
 - Focus on revenue drivers (pricing × conversion × retention) rather than speculative user counts
+- **If you see Sensor Tower data showing <$5K/month, use that as the realistic baseline. Most apps never reach $100K/year.**
 
 **5. Monetization Do's and Don'ts**
 - What to avoid based on competitor review complaints
@@ -1169,7 +1172,7 @@ REQUIRED OUTPUT - Provide comprehensive pricing and revenue analysis:
 - Price optimization timeline
 - A/B testing recommendations
 
-Base recommendations on competitive pricing data and actual user feedback about pricing. Keep revenue projections grounded in realistic assumptions about conversion rates and growth for new apps in this category.`;
+Base recommendations on competitive pricing data and actual user feedback about pricing. **MOST IMPORTANTLY: Revenue projections must be EXTREMELY conservative. The vast majority of apps generate $1K-$10K/month. Year 1 revenue for new apps is typically $5K-$60K TOTAL. If Sensor Tower shows <$5K/month for similar apps, use that as your realistic baseline. Divide any optimistic estimates by 10x. Most apps never reach $100K/year revenue.**`;
 
     return [{role:'user', content: prompt}];
   };
