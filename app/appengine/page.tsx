@@ -552,9 +552,9 @@ function AppEngineContent() {
     let cleanedText = text;
     
     // Remove disclaimer paragraphs (multi-line pattern)
-    cleanedText = cleanedText.replace(/IMPORTANT DISCLAIMER[:\s]*.*?(?=\n\n|\n(?=\*\*)|$)/gis, '');
-    cleanedText = cleanedText.replace(/All (market size estimates|pricing recommendations|revenue projections).*?past performance does not guarantee future results\./gis, '');
-    cleanedText = cleanedText.replace(/These figures are provided for informational purposes only.*?past performance does not guarantee future results\./gis, '');
+    cleanedText = cleanedText.replace(/IMPORTANT DISCLAIMER[:\s]*[\s\S]*?(?=\n\n|\n(?=\*\*)|$)/gi, '');
+    cleanedText = cleanedText.replace(/All (market size estimates|pricing recommendations|revenue projections)[\s\S]*?past performance does not guarantee future results\./gi, '');
+    cleanedText = cleanedText.replace(/These figures are provided for informational purposes only[\s\S]*?past performance does not guarantee future results\./gi, '');
     
     // Remove any standalone disclaimer lines
     const lines = cleanedText.split('\n');
