@@ -41,13 +41,22 @@ function extractRevenuePotential(viabilityContent: string): { conservative: stri
   if (!viabilityContent) return null;
   
   // Try multiple patterns to find revenue estimates
-  const patterns = [
+  const conservativePatterns = [
     /Conservative[^:]*:\s*\$?([\d,]+(?:-\$?[\d,]+)?)/i,
     /conservative[^:]*scenario[^:]*:\s*\$?([\d,]+(?:-\$?[\d,]+)?)/i,
     /Conservative[^:]*\$?([\d,]+(?:-\$?[\d,]+)?)/i
   ];
   
-  const conservativeMatch = patterns.reduce((match, pattern) => match || viabilityContent.match(pattern), null);
+  // Find first matching pattern for conservative
+  let conservativeMatch: RegExpMatchArray | null = null;
+  for (const pattern of conservativePatterns) {
+    const match = viabilityContent.match(pattern);
+    if (match) {
+      conservativeMatch = match;
+      break;
+    }
+  }
+  
   const realisticMatch = viabilityContent.match(/Realistic[^:]*:\s*\$?([\d,]+(?:-\$?[\d,]+)?)/i) || 
                         viabilityContent.match(/realistic[^:]*scenario[^:]*:\s*\$?([\d,]+(?:-\$?[\d,]+)?)/i);
   const optimisticMatch = viabilityContent.match(/Optimistic[^:]*:\s*\$?([\d,]+(?:-\$?[\d,]+)?)/i) ||
