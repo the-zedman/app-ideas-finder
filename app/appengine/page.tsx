@@ -2880,8 +2880,8 @@ Base recommendations on competitive pricing data and actual user feedback about 
                   {/* Divider */}
                   <div className="border-t border-gray-300 my-8"></div>
                   
-                  {/* Shareable Results Card */}
-                  {appMeta && Object.keys(rollupContent).length > 0 && (
+                  {/* Shareable Results Card - Hidden for now */}
+                  {false && appMeta && Object.keys(rollupContent).length > 0 && (
                     <ShareableResultsCard
                       appMeta={appMeta}
                       rollupContent={rollupContent}
