@@ -101,6 +101,20 @@ function extractKeyPainPoints(dislikes: string[], viabilityContent: string): str
   return painPoints.slice(0, 3);
 }
 
+// Helper to extract summary from content
+function extractSummary(content: string, pattern: string, maxLength: number): string {
+  if (!content) return '';
+  const regex = new RegExp(pattern, 'i');
+  const sections = content.split(/\n\n|\n(?=\*\*)/);
+  for (const section of sections) {
+    if (regex.test(section)) {
+      const summary = section.replace(/\*\*/g, '').replace(/^#+\s*/, '').trim();
+      return summary.substring(0, maxLength) + (summary.length > maxLength ? '...' : '');
+    }
+  }
+  return content.substring(0, maxLength) + (content.length > maxLength ? '...' : '');
+}
+
 // Shareable Results Card Component
 function ShareableResultsCard({ 
   appMeta, 
@@ -116,35 +130,54 @@ function ShareableResultsCard({
   const [isSharing, setIsSharing] = useState(false);
   
   // Extract key metrics
-  const viabilityContent = Array.isArray(rollupContent.viability) 
-    ? rollupContent.viability.join('\n') 
-    : rollupContent.viability || '';
-  
-  const revenuePotential = extractRevenuePotential(viabilityContent);
   const reviewCount = analysisMetrics.reviewCount || 0;
   const ratingsCount = appMeta.userRatingCount || 0;
+  const averageRating = appMeta.averageUserRating || 0;
   
-  // Extract key features/insights
+  // Extract new app name (first suggested name)
+  const appNames = Array.isArray(rollupContent.names) 
+    ? rollupContent.names 
+    : (rollupContent.names ? [rollupContent.names] : []);
+  const newAppName = appNames.length > 0 ? appNames[0] : 'Your New App';
+  
+  // Extract description
+  const descriptionContent = Array.isArray(rollupContent.description) 
+    ? rollupContent.description.join('\n') 
+    : rollupContent.description || '';
+  const descriptionSummary = descriptionContent.substring(0, 150) + (descriptionContent.length > 150 ? '...' : '');
+  
+  // Extract key opportunities (keywords)
   const keywordsArray = Array.isArray(rollupContent.keywords) 
     ? rollupContent.keywords 
     : (rollupContent.keywords ? [rollupContent.keywords] : []);
+  const keyOpportunities = keywordsArray.slice(0, 5).filter(k => k && k.trim().length > 0);
   
+  // Extract market opportunity from viability
+  const viabilityContent = Array.isArray(rollupContent.viability) 
+    ? rollupContent.viability.join('\n') 
+    : rollupContent.viability || '';
+  const marketOpportunity = extractSummary(viabilityContent, 'Market|TAM|SAM|SOM', 120);
+  
+  // Extract innovation opportunities from backlog/definitely include
   const definitelyInclude = Array.isArray(rollupContent.definitely) 
     ? rollupContent.definitely 
     : (rollupContent.definitely ? [rollupContent.definitely] : []);
+  const backlog = Array.isArray(rollupContent.backlog) 
+    ? rollupContent.backlog 
+    : (rollupContent.backlog ? [rollupContent.backlog] : []);
+  const innovationOpportunities = [...definitelyInclude.slice(0, 3), ...backlog.slice(0, 2)].filter(i => i && i.trim().length > 0).slice(0, 4);
   
-  const dislikes = Array.isArray(rollupContent.dislikes) 
-    ? rollupContent.dislikes 
-    : (rollupContent.dislikes ? [rollupContent.dislikes] : []);
+  // Extract launch strategy from viability
+  const launchStrategy = extractSummary(viabilityContent, 'Go-to-Market|Launch|Strategy', 120);
   
-  // Get top keywords (first 3)
-  const topKeywords = keywordsArray.slice(0, 3).filter(k => k && k.trim().length > 0);
+  // Extract monetization strategy from pricing
+  const pricingContent = Array.isArray(rollupContent.pricing) 
+    ? rollupContent.pricing.join('\n') 
+    : rollupContent.pricing || '';
+  const monetizationStrategy = extractSummary(pricingContent, 'Pricing|Monetization|Revenue', 120);
   
-  // Get top features (first 2)
-  const topFeatures = definitelyInclude.slice(0, 2).filter(f => f && f.trim().length > 0);
-  
-  // Get top pain points (first 2)
-  const topPainPoints = dislikes.slice(0, 2).filter(d => d && d.trim().length > 0);
+  // Extract willingness to pay from pricing
+  const willingnessToPay = extractSummary(pricingContent, 'Willingness|pay|Price', 120);
   
   const handleShare = async () => {
     if (!shareCardRef.current) return;
@@ -163,7 +196,7 @@ function ShareableResultsCard({
           const url = URL.createObjectURL(blob);
           const link = document.createElement('a');
           link.href = url;
-          link.download = `${appMeta.trackName}-analysis-share.png`;
+          link.download = `${newAppName}-app-idea-share.png`;
           document.body.appendChild(link);
           link.click();
           document.body.removeChild(link);
@@ -192,116 +225,112 @@ function ShareableResultsCard({
       {/* Shareable Card - X Post Aspect Ratio (1200x628 = 1.91:1) */}
       <div 
         ref={shareCardRef}
-        className="relative bg-gradient-to-br from-[#88D18A] via-[#7BC87D] to-[#6BC070] rounded-2xl overflow-hidden shadow-2xl"
+        className="relative bg-white rounded-xl overflow-hidden shadow-lg border border-gray-200"
         style={{
           aspectRatio: '1200 / 628',
           minHeight: '400px'
         }}
       >
-        {/* Background Pattern */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-0 left-0 w-full h-full" style={{
-            backgroundImage: 'radial-gradient(circle at 2px 2px, rgba(255,255,255,0.3) 1px, transparent 0)',
-            backgroundSize: '40px 40px'
-          }}></div>
-        </div>
-        
-        {/* Decorative Elements */}
-        <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full blur-3xl"></div>
-        
         {/* Content */}
-        <div className="relative z-10 p-8 h-full flex flex-col justify-between text-white">
+        <div className="relative z-10 p-8 h-full flex flex-col text-gray-900">
           {/* Header */}
-          <div className="flex items-start justify-between mb-6">
-            <div className="flex-1">
-              <div className="text-xs font-bold opacity-90 mb-2 tracking-wider">APP IDEAS FINDER</div>
-              <h2 className="text-3xl sm:text-4xl md:text-5xl font-black leading-tight mb-2">
-                Just Analyzed:
-              </h2>
-              <h3 className="text-2xl sm:text-3xl md:text-4xl font-black leading-tight text-white/95">
-                {appMeta.trackName.length > 40 ? appMeta.trackName.substring(0, 40) + '...' : appMeta.trackName}
-              </h3>
-            </div>
-            <div className="bg-white/25 backdrop-blur-md rounded-xl px-4 py-3 text-right border border-white/40 shadow-lg ml-4">
-              <div className="text-xs opacity-90 font-semibold mb-1">Reviews</div>
-              <div className="text-3xl font-black">{reviewCount.toLocaleString()}+</div>
-              <div className="text-xs opacity-75 mt-1">Analyzed</div>
+          <div className="mb-6">
+            <div className="flex items-start justify-between mb-4">
+              <div className="flex-1">
+                <div className="text-xs font-semibold text-[#88D18A] mb-1 tracking-wider uppercase">App Ideas Finder</div>
+                <h2 className="text-3xl sm:text-4xl font-black leading-tight text-gray-900 mb-2">
+                  New App Idea: {newAppName.length > 35 ? newAppName.substring(0, 35) + '...' : newAppName}
+                </h2>
+              </div>
+              <div className="ml-6 text-right">
+                <div className="text-xs text-gray-500 mb-1">Analyzed</div>
+                <div className="text-lg font-bold text-gray-900">{appMeta.trackName.length > 25 ? appMeta.trackName.substring(0, 25) + '...' : appMeta.trackName}</div>
+                <div className="text-xs text-gray-500 mt-1">{reviewCount.toLocaleString()} reviews • {averageRating.toFixed(1)}★ ({ratingsCount.toLocaleString()} ratings)</div>
+              </div>
             </div>
           </div>
           
-          {/* Key Metrics Grid */}
-          {revenuePotential ? (
-            <div className="grid grid-cols-3 gap-4 mb-6">
-              <div className="bg-white/25 backdrop-blur-md rounded-xl p-5 border-2 border-white/40 shadow-lg">
-                <div className="text-xs opacity-90 mb-2 font-semibold">Conservative</div>
-                <div className="text-2xl sm:text-3xl font-black mb-1">{revenuePotential.conservative}</div>
-                <div className="text-xs opacity-75">Year 1 Revenue</div>
-              </div>
-              <div className="bg-white/30 backdrop-blur-md rounded-xl p-5 border-2 border-white/50 shadow-xl transform scale-105">
-                <div className="text-xs opacity-90 mb-2 font-semibold">⭐ Realistic</div>
-                <div className="text-2xl sm:text-3xl font-black mb-1">{revenuePotential.realistic}</div>
-                <div className="text-xs opacity-75">Year 1 Revenue</div>
-              </div>
-              <div className="bg-white/25 backdrop-blur-md rounded-xl p-5 border-2 border-white/40 shadow-lg">
-                <div className="text-xs opacity-90 mb-2 font-semibold">Optimistic</div>
-                <div className="text-2xl sm:text-3xl font-black mb-1">{revenuePotential.optimistic}</div>
-                <div className="text-xs opacity-75">Year 1 Revenue</div>
-              </div>
-            </div>
-          ) : (
-            <div className="bg-white/20 backdrop-blur-sm rounded-xl p-6 mb-6 border border-white/30 text-center">
-              <div className="text-lg font-black mb-2">📊 Comprehensive Analysis Complete</div>
-              <div className="text-sm opacity-90">13 sections of detailed insights generated</div>
-            </div>
-          )}
-          
-          {/* Key Insights - Two Column Layout */}
-          <div className="grid grid-cols-2 gap-4 mb-4">
-            {/* Key Opportunities */}
-            {topKeywords.length > 0 && (
-              <div>
-                <div className="text-xs font-semibold opacity-90 mb-2">🎯 Key Opportunities</div>
-                <div className="space-y-1.5">
-                  {topKeywords.map((keyword, idx) => (
-                    <div 
-                      key={idx}
-                      className="bg-white/25 backdrop-blur-sm rounded-lg px-3 py-2 text-xs font-semibold border border-white/30"
-                    >
-                      {keyword.length > 35 ? keyword.substring(0, 35) + '...' : keyword}
-                    </div>
-                  ))}
+          {/* Summary Sections Grid */}
+          <div className="grid grid-cols-2 gap-4 flex-1">
+            {/* Left Column */}
+            <div className="space-y-3">
+              {/* Suggested Description */}
+              {descriptionSummary && (
+                <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
+                  <div className="text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">Suggested Description</div>
+                  <div className="text-xs text-gray-600 leading-relaxed">{descriptionSummary}</div>
                 </div>
-              </div>
-            )}
+              )}
+              
+              {/* Key Opportunities */}
+              {keyOpportunities.length > 0 && (
+                <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
+                  <div className="text-xs font-bold text-gray-700 mb-2 uppercase tracking-wide">Key Opportunities</div>
+                  <div className="space-y-1">
+                    {keyOpportunities.slice(0, 3).map((opp, idx) => (
+                      <div key={idx} className="text-xs text-gray-600">• {opp.length > 50 ? opp.substring(0, 50) + '...' : opp}</div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              
+              {/* Market Opportunity */}
+              {marketOpportunity && (
+                <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
+                  <div className="text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">Market Opportunity</div>
+                  <div className="text-xs text-gray-600 leading-relaxed">{marketOpportunity}</div>
+                </div>
+              )}
+            </div>
             
-            {/* Top Pain Points Addressed */}
-            {topPainPoints.length > 0 && (
-              <div>
-                <div className="text-xs font-semibold opacity-90 mb-2">💡 Pain Points Addressed</div>
-                <div className="space-y-1.5">
-                  {topPainPoints.map((point, idx) => (
-                    <div 
-                      key={idx}
-                      className="bg-white/25 backdrop-blur-sm rounded-lg px-3 py-2 text-xs font-semibold border border-white/30"
-                    >
-                      {point.length > 35 ? point.substring(0, 35) + '...' : point}
-                    </div>
-                  ))}
+            {/* Right Column */}
+            <div className="space-y-3">
+              {/* Innovation Opportunities */}
+              {innovationOpportunities.length > 0 && (
+                <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
+                  <div className="text-xs font-bold text-gray-700 mb-2 uppercase tracking-wide">Innovation Opportunities</div>
+                  <div className="space-y-1">
+                    {innovationOpportunities.slice(0, 3).map((opp, idx) => (
+                      <div key={idx} className="text-xs text-gray-600">• {opp.length > 50 ? opp.substring(0, 50) + '...' : opp}</div>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
+              
+              {/* Launch Strategy */}
+              {launchStrategy && (
+                <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
+                  <div className="text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">Launch Strategy</div>
+                  <div className="text-xs text-gray-600 leading-relaxed">{launchStrategy}</div>
+                </div>
+              )}
+              
+              {/* Monetization Strategy */}
+              {monetizationStrategy && (
+                <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
+                  <div className="text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">Monetization Strategy</div>
+                  <div className="text-xs text-gray-600 leading-relaxed">{monetizationStrategy}</div>
+                </div>
+              )}
+              
+              {/* Willingness to Pay */}
+              {willingnessToPay && (
+                <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
+                  <div className="text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">Willingness to Pay</div>
+                  <div className="text-xs text-gray-600 leading-relaxed">{willingnessToPay}</div>
+                </div>
+              )}
+            </div>
           </div>
           
-          {/* CTA Footer */}
-          <div className="flex items-center justify-between pt-6 border-t-2 border-white/40">
+          {/* Footer CTA */}
+          <div className="mt-4 pt-4 border-t border-gray-200 flex items-center justify-between">
             <div className="flex-1">
-              <div className="text-xl sm:text-2xl font-black mb-2">Want This Analysis For Your App?</div>
-              <div className="text-sm sm:text-base opacity-95 font-semibold">Get AI-powered insights in seconds, not weeks</div>
+              <div className="text-sm font-bold text-gray-900 mb-0.5">Get your complete analysis at</div>
+              <div className="text-lg font-black text-[#88D18A]">appideasfinder.com</div>
             </div>
-            <div className="text-right ml-6 bg-white/20 backdrop-blur-sm rounded-xl px-5 py-3 border border-white/30">
-              <div className="text-xl sm:text-2xl font-black mb-1">appideasfinder.com</div>
-              <div className="text-xs opacity-90">Analyze any iOS app instantly</div>
+            <div className="text-right">
+              <div className="text-xs text-gray-500">13-section comprehensive analysis</div>
             </div>
           </div>
         </div>
