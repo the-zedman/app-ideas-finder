@@ -36,6 +36,7 @@ export default function AdminCouponsPage() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState<string | null>(null);
 
   useEffect(() => {
     const init = async () => {
@@ -134,6 +135,36 @@ export default function AdminCouponsPage() {
       setError(err instanceof Error ? err.message : 'Failed to create coupon');
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleDelete = async (coupon: Coupon) => {
+    if (!coupon.id) return;
+    const confirmed = window.confirm(
+      `Delete coupon "${coupon.code}"? This will remove it from your database (Stripe coupon/promo is not affected).`
+    );
+    if (!confirmed) return;
+
+    setError(null);
+    setIsDeleting(coupon.id);
+
+    try {
+      const res = await fetch(`/api/admin/coupons/${coupon.id}`, {
+        method: 'DELETE',
+      });
+
+      const body = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        throw new Error(body.message || body.error || 'Failed to delete coupon');
+      }
+
+      await loadCoupons();
+    } catch (err) {
+      console.error('Error deleting coupon:', err);
+      setError(err instanceof Error ? err.message : 'Failed to delete coupon');
+    } finally {
+      setIsDeleting(null);
     }
   };
 
@@ -305,12 +336,13 @@ export default function AdminCouponsPage() {
                 <table className="min-w-full divide-y divide-gray-200 text-sm">
                   <thead className="bg-gray-50">
                     <tr>
-                      <th className="px-3 py-2 text-left font-semibold text-gray  -700">Code</th>
+                      <th className="px-3 py-2 text-left font-semibold text-gray-700">Code</th>
                       <th className="px-3 py-2 text-left font-semibold text-gray-700">Type</th>
                       <th className="px-3 py-2 text-left font-semibold text-gray-700">Value</th>
                       <th className="px-3 py-2 text-left font-semibold text-gray-700">Uses</th>
                       <th className="px-3 py-2 text-left font-semibold text-gray-700">Stripe</th>
                       <th className="px-3 py-2 text-left font-semibold text-gray-700">Notes</th>
+                      <th className="px-3 py-2 text-left font-semibold text-gray-700">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200">
@@ -349,6 +381,16 @@ export default function AdminCouponsPage() {
                           <span className="block max-w-xs truncate text-xs text-gray-600">
                             {coupon.description || '—'}
                           </span>
+                        </td>
+                        <td className="px-3 py-2">
+                          <button
+                            type="button"
+                            onClick={() => handleDelete(coupon)}
+                            disabled={isDeleting === coupon.id}
+                            className="text-xs font-semibold text-red-600 hover:text-red-700 disabled:opacity-50"
+                          >
+                            {isDeleting === coupon.id ? 'Deleting...' : 'Delete'}
+                          </button>
                         </td>
                       </tr>
                     ))}
