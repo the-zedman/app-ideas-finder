@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase-client';
 import type { User } from '@supabase/supabase-js';
 import CryptoJS from 'crypto-js';
+import Footer from '@/components/Footer';
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -256,7 +257,7 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 flex flex-col">
       {/* Header */}
       <header className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -280,7 +281,7 @@ export default function ProfilePage() {
         </div>
       </header>
 
-      <div className="px-4 py-6">
+      <div className="px-4 py-6 flex-1">
         {/* Navigation Tabs */}
         <div className="flex space-x-1 mb-6 bg-gray-100 rounded-lg p-1">
           {tabs.map((tab) => (
@@ -611,6 +612,8 @@ export default function ProfilePage() {
           </div>
         )}
       </div>
+
+      <Footer />
     </div>
   );
 }

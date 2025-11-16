@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { createClient } from '@/lib/supabase-client';
 import type { User } from '@supabase/supabase-js';
+import Footer from '@/components/Footer';
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -220,7 +221,7 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 flex flex-col">
       {/* Header */}
       <div className="bg-white shadow-sm border-b border-gray-200">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -240,7 +241,7 @@ export default function ProfilePage() {
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1">
         {/* Profile Header */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-6">
           <div className="px-6 py-8">
@@ -557,6 +558,7 @@ export default function ProfilePage() {
           </button>
         </div>
       </div>
+      <Footer />
     </div>
   );
 }

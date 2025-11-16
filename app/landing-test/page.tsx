@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { createClient } from '@/lib/supabase-client';
 import ReCAPTCHA from 'react-google-recaptcha';
+import Footer from '@/components/Footer';
 
 export default function LandingTest() {
   const [email, setEmail] = useState('');
@@ -760,63 +761,7 @@ export default function LandingTest() {
         />
       </section>
 
-      {/* Footer */}
-      <footer className="bg-gray-900 text-gray-300 py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-1 gap-8">
-            {/* Hidden for future development */}
-            <div className="hidden">
-              <h3 className="font-bold text-white mb-4">Tools</h3>
-              <ul className="space-y-2 text-sm">
-                <li><a href="/appengine" className="hover:text-white">Generate app ideas</a></li>
-                <li><a href="#" className="hover:text-white">Explore popular apps</a></li>
-                <li><a href="#" className="hover:text-white">Analyze competitors</a></li>
-                <li><a href="#" className="hover:text-white">Market research</a></li>
-              </ul>
-            </div>
-            
-            {/* Hidden for future development */}
-            <div className="hidden">
-              <h3 className="font-bold text-white mb-4">Resources</h3>
-              <ul className="space-y-2 text-sm">
-                <li><a href="#" className="hover:text-white">Documentation</a></li>
-                <li><a href="#" className="hover:text-white">API Reference</a></li>
-                <li><a href="#" className="hover:text-white">Tutorials</a></li>
-                <li><a href="#" className="hover:text-white">Blog</a></li>
-              </ul>
-            </div>
-            
-            {/* Hidden for future development */}
-            <div className="hidden">
-              <h3 className="font-bold text-white mb-4">Apps</h3>
-              <ul className="space-y-2 text-sm">
-                <li><a href="#" className="hover:text-white">Web App</a></li>
-                <li><a href="#" className="hover:text-white">Chrome Extension</a></li>
-                <li><a href="#" className="hover:text-white">API Access</a></li>
-              </ul>
-            </div>
-            
-            <div>
-              <h3 className="font-bold text-white mb-4">Company</h3>
-              <ul className="space-y-2 text-sm">
-                <li><a href="/pricing" className="hover:text-white">Pricing</a></li>
-                <li><a href="/terms-of-service" className="hover:text-white">Terms of Service</a></li>
-                <li><a href="/privacy-policy" className="hover:text-white">Privacy Policy</a></li>
-                <li><a href="/contact" className="hover:text-white">Contact</a></li>
-              </ul>
-            </div>
-          </div>
-          
-          <div className="border-t border-gray-800 mt-8 pt-8 flex justify-between items-center">
-            <p className="text-sm">© 2025 App Ideas Finder. Elevating humanity, one algorithm at a time.</p>
-            <div className="flex gap-4">
-              <a href="https://x.com/appideasfinder" target="_blank" rel="noopener noreferrer" className="hover:text-white">
-                𝕏
-              </a>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }
