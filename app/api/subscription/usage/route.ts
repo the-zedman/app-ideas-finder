@@ -67,25 +67,33 @@ export async function GET() {
       .eq('user_id', user.id)
       .eq('is_active', true);
     
-    // Calculate total bonus searches
-    let bonusSearches = 0;
+    // Calculate bonus searches
+    let bonusSearchesRemaining = 0; // fixed, never-expiring bonus searches (e.g. early access 75)
     let percentageBonus = 0;
     
-    bonuses?.forEach(bonus => {
+    bonuses?.forEach((bonus: any) => {
       if (bonus.bonus_type === 'fixed_searches') {
-        bonusSearches += bonus.bonus_value;
+        // Treat bonus_value as remaining fixed searches that never expire
+        bonusSearchesRemaining += bonus.bonus_value || 0;
       } else if (bonus.bonus_type === 'percentage_increase') {
-        percentageBonus += bonus.bonus_value;
+        percentageBonus += bonus.bonus_value || 0;
       }
     });
     
     const baseLimit = usage?.searches_limit || subscription.subscription_plans.searches_per_month;
-    const bonusFromPercentage = Math.floor((baseLimit * percentageBonus) / 100);
-    const totalLimit = subscription.status === 'free_unlimited' ? -1 : baseLimit + bonusFromPercentage + bonusSearches;
+    const percentageBonusAmount = Math.floor((baseLimit * percentageBonus) / 100);
+    
+    // Plan-based monthly limit does NOT include fixed bonus or search packs
+    const planSearchesLimit = subscription.status === 'free_unlimited' ? -1 : baseLimit + percentageBonusAmount;
     
     const searchesUsed = usage?.searches_used || 0;
-    const searchesRemaining = subscription.status === 'free_unlimited' ? -1 : 
-      Math.max(0, totalLimit - searchesUsed + packSearches);
+    const planSearchesRemaining = subscription.status === 'free_unlimited'
+      ? -1
+      : Math.max(0, planSearchesLimit - searchesUsed);
+    
+    const totalSearchesRemaining = subscription.status === 'free_unlimited'
+      ? -1
+      : planSearchesRemaining + bonusSearchesRemaining + packSearches;
     
     // Calculate trial time remaining
     let trialTimeRemaining = null;
@@ -108,10 +116,12 @@ export async function GET() {
       planName: subscription.subscription_plans?.name,
       status: subscription.status,
       searchesUsed,
-      searchesLimit: totalLimit,
-      searchesRemaining,
+      // Plan-based monthly limit (excludes fixed bonus & packs)
+      searchesLimit: planSearchesLimit,
+      // Total remaining including plan, fixed bonuses and search packs
+      searchesRemaining: totalSearchesRemaining,
       packSearches,
-      bonusSearches,
+      bonusSearchesRemaining,
       percentageBonus,
       trialTimeRemaining,
       currentPeriodEnd: subscription.current_period_end,

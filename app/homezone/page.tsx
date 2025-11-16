@@ -347,7 +347,7 @@ export default function HomeZone() {
 
         {/* Usage Card */}
         {!isUnlimited && (
-          <div className="bg-white rounded-2xl p-6 mb-8 border-2 border-gray-200 shadow-sm">
+          <div className="bg-white rounded-2xl p-6 mb-4 border-2 border-gray-200 shadow-sm">
             <div className="flex items-center justify-between mb-4">
               <div>
                 <h3 className="text-lg font-semibold text-gray-900">
@@ -395,6 +395,50 @@ export default function HomeZone() {
                 <p className="text-yellow-800 font-medium">💡 Only {searchesRemaining} searches remaining this month</p>
               </div>
             ) : null}
+          </div>
+        )}
+
+        {/* Early Access / Bonus Searches */}
+        {usageData?.bonusSearchesRemaining > 0 && (
+          <div className="bg-gradient-to-r from-[#88D18A]/10 to-[#6BC070]/10 border border-[#88D18A]/40 rounded-2xl p-5 mb-8">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div>
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#88D18A]/20 text-xs font-semibold text-[#256029] mb-2">
+                  <span>🎁 Early Access Bonus</span>
+                  <span className="uppercase tracking-wide">WAITLIST</span>
+                </div>
+                <h3 className="text-lg font-bold text-gray-900 mb-1">
+                  You have {usageData.bonusSearchesRemaining} early-access bonus searches
+                </h3>
+                <p className="text-sm text-gray-700">
+                  These never expire and are used <span className="font-semibold">before</span> your monthly plan
+                  quota or any paid Search Packs.
+                </p>
+              </div>
+              <div className="flex flex-col items-start sm:items-end gap-2">
+                <div className="text-xs uppercase tracking-wide text-gray-500">Your lifetime discount code</div>
+                <div className="inline-flex items-center gap-2 bg-white border border-dashed border-[#88D18A] rounded-lg px-3 py-2">
+                  <code className="font-mono text-sm font-bold text-[#256029]">WAITLIST25</code>
+                  <button
+                    type="button"
+                    className="text-xs font-semibold text-[#256029] hover:text-[#1b4420]"
+                    onClick={() => {
+                      navigator.clipboard
+                        .writeText('WAITLIST25')
+                        .catch(() => {
+                          // ignore clipboard errors (e.g. not available)
+                        });
+                    }}
+                  >
+                    Copy
+                  </button>
+                </div>
+                <p className="text-[11px] text-gray-500 text-right max-w-xs">
+                  Use this on checkout in Stripe to unlock your <span className="font-semibold">25% lifetime</span>{' '}
+                  discount on Core or Prime.
+                </p>
+              </div>
+            </div>
           </div>
         )}
 

@@ -78,7 +78,7 @@ export async function POST() {
       usage = newUsage;
     }
     
-    // Check if user has unlimited access
+    // Check subscription status
     const { data: subscription } = await supabaseAdmin
       .from('user_subscriptions')
       .select('status')
@@ -86,11 +86,85 @@ export async function POST() {
       .single();
     
     if (subscription?.status === 'free_unlimited') {
-      // Don't increment for unlimited users
-      return NextResponse.json({ success: true, unlimited: true });
+      // Don't decrement anything for unlimited users
+      return NextResponse.json({ success: true, unlimited: true, source: 'unlimited' });
     }
-    
-    // Increment searches_used
+
+    // 1) Consume fixed bonus searches first (never-expiring early access credits)
+    const { data: bonusRows, error: bonusError } = await supabaseAdmin
+      .from('user_bonuses')
+      .select('*')
+      .eq('user_id', user.id)
+      .eq('bonus_type', 'fixed_searches')
+      .eq('is_active', true)
+      .gt('bonus_value', 0)
+      .order('awarded_at', { ascending: true })
+      .limit(1)
+      .maybeSingle();
+
+    if (bonusError) {
+      console.error('Error fetching bonus searches:', bonusError);
+    } else if (bonusRows) {
+      const newValue = (bonusRows.bonus_value || 0) - 1;
+      const updatePayload: any = { bonus_value: newValue };
+      if (newValue <= 0) {
+        updatePayload.is_active = false;
+      }
+
+      const { error: updateBonusError } = await supabaseAdmin
+        .from('user_bonuses')
+        .update(updatePayload)
+        .eq('id', bonusRows.id);
+
+      if (updateBonusError) {
+        console.error('Error updating bonus searches:', updateBonusError);
+        return NextResponse.json(
+          { error: 'Failed to consume bonus search', message: updateBonusError.message },
+          { status: 500 }
+        );
+      }
+
+      return NextResponse.json({
+        success: true,
+        source: 'bonus_search',
+      });
+    }
+
+    // 2) Consume Search Pack credits next (never-expiring paid packs)
+    const { data: packRow, error: packError } = await supabaseAdmin
+      .from('search_packs')
+      .select('*')
+      .eq('user_id', user.id)
+      .gt('searches_remaining', 0)
+      .order('purchased_at', { ascending: true })
+      .limit(1)
+      .maybeSingle();
+
+    if (packError) {
+      console.error('Error fetching search packs:', packError);
+    } else if (packRow) {
+      const newRemaining = (packRow.searches_remaining || 0) - 1;
+
+      const { error: updatePackError } = await supabaseAdmin
+        .from('search_packs')
+        .update({ searches_remaining: newRemaining })
+        .eq('id', packRow.id);
+
+      if (updatePackError) {
+        console.error('Error updating search pack:', updatePackError);
+        return NextResponse.json(
+          { error: 'Failed to consume search pack', message: updatePackError.message },
+          { status: 500 }
+        );
+      }
+
+      return NextResponse.json({
+        success: true,
+        source: 'search_pack',
+      });
+    }
+
+    // 3) Fall back to monthly plan quota
     const { error } = await supabaseAdmin
       .from('monthly_usage')
       .update({ searches_used: usage.searches_used + 1 })
@@ -102,6 +176,7 @@ export async function POST() {
     
     return NextResponse.json({ 
       success: true, 
+      source: 'plan_quota',
       searchesUsed: usage.searches_used + 1,
       searchesLimit: usage.searches_limit
     });
