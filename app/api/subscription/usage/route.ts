@@ -125,7 +125,7 @@ export async function GET() {
       percentageBonus,
       trialTimeRemaining,
       currentPeriodEnd: subscription.current_period_end,
-      canSearch: subscription.status === 'free_unlimited' || searchesRemaining > 0
+      canSearch: subscription.status === 'free_unlimited' || totalSearchesRemaining > 0
     });
     
   } catch (error) {
