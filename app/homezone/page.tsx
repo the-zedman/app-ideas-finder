@@ -36,6 +36,15 @@ export default function HomeZone() {
       setUser(user);
       
       if (user && canonicalUserId) {
+        // Remember last used login provider in localStorage for login page UX
+        try {
+          if (typeof window !== 'undefined' && (user as any).app_metadata?.provider) {
+            window.localStorage.setItem('lastLoginProvider', (user as any).app_metadata.provider);
+          }
+        } catch {
+          // ignore storage errors (private mode, etc.)
+        }
+
         // Fetch profile
         const { data: profileData } = await supabase
           .from('profiles')
@@ -217,15 +226,15 @@ export default function HomeZone() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             {/* Logo */}
-            <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3">
               <img 
-                src="/App Ideas Finder - logo - 200x200.png" 
-                alt="App Ideas Finder" 
+              src="/App Ideas Finder - logo - 200x200.png"
+              alt="App Ideas Finder"
                 className="h-8 w-8"
-              />
+            />
               <h1 className="text-xl font-bold text-[#3D405B]">App Ideas Finder</h1>
-            </div>
-
+          </div>
+          
             {/* Main Navigation */}
             <nav className="flex items-center gap-6">
               <a href="/homezone" className="text-[#3D405B] font-semibold">
@@ -237,30 +246,30 @@ export default function HomeZone() {
             </nav>
 
             {/* Profile Dropdown */}
-            <div className="relative">
-              <button
-                onClick={() => setShowProfileMenu(!showProfileMenu)}
+          <div className="relative">
+            <button 
+              onClick={() => setShowProfileMenu(!showProfileMenu)}
                 className="flex items-center space-x-3 hover:bg-gray-100 rounded-lg px-3 py-2 transition-colors"
-              >
+            >
                 <div className="relative w-8 h-8 rounded-full overflow-hidden">
                   <div className="absolute inset-0 flex items-center justify-center bg-[#88D18A] text-white text-sm font-semibold">
                     {getInitials()}
                   </div>
                   {user?.email ? (
-                    <img
+              <img 
                       src={getGravatarUrl(user.email)}
-                      alt="Profile"
+                alt="Profile" 
                       className="w-full h-full object-cover absolute inset-0 z-10"
-                      onError={(e) => {
-                        e.currentTarget.style.display = 'none';
-                      }}
-                    />
+                onError={(e) => {
+                  e.currentTarget.style.display = 'none';
+                }}
+              />
                   ) : null}
-                </div>
+              </div>
                 <span className="hidden sm:block text-gray-900">{getDisplayName()}</span>
-              </button>
+            </button>
 
-              {showProfileMenu && (
+            {showProfileMenu && (
                 <div className="absolute right-0 mt-2 w-64 rounded-lg shadow-xl border border-gray-200 z-50" style={{ backgroundColor: '#ffffff', opacity: 1 }}>
                   <div className="p-4 border-b border-gray-200" style={{ backgroundColor: '#ffffff' }}>
                     <p className="font-semibold text-gray-900">{getDisplayName()}</p>
@@ -317,7 +326,7 @@ export default function HomeZone() {
                   </div>
                 </div>
               )}
-            </div>
+              </div>
           </div>
         </div>
       </header>
@@ -334,7 +343,7 @@ export default function HomeZone() {
               ? "Let's find your next app idea. Analyze your first app below!" 
               : "Ready to discover more app opportunities for you to build?"}
           </p>
-        </div>
+      </div>
 
         {/* Usage Card */}
         {!isUnlimited && (
@@ -359,8 +368,8 @@ export default function HomeZone() {
                 </div>
                 <div className="text-sm text-gray-600">searches used</div>
               </div>
-            </div>
-            
+          </div>
+
             {/* Progress Bar */}
             <div className="w-full bg-gray-200 rounded-full h-3 mb-4">
               <div 
@@ -416,9 +425,9 @@ export default function HomeZone() {
               >
                 <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                </svg>
+                    </svg>
               </button>
-            </div>
+                  </div>
             <p className="text-gray-600 mb-6">
               Try analyzing one of these popular apps to see what App Ideas Finder can do:
             </p>
@@ -582,7 +591,7 @@ export default function HomeZone() {
                       >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                        </svg>
+                    </svg>
                         PDF
                       </button>
                     </div>
@@ -602,7 +611,7 @@ export default function HomeZone() {
         {affiliateData && (
           <div className="bg-gradient-to-br from-[#88D18A]/10 to-[#6BC070]/10 rounded-2xl p-6 sm:p-8 mb-8 border-2 border-[#88D18A]/20">
             <div className="flex items-center justify-between mb-6">
-              <div className="flex-1">
+                  <div className="flex-1">
                 <button
                   onClick={() => setIsAffiliateExpanded(!isAffiliateExpanded)}
                   className="flex items-center gap-2 hover:opacity-80 transition-opacity"
@@ -640,14 +649,14 @@ export default function HomeZone() {
               <div className="bg-white rounded-lg p-4 border border-gray-200">
                 <div className="text-xs text-gray-600 mb-1">Paying Referrals</div>
                 <div className="text-2xl font-bold text-gray-900">{affiliateData.paying_referrals || 0}</div>
-              </div>
+                  </div>
               
               <div className="bg-white rounded-lg p-4 border border-gray-200">
                 <div className="text-xs text-gray-600 mb-1">Pending Commission</div>
                 <div className="text-2xl font-bold text-yellow-600">
                   ${(affiliateData.pendingAmount || 0).toFixed(2)}
                 </div>
-              </div>
+                  </div>
               
               <div className="bg-white rounded-lg p-4 border border-gray-200">
                 <div className="text-xs text-gray-600 mb-1">Total Earned</div>
@@ -715,11 +724,11 @@ export default function HomeZone() {
                           {commission.status}
                         </span>
                         <span className="ml-2 text-gray-600">{commission.transaction_type}</span>
-                      </div>
+                  </div>
                       <div className="font-bold text-[#88D18A]">
                         ${parseFloat(commission.commission_amount).toFixed(2)}
-                      </div>
-                    </div>
+                  </div>
+                </div>
                   ))}
                 </div>
               </div>
