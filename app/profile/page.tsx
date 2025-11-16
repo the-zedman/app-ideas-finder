@@ -226,6 +226,14 @@ export default function ProfilePage() {
     }
   };
 
+  const getProviderLabel = () => {
+    const provider = user?.app_metadata?.provider;
+    if (provider === 'github') return 'GitHub';
+    if (provider === 'google') return 'Google';
+    if (provider === 'email') return 'Magic Link';
+    return 'OAuth';
+  };
+
   const getEmail = () => {
     return user?.email || 'dev@localhost.com';
   };
@@ -464,16 +472,17 @@ export default function ProfilePage() {
                       {getProviderIcon()}
                     </div>
                     <div>
-                      <h4 className="font-medium text-blue-900">Login Method</h4>
-                      <p className="text-sm text-blue-700">
-                        You're signed in with {user?.app_metadata?.provider === 'github' ? 'GitHub' : 
-                        user?.app_metadata?.provider === 'google' ? 'Google' : 
-                        user?.app_metadata?.provider === 'email' ? 'Magic Link' : 'OAuth'}
-                      </p>
+                      <h4 className="font-medium text-blue-900 mb-1">Login Method</h4>
+                      <div className="flex items-center gap-2">
+                        <p className="text-sm text-blue-700">
+                          You're signed in with {getProviderLabel()}
+                        </p>
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-white text-blue-700 border border-blue-200">
+                          Last used
+                        </span>
+                      </div>
                       <p className="text-xs text-blue-600 mt-1">
-                        Your account is secured through {user?.app_metadata?.provider === 'github' ? 'GitHub' : 
-                        user?.app_metadata?.provider === 'google' ? 'Google' : 
-                        user?.app_metadata?.provider === 'email' ? 'Magic Link authentication' : 'OAuth authentication'}
+                        Your account is secured through {getProviderLabel()} authentication
                       </p>
                     </div>
                   </div>

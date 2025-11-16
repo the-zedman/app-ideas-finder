@@ -7,6 +7,7 @@ import { createClient } from '@/lib/supabase-client';
 import type { User } from '@supabase/supabase-js';
 import CryptoJS from 'crypto-js';
 import Footer from '@/components/Footer';
+import { getCanonicalUser } from '@/lib/canonical-user';
 
 export default function HomeZone() {
   const router = useRouter();
@@ -31,15 +32,15 @@ export default function HomeZone() {
 
   useEffect(() => {
     const init = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const { user, canonicalUserId } = await getCanonicalUser(supabase);
       setUser(user);
       
-      if (user) {
+      if (user && canonicalUserId) {
         // Fetch profile
         const { data: profileData } = await supabase
           .from('profiles')
           .select('*')
-          .eq('id', user.id)
+          .eq('id', canonicalUserId)
           .single();
         
         setProfile(profileData);
@@ -61,7 +62,7 @@ export default function HomeZone() {
         const { count: totalCount } = await supabase
           .from('user_analyses')
           .select('*', { count: 'exact', head: true })
-          .eq('user_id', user.id);
+          .eq('user_id', canonicalUserId);
         
         setTotalAnalysesCount(totalCount || 0);
         
@@ -69,7 +70,7 @@ export default function HomeZone() {
         const { data: analyses, error: analysesError } = await supabase
           .from('user_analyses')
           .select('*')
-          .eq('user_id', user.id)
+          .eq('user_id', canonicalUserId)
           .order('created_at', { ascending: false })
           .limit(5);
         
@@ -84,7 +85,7 @@ export default function HomeZone() {
         const { data: affiliateInfo } = await supabase
           .from('user_affiliates')
           .select('*')
-          .eq('user_id', user.id)
+          .eq('user_id', canonicalUserId)
           .single();
         
         if (affiliateInfo) {
