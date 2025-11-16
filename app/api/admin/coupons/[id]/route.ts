@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { createClient as createAdminClient } from '@supabase/supabase-js';
 
@@ -56,15 +56,15 @@ async function requireAdmin() {
 }
 
 export async function DELETE(
-  _request: Request,
-  { params }: { params: { id: string } }
+  _request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const adminContext = await requireAdmin();
     if (adminContext instanceof Response) return adminContext;
 
     const { supabaseAdmin } = adminContext;
-    const { id } = params;
+    const { id } = await params;
 
     if (!id) {
       return NextResponse.json({ error: 'Missing coupon id' }, { status: 400 });
