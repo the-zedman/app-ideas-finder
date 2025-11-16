@@ -158,11 +158,11 @@ function LoginContent() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 bg-[#88D18A] hover:bg-[#88D18A]/90 active:scale-98 text-white font-semibold rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="relative w-full py-3 bg-[#88D18A] hover:bg-[#88D18A]/90 active:scale-98 text-white font-semibold rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
             >
               <span>{loading ? 'Sending Magic Link...' : 'Send Magic Link'}</span>
               {lastLoginProvider === 'email' && !loading && (
-                <span className="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-white/90 text-[#1f2937] border border-[#88D18A]/60">
+                <span className="absolute right-3 top-2 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-[#22c55e] text-white">
                   Last used
                 </span>
               )}
@@ -185,7 +185,7 @@ function LoginContent() {
             <button
               onClick={() => handleOAuthLogin('github')}
               disabled={loading}
-              className="w-full py-3 px-4 bg-[#24292e] hover:bg-[#24292e]/90 font-medium rounded-xl flex items-center justify-center gap-3 active:scale-98 transition-all disabled:opacity-50"
+              className="relative w-full py-3 px-4 bg-[#24292e] hover:bg-[#24292e]/90 font-medium rounded-xl flex items-center justify-center gap-3 active:scale-98 transition-all disabled:opacity-50"
               style={{ color: 'white' }}
             >
               <svg className="w-5 h-5" fill="white" viewBox="0 0 24 24">
@@ -193,7 +193,7 @@ function LoginContent() {
               </svg>
               <span>Continue with GitHub</span>
               {lastLoginProvider === 'github' && !loading && (
-                <span className="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-white/20 text-white border border-white/40">
+                <span className="absolute right-3 top-2 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-[#22c55e] text-white">
                   Last used
                 </span>
               )}
@@ -203,7 +203,7 @@ function LoginContent() {
             <button
               onClick={() => handleOAuthLogin('google')}
               disabled={loading}
-              className="w-full py-3 px-4 bg-white hover:bg-gray-50 font-medium rounded-xl flex items-center justify-center gap-3 active:scale-98 transition-all disabled:opacity-50 border-2 border-grey/40 text-[#3D405B]"
+              className="relative w-full py-3 px-4 bg-white hover:bg-gray-50 font-medium rounded-xl flex items-center justify-center gap-3 active:scale-98 transition-all disabled:opacity-50 border-2 border-grey/40 text-[#3D405B]"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24">
                 <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -213,7 +213,7 @@ function LoginContent() {
               </svg>
               <span>Continue with Google</span>
               {lastLoginProvider === 'google' && !loading && (
-                <span className="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-[#88D18A]/10 text-[#1f2937] border border-[#88D18A]/60">
+                <span className="absolute right-3 top-2 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-[#22c55e] text-white">
                   Last used
                 </span>
               )}
