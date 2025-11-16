@@ -15,6 +15,10 @@ export async function GET(request: NextRequest) {
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
       {
+        auth: {
+          // Use implicit flow to avoid PKCE code verifier issues with magic links
+          flowType: 'implicit',
+        },
         cookies: {
           getAll() {
             return cookieStore.getAll()
