@@ -29,7 +29,7 @@ export default function Footer() {
         </div>
         
         <div className="border-t border-gray-800 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4">
-          <p className="text-sm text-center sm:text-left">© 2025 App Ideas Finder. Elevating humanity, one algorithm at a time.</p>
+          <p className="text-sm text-center sm:text-left">© 2025 App Ideas Finder — elevating creators, one idea at a time.</p>
           <div className="flex gap-4">
             <a href="https://x.com/appideasfinder" target="_blank" rel="noopener noreferrer" className="hover:text-white">
               𝕏
