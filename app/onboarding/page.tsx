@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import Footer from '@/components/Footer';
 
 type Preview = {
@@ -10,6 +12,23 @@ type Preview = {
   app_icon_url: string | null;
   app_id: string;
   created_at: string;
+};
+
+type BacklogItem = {
+  priority?: string;
+  content: string;
+};
+
+type SimilarApp = {
+  trackName?: string;
+  artistName?: string;
+  averageUserRating?: number;
+  userRatingCount?: number;
+  formattedPrice?: string;
+  description?: string;
+  trackViewUrl?: string;
+  artworkUrl100?: string;
+  [key: string]: any;
 };
 
 type Analysis = {
@@ -21,16 +40,56 @@ type Analysis = {
   recommendations: string[];
   keywords: string[];
   definitely_include: string[];
-  backlog: string[];
+  backlog: (string | BacklogItem)[];
   description: string | null;
   app_names: string[];
   prp: string | null;
-  similar_apps: any[];
+  similar_apps: SimilarApp[];
   pricing_model: string | null;
   market_viability: string | null;
   review_count: number;
+  analysis_time_seconds?: number | null;
+  api_cost?: number | null;
+  ratings_count?: number | null;
+  app_developer?: string | null;
   [key: string]: any;
 };
+
+const MarkdownRenderer = ({ content }: { content: string }) => (
+  <ReactMarkdown
+    remarkPlugins={[remarkGfm]}
+    components={{
+      p: ({ children }) => <p className="text-gray-700 mb-3">{children}</p>,
+      strong: ({ children }) => <strong className="font-semibold text-gray-900">{children}</strong>,
+      ul: ({ children }) => <ul className="list-disc pl-5 mb-3 text-gray-700">{children}</ul>,
+      ol: ({ children }) => <ol className="list-decimal pl-5 mb-3 text-gray-700">{children}</ol>,
+      li: ({ children }) => <li className="mb-1">{children}</li>,
+      a: ({ children, href }) => (
+        <a href={href} target="_blank" rel="noopener noreferrer" className="text-[#88D18A] underline">
+          {children}
+        </a>
+      ),
+    }}
+  >
+    {content}
+  </ReactMarkdown>
+);
+
+const SectionCard = ({ title, children }: { title: string; children: React.ReactNode }) => (
+  <div>
+    <h4 className="text-lg font-bold text-gray-900 mb-3">{title}</h4>
+    {children}
+  </div>
+);
+
+const normalizeBacklog = (items: (string | BacklogItem)[] = []): BacklogItem[] =>
+  items
+    .map((item) =>
+      typeof item === 'string'
+        ? { content: item, priority: 'Medium' }
+        : { priority: item.priority || 'Medium', content: item.content }
+    )
+    .filter((item) => item.content && item.content.length > 0);
 
 export default function OnboardingPage() {
   const router = useRouter();
@@ -40,6 +99,11 @@ export default function OnboardingPage() {
   const [showModal, setShowModal] = useState(false);
   const [previewCount, setPreviewCount] = useState(0);
   const [loadingAnalysis, setLoadingAnalysis] = useState(false);
+  const normalizedBacklog = normalizeBacklog(selectedAnalysis?.backlog || []);
+  const keywords = selectedAnalysis?.keywords || [];
+  const recommendations = selectedAnalysis?.recommendations || [];
+  const appNames = selectedAnalysis?.app_names || [];
+  const similarApps = (selectedAnalysis?.similar_apps || []) as SimilarApp[];
 
   useEffect(() => {
     loadPreviews();
@@ -260,70 +324,174 @@ export default function OnboardingPage() {
 
             {/* Modal Content - Analysis Preview */}
             <div className="p-6 space-y-8">
-              {/* What People Like */}
-              {selectedAnalysis.likes && selectedAnalysis.likes.length > 0 && (
-                <div>
-                  <h4 className="text-lg font-bold text-gray-900 mb-3">1. What People Like</h4>
+              {selectedAnalysis.likes?.length > 0 && (
+                <SectionCard title="1. What People Like">
                   <ul className="space-y-2">
-                    {selectedAnalysis.likes.slice(0, 5).map((like: string, idx: number) => (
+                    {selectedAnalysis.likes.map((like, idx) => (
                       <li key={idx} className="flex items-start gap-2 text-gray-700">
                         <span className="text-green-500 font-bold">✓</span>
                         <span>{like}</span>
                       </li>
                     ))}
                   </ul>
-                </div>
+                </SectionCard>
               )}
 
-              {/* What Users Want */}
-              {selectedAnalysis.dislikes && selectedAnalysis.dislikes.length > 0 && (
-                <div>
-                  <h4 className="text-lg font-bold text-gray-900 mb-3">2. What Users Want</h4>
+              {selectedAnalysis.dislikes?.length > 0 && (
+                <SectionCard title="2. What Users Want">
                   <ul className="space-y-2">
-                    {selectedAnalysis.dislikes.slice(0, 5).map((dislike: string, idx: number) => (
+                    {selectedAnalysis.dislikes.map((dislike, idx) => (
                       <li key={idx} className="flex items-start gap-2 text-gray-700">
                         <span className="text-red-500 font-bold">⚠</span>
                         <span>{dislike}</span>
                       </li>
                     ))}
                   </ul>
-                </div>
+                </SectionCard>
               )}
 
-              {/* Core Features */}
-              {selectedAnalysis.definitely_include && selectedAnalysis.definitely_include.length > 0 && (
-                <div>
-                  <h4 className="text-lg font-bold text-gray-900 mb-3">4. Core Features to Include</h4>
+              {keywords.length > 0 && (
+                <SectionCard title="3. SEO Keywords">
+                  <div className="flex flex-wrap gap-2">
+                    {keywords.map((keyword, idx) => (
+                      <span key={idx} className="px-3 py-1 rounded-full bg-gray-100 text-gray-800 text-sm">
+                        #{keyword}
+                      </span>
+                    ))}
+                  </div>
+                </SectionCard>
+              )}
+
+              {selectedAnalysis.definitely_include?.length > 0 && (
+                <SectionCard title="4. Core Features to Include">
                   <ul className="space-y-2">
-                    {selectedAnalysis.definitely_include.slice(0, 5).map((feature: string, idx: number) => (
+                    {selectedAnalysis.definitely_include.map((feature, idx) => (
                       <li key={idx} className="flex items-start gap-2 text-gray-700">
                         <span className="text-blue-500 font-bold">•</span>
                         <span>{feature}</span>
                       </li>
                     ))}
                   </ul>
-                </div>
+                </SectionCard>
               )}
 
-              {/* App Description */}
-              {selectedAnalysis.description && (
-                <div>
-                  <h4 className="text-lg font-bold text-gray-900 mb-3">7. App Description</h4>
-                  <p className="text-gray-700">{selectedAnalysis.description}</p>
-                </div>
-              )}
-
-              {/* Pricing Model */}
-              {selectedAnalysis.pricing_model && (
-                <div>
-                  <h4 className="text-lg font-bold text-gray-900 mb-3">11. Pricing & Revenue Projections</h4>
-                  <div className="bg-gray-50 rounded-lg p-4">
-                    <p className="text-gray-700 whitespace-pre-wrap">{selectedAnalysis.pricing_model.substring(0, 500)}...</p>
+              {normalizedBacklog.length > 0 && (
+                <SectionCard title="5. Enhanced Features to Add">
+                  <div className="space-y-3">
+                    {normalizedBacklog.map((item, idx) => (
+                      <div key={idx} className="border border-gray-200 rounded-lg p-4">
+                        <p className="text-xs uppercase tracking-wide text-gray-500 mb-1">{item.priority || 'Medium'} Priority</p>
+                        <p className="text-gray-700">{item.content}</p>
+                      </div>
+                    ))}
                   </div>
-                </div>
+                </SectionCard>
               )}
 
-              {/* CTA Button */}
+              {recommendations.length > 0 && (
+                <SectionCard title="6. Strategic Recommendations">
+                  <ul className="space-y-2">
+                    {recommendations.map((rec, idx) => (
+                      <li key={idx} className="flex items-start gap-2 text-gray-700">
+                        <span className="text-purple-500 font-bold">→</span>
+                        <span>{rec}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </SectionCard>
+              )}
+
+              {selectedAnalysis.description && (
+                <SectionCard title="7. App Description">
+                  <p className="text-gray-700">{selectedAnalysis.description}</p>
+                </SectionCard>
+              )}
+
+              {appNames.length > 0 && (
+                <SectionCard title="8. App Name Ideas">
+                  <div className="flex flex-wrap gap-2">
+                    {appNames.map((name, idx) => (
+                      <span key={idx} className="px-3 py-1 rounded-lg bg-gray-100 text-gray-800 text-sm">
+                        {name}
+                      </span>
+                    ))}
+                  </div>
+                </SectionCard>
+              )}
+
+              {selectedAnalysis.prp && (
+                <SectionCard title="9. Product Requirements Prompt">
+                  <MarkdownRenderer content={selectedAnalysis.prp} />
+                </SectionCard>
+              )}
+
+              {similarApps.length > 0 && (
+                <SectionCard title="10. Similar Apps to Study">
+                  <div className="space-y-3">
+                    {similarApps.slice(0, 6).map((app, idx) => (
+                      <div key={`${app.trackName}-${idx}`} className="border border-gray-200 rounded-lg p-4">
+                        <div className="flex items-center gap-3 mb-2">
+                          {app.artworkUrl100 ? (
+                            <img src={app.artworkUrl100} alt={app.trackName} className="w-10 h-10 rounded-lg" />
+                          ) : (
+                            <div className="w-10 h-10 rounded-lg bg-gray-200 flex items-center justify-center text-lg">📱</div>
+                          )}
+                          <div>
+                            <p className="font-semibold text-gray-900">{app.trackName}</p>
+                            <p className="text-sm text-gray-500">{app.artistName}</p>
+                          </div>
+                        </div>
+                        <p className="text-sm text-gray-600 mb-2">
+                          {app.averageUserRating ? `${app.averageUserRating.toFixed(1)}★ (${app.userRatingCount?.toLocaleString() || 0} ratings)` : 'No rating data'}
+                          {app.formattedPrice ? ` • ${app.formattedPrice}` : ''}
+                        </p>
+                        {app.description && (
+                          <p className="text-sm text-gray-600 line-clamp-3">{app.description}</p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </SectionCard>
+              )}
+
+              {selectedAnalysis.pricing_model && (
+                <SectionCard title="11. Pricing & Revenue Projections">
+                  <div className="bg-gray-50 rounded-lg p-4">
+                    <MarkdownRenderer content={selectedAnalysis.pricing_model} />
+                  </div>
+                </SectionCard>
+              )}
+
+              {selectedAnalysis.market_viability && (
+                <SectionCard title="12. Market Viability & Business Case">
+                  <div className="bg-gray-50 rounded-lg p-4">
+                    <MarkdownRenderer content={selectedAnalysis.market_viability} />
+                  </div>
+                </SectionCard>
+              )}
+
+              {(
+                selectedAnalysis.analysis_time_seconds ||
+                selectedAnalysis.api_cost
+              ) && (
+                <SectionCard title="13. Time & Money Saved">
+                  <div className="space-y-2 text-gray-700">
+                    {selectedAnalysis.analysis_time_seconds && (
+                      <p>
+                        AI generated this report in{' '}
+                        <span className="font-semibold">
+                          {Math.round(selectedAnalysis.analysis_time_seconds)} seconds
+                        </span>{' '}
+                        versus the 12+ hours a manual analyst would spend researching.
+                      </p>
+                    )}
+                    <p>
+                      Developers typically spend days researching reviews, keywords, pricing, and competitors. This analysis compresses all of that into minutes so you can move faster.
+                    </p>
+                  </div>
+                </SectionCard>
+              )}
+
               <div className="border-t border-gray-200 pt-6">
                 <button
                   onClick={handleStartTrial}
