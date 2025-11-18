@@ -228,6 +228,7 @@ export default function OnboardingPage() {
         >
           <div 
             className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto"
+            style={{ backgroundColor: '#ffffff' }}
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}
