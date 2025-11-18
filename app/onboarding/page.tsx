@@ -335,7 +335,9 @@ export default function OnboardingPage() {
                     {selectedAnalysis.likes.map((like, idx) => (
                       <li key={idx} className="flex items-start gap-2 text-gray-700">
                         <span className="text-green-500 font-bold">✓</span>
-                        <span>{like}</span>
+                        <div className="flex-1">
+                          <MarkdownRenderer content={like} />
+                        </div>
                       </li>
                     ))}
                   </ul>
@@ -348,7 +350,9 @@ export default function OnboardingPage() {
                     {selectedAnalysis.dislikes.map((dislike, idx) => (
                       <li key={idx} className="flex items-start gap-2 text-gray-700">
                         <span className="text-red-500 font-bold">⚠</span>
-                        <span>{dislike}</span>
+                        <div className="flex-1">
+                          <MarkdownRenderer content={dislike} />
+                        </div>
                       </li>
                     ))}
                   </ul>
