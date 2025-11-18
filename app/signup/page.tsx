@@ -14,7 +14,8 @@ function SignupContent() {
   const [messageType, setMessageType] = useState<'success' | 'error'>('success');
   
   const supabase = createClient();
-  const redirectTo = searchParams.get('redirectTo') || '/homezone';
+  const isOnboarding = searchParams.get('onboarding') === 'true';
+  const redirectTo = isOnboarding ? '/billing?onboarding=true&trial=true' : (searchParams.get('redirectTo') || '/homezone');
 
   useEffect(() => {
     const error = searchParams.get('error');
@@ -33,7 +34,7 @@ function SignupContent() {
       const { data, error } = await supabase.auth.signInWithOtp({
         email,
         options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback?next=/homezone`,
+          emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(redirectTo)}`,
         },
       });
 

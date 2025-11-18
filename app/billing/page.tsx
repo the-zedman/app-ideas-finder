@@ -1,11 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase-client';
 import Footer from '@/components/Footer';
 
-export default function BillingPage() {
+function BillingContent() {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [subscription, setSubscription] = useState<any>(null);
@@ -13,9 +13,15 @@ export default function BillingPage() {
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [processingCheckout, setProcessingCheckout] = useState(false);
   const [billingInterval, setBillingInterval] = useState<'monthly' | 'annual'>('monthly');
+  const [isOnboarding, setIsOnboarding] = useState(false);
   
   const router = useRouter();
+  const searchParams = useSearchParams();
   const supabase = createClient();
+
+  useEffect(() => {
+    setIsOnboarding(searchParams.get('onboarding') === 'true' && searchParams.get('trial') === 'true');
+  }, [searchParams]);
 
   useEffect(() => {
     const init = async () => {
@@ -189,6 +195,28 @@ export default function BillingPage() {
                   Any future date | Any 3-digit CVC | Any ZIP code
                 </div>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* Onboarding Trial Prompt */}
+        {isOnboarding && !subscription && (
+          <div className="bg-gradient-to-r from-[#88D18A] to-[#6BC070] rounded-2xl p-8 mb-8 text-white">
+            <div className="text-center">
+              <h2 className="text-3xl font-bold mb-4">🎉 Welcome! Start Your 3-Day Trial</h2>
+              <p className="text-lg mb-6 opacity-90">
+                You've seen what's possible. Now analyze your own apps with a 3-day trial for just $1.
+              </p>
+              <p className="text-sm mb-6 opacity-75">
+                Get 10 free searches • Full access to all features • Cancel anytime
+              </p>
+              <button
+                onClick={() => handleCheckout('trial', '')}
+                disabled={processingCheckout}
+                className="bg-white text-[#88D18A] px-8 py-4 rounded-lg font-bold text-lg hover:bg-gray-100 transition-colors disabled:opacity-50"
+              >
+                {processingCheckout ? 'Processing...' : 'Start Trial for $1 →'}
+              </button>
             </div>
           </div>
         )}
@@ -514,5 +542,13 @@ export default function BillingPage() {
 
       <Footer />
     </div>
+  );
+}
+
+export default function BillingPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-gray-50 flex items-center justify-center"><div className="text-gray-600 text-xl">Loading...</div></div>}>
+      <BillingContent />
+    </Suspense>
   );
 }
