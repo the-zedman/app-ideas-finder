@@ -324,6 +324,11 @@ export default function OnboardingPage() {
 
             {/* Modal Content - Analysis Preview */}
             <div className="p-6 space-y-8">
+              <div className="bg-[#F0FDF4] border border-[#BBF7D0] rounded-xl p-5 text-sm text-[#14532D]">
+                <p>
+                  This report dissects <span className="font-bold">{selectedAnalysis.app_name}</span> across 13 sections—surfacing what users love, hate, and desperately want—so you can ship a version that’s at least 1% better. Every insight is sourced from real App Store feedback, highlighting competitor weaknesses, unmet needs, and monetization angles. In a single read, you get the strategic blueprint to build a stronger app faster, without guesswork.
+                </p>
+              </div>
               {selectedAnalysis.likes?.length > 0 && (
                 <SectionCard title="1. What People Like">
                   <ul className="space-y-2">
