@@ -22,7 +22,9 @@ export async function GET() {
     }
     
     // Randomize and limit to 20
-    const shuffled = (analyses || []).sort(() => 0.5 - Math.random()).slice(0, 20);
+    const unique = (analyses || []).filter((preview, index, arr) => 
+      index === arr.findIndex((p) => p.app_id === preview.app_id));
+    const shuffled = unique.sort(() => 0.5 - Math.random()).slice(0, 15);
     
     return NextResponse.json({ previews: shuffled });
     
