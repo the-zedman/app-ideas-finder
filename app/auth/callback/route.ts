@@ -97,6 +97,12 @@ export async function GET(request: NextRequest) {
     const { data, error } = await supabase.auth.exchangeCodeForSession(code);
     
     if (!error) {
+      const cookieOverride = cookieStore.get('pending_signup_redirect')?.value;
+      const finalPath =
+        (cookieOverride && resolveNextPath(cookieOverride, SIGNUP_REDIRECT, origin)) ||
+        nextPath ||
+        DEFAULT_REDIRECT;
+
       const forwardedHost = request.headers.get('x-forwarded-host');
       const isLocalEnv = process.env.NODE_ENV === 'development';
       const baseUrl = isLocalEnv
@@ -105,8 +111,16 @@ export async function GET(request: NextRequest) {
           ? `https://${forwardedHost}`
           : origin;
 
-      const redirectUrl = new URL(nextPath, baseUrl);
-      return NextResponse.redirect(redirectUrl);
+      const redirectUrl = new URL(finalPath, baseUrl);
+      const response = NextResponse.redirect(redirectUrl);
+
+      try {
+        response.cookies.delete('pending_signup_redirect');
+      } catch (err) {
+        console.warn('Failed to clear pending signup redirect cookie', err);
+      }
+
+      return response;
     }
   }
 

@@ -25,6 +25,12 @@ function SignupContent() {
     }
   }, [searchParams]);
 
+  useEffect(() => {
+    if (isOnboarding && typeof window !== 'undefined') {
+      window.sessionStorage.setItem('pendingSignupRedirect', redirectTo);
+    }
+  }, [isOnboarding, redirectTo]);
+
   const handleMagicLinkSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
