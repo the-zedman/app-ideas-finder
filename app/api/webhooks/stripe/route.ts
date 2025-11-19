@@ -49,27 +49,38 @@ export async function POST(request: Request) {
           // Trial payment completed - activate trial
           const trialEndDate = new Date();
           trialEndDate.setDate(trialEndDate.getDate() + 3);
+          const trialStart = new Date();
           
+          // Upsert subscription (create if doesn't exist, update if it does)
+          // Since auto-trial trigger is disabled, we need to create the record
           await supabase
             .from('user_subscriptions')
-            .update({
+            .upsert({
+              user_id: userId,
+              plan_id: 'trial',
               status: 'trial',
-              trial_start_date: new Date().toISOString(),
+              trial_start_date: trialStart.toISOString(),
               trial_end_date: trialEndDate.toISOString(),
-              current_period_start: new Date().toISOString(),
+              current_period_start: trialStart.toISOString(),
               current_period_end: trialEndDate.toISOString(),
+              stripe_customer_id: session.customer as string || null,
               stripe_subscription_id: session.subscription as string || null,
-            })
-            .eq('user_id', userId);
+            }, {
+              onConflict: 'user_id'
+            });
           
-          // Set usage limit to 10 for trial
+          // Upsert usage record (create if doesn't exist, update if it does)
           await supabase
             .from('monthly_usage')
-            .update({
-              searches_limit: 10,
+            .upsert({
+              user_id: userId,
+              period_start: trialStart.toISOString(),
               period_end: trialEndDate.toISOString(),
-            })
-            .eq('user_id', userId);
+              searches_used: 0,
+              searches_limit: 10,
+            }, {
+              onConflict: 'user_id,period_start'
+            });
             
         } else if (planType === 'search_pack') {
           // Search pack purchased - add to search_packs table
@@ -136,35 +147,51 @@ export async function POST(request: Request) {
                       subscription.status === 'trialing' ? 'trial' : 
                       subscription.status === 'canceled' ? 'cancelled' : 'expired';
         
-        // Update user subscription
+        // Get user_id from subscription metadata or find by customer_id
+        let finalUserId = userId;
+        if (!finalUserId) {
+          const { data: subData } = await supabase
+            .from('user_subscriptions')
+            .select('user_id')
+            .eq('stripe_customer_id', subscription.customer as string)
+            .maybeSingle();
+          if (subData) {
+            finalUserId = subData.user_id;
+          }
+        }
+        
+        if (!finalUserId) {
+          console.error('No user_id found for subscription');
+          break;
+        }
+        
+        // Upsert user subscription (create if doesn't exist, update if it does)
         await supabase
           .from('user_subscriptions')
-          .update({
+          .upsert({
+            user_id: finalUserId,
             plan_id: planId,
             status: status,
+            stripe_customer_id: subscription.customer as string,
             stripe_subscription_id: subscription.id,
             current_period_start: periodStart.toISOString(),
             current_period_end: periodEnd.toISOString(),
-          })
-          .eq('stripe_customer_id', subscription.customer as string);
+          }, {
+            onConflict: 'user_id'
+          });
         
-        // Update usage limits
-        const { data: subData } = await supabase
-          .from('user_subscriptions')
-          .select('user_id')
-          .eq('stripe_customer_id', subscription.customer as string)
-          .maybeSingle();
-        
-        if (subData) {
-          await supabase
-            .from('monthly_usage')
-            .update({
-              searches_limit: searchesLimit,
-              period_start: periodStart.toISOString(),
-              period_end: periodEnd.toISOString(),
-            })
-            .eq('user_id', subData.user_id);
-        }
+        // Upsert usage limits (create if doesn't exist, update if it does)
+        await supabase
+          .from('monthly_usage')
+          .upsert({
+            user_id: finalUserId,
+            period_start: periodStart.toISOString(),
+            period_end: periodEnd.toISOString(),
+            searches_used: 0,
+            searches_limit: searchesLimit,
+          }, {
+            onConflict: 'user_id,period_start'
+          });
         
         break;
       }
