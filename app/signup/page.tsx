@@ -26,8 +26,19 @@ function SignupContent() {
   }, [searchParams]);
 
   useEffect(() => {
-    if (typeof document !== 'undefined' && isOnboarding) {
-      document.cookie = `pending_signup_redirect=${encodeURIComponent(redirectTo)}; Path=/; Max-Age=900; SameSite=Lax`;
+    if (isOnboarding && typeof window !== 'undefined' && 'cookieStore' in window) {
+      try {
+        (window as any).cookieStore?.set({
+          name: 'pending_signup_redirect',
+          value: encodeURIComponent(redirectTo),
+          expires: Date.now() + 15 * 60 * 1000,
+          path: '/',
+          sameSite: 'lax'
+        });
+      } catch (error) {
+        console.warn('Failed to set pending signup redirect cookie', error);
+        document.cookie = `pending_signup_redirect=${encodeURIComponent(redirectTo)}; Path=/; Max-Age=900; SameSite=Lax`;
+      }
     }
   }, [isOnboarding, redirectTo]);
 
