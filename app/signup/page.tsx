@@ -26,8 +26,8 @@ function SignupContent() {
   }, [searchParams]);
 
   useEffect(() => {
-    if (isOnboarding && typeof window !== 'undefined') {
-      window.sessionStorage.setItem('pendingSignupRedirect', redirectTo);
+    if (typeof document !== 'undefined' && isOnboarding) {
+      document.cookie = `pending_signup_redirect=${encodeURIComponent(redirectTo)}; Path=/; Max-Age=900; SameSite=Lax`;
     }
   }, [isOnboarding, redirectTo]);
 
