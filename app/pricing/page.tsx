@@ -56,7 +56,7 @@ export default function Pricing() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           planType,
-          successUrl: `${window.location.origin}/billing?success=true`,
+          successUrl: `${window.location.origin}/homezone?success=true`,
           cancelUrl: `${window.location.origin}/pricing?canceled=true`,
         }),
       });
@@ -147,7 +147,7 @@ export default function Pricing() {
                 <p className="text-gray-600 mb-4">Perfect for trying out</p>
                 <div className="mb-4">
                   <span className="text-4xl font-bold text-gray-900">$1</span>
-                  <span className="text-gray-600"> / 3 days</span>
+                  <span className="text-gray-600"> USD / 3 days</span>
                 </div>
                 <p className="text-sm text-gray-500">One-time payment</p>
               </div>
@@ -192,7 +192,7 @@ export default function Pricing() {
                     ${billingCycle === 'monthly' ? '39' : '399'}
                   </span>
                   <span className="text-gray-600">
-                    {billingCycle === 'monthly' ? ' / month' : ' / year'}
+                    {' USD' + (billingCycle === 'monthly' ? ' / month' : ' / year')}
                   </span>
                 </div>
                 <p className="text-sm text-gray-500">
@@ -255,7 +255,7 @@ export default function Pricing() {
                     ${billingCycle === 'monthly' ? '79' : '799'}
                   </span>
                   <span className="text-gray-600">
-                    {billingCycle === 'monthly' ? ' / month' : ' / year'}
+                    {' USD' + (billingCycle === 'monthly' ? ' / month' : ' / year')}
                   </span>
                 </div>
                 <p className="text-sm text-gray-500">
@@ -399,7 +399,7 @@ export default function Pricing() {
                 <div className="flex flex-col items-center gap-4">
                   <div>
                     <div className="text-5xl font-bold text-gray-900">$29</div>
-                    <div className="text-sm text-gray-500 text-center mt-1">one-time payment</div>
+                    <div className="text-sm text-gray-500 text-center mt-1">USD - one-time payment</div>
                     <div className="text-xs text-gray-400 text-center mt-1">$0.58 per search</div>
                   </div>
                   <Link href="//" className="px-8 py-3 bg-[#88D18A] hover:bg-[#88D18A]/90 text-white font-semibold rounded-lg transition-colors whitespace-nowrap">
