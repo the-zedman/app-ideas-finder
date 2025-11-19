@@ -2,18 +2,24 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase-client';
 
 export default function Pricing() {
+  const router = useRouter();
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'annual'>('monthly');
   const [hasActiveSubscription, setHasActiveSubscription] = useState<boolean | null>(null);
+  const [processingCheckout, setProcessingCheckout] = useState(false);
+  const [user, setUser] = useState<any>(null);
   
   useEffect(() => {
     const checkSubscription = async () => {
       const supabase = createClient();
-      const { data: { user } } = await supabase.auth.getUser();
+      const { data: { user: currentUser } } = await supabase.auth.getUser();
       
-      if (!user) {
+      setUser(currentUser);
+      
+      if (!currentUser) {
         setHasActiveSubscription(false);
         return;
       }
@@ -21,7 +27,7 @@ export default function Pricing() {
       const { data: subscription } = await supabase
         .from('user_subscriptions')
         .select('status')
-        .eq('user_id', user.id)
+        .eq('user_id', currentUser.id)
         .maybeSingle();
       
       if (subscription) {
@@ -34,6 +40,41 @@ export default function Pricing() {
     
     checkSubscription();
   }, []);
+
+  const handleCheckout = async (planType: string) => {
+    // Redirect to login if not authenticated
+    if (!user) {
+      router.push(`/login?redirectTo=${encodeURIComponent('/pricing')}`);
+      return;
+    }
+
+    setProcessingCheckout(true);
+    
+    try {
+      const response = await fetch('/api/stripe/create-checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          planType,
+          successUrl: `${window.location.origin}/billing?success=true`,
+          cancelUrl: `${window.location.origin}/pricing?canceled=true`,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        alert('Error creating checkout session');
+        setProcessingCheckout(false);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Failed to start checkout');
+      setProcessingCheckout(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-white">
@@ -131,10 +172,13 @@ export default function Pricing() {
               </ul>
 
               <div className="text-center">
-                <button disabled className="block w-full bg-gray-300 text-gray-500 font-semibold py-3 px-6 rounded-lg cursor-not-allowed">
-                  Coming Soon
+                <button 
+                  onClick={() => handleCheckout('trial')}
+                  disabled={processingCheckout}
+                  className="block w-full bg-[#88D18A] hover:bg-[#88D18A]/90 text-white font-semibold py-3 px-6 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {processingCheckout ? 'Processing...' : 'Start Trial for $1'}
                 </button>
-                <p className="text-xs text-gray-500 mt-3">Sign up at launch for special early-bird pricing</p>
               </div>
             </div>
 
@@ -184,8 +228,12 @@ export default function Pricing() {
                 <p className="text-xs text-gray-500 mb-4">
                   ${billingCycle === 'monthly' ? '0.52' : '0.44'} per search
                 </p>
-                <button disabled className="block w-full bg-gray-300 text-gray-500 font-semibold py-3 px-6 rounded-lg cursor-not-allowed">
-                  Coming Soon
+                <button 
+                  onClick={() => handleCheckout(billingCycle === 'monthly' ? 'core_monthly' : 'core_annual')}
+                  disabled={processingCheckout}
+                  className="block w-full bg-[#88D18A] hover:bg-[#88D18A]/90 text-white font-semibold py-3 px-6 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {processingCheckout ? 'Processing...' : 'Get Started'}
                 </button>
               </div>
             </div>
@@ -251,8 +299,12 @@ export default function Pricing() {
                 <p className="text-xs text-gray-500 mb-4">
                   ${billingCycle === 'monthly' ? '0.35' : '0.30'} per search
                 </p>
-                <button disabled className="block w-full bg-gray-300 text-gray-500 font-semibold py-3 px-6 rounded-lg cursor-not-allowed">
-                  Coming Soon
+                <button 
+                  onClick={() => handleCheckout(billingCycle === 'monthly' ? 'prime_monthly' : 'prime_annual')}
+                  disabled={processingCheckout}
+                  className="block w-full bg-[#88D18A] hover:bg-[#88D18A]/90 text-white font-semibold py-3 px-6 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {processingCheckout ? 'Processing...' : 'Get Started'}
                 </button>
               </div>
             </div>
