@@ -4,9 +4,14 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 const DEFAULT_REDIRECT = '/homezone';
+const SIGNUP_REDIRECT = '/billing?onboarding=true&trial=true';
 
-const resolveNextPath = (value: string | null, origin: string): string => {
-  if (!value) return DEFAULT_REDIRECT;
+const resolveNextPath = (
+  value: string | null,
+  origin: string,
+  fallback: string = DEFAULT_REDIRECT
+): string => {
+  if (!value) return fallback;
   let decoded = value;
 
   // Attempt to decode multiple times to handle double-encoded values
@@ -27,25 +32,27 @@ const resolveNextPath = (value: string | null, origin: string): string => {
       if (url.origin === origin) {
         return `${url.pathname}${url.search}${url.hash}`;
       }
-      return DEFAULT_REDIRECT;
+      return fallback;
     } catch {
-      return DEFAULT_REDIRECT;
+      return fallback;
     }
   }
 
   // Ensure we only redirect to relative paths
   if (!decoded.startsWith('/')) {
-    return DEFAULT_REDIRECT;
+    return fallback;
   }
 
-  return decoded || DEFAULT_REDIRECT;
+  return decoded || fallback;
 };
 
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get('code');
+  const eventType = searchParams.get('type');
   const nextParam = searchParams.get('next');
-  const nextPath = resolveNextPath(nextParam, origin);
+  const fallback = eventType === 'signup' ? SIGNUP_REDIRECT : DEFAULT_REDIRECT;
+  const nextPath = resolveNextPath(nextParam, origin, fallback);
 
   if (code) {
     const cookieStore = await cookies();
