@@ -345,7 +345,7 @@ export default function OnboardingPage() {
               )}
 
               {selectedAnalysis.dislikes?.length > 0 && (
-                <SectionCard title="2. What Users Want">
+                <SectionCard title="2. What Users Want (or Hate!)">
                   <ul className="space-y-2">
                     {selectedAnalysis.dislikes.map((dislike, idx) => (
                       <li key={idx} className="flex items-start gap-2 text-gray-700">
@@ -363,8 +363,8 @@ export default function OnboardingPage() {
                 <SectionCard title="3. SEO Keywords">
                   <div className="flex flex-wrap gap-2">
                     {keywords.map((keyword, idx) => (
-                      <span key={idx} className="px-3 py-1 rounded-full bg-gray-100 text-gray-800 text-sm">
-                        #{keyword}
+                      <span key={idx} className="px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-sm font-semibold">
+                        {keyword}
                       </span>
                     ))}
                   </div>
@@ -372,7 +372,7 @@ export default function OnboardingPage() {
               )}
 
               {selectedAnalysis.definitely_include?.length > 0 && (
-                <SectionCard title="4. Core Features to Include">
+                <SectionCard title="4. Core Features to Include in Your New App">
                   <ul className="space-y-2">
                     {selectedAnalysis.definitely_include.map((feature, idx) => (
                       <li key={idx} className="flex items-start gap-2 text-gray-700">
@@ -385,11 +385,11 @@ export default function OnboardingPage() {
               )}
 
               {normalizedBacklog.length > 0 && (
-                <SectionCard title="5. Enhanced Features to Add">
+                <SectionCard title="5. Enhanced Features to Add in Your Next Release">
                   <div className="space-y-3">
                     {normalizedBacklog.map((item, idx) => (
-                      <div key={idx} className="border border-gray-200 rounded-lg p-4">
-                        <p className="text-xs uppercase tracking-wide text-gray-500 mb-1">{item.priority || 'Medium'} Priority</p>
+                      <div key={idx} className="border border-blue-200 bg-blue-50 rounded-lg p-4">
+                        <p className="text-xs uppercase tracking-wide text-blue-700 mb-1">{item.priority || 'Medium'} Priority</p>
                         <p className="text-gray-700">{item.content}</p>
                       </div>
                     ))}
@@ -398,11 +398,11 @@ export default function OnboardingPage() {
               )}
 
               {recommendations.length > 0 && (
-                <SectionCard title="6. Strategic Recommendations">
-                  <ul className="space-y-2">
+                <SectionCard title="6. Strategic Recommendations to Stay 1% Ahead">
+                  <ul className="space-y-2 bg-purple-50 border border-purple-200 rounded-xl p-4">
                     {recommendations.map((rec, idx) => (
                       <li key={idx} className="flex items-start gap-2 text-gray-700">
-                        <span className="text-purple-500 font-bold">→</span>
+                        <span className="text-purple-600 font-bold">→</span>
                         <span>{rec}</span>
                       </li>
                     ))}
@@ -411,13 +411,13 @@ export default function OnboardingPage() {
               )}
 
               {selectedAnalysis.description && (
-                <SectionCard title="7. App Description">
+                <SectionCard title="7. App Description You Can Build On">
                   <p className="text-gray-700">{selectedAnalysis.description}</p>
                 </SectionCard>
               )}
 
               {appNames.length > 0 && (
-                <SectionCard title="8. App Name Ideas">
+                <SectionCard title="8. App Name Ideas for Your Version">
                   <div className="flex flex-wrap gap-2">
                     {appNames.map((name, idx) => (
                       <span key={idx} className="px-3 py-1 rounded-lg bg-gray-100 text-gray-800 text-sm">
@@ -464,7 +464,7 @@ export default function OnboardingPage() {
               )}
 
               {selectedAnalysis.pricing_model && (
-                <SectionCard title="11. Pricing & Revenue Projections">
+                <SectionCard title="11. Pricing & Revenue Blueprint for Your App">
                   <div className="bg-gray-50 rounded-lg p-4">
                     <MarkdownRenderer content={selectedAnalysis.pricing_model} />
                   </div>
@@ -472,7 +472,7 @@ export default function OnboardingPage() {
               )}
 
               {selectedAnalysis.market_viability && (
-                <SectionCard title="12. Market Viability & Business Case">
+                <SectionCard title="12. Market Viability & Business Case for Your Version">
                   <div className="bg-gray-50 rounded-lg p-4">
                     <MarkdownRenderer content={selectedAnalysis.market_viability} />
                   </div>
