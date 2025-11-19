@@ -3,8 +3,8 @@ import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-const DEFAULT_REDIRECT = '/homezone';
-const SIGNUP_REDIRECT = '/billing?onboarding=true&trial=true';
+const DEFAULT_REDIRECT = '/pricing';
+const SIGNUP_REDIRECT = '/pricing';
 
 const decodeValue = (value: string | null) => {
   if (!value) return null;

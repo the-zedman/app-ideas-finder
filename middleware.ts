@@ -1,5 +1,6 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
+import { hasActiveSubscription } from './lib/check-subscription'
 
 export async function middleware(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
@@ -39,10 +40,11 @@ export async function middleware(request: NextRequest) {
   // Refresh session if expired
   const { data: { user } } = await supabase.auth.getUser()
 
-  // Protected routes
-  const protectedRoutes = ['/homezone', '/profile', '/appengine']
+  // Protected routes (require subscription)
+  const protectedRoutes = ['/homezone', '/profile', '/appengine', '/analyses', '/billing']
   const authRoutes = ['/login', '/signup']
   const adminRoutes = ['/admin']
+  const publicRoutes = ['/pricing', '/onboarding', '/', '/contact', '/terms-of-service', '/privacy-policy', '/affiliate']
   
   const isProtectedRoute = protectedRoutes.some(route => 
     request.nextUrl.pathname.startsWith(route)
@@ -52,6 +54,9 @@ export async function middleware(request: NextRequest) {
   )
   const isAdminRoute = adminRoutes.some(route => 
     request.nextUrl.pathname.startsWith(route)
+  )
+  const isPublicRoute = publicRoutes.some(route => 
+    request.nextUrl.pathname === route || request.nextUrl.pathname.startsWith(route + '/')
   )
 
   // Skip auth checks in development bypass mode
@@ -68,11 +73,44 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(redirectUrl)
   }
 
-  // Redirect to homezone if accessing auth routes while already authenticated
+  // Check subscription status for protected routes (user must be authenticated at this point)
+  if (isProtectedRoute && user && !isAdminRoute) {
+    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+    if (serviceRoleKey) {
+      const hasSubscription = await hasActiveSubscription(
+        user.id,
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        serviceRoleKey
+      )
+      
+      if (!hasSubscription) {
+        // No active subscription - redirect to pricing
+        const redirectUrl = request.nextUrl.clone()
+        redirectUrl.pathname = '/pricing'
+        return NextResponse.redirect(redirectUrl)
+      }
+    }
+  }
+
+  // Redirect authenticated users away from auth routes
   if (isAuthRoute && user) {
-    const redirectUrl = request.nextUrl.clone()
-    redirectUrl.pathname = '/homezone'
-    return NextResponse.redirect(redirectUrl)
+    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+    if (serviceRoleKey) {
+      const hasSubscription = await hasActiveSubscription(
+        user.id,
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        serviceRoleKey
+      )
+      
+      const redirectUrl = request.nextUrl.clone()
+      redirectUrl.pathname = hasSubscription ? '/homezone' : '/pricing'
+      return NextResponse.redirect(redirectUrl)
+    } else {
+      // Fallback to pricing if we can't check subscription
+      const redirectUrl = request.nextUrl.clone()
+      redirectUrl.pathname = '/pricing'
+      return NextResponse.redirect(redirectUrl)
+    }
   }
 
   // Check admin access for admin routes
