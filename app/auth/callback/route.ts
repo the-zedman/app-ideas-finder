@@ -6,15 +6,9 @@ import type { NextRequest } from 'next/server';
 const DEFAULT_REDIRECT = '/homezone';
 const SIGNUP_REDIRECT = '/billing?onboarding=true&trial=true';
 
-const resolveNextPath = (
-  value: string | null,
-  origin: string,
-  fallback: string = DEFAULT_REDIRECT
-): string => {
-  if (!value) return fallback;
+const decodeValue = (value: string | null) => {
+  if (!value) return null;
   let decoded = value;
-
-  // Attempt to decode multiple times to handle double-encoded values
   for (let i = 0; i < 2; i++) {
     try {
       const nextDecoded = decodeURIComponent(decoded);
@@ -24,11 +18,30 @@ const resolveNextPath = (
       break;
     }
   }
+    return decoded;
+};
 
-  // If decoded string is an absolute URL, ensure it points to our origin
-  if (/^https?:\/\//i.test(decoded)) {
+const parseParams = (request: NextRequest) => {
+  const { searchParams } = new URL(request.url);
+  const hashParams = new URLSearchParams(
+    request.nextUrl.hash ? request.nextUrl.hash.replace(/^#/, '') : ''
+  );
+  return {
+    code: decodeValue(searchParams.get('code') || hashParams.get('code')),
+    type: decodeValue(searchParams.get('type') || hashParams.get('type')),
+    next: decodeValue(searchParams.get('next') || hashParams.get('next')),
+  };
+};
+
+const resolveNextPath = (
+  next: string | null,
+  fallback: string,
+  origin: string
+): string => {
+  if (!next) return fallback;
+  if (next.startsWith('http://') || next.startsWith('https://')) {
     try {
-      const url = new URL(decoded);
+      const url = new URL(next);
       if (url.origin === origin) {
         return `${url.pathname}${url.search}${url.hash}`;
       }
@@ -37,26 +50,20 @@ const resolveNextPath = (
       return fallback;
     }
   }
-
-  // Ensure we only redirect to relative paths
-  if (!decoded.startsWith('/')) {
+  if (!next.startsWith('/')) return fallback;
+  try {
+    new URL(next, origin);
+    return next;
+  } catch {
     return fallback;
   }
-
-  return decoded || fallback;
 };
 
 export async function GET(request: NextRequest) {
-  const { searchParams, origin } = new URL(request.url);
-  const hashParams = new URLSearchParams(
-    request.nextUrl.hash ? request.nextUrl.hash.replace(/^#/, '') : ''
-  );
-
-  const code = searchParams.get('code') || hashParams.get('code');
-  const eventType = searchParams.get('type') || hashParams.get('type');
-  const nextParam = searchParams.get('next') || hashParams.get('next');
-  const fallback = eventType === 'signup' ? SIGNUP_REDIRECT : DEFAULT_REDIRECT;
-  const nextPath = resolveNextPath(nextParam, origin, fallback);
+  const { origin } = new URL(request.url);
+  const { code, type, next } = parseParams(request);
+  const fallback = type === 'signup' ? SIGNUP_REDIRECT : DEFAULT_REDIRECT;
+  const nextPath = resolveNextPath(next, fallback, origin);
 
   if (code) {
     const cookieStore = await cookies();
