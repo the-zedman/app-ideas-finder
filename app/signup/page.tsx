@@ -58,10 +58,11 @@ function SignupContent() {
     setMessage('');
 
     try {
+      const encodedNext = encodeURIComponent(redirectTo);
       const { error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
-          redirectTo: `${window.location.origin}/auth/callback?next=${redirectTo}`,
+          redirectTo: `${window.location.origin}/auth/callback?next=${encodedNext}`,
         },
       });
 
