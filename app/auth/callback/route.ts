@@ -3,12 +3,49 @@ import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
+const DEFAULT_REDIRECT = '/homezone';
+
+const resolveNextPath = (value: string | null, origin: string): string => {
+  if (!value) return DEFAULT_REDIRECT;
+  let decoded = value;
+
+  // Attempt to decode multiple times to handle double-encoded values
+  for (let i = 0; i < 2; i++) {
+    try {
+      const nextDecoded = decodeURIComponent(decoded);
+      if (nextDecoded === decoded) break;
+      decoded = nextDecoded;
+    } catch {
+      break;
+    }
+  }
+
+  // If decoded string is an absolute URL, ensure it points to our origin
+  if (/^https?:\/\//i.test(decoded)) {
+    try {
+      const url = new URL(decoded);
+      if (url.origin === origin) {
+        return `${url.pathname}${url.search}${url.hash}`;
+      }
+      return DEFAULT_REDIRECT;
+    } catch {
+      return DEFAULT_REDIRECT;
+    }
+  }
+
+  // Ensure we only redirect to relative paths
+  if (!decoded.startsWith('/')) {
+    return DEFAULT_REDIRECT;
+  }
+
+  return decoded || DEFAULT_REDIRECT;
+};
+
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get('code');
-  const type = searchParams.get('type');
   const nextParam = searchParams.get('next');
-  const next = nextParam ? decodeURIComponent(nextParam) : '/homezone';
+  const nextPath = resolveNextPath(nextParam, origin);
 
   if (code) {
     const cookieStore = await cookies();
@@ -44,14 +81,14 @@ export async function GET(request: NextRequest) {
     if (!error) {
       const forwardedHost = request.headers.get('x-forwarded-host');
       const isLocalEnv = process.env.NODE_ENV === 'development';
-      
-      if (isLocalEnv) {
-        return NextResponse.redirect(`${origin}${next}`);
-      } else if (forwardedHost) {
-        return NextResponse.redirect(`https://${forwardedHost}${next}`);
-      } else {
-        return NextResponse.redirect(`${origin}${next}`);
-      }
+      const baseUrl = isLocalEnv
+        ? origin
+        : forwardedHost
+          ? `https://${forwardedHost}`
+          : origin;
+
+      const redirectUrl = new URL(nextPath, baseUrl);
+      return NextResponse.redirect(redirectUrl);
     }
   }
 
