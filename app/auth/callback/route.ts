@@ -48,9 +48,13 @@ const resolveNextPath = (
 
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);
-  const code = searchParams.get('code');
-  const eventType = searchParams.get('type');
-  const nextParam = searchParams.get('next');
+  const hashParams = new URLSearchParams(
+    request.nextUrl.hash ? request.nextUrl.hash.replace(/^#/, '') : ''
+  );
+
+  const code = searchParams.get('code') || hashParams.get('code');
+  const eventType = searchParams.get('type') || hashParams.get('type');
+  const nextParam = searchParams.get('next') || hashParams.get('next');
   const fallback = eventType === 'signup' ? SIGNUP_REDIRECT : DEFAULT_REDIRECT;
   const nextPath = resolveNextPath(nextParam, origin, fallback);
 
