@@ -174,10 +174,10 @@ export default function Pricing() {
               <div className="text-center">
                 <button 
                   onClick={() => handleCheckout('trial')}
-                  disabled={processingCheckout}
-                  className="block w-full bg-[#88D18A] hover:bg-[#88D18A]/90 text-white font-semibold py-3 px-6 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={true}
+                  className="block w-full bg-gray-300 text-gray-500 font-semibold py-3 px-6 rounded-lg cursor-not-allowed"
                 >
-                  {processingCheckout ? 'Processing...' : 'Start Trial for $1'}
+                  Temporarily Unavailable
                 </button>
               </div>
             </div>
@@ -230,10 +230,10 @@ export default function Pricing() {
                 </p>
                 <button 
                   onClick={() => handleCheckout(billingCycle === 'monthly' ? 'core_monthly' : 'core_annual')}
-                  disabled={processingCheckout}
-                  className="block w-full bg-[#88D18A] hover:bg-[#88D18A]/90 text-white font-semibold py-3 px-6 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={true}
+                  className="block w-full bg-gray-300 text-gray-500 font-semibold py-3 px-6 rounded-lg cursor-not-allowed"
                 >
-                  {processingCheckout ? 'Processing...' : 'Get Started'}
+                  Temporarily Unavailable
                 </button>
               </div>
             </div>
@@ -301,10 +301,10 @@ export default function Pricing() {
                 </p>
                 <button 
                   onClick={() => handleCheckout(billingCycle === 'monthly' ? 'prime_monthly' : 'prime_annual')}
-                  disabled={processingCheckout}
-                  className="block w-full bg-[#88D18A] hover:bg-[#88D18A]/90 text-white font-semibold py-3 px-6 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={true}
+                  className="block w-full bg-gray-300 text-gray-500 font-semibold py-3 px-6 rounded-lg cursor-not-allowed"
                 >
-                  {processingCheckout ? 'Processing...' : 'Get Started'}
+                  Temporarily Unavailable
                 </button>
               </div>
             </div>
