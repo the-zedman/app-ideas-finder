@@ -177,7 +177,7 @@ export default function Pricing() {
                   disabled={true}
                   className="block w-full bg-gray-300 text-gray-500 font-semibold py-3 px-6 rounded-lg cursor-not-allowed"
                 >
-                  Temporarily Unavailable
+                  Coming Soon
                 </button>
               </div>
             </div>
@@ -233,7 +233,7 @@ export default function Pricing() {
                   disabled={true}
                   className="block w-full bg-gray-300 text-gray-500 font-semibold py-3 px-6 rounded-lg cursor-not-allowed"
                 >
-                  Temporarily Unavailable
+                  Coming Soon
                 </button>
               </div>
             </div>
@@ -304,7 +304,7 @@ export default function Pricing() {
                   disabled={true}
                   className="block w-full bg-gray-300 text-gray-500 font-semibold py-3 px-6 rounded-lg cursor-not-allowed"
                 >
-                  Temporarily Unavailable
+                  Coming Soon
                 </button>
               </div>
             </div>
