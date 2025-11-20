@@ -97,17 +97,28 @@ export async function middleware(request: NextRequest) {
   if (isAuthRoute && user) {
     const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
     if (serviceRoleKey) {
-      const hasSubscription = await hasActiveSubscription(
-        user.id,
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        serviceRoleKey,
-        user.email
-      )
-      
-      const redirectUrl = request.nextUrl.clone()
-      redirectUrl.pathname = hasSubscription ? '/homezone' : '/pricing'
-      return NextResponse.redirect(redirectUrl)
+      try {
+        console.log(`[middleware] Checking subscription for user ${user.id} on auth route ${request.nextUrl.pathname}`);
+        const hasSubscription = await hasActiveSubscription(
+          user.id,
+          process.env.NEXT_PUBLIC_SUPABASE_URL!,
+          serviceRoleKey,
+          user.email
+        )
+        
+        console.log(`[middleware] Subscription check result for ${user.id}: ${hasSubscription}`);
+        const redirectUrl = request.nextUrl.clone()
+        redirectUrl.pathname = hasSubscription ? '/homezone' : '/pricing'
+        return NextResponse.redirect(redirectUrl)
+      } catch (error) {
+        console.error(`[middleware] Error checking subscription for ${user.id}:`, error);
+        // On error, redirect to pricing to be safe
+        const redirectUrl = request.nextUrl.clone()
+        redirectUrl.pathname = '/pricing'
+        return NextResponse.redirect(redirectUrl)
+      }
     } else {
+      console.error('[middleware] No service role key available, redirecting to pricing');
       // Fallback to pricing if we can't check subscription
       const redirectUrl = request.nextUrl.clone()
       redirectUrl.pathname = '/pricing'

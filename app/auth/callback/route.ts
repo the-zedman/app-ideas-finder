@@ -119,22 +119,33 @@ export async function GET(request: NextRequest) {
         nextPath ||
         DEFAULT_REDIRECT;
 
-      // If no explicit redirect path and user is logging in (not signing up),
-      // check subscription status to determine redirect
-      if (!cookieOverride && !nextPath && type !== 'signup' && data?.user) {
+      // For logins (not signups), always check subscription status to determine redirect
+      // This ensures users with subscriptions go to /homezone, not /pricing
+      if (!cookieOverride && type !== 'signup' && data?.user) {
         const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
         if (serviceRoleKey) {
-          const userHasSubscription = await hasActiveSubscription(
-            data.user.id,
-            process.env.NEXT_PUBLIC_SUPABASE_URL!,
-            serviceRoleKey,
-            data.user.email
-          );
-          if (userHasSubscription) {
-            finalPath = '/homezone';
-            console.log(`[auth/callback] User ${data.user.id} has subscription, redirecting to /homezone`);
-          } else {
-            console.log(`[auth/callback] User ${data.user.id} has no subscription, redirecting to /pricing`);
+          try {
+            console.log(`[auth/callback] Checking subscription for user ${data.user.id} (type: ${type || 'null'}, nextPath: ${nextPath || 'null'})`);
+            const userHasSubscription = await hasActiveSubscription(
+              data.user.id,
+              process.env.NEXT_PUBLIC_SUPABASE_URL!,
+              serviceRoleKey,
+              data.user.email
+            );
+            if (userHasSubscription) {
+              // User has subscription - redirect to /homezone (or use nextPath if it's also /homezone)
+              finalPath = '/homezone';
+              console.log(`[auth/callback] User ${data.user.id} has subscription, redirecting to /homezone`);
+            } else {
+              // User has no subscription - always redirect to /pricing
+              // (middleware will catch them if they try to access protected routes)
+              finalPath = '/pricing';
+              console.log(`[auth/callback] User ${data.user.id} has no subscription, redirecting to /pricing`);
+            }
+          } catch (error) {
+            console.error(`[auth/callback] Error checking subscription for ${data.user.id}:`, error);
+            // On error, redirect to pricing to be safe
+            finalPath = '/pricing';
           }
         }
       }
