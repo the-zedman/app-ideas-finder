@@ -216,7 +216,10 @@ export default function HomeZone() {
   const isFirstTime = recentAnalyses.length === 0;
   const isUnlimited = usageData?.status === 'free_unlimited';
   const searchesUsed = usageData?.searchesUsed || 0;
-  const searchesLimit = usageData?.searchesLimit || 10;
+  // For waitlist users, use the original bonus amount (75) as the limit; otherwise use the plan limit
+  const searchesLimit = usageData?.status === 'waitlist_bonus' 
+    ? (usageData?.waitlistBonusAmount || WAITLIST_BONUS_AMOUNT || 75)
+    : (usageData?.searchesLimit || 10);
   const searchesRemaining = usageData?.searchesRemaining || 0;
   const usagePercent = isUnlimited ? 0 : Math.min(100, (searchesUsed / searchesLimit) * 100);
 
