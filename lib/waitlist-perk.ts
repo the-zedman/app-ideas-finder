@@ -36,10 +36,11 @@ export async function ensureWaitlistBonus(
 
     const normalizedEmail = email.trim().toLowerCase();
 
+    const escapedEmail = normalizedEmail.replace(/[%_]/g, '\\$&');
     const { data: waitlistEntry } = await supabaseAdmin
       .from('waitlist')
       .select('id, bonus_granted_at')
-      .eq('email', normalizedEmail)
+      .ilike('email', escapedEmail)
       .maybeSingle();
 
     if (!waitlistEntry || waitlistEntry.bonus_granted_at) {
