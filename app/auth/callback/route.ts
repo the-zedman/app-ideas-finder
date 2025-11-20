@@ -2,6 +2,7 @@ import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { sendAdminAlert } from '@/lib/email';
 
 const DEFAULT_REDIRECT = '/pricing';
 const SIGNUP_REDIRECT = '/pricing';
@@ -97,6 +98,20 @@ export async function GET(request: NextRequest) {
     const { data, error } = await supabase.auth.exchangeCodeForSession(code);
     
     if (!error) {
+      if (type === 'signup' && data?.user?.email) {
+        const email = data.user.email;
+        const text = `New signup: ${email}\nUser ID: ${data.user.id}\nSigned up at: ${new Date().toISOString()}`;
+        const html = `
+          <h2>🎉 New Signup</h2>
+          <p><strong>Email:</strong> ${email}</p>
+          <p><strong>User ID:</strong> ${data.user.id}</p>
+          <p><strong>Time:</strong> ${new Date().toLocaleString()}</p>
+        `;
+        sendAdminAlert(`[New Signup] ${email}`, html, text).catch((err) =>
+          console.error('Failed to send signup alert:', err)
+        );
+      }
+
       const cookieOverride = cookieStore.get('pending_signup_redirect')?.value;
       const finalPath =
         (cookieOverride && resolveNextPath(cookieOverride, SIGNUP_REDIRECT, origin)) ||

@@ -8,6 +8,10 @@ type AdminContext =
   | {
       supabaseAdmin: SupabaseClient<any>;
       adminRole: string;
+      adminUser: {
+        id: string;
+        email?: string;
+      };
     };
 
 async function requireSuperAdmin(): Promise<AdminContext> {
@@ -66,7 +70,7 @@ async function requireSuperAdmin(): Promise<AdminContext> {
     );
   }
 
-  return { supabaseAdmin, adminRole: adminData.role };
+  return { supabaseAdmin, adminRole: adminData.role, adminUser: { id: user.id, email: user.email || undefined } };
 }
 
 export async function PATCH(
@@ -144,7 +148,7 @@ export async function DELETE(
     const context = await requireSuperAdmin();
     if (context instanceof NextResponse) return context;
 
-    const { supabaseAdmin } = context;
+    const { supabaseAdmin, adminUser } = context;
     const { id } = await params;
 
     if (!id) {
@@ -207,6 +211,18 @@ export async function DELETE(
         { status: 500 }
       );
     }
+
+    await supabaseAdmin
+      .from('account_deletion_requests')
+      .update({
+        status: 'completed',
+        processed_at: new Date().toISOString(),
+        processed_by: adminUser.id,
+        processed_by_email: adminUser.email || null,
+        admin_note: 'Deleted directly via admin users endpoint',
+      })
+      .eq('user_id', id)
+      .eq('status', 'pending');
 
     return NextResponse.json({ success: true });
   } catch (error) {

@@ -28,6 +28,8 @@ export default function ProfilePage() {
   });
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState<'success' | 'error'>('success');
+  const [deleteRequest, setDeleteRequest] = useState<any>(null);
+  const [deleteReason, setDeleteReason] = useState('');
   
   const supabase = createClient();
 
@@ -85,6 +87,10 @@ export default function ProfilePage() {
       subscription.unsubscribe();
     };
   }, [supabase.auth]);
+
+  useEffect(() => {
+    fetchDeleteRequestStatus();
+  }, []);
 
   const handleSaveProfile = async () => {
     // In development bypass mode, show success message without database operations
@@ -165,9 +171,28 @@ export default function ProfilePage() {
     }
   };
 
+const fetchDeleteRequestStatus = async () => {
+  try {
+    const response = await fetch('/api/account/delete-request');
+    const data = await response.json();
+
+    if (response.ok) {
+      setDeleteRequest(data.request);
+    }
+  } catch (error) {
+    console.error('Failed to fetch delete request status:', error);
+  }
+};
+
 
   const handleDeleteAccount = async () => {
-    if (!confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
+    if (deleteRequest?.status === 'pending') {
+      setMessage('You already have a pending deletion request.');
+      setMessageType('error');
+      return;
+    }
+
+    if (!confirm('Submit an account deletion request? Our team will review and process it.')) {
       return;
     }
 
@@ -175,10 +200,25 @@ export default function ProfilePage() {
     setMessage('');
 
     try {
-      setMessage('Account deletion requires admin assistance. Please contact support.');
-      setMessageType('error');
+      const response = await fetch('/api/account/delete-request', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reason: deleteReason }),
+      });
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to submit request');
+      }
+
+      setDeleteRequest(data.request);
+      setDeleteReason('');
+      setMessage('Request submitted. We will email you once it is processed.');
+      setMessageType('success');
     } catch (err) {
-      setMessage('An unexpected error occurred');
+      setMessage(
+        err instanceof Error ? err.message : 'An unexpected error occurred while requesting deletion'
+      );
       setMessageType('error');
     } finally {
       setLoading(false);
@@ -522,12 +562,31 @@ export default function ProfilePage() {
                       Deleting your account is permanent and cannot be undone. Your data will be deleted within 30 days, 
                       except we may retain some metadata and logs for longer where required or permitted by law.
                     </p>
+                    {deleteRequest?.status === 'pending' && (
+                      <div className="mt-3 rounded-md border border-red-200 bg-white/70 p-3 text-sm text-red-700">
+                        <p className="font-semibold">Pending review</p>
+                        <p className="text-red-600">
+                          Requested {new Date(deleteRequest.requested_at).toLocaleString()}
+                        </p>
+                      </div>
+                    )}
+                    <label className="block mt-4 text-sm font-medium text-red-900">
+                      Reason (optional)
+                    </label>
+                    <textarea
+                      value={deleteReason}
+                      onChange={(e) => setDeleteReason(e.target.value)}
+                      placeholder="Tell us why you're leaving..."
+                      maxLength={2000}
+                      className="mt-2 w-full border border-red-200 rounded-md p-3 text-sm focus:ring-2 focus:ring-red-200 focus:border-transparent bg-white"
+                      rows={3}
+                    />
                     <button
                       onClick={handleDeleteAccount}
-                      disabled={loading}
-                      className="mt-3 px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-md transition-colors disabled:opacity-50"
+                      disabled={loading || deleteRequest?.status === 'pending'}
+                      className="mt-3 px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      Request to delete account
+                      {deleteRequest?.status === 'pending' ? 'Request Pending' : 'Request to delete account'}
                     </button>
                   </div>
                 </div>
