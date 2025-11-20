@@ -76,6 +76,14 @@ export default function Pricing() {
     }
   };
 
+  const purchaseButtonClasses = `block w-full font-semibold py-3 px-6 rounded-lg transition-colors ${
+    processingCheckout
+      ? 'bg-[#88D18A]/60 text-white cursor-not-allowed'
+      : 'bg-[#88D18A] hover:bg-[#6BC070] text-white cursor-pointer'
+  }`;
+
+  const getButtonLabel = (label: string) => (processingCheckout ? 'Processing...' : label);
+
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
@@ -174,10 +182,10 @@ export default function Pricing() {
               <div className="text-center">
                 <button 
                   onClick={() => handleCheckout('trial')}
-                  disabled={true}
-                  className="block w-full bg-gray-300 text-gray-500 font-semibold py-3 px-6 rounded-lg cursor-not-allowed"
+                  disabled={processingCheckout}
+                  className={purchaseButtonClasses}
                 >
-                  Coming Soon
+                  {getButtonLabel('Start Trial for $1')}
                 </button>
               </div>
             </div>
@@ -230,10 +238,10 @@ export default function Pricing() {
                 </p>
                 <button 
                   onClick={() => handleCheckout(billingCycle === 'monthly' ? 'core_monthly' : 'core_annual')}
-                  disabled={true}
-                  className="block w-full bg-gray-300 text-gray-500 font-semibold py-3 px-6 rounded-lg cursor-not-allowed"
+                  disabled={processingCheckout}
+                  className={purchaseButtonClasses}
                 >
-                  Coming Soon
+                  {getButtonLabel('Get Core Plan')}
                 </button>
               </div>
             </div>
@@ -301,10 +309,10 @@ export default function Pricing() {
                 </p>
                 <button 
                   onClick={() => handleCheckout(billingCycle === 'monthly' ? 'prime_monthly' : 'prime_annual')}
-                  disabled={true}
-                  className="block w-full bg-gray-300 text-gray-500 font-semibold py-3 px-6 rounded-lg cursor-not-allowed"
+                  disabled={processingCheckout}
+                  className={purchaseButtonClasses}
                 >
-                  Coming Soon
+                  {getButtonLabel('Get Prime Plan')}
                 </button>
               </div>
             </div>
