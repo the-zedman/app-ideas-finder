@@ -37,9 +37,9 @@ export async function hasActiveSubscription(
   }
 
   // Check for existing waitlist bonus first (before trying to grant)
-  const { data: activeBonus } = await supabase
+  const { data: activeBonus, error: bonusCheckError } = await supabase
     .from('user_bonuses')
-    .select('id')
+    .select('id, bonus_value')
     .eq('user_id', userId)
     .eq('bonus_type', 'fixed_searches')
     .eq('reason', WAITLIST_BONUS_REASON)
@@ -48,15 +48,19 @@ export async function hasActiveSubscription(
     .maybeSingle();
 
   if (activeBonus) {
+    console.log(`[check-subscription] User ${userId} has active waitlist bonus: ${activeBonus.bonus_value} searches`);
     return true;
   }
 
   // If no active bonus, try to grant one if user is on waitlist
   if (!userEmail) {
+    console.log(`[check-subscription] No email provided for user ${userId}, cannot check waitlist`);
     return false;
   }
 
+  console.log(`[check-subscription] Checking waitlist for user ${userId} with email ${userEmail}`);
   const waitlistResult = await ensureWaitlistBonus(supabase, userId, userEmail);
+  console.log(`[check-subscription] Waitlist result for ${userId}:`, waitlistResult);
   return waitlistResult.hasActiveBonus;
 }
 

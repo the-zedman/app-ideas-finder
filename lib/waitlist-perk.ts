@@ -36,14 +36,57 @@ export async function ensureWaitlistBonus(
 
     const normalizedEmail = email.trim().toLowerCase();
 
-    const escapedEmail = normalizedEmail.replace(/[%_]/g, '\\$&');
-    const { data: waitlistEntry } = await supabaseAdmin
+    console.log(`[ensureWaitlistBonus] Looking up waitlist for email: ${normalizedEmail}`);
+    // Fetch all waitlist entries and filter in code to avoid SQL escaping issues
+    const { data: allWaitlistEntries, error: waitlistError } = await supabaseAdmin
       .from('waitlist')
-      .select('id, bonus_granted_at')
-      .ilike('email', escapedEmail)
-      .maybeSingle();
+      .select('id, email, bonus_granted_at, bonus_granted_user_id');
 
-    if (!waitlistEntry || waitlistEntry.bonus_granted_at) {
+    if (waitlistError) {
+      console.error('[ensureWaitlistBonus] Error looking up waitlist:', waitlistError);
+      return { hasActiveBonus: false };
+    }
+
+    // Find matching email (case-insensitive)
+    const waitlistEntry = allWaitlistEntries?.find(
+      entry => entry.email?.trim().toLowerCase() === normalizedEmail
+    );
+
+    if (!waitlistEntry) {
+      console.log(`[ensureWaitlistBonus] No waitlist entry found for ${normalizedEmail}`);
+      return { hasActiveBonus: false };
+    }
+
+    console.log(`[ensureWaitlistBonus] Found waitlist entry:`, {
+      id: waitlistEntry.id,
+      email: waitlistEntry.email,
+      bonus_granted_at: waitlistEntry.bonus_granted_at,
+      bonus_granted_user_id: waitlistEntry.bonus_granted_user_id
+    });
+
+    // If bonus was already granted, check if it's to this user
+    if (waitlistEntry.bonus_granted_at) {
+      if (waitlistEntry.bonus_granted_user_id === userId) {
+        // This user already got the bonus, check if it still exists
+        const { data: existingBonus } = await supabaseAdmin
+          .from('user_bonuses')
+          .select('id, bonus_value')
+          .eq('user_id', userId)
+          .eq('bonus_type', 'fixed_searches')
+          .eq('reason', WAITLIST_BONUS_REASON)
+          .eq('is_active', true)
+          .gt('bonus_value', 0)
+          .maybeSingle();
+        
+        if (existingBonus) {
+          console.log(`[ensureWaitlistBonus] User ${userId} already has bonus: ${existingBonus.bonus_value} searches`);
+          return { hasActiveBonus: true };
+        } else {
+          console.log(`[ensureWaitlistBonus] Bonus was granted to ${userId} but no longer exists in user_bonuses`);
+        }
+      } else {
+        console.log(`[ensureWaitlistBonus] Bonus already granted to different user ${waitlistEntry.bonus_granted_user_id}`);
+      }
       return { hasActiveBonus: false };
     }
 
@@ -61,9 +104,11 @@ export async function ensureWaitlistBonus(
       .single();
 
     if (bonusError || !bonusRow) {
-      console.error('Failed to award waitlist bonus:', bonusError);
+      console.error('[ensureWaitlistBonus] Failed to award waitlist bonus:', bonusError);
       return { hasActiveBonus: false };
     }
+
+    console.log(`[ensureWaitlistBonus] Successfully granted ${WAITLIST_BONUS_AMOUNT} bonus searches to user ${userId}`);
 
     const { error: updateError } = await supabaseAdmin
       .from('waitlist')
@@ -75,7 +120,9 @@ export async function ensureWaitlistBonus(
       .eq('id', waitlistEntry.id);
 
     if (updateError) {
-      console.error('Failed to update waitlist entry after granting bonus:', updateError);
+      console.error('[ensureWaitlistBonus] Failed to update waitlist entry after granting bonus:', updateError);
+    } else {
+      console.log(`[ensureWaitlistBonus] Updated waitlist entry ${waitlistEntry.id} with bonus grant info`);
     }
 
     return { hasActiveBonus: true };
