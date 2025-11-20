@@ -85,6 +85,8 @@ export async function GET(request: Request) {
       const profile = profiles?.find(p => p.id === authUser.id);
       const analysisCount = analysisCountMap.get(authUser.id) || 0;
       const lastActive = lastActivityMap.get(authUser.id);
+      const bannedUntil = (authUser as Record<string, any>)?.banned_until;
+      const isCurrentlyBanned = bannedUntil ? new Date(bannedUntil).getTime() > Date.now() : false;
       
       // Determine provider
       const provider = authUser.app_metadata?.provider || 
@@ -99,7 +101,7 @@ export async function GET(request: Request) {
         last_active: lastActive,
         analysis_count: analysisCount,
         provider: provider,
-        disabled: false // Can be extended with ban functionality later
+        disabled: Boolean((authUser.app_metadata as Record<string, any> | undefined)?.disabled) || isCurrentlyBanned
       };
     });
     

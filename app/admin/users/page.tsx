@@ -12,6 +12,9 @@ export default function AdminUsersPage() {
   const [search, setSearch] = useState('');
   const [providerFilter, setProviderFilter] = useState('');
   const [activityFilter, setActivityFilter] = useState('');
+  const [currentAdminId, setCurrentAdminId] = useState<string | null>(null);
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [actionMessage, setActionMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   
   const router = useRouter();
   const supabase = createClient();
@@ -33,6 +36,7 @@ export default function AdminUsersPage() {
         isSuperAdmin: data.role === 'super_admin',
         isSupport: data.role === 'support'
       });
+      setCurrentAdminId(data.userId);
       
       await fetchUsers();
       setLoading(false);
@@ -70,6 +74,85 @@ export default function AdminUsersPage() {
   const handleLogout = async () => {
     await supabase.auth.signOut();
     router.push('/');
+  };
+
+  const handleDisableToggle = async (targetUser: any) => {
+    if (!adminCheck?.isSuperAdmin) return;
+
+    const action = targetUser.disabled ? 'enable' : 'disable';
+    const confirmMessage =
+      action === 'disable'
+        ? `Disable ${targetUser.email}? They will be prevented from logging in.`
+        : `Re-enable ${targetUser.email}?`;
+
+    if (!confirm(confirmMessage)) {
+      return;
+    }
+
+    setActionLoading(`disable-${targetUser.id}`);
+    setActionMessage(null);
+
+    try {
+      const response = await fetch(`/api/admin/users/${targetUser.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to update user status');
+      }
+
+      setActionMessage({
+        type: 'success',
+        text: data.message || `User ${action === 'disable' ? 'disabled' : 'enabled'} successfully.`,
+      });
+
+      await fetchUsers();
+    } catch (error) {
+      setActionMessage({
+        type: 'error',
+        text: error instanceof Error ? error.message : 'Failed to update user status',
+      });
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleDeleteUser = async (targetUser: any) => {
+    if (!adminCheck?.isSuperAdmin || targetUser.id === currentAdminId) return;
+
+    const confirmDelete = confirm(
+      `Delete ${targetUser.email}? This will permanently remove their account, data, and revoke access.`
+    );
+
+    if (!confirmDelete) return;
+
+    setActionLoading(`delete-${targetUser.id}`);
+    setActionMessage(null);
+
+    try {
+      const response = await fetch(`/api/admin/users/${targetUser.id}`, {
+        method: 'DELETE',
+      });
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to delete user');
+      }
+
+      setActionMessage({ type: 'success', text: 'User deleted successfully.' });
+      await fetchUsers();
+    } catch (error) {
+      setActionMessage({
+        type: 'error',
+        text: error instanceof Error ? error.message : 'Failed to delete user',
+      });
+    } finally {
+      setActionLoading(null);
+    }
   };
 
   if (loading) {
@@ -110,6 +193,19 @@ export default function AdminUsersPage() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Notifications */}
+        {actionMessage && (
+          <div
+            className={`mb-6 rounded-lg border px-4 py-3 text-sm ${
+              actionMessage.type === 'success'
+                ? 'border-green-200 bg-green-50 text-green-800'
+                : 'border-red-200 bg-red-50 text-red-800'
+            }`}
+          >
+            {actionMessage.text}
+          </div>
+        )}
+
         {/* Filters */}
         <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6 mb-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -199,12 +295,17 @@ export default function AdminUsersPage() {
                 {users.map((user) => (
                   <tr key={user.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
+                      <div className="flex items-center gap-2">
                         <div>
                           <div className="text-sm font-medium text-gray-900">
-                            {user.first_name} {user.last_name}
+                            {[user.first_name, user.last_name].filter(Boolean).join(' ') || '—'}
                           </div>
                         </div>
+                        {user.disabled && (
+                          <span className="px-2 py-0.5 text-xs font-semibold rounded-full bg-red-100 text-red-700">
+                            Disabled
+                          </span>
+                        )}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -225,25 +326,44 @@ export default function AdminUsersPage() {
                       {user.last_active ? new Date(user.last_active).toLocaleDateString() : 'Never'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <a
-                        href={`/admin/users/${user.id}`}
-                        className="text-purple-600 hover:text-purple-900 mr-4"
-                      >
-                        View
-                      </a>
-                      {adminCheck?.isSuperAdmin && (
-                        <button
-                          className="text-red-600 hover:text-red-900"
-                          onClick={() => {
-                            if (confirm(`Disable user ${user.email}?`)) {
-                              // TODO: Implement disable user
-                              alert('Disable user feature coming soon');
-                            }
-                          }}
+                      <div className="flex flex-wrap items-center gap-3">
+                        <a
+                          href={`/admin/users/${user.id}`}
+                          className="text-purple-600 hover:text-purple-900"
                         >
-                          Disable
-                        </button>
-                      )}
+                          View
+                        </a>
+                        {adminCheck?.isSuperAdmin && (
+                          <>
+                            <button
+                              className={`text-xs font-semibold px-3 py-1 rounded border transition ${
+                                user.disabled
+                                  ? 'border-green-300 text-green-700 hover:bg-green-50'
+                                  : 'border-red-300 text-red-600 hover:bg-red-50'
+                              } ${actionLoading === `disable-${user.id}` ? 'opacity-70 cursor-not-allowed' : ''}`}
+                              disabled={actionLoading === `disable-${user.id}`}
+                              onClick={() => handleDisableToggle(user)}
+                            >
+                              {actionLoading === `disable-${user.id}`
+                                ? 'Updating...'
+                                : user.disabled
+                                  ? 'Enable'
+                                  : 'Disable'}
+                            </button>
+                            <button
+                              className={`text-xs font-semibold px-3 py-1 rounded border border-gray-300 text-gray-700 hover:bg-gray-50 ${
+                                actionLoading === `delete-${user.id}` || user.id === currentAdminId
+                                  ? 'opacity-60 cursor-not-allowed'
+                                  : ''
+                              }`}
+                              disabled={actionLoading === `delete-${user.id}` || user.id === currentAdminId}
+                              onClick={() => handleDeleteUser(user)}
+                            >
+                              {actionLoading === `delete-${user.id}` ? 'Deleting...' : 'Delete'}
+                            </button>
+                          </>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 ))}
