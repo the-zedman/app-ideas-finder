@@ -3,6 +3,7 @@ import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { sendAdminAlert } from '@/lib/email';
+import { hasActiveSubscription } from '@/lib/check-subscription';
 
 const DEFAULT_REDIRECT = '/pricing';
 const SIGNUP_REDIRECT = '/pricing';
@@ -113,10 +114,30 @@ export async function GET(request: NextRequest) {
       }
 
       const cookieOverride = cookieStore.get('pending_signup_redirect')?.value;
-      const finalPath =
+      let finalPath =
         (cookieOverride && resolveNextPath(cookieOverride, SIGNUP_REDIRECT, origin)) ||
         nextPath ||
         DEFAULT_REDIRECT;
+
+      // If no explicit redirect path and user is logging in (not signing up),
+      // check subscription status to determine redirect
+      if (!cookieOverride && !nextPath && type !== 'signup' && data?.user) {
+        const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+        if (serviceRoleKey) {
+          const userHasSubscription = await hasActiveSubscription(
+            data.user.id,
+            process.env.NEXT_PUBLIC_SUPABASE_URL!,
+            serviceRoleKey,
+            data.user.email
+          );
+          if (userHasSubscription) {
+            finalPath = '/homezone';
+            console.log(`[auth/callback] User ${data.user.id} has subscription, redirecting to /homezone`);
+          } else {
+            console.log(`[auth/callback] User ${data.user.id} has no subscription, redirecting to /pricing`);
+          }
+        }
+      }
 
       const forwardedHost = request.headers.get('x-forwarded-host');
       const isLocalEnv = process.env.NODE_ENV === 'development';
