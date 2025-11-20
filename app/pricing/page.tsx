@@ -76,13 +76,8 @@ export default function Pricing() {
     }
   };
 
-  const purchaseButtonClasses = `block w-full font-semibold py-3 px-6 rounded-lg transition-colors ${
-    processingCheckout
-      ? 'bg-[#88D18A]/60 text-white cursor-not-allowed'
-      : 'bg-[#88D18A] hover:bg-[#6BC070] text-white cursor-pointer'
-  }`;
-
-  const getButtonLabel = (label: string) => (processingCheckout ? 'Processing...' : label);
+  const disabledButtonClasses =
+    'block w-full bg-gray-300 text-gray-500 font-semibold py-3 px-6 rounded-lg cursor-not-allowed';
 
   return (
     <div className="min-h-screen bg-white">
@@ -180,12 +175,8 @@ export default function Pricing() {
               </ul>
 
               <div className="text-center">
-                <button 
-                  onClick={() => handleCheckout('trial')}
-                  disabled={processingCheckout}
-                  className={purchaseButtonClasses}
-                >
-                  {getButtonLabel('Start Trial for $1')}
+                <button disabled className={disabledButtonClasses}>
+                  Coming Soon
                 </button>
               </div>
             </div>
@@ -236,12 +227,8 @@ export default function Pricing() {
                 <p className="text-xs text-gray-500 mb-4">
                   ${billingCycle === 'monthly' ? '0.52' : '0.44'} per search
                 </p>
-                <button 
-                  onClick={() => handleCheckout(billingCycle === 'monthly' ? 'core_monthly' : 'core_annual')}
-                  disabled={processingCheckout}
-                  className={purchaseButtonClasses}
-                >
-                  {getButtonLabel('Get Core Plan')}
+                <button disabled className={disabledButtonClasses}>
+                  Coming Soon
                 </button>
               </div>
             </div>
@@ -307,12 +294,8 @@ export default function Pricing() {
                 <p className="text-xs text-gray-500 mb-4">
                   ${billingCycle === 'monthly' ? '0.35' : '0.30'} per search
                 </p>
-                <button 
-                  onClick={() => handleCheckout(billingCycle === 'monthly' ? 'prime_monthly' : 'prime_annual')}
-                  disabled={processingCheckout}
-                  className={purchaseButtonClasses}
-                >
-                  {getButtonLabel('Get Prime Plan')}
+                <button disabled className={disabledButtonClasses}>
+                  Coming Soon
                 </button>
               </div>
             </div>
