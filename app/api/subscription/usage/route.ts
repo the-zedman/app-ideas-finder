@@ -79,13 +79,15 @@ export async function GET() {
     
     if (!subscription) {
       if (bonusSearchesRemaining > 0 || packSearches > 0) {
+        // Calculate searches used for waitlist users: original amount - remaining amount
+        const waitlistSearchesUsed = WAITLIST_BONUS_AMOUNT - bonusSearchesRemaining;
         return NextResponse.json({
           hasSubscription: false,
           planId: 'waitlist_bonus',
           planName: 'Waitlist Early Access',
           status: 'waitlist_bonus',
-          searchesUsed: 0,
-          searchesLimit: 0,
+          searchesUsed: waitlistSearchesUsed,
+          searchesLimit: WAITLIST_BONUS_AMOUNT,
           searchesRemaining: bonusSearchesRemaining + packSearches,
           packSearches,
           bonusSearchesRemaining,
