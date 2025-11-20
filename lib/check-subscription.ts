@@ -27,18 +27,16 @@ export async function hasActiveSubscription(
     .eq('user_id', userId)
     .maybeSingle();
 
-  if (error || !subscription) {
-    return false;
+  // If there's a subscription, check if it's active
+  if (subscription && !error) {
+    const activeStatuses = ['trial', 'active', 'free_unlimited'];
+    if (activeStatuses.includes(subscription.status)) {
+      return true;
+    }
+    // If subscription exists but is inactive (cancelled/expired), still check for waitlist bonus
   }
 
-  // Active subscription statuses: trial, active, free_unlimited
-  // Inactive: cancelled, expired
-  const activeStatuses = ['trial', 'active', 'free_unlimited'];
-  if (activeStatuses.includes(subscription.status)) {
-    return true;
-  }
-
-  // Check for waitlist bonus access (75 free searches) if no subscription
+  // Check for existing waitlist bonus first (before trying to grant)
   const { data: activeBonus } = await supabase
     .from('user_bonuses')
     .select('id')
@@ -53,6 +51,7 @@ export async function hasActiveSubscription(
     return true;
   }
 
+  // If no active bonus, try to grant one if user is on waitlist
   if (!userEmail) {
     return false;
   }
