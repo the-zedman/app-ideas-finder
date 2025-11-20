@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
-import { createClient } from '@supabase/supabase-js';
+import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { stripe } from '@/lib/stripe';
 
 type AdminContext =
   | NextResponse
   | {
-      supabaseAdmin: ReturnType<typeof createClient>;
+      supabaseAdmin: SupabaseClient<any>;
       adminRole: string;
     };
 
@@ -43,7 +43,7 @@ async function requireSuperAdmin(): Promise<AdminContext> {
     return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
   }
 
-  const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey);
+  const supabaseAdmin: SupabaseClient<any> = createClient(supabaseUrl, serviceRoleKey);
 
   const { data: adminData, error: adminError } = await supabaseAdmin
     .from('admins')
