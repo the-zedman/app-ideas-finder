@@ -23,17 +23,26 @@ export async function hasActiveSubscription(
 
   const { data: subscription, error } = await supabase
     .from('user_subscriptions')
-    .select('status')
+    .select('status, plan_id')
     .eq('user_id', userId)
     .maybeSingle();
 
+  if (error) {
+    console.error(`[check-subscription] Error fetching subscription for ${userId}:`, error);
+  }
+
   // If there's a subscription, check if it's active
   if (subscription && !error) {
+    console.log(`[check-subscription] Found subscription for ${userId}: status=${subscription.status}, plan=${subscription.plan_id}`);
     const activeStatuses = ['trial', 'active', 'free_unlimited'];
     if (activeStatuses.includes(subscription.status)) {
+      console.log(`[check-subscription] User ${userId} has active subscription: ${subscription.status}`);
       return true;
     }
+    console.log(`[check-subscription] User ${userId} has inactive subscription: ${subscription.status}`);
     // If subscription exists but is inactive (cancelled/expired), still check for waitlist bonus
+  } else if (!subscription) {
+    console.log(`[check-subscription] No subscription found for ${userId}, checking for waitlist bonus`);
   }
 
   // Check for existing waitlist bonus first (before trying to grant)

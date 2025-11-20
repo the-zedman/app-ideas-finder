@@ -118,6 +118,7 @@ function BillingContent() {
   const getPlanDisplayName = (planId: string) => {
     const planNames: any = {
       trial: 'Trial',
+      waitlist_bonus: 'Waitlist Early Access',
       core_monthly: 'Core (Monthly)',
       core_annual: 'Core (Annual)',
       prime_monthly: 'Prime (Monthly)',
@@ -151,10 +152,11 @@ function BillingContent() {
     );
   }
 
-  const currentPlan = subscription?.plan_id || 'trial';
+  const currentPlan = subscription?.plan_id || (usage?.status === 'waitlist_bonus' ? 'waitlist_bonus' : 'trial');
   const isUnlimited = subscription?.status === 'free_unlimited';
   const isTrial = subscription?.status === 'trial';
   const isActive = subscription?.status === 'active';
+  const isWaitlistUser = usage?.status === 'waitlist_bonus' || (usage?.bonusSearchesRemaining > 0 && !subscription);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -199,8 +201,23 @@ function BillingContent() {
           </div>
         )}
 
-        {/* Onboarding Trial Prompt */}
-        {isOnboarding && !subscription && (
+        {/* Waitlist User Welcome */}
+        {isWaitlistUser && (
+          <div className="bg-gradient-to-r from-[#88D18A] to-[#6BC070] rounded-2xl p-8 mb-8 text-white">
+            <div className="text-center">
+              <h2 className="text-3xl font-bold mb-4">🎉 Thank You for Being an Early Supporter!</h2>
+              <p className="text-lg mb-6 opacity-90">
+                As a thank you for joining our waitlist, you have <strong>{usage?.bonusSearchesRemaining || usage?.waitlistBonusAmount || 75} free searches</strong> to use anytime - no expiration, no limits!
+              </p>
+              <p className="text-sm mb-6 opacity-75">
+                These searches never expire and roll over month to month until you use them. Once you've used your free searches, use code <strong>{usage?.waitlistCouponCode || 'WAITLISTTHANKYOU'}</strong> for 25% off any plan forever.
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Onboarding Trial Prompt - Only for non-waitlist users */}
+        {isOnboarding && !subscription && !isWaitlistUser && (
           <div className="bg-gradient-to-r from-[#88D18A] to-[#6BC070] rounded-2xl p-8 mb-8 text-white">
             <div className="text-center">
               <h2 className="text-3xl font-bold mb-4">🎉 Welcome! Start Your 3-Day Trial</h2>
