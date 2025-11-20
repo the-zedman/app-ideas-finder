@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { cookies } from 'next/headers';
+import { ensureWaitlistBonus } from '@/lib/waitlist-perk';
+import { WAITLIST_BONUS_AMOUNT, WAITLIST_COUPON_CODE } from '@/lib/waitlist';
 
 export async function GET() {
   try {
@@ -27,19 +29,14 @@ export async function GET() {
     
     const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey);
     
+    await ensureWaitlistBonus(supabaseAdmin, user.id, user.email);
+    
     // Get user subscription
     const { data: subscription } = await supabaseAdmin
       .from('user_subscriptions')
       .select('*, subscription_plans(*)')
       .eq('user_id', user.id)
-      .single();
-    
-    if (!subscription) {
-      return NextResponse.json({ 
-        error: 'No subscription found',
-        hasSubscription: false 
-      }, { status: 404 });
-    }
+      .maybeSingle();
     
     // Get current period usage
     const now = new Date();
@@ -80,7 +77,37 @@ export async function GET() {
       }
     });
     
-    const baseLimit = usage?.searches_limit || subscription.subscription_plans.searches_per_month;
+    if (!subscription) {
+      if (bonusSearchesRemaining > 0 || packSearches > 0) {
+        return NextResponse.json({
+          hasSubscription: false,
+          planId: 'waitlist_bonus',
+          planName: 'Waitlist Early Access',
+          status: 'waitlist_bonus',
+          searchesUsed: 0,
+          searchesLimit: 0,
+          searchesRemaining: bonusSearchesRemaining + packSearches,
+          packSearches,
+          bonusSearchesRemaining,
+          percentageBonus: 0,
+          trialTimeRemaining: null,
+          currentPeriodEnd: null,
+          waitlistCouponCode: WAITLIST_COUPON_CODE,
+          waitlistBonusAmount: WAITLIST_BONUS_AMOUNT,
+          canSearch: bonusSearchesRemaining + packSearches > 0,
+        });
+      }
+
+      return NextResponse.json(
+        {
+          error: 'No subscription found',
+          hasSubscription: false,
+        },
+        { status: 404 }
+      );
+    }
+    
+    const baseLimit = usage?.searches_limit || subscription.subscription_plans?.searches_per_month || 0;
     const percentageBonusAmount = Math.floor((baseLimit * percentageBonus) / 100);
     
     // Plan-based monthly limit does NOT include fixed bonus or search packs
@@ -125,6 +152,8 @@ export async function GET() {
       percentageBonus,
       trialTimeRemaining,
       currentPeriodEnd: subscription.current_period_end,
+      waitlistCouponCode: bonusSearchesRemaining > 0 ? WAITLIST_COUPON_CODE : null,
+      waitlistBonusAmount: bonusSearchesRemaining > 0 ? WAITLIST_BONUS_AMOUNT : null,
       canSearch: subscription.status === 'free_unlimited' || totalSearchesRemaining > 0
     });
     

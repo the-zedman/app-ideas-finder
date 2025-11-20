@@ -215,7 +215,7 @@ export default function AdminDashboard() {
               className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow border-yellow-300"
             >
               <div className="text-lg font-semibold text-yellow-900 mb-2">🎁 Coupons & Promotions</div>
-              <div className="text-sm text-gray-600">Manage codes like WAITLIST25 and other promos</div>
+              <div className="text-sm text-gray-600">Manage codes like WAITLISTTHANKYOU and other promos</div>
             </a>
             <a
               href="/admin/deletions"

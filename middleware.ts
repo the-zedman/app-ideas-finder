@@ -80,7 +80,8 @@ export async function middleware(request: NextRequest) {
       const hasSubscription = await hasActiveSubscription(
         user.id,
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        serviceRoleKey
+        serviceRoleKey,
+        user.email
       )
       
       if (!hasSubscription) {
@@ -99,7 +100,8 @@ export async function middleware(request: NextRequest) {
       const hasSubscription = await hasActiveSubscription(
         user.id,
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        serviceRoleKey
+        serviceRoleKey,
+        user.email
       )
       
       const redirectUrl = request.nextUrl.clone()

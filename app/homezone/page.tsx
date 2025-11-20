@@ -8,6 +8,7 @@ import type { User } from '@supabase/supabase-js';
 import CryptoJS from 'crypto-js';
 import Footer from '@/components/Footer';
 import { getCanonicalUser } from '@/lib/canonical-user';
+import { WAITLIST_COUPON_CODE, WAITLIST_BONUS_AMOUNT } from '@/lib/waitlist';
 
 export default function HomeZone() {
   const router = useRouter();
@@ -408,7 +409,7 @@ export default function HomeZone() {
                   <span className="uppercase tracking-wide">WAITLIST</span>
                 </div>
                 <h3 className="text-lg font-bold text-gray-900 mb-1">
-                  You have {usageData.bonusSearchesRemaining} early-access bonus searches
+                  You have {usageData.bonusSearchesRemaining} of {WAITLIST_BONUS_AMOUNT} waitlist bonus searches
                 </h3>
                 <p className="text-sm text-gray-700">
                   These never expire and are used <span className="font-semibold">before</span> your monthly plan
@@ -418,13 +419,15 @@ export default function HomeZone() {
               <div className="flex flex-col items-start sm:items-end gap-2">
                 <div className="text-xs uppercase tracking-wide text-gray-500">Your lifetime discount code</div>
                 <div className="inline-flex items-center gap-2 bg-white border border-dashed border-[#88D18A] rounded-lg px-3 py-2">
-                  <code className="font-mono text-sm font-bold text-[#256029]">WAITLIST25</code>
+                  <code className="font-mono text-sm font-bold text-[#256029]">
+                    {usageData?.waitlistCouponCode || WAITLIST_COUPON_CODE}
+                  </code>
                   <button
                     type="button"
                     className="text-xs font-semibold text-[#256029] hover:text-[#1b4420]"
                     onClick={() => {
                       navigator.clipboard
-                        .writeText('WAITLIST25')
+                        .writeText(usageData?.waitlistCouponCode || WAITLIST_COUPON_CODE)
                         .catch(() => {
                           // ignore clipboard errors (e.g. not available)
                         });
@@ -434,8 +437,8 @@ export default function HomeZone() {
                   </button>
                 </div>
                 <p className="text-[11px] text-gray-500 text-right max-w-xs">
-                  Use this on checkout in Stripe to unlock your <span className="font-semibold">25% lifetime</span>{' '}
-                  discount on Core or Prime.
+                  Use this code at checkout to unlock your <span className="font-semibold">25% lifetime</span> discount
+                  on Core or Prime once your free searches are gone.
                 </p>
               </div>
             </div>

@@ -1,0 +1,5 @@
+export const WAITLIST_BONUS_AMOUNT = 75;
+export const WAITLIST_BONUS_REASON = 'waitlist_75_free';
+export const WAITLIST_COUPON_CODE =
+  process.env.NEXT_PUBLIC_WAITLIST_COUPON_CODE || 'WAITLISTTHANKYOU';
+

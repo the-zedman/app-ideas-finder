@@ -1,0 +1,6 @@
+ALTER TABLE public.waitlist
+  ADD COLUMN IF NOT EXISTS bonus_granted_at TIMESTAMPTZ,
+  ADD COLUMN IF NOT EXISTS bonus_granted_user_id UUID REFERENCES auth.users(id) ON DELETE SET NULL,
+  ADD COLUMN IF NOT EXISTS bonus_code TEXT,
+  ADD COLUMN IF NOT EXISTS bonus_notes TEXT;
+

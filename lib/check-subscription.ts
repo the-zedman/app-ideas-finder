@@ -1,4 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
+import { ensureWaitlistBonus } from './waitlist-perk';
+import { WAITLIST_BONUS_REASON } from './waitlist';
 
 /**
  * Check if a user has an active subscription (trial, active, or free_unlimited)
@@ -7,7 +9,8 @@ import { createClient } from '@supabase/supabase-js';
 export async function hasActiveSubscription(
   userId: string | undefined,
   supabaseUrl: string,
-  supabaseServiceKey: string
+  supabaseServiceKey: string,
+  userEmail?: string | null
 ): Promise<boolean> {
   if (!userId) return false;
 
@@ -31,6 +34,30 @@ export async function hasActiveSubscription(
   // Active subscription statuses: trial, active, free_unlimited
   // Inactive: cancelled, expired
   const activeStatuses = ['trial', 'active', 'free_unlimited'];
-  return activeStatuses.includes(subscription.status);
+  if (activeStatuses.includes(subscription.status)) {
+    return true;
+  }
+
+  // Check for waitlist bonus access (75 free searches) if no subscription
+  const { data: activeBonus } = await supabase
+    .from('user_bonuses')
+    .select('id')
+    .eq('user_id', userId)
+    .eq('bonus_type', 'fixed_searches')
+    .eq('reason', WAITLIST_BONUS_REASON)
+    .eq('is_active', true)
+    .gt('bonus_value', 0)
+    .maybeSingle();
+
+  if (activeBonus) {
+    return true;
+  }
+
+  if (!userEmail) {
+    return false;
+  }
+
+  const waitlistResult = await ensureWaitlistBonus(supabase, userId, userEmail);
+  return waitlistResult.hasActiveBonus;
 }
 

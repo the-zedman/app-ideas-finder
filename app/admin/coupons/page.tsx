@@ -26,7 +26,7 @@ export default function AdminCouponsPage() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [coupons, setCoupons] = useState<Coupon[]>([]);
   const [form, setForm] = useState({
-    code: 'WAITLIST25',
+    code: 'WAITLISTTHANKYOU',
     discountType: 'percentage',
     discountValue: 25,
     description: 'Early access waitlist – 25% lifetime discount',
@@ -121,7 +121,7 @@ export default function AdminCouponsPage() {
 
       setForm((prev) => ({
         ...prev,
-        code: 'WAITLIST25',
+        code: 'WAITLISTTHANKYOU',
         discountType: 'percentage',
         discountValue: 25,
         stripeCouponId: '',
@@ -220,7 +220,7 @@ export default function AdminCouponsPage() {
           <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 lg:col-span-1">
             <h2 className="text-lg font-bold text-gray-900 mb-4">Create Coupon</h2>
             <p className="text-sm text-gray-600 mb-4">
-              Use this to register coupons you create in Stripe, like <strong>WAITLIST25</strong>, so you have a clear
+              Use this to register coupons you create in Stripe, like <strong>WAITLISTTHANKYOU</strong>, so you have a clear
               record of what they do.
             </p>
 
@@ -232,7 +232,7 @@ export default function AdminCouponsPage() {
                   value={form.code}
                   onChange={handleChange}
                   className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#88D18A]"
-                  placeholder="WAITLIST25"
+                  placeholder="WAITLISTTHANKYOU"
                   required
                 />
               </div>
