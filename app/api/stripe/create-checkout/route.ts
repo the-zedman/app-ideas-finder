@@ -92,6 +92,7 @@ export async function POST(request: Request) {
       mode: isSubscription ? 'subscription' : 'payment',
       success_url: successUrl || `${request.headers.get('origin')}/billing?success=true`,
       cancel_url: cancelUrl || `${request.headers.get('origin')}/billing?canceled=true`,
+      allow_promotion_codes: true,
       metadata: {
         user_id: user.id,
         plan_type: planType,
