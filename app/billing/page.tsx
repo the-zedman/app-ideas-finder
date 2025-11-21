@@ -340,7 +340,7 @@ function BillingContent() {
                 <div className="text-gray-600">per {billingInterval === 'monthly' ? 'month' : 'year'}</div>
                 <div className="text-sm text-gray-500 mt-2">73 searches/month</div>
                 <div className="text-xs text-gray-400 mt-1">
-                  ${billingInterval === 'monthly' ? '0.53' : '0.46'} per search
+                  ${billingInterval === 'monthly' ? '0.51' : '0.46'} per search
                 </div>
               </div>
               
@@ -465,7 +465,7 @@ function BillingContent() {
                 <ul className="space-y-2 mb-4">
                   <li className="flex items-center gap-2 text-gray-700">
                     <span className="text-green-500 font-bold">✓</span>
-                    <span>53 additional searches</span>
+                    <span>29 additional searches</span>
                   </li>
                   <li className="flex items-center gap-2 text-gray-700">
                     <span className="text-green-500 font-bold">✓</span>

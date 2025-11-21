@@ -277,7 +277,7 @@ export default function AdminSubscriptionsPage() {
               <label className="block text-sm font-medium text-gray-700 mb-2">Plan</label>
               <select id="planSelect" className="w-full px-4 py-2 border border-gray-300 rounded-lg">
                 <option value="trial">Trial (10 searches, 3 days)</option>
-                <option value="core_monthly">Core Monthly (73 searches, $39/mo)</option>
+                <option value="core_monthly">Core Monthly (73 searches, $37/mo)</option>
                 <option value="core_annual">Core Annual (73 searches, $399/yr)</option>
                 <option value="prime_monthly">Prime Monthly (227 searches, $79/mo)</option>
                 <option value="prime_annual">Prime Annual (227 searches, $799/yr)</option>

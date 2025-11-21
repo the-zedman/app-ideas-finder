@@ -197,7 +197,7 @@ export default function Pricing() {
                 <p className="text-gray-600 mb-4">For regular users</p>
                 <div className="mb-4">
                   <span className="text-4xl font-bold text-gray-900">
-                    ${billingCycle === 'monthly' ? '39' : '399'}
+                    ${billingCycle === 'monthly' ? '37' : '399'}
                   </span>
                   <span className="text-gray-600">
                     {' USD' + (billingCycle === 'monthly' ? ' / month' : ' / year')}
@@ -234,7 +234,7 @@ export default function Pricing() {
 
               <div className="text-center">
                 <p className="text-xs text-gray-500 mb-4">
-                  ${billingCycle === 'monthly' ? '0.52' : '0.44'} per search
+                  ${billingCycle === 'monthly' ? '0.51' : '0.44'} per search
                 </p>
                 <button 
                   onClick={() => handleCheckout(billingCycle === 'monthly' ? 'core_monthly' : 'core_annual')}
@@ -391,7 +391,7 @@ export default function Pricing() {
                   <ul className="space-y-2">
                     <li className="flex items-center gap-2 text-gray-700">
                       <span className="text-[#88D18A] font-bold">✓</span>
-                      <span>53 additional searches</span>
+                      <span>29 additional searches</span>
                     </li>
                     <li className="flex items-center gap-2 text-gray-700">
                       <span className="text-[#88D18A] font-bold">✓</span>
@@ -408,7 +408,7 @@ export default function Pricing() {
                   <div>
                     <div className="text-5xl font-bold text-gray-900">$29</div>
                     <div className="text-sm text-gray-500 text-center mt-1">USD - one-time payment</div>
-                    <div className="text-xs text-gray-400 text-center mt-1">$0.58 per search</div>
+                    <div className="text-xs text-gray-400 text-center mt-1">$1.00 per search</div>
                   </div>
                   <Link href="//" className="px-8 py-3 bg-[#88D18A] hover:bg-[#88D18A]/90 text-white font-semibold rounded-lg transition-colors whitespace-nowrap">
                     Purchase Search Pack
@@ -428,7 +428,7 @@ export default function Pricing() {
           <div className="space-y-6">
             <div className="bg-gray-50 rounded-lg p-6">
               <h3 className="font-bold text-gray-900 mb-2">What happens after my trial ends?</h3>
-              <p className="text-gray-700">Your trial automatically converts to the Core monthly plan ($39/month) after 3 days unless you cancel. You can cancel anytime during the trial period.</p>
+                  <p className="text-gray-700">Your trial automatically converts to the Core monthly plan ($37/month) after 3 days unless you cancel. You can cancel anytime during the trial period.</p>
             </div>
 
             <div className="bg-gray-50 rounded-lg p-6">

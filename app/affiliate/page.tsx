@@ -67,7 +67,7 @@ export default function AffiliatePage() {
               <h3 className="text-xl font-bold text-gray-900 mb-3">Monthly Plans</h3>
               <div className="space-y-2">
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-700">Core ($39/mo)</span>
+                  <span className="text-gray-700">Core ($37/mo)</span>
                   <span className="font-bold text-[#88D18A]">$9.75</span>
                 </div>
                 <div className="flex justify-between items-center">

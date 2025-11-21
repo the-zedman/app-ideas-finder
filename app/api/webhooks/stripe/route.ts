@@ -88,8 +88,8 @@ export async function POST(request: Request) {
             .from('search_packs')
             .insert({
               user_id: userId,
-              searches_purchased: 53,
-              searches_remaining: 53,
+              searches_purchased: 29,
+              searches_remaining: 29,
               price_paid: (session.amount_total || 0) / 100,
               expires_at: null, // Never expires
             });
