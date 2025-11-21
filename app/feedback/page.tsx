@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { createClient } from '@/lib/supabase-client';
 import type { User } from '@supabase/supabase-js';
 import Footer from '@/components/Footer';
@@ -15,6 +16,7 @@ const categories = [
 export default function FeedbackPage() {
   const supabase = createClient();
   const [user, setUser] = useState<User | null>(null);
+  const [checkingAuth, setCheckingAuth] = useState(true);
   const [category, setCategory] = useState('feature');
   const [message, setMessage] = useState('');
   const [allowContact, setAllowContact] = useState(true);
@@ -30,7 +32,7 @@ export default function FeedbackPage() {
       } else {
         setUser(data.user);
       }
-    });
+    }).finally(() => setCheckingAuth(false));
   }, [supabase]);
 
   useEffect(() => {
@@ -88,7 +90,7 @@ export default function FeedbackPage() {
     }
   };
 
-  if (!user) {
+  if (checkingAuth || !user) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-gray-600 text-lg">Checking your account...</div>
@@ -99,20 +101,51 @@ export default function FeedbackPage() {
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       <header className="bg-white border-b border-gray-200">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-5 flex items-center justify-between">
-          <div>
-            <a href="/homezone" className="text-lg font-semibold text-[#3D405B] hover:text-black">
-              ← Back to dashboard
-            </a>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-wrap items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <Link href="/" className="flex items-center gap-2">
+              <img
+                src="/App Ideas Finder - logo - 200x200.png"
+                alt="App Ideas Finder logo"
+                className="h-8 w-8 rounded-lg"
+              />
+              <span className="text-base sm:text-lg font-bold tracking-tight text-gray-900">
+                APP IDEAS FINDER
+              </span>
+            </Link>
+            <nav className="hidden md:flex items-center gap-4 text-sm text-gray-600">
+              <Link href="/homezone" className="hover:text-gray-900 transition-colors">
+                Dashboard
+              </Link>
+              <Link href="/pricing" className="hover:text-gray-900 transition-colors">
+                Pricing
+              </Link>
+              <Link href="/contact" className="hover:text-gray-900 transition-colors">
+                Contact
+              </Link>
+            </nav>
           </div>
           <div className="flex items-center gap-3">
             <div className="text-right">
-              <p className="text-sm text-gray-500">Signed in as</p>
-              <p className="text-sm font-semibold text-gray-800">{user.email}</p>
+              <p className="text-xs uppercase tracking-wide text-gray-500">Signed in as</p>
+              <p className="text-sm font-semibold text-gray-900">{user.email}</p>
             </div>
             <div className="h-10 w-10 rounded-full bg-[#eef2ff] flex items-center justify-center text-[#3D405B] font-semibold">
               {user.email?.[0]?.toUpperCase()}
             </div>
+          </div>
+        </div>
+        <div className="md:hidden border-t border-gray-100 bg-white">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between text-sm font-semibold text-gray-600">
+            <Link href="/homezone" className="hover:text-gray-900">
+              Dashboard
+            </Link>
+            <Link href="/pricing" className="hover:text-gray-900">
+              Pricing
+            </Link>
+            <Link href="/contact" className="hover:text-gray-900">
+              Contact
+            </Link>
           </div>
         </div>
       </header>
