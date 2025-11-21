@@ -75,7 +75,7 @@ export async function POST(request: Request) {
     
     // Verify Stripe mode (test vs live)
     try {
-      const account = await stripe.account.retrieve();
+      const account = await stripe.accounts.retrieve();
       console.log(`Stripe mode: ${account.livemode ? 'LIVE' : 'TEST'}, account ID: ${account.id}`);
     } catch (accountError) {
       console.warn('Could not retrieve Stripe account info:', accountError);
