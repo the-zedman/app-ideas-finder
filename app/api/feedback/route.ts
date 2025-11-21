@@ -35,23 +35,23 @@ async function requireUser() {
 async function grantFeedbackBonus(supabaseAdmin: ReturnType<typeof createClient>, userId: string) {
   const FEEDBACK_REASON = 'feedback_reward';
 
-type FeedbackBonus = { id: string; bonus_value: number | null };
-
+  type FeedbackBonus = { id: string; bonus_value: number | null };
   const { data: existingBonus } = await supabaseAdmin
-    .from<FeedbackBonus>('user_bonuses')
+    .from('user_bonuses')
     .select('id, bonus_value')
     .eq('user_id', userId)
     .eq('bonus_type', 'fixed_searches')
     .eq('reason', FEEDBACK_REASON)
     .eq('is_active', true)
     .maybeSingle();
+  const typedBonus = (existingBonus as FeedbackBonus | null);
 
-  if (existingBonus) {
-    const nextValue = (existingBonus.bonus_value || 0) + 1;
+  if (typedBonus) {
+    const nextValue = (typedBonus.bonus_value || 0) + 1;
     const { error } = await supabaseAdmin
-      .from<FeedbackBonus>('user_bonuses')
+      .from('user_bonuses')
       .update({ bonus_value: nextValue })
-      .eq('id', existingBonus.id);
+      .eq('id', typedBonus.id);
 
     if (error) {
       console.error('Failed to update feedback bonus:', error);
