@@ -165,6 +165,12 @@ export async function POST(request: Request) {
     
     // Create checkout session
     console.log(`Creating checkout session for plan type: ${planType}, price ID: ${priceId.substring(0, 12)}...`);
+    
+    // For trial purchases, redirect to dashboard. For others, use provided success URL or billing page
+    const defaultSuccessUrl = planType === 'trial' 
+      ? `${request.headers.get('origin')}/homezone?trial_started=true`
+      : `${request.headers.get('origin')}/billing?success=true`;
+    
     const sessionConfig: any = {
       customer: customerId,
       line_items: [
@@ -174,7 +180,7 @@ export async function POST(request: Request) {
         },
       ],
       mode: isSubscription ? 'subscription' : 'payment',
-      success_url: successUrl || `${request.headers.get('origin')}/billing?success=true`,
+      success_url: successUrl || defaultSuccessUrl,
       cancel_url: cancelUrl || `${request.headers.get('origin')}/billing?canceled=true`,
       allow_promotion_codes: true,
       metadata: {

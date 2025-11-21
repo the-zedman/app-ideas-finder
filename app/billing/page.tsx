@@ -77,13 +77,18 @@ function BillingContent() {
     setProcessingCheckout(true);
     
     try {
+      // For trial purchases, redirect to dashboard. For others, redirect to billing page.
+      const successUrl = planType === 'trial' 
+        ? `${window.location.origin}/homezone?trial_started=true`
+        : `${window.location.origin}/billing?success=true`;
+      
       const response = await fetch('/api/stripe/create-checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           priceId,
           planType,
-          successUrl: `${window.location.origin}/billing?success=true`,
+          successUrl,
           cancelUrl: `${window.location.origin}/billing?canceled=true`,
         }),
       });
