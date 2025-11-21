@@ -91,6 +91,7 @@ export async function POST() {
     }
 
     // 1) Consume fixed bonus searches first (never-expiring early access credits)
+    // Order by newest first so feedback bonuses are consumed before waitlist bonuses
     const { data: bonusRows, error: bonusError } = await supabaseAdmin
       .from('user_bonuses')
       .select('*')
@@ -98,7 +99,7 @@ export async function POST() {
       .eq('bonus_type', 'fixed_searches')
       .eq('is_active', true)
       .gt('bonus_value', 0)
-      .order('awarded_at', { ascending: true })
+      .order('awarded_at', { ascending: false })
       .limit(1)
       .maybeSingle();
 
