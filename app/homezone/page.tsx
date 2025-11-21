@@ -390,13 +390,22 @@ export default function HomeZone() {
             {searchesRemaining === 0 ? (
               <div className="bg-red-50 border border-red-200 rounded-lg p-4">
                 <p className="text-red-800 font-medium mb-2">⚠️ You've used all your searches this month</p>
-                <button className="bg-[#88D18A] text-white px-6 py-2 rounded-lg font-semibold hover:bg-[#88D18A]/90">
+                <button 
+                  onClick={() => router.push('/billing')}
+                  className="bg-[#88D18A] text-white px-6 py-2 rounded-lg font-semibold hover:bg-[#88D18A]/90 transition-colors"
+                >
                   Upgrade Plan or Buy Search Pack
                 </button>
               </div>
-            ) : searchesRemaining <= 2 ? (
+            ) : searchesRemaining <= 5 ? (
               <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                <p className="text-yellow-800 font-medium">💡 Only {searchesRemaining} searches remaining this month</p>
+                <p className="text-yellow-800 font-medium mb-3">💡 Only {searchesRemaining} {searchesRemaining === 1 ? 'search' : 'searches'} remaining this month</p>
+                <button 
+                  onClick={() => router.push('/billing')}
+                  className="bg-[#88D18A] text-white px-6 py-2 rounded-lg font-semibold hover:bg-[#88D18A]/90 transition-colors text-sm"
+                >
+                  Get More Searches →
+                </button>
               </div>
             ) : null}
           </div>
