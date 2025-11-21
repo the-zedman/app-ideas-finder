@@ -1,6 +1,9 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { createClient } from '@/lib/supabase-client';
+import Footer from '@/components/Footer';
 
 type FeedbackItem = {
   id: string;
@@ -33,12 +36,15 @@ const categoryLabels: Record<string, string> = {
 };
 
 export default function AdminFeedbackPage() {
+  const router = useRouter();
+  const supabase = createClient();
   const [feedback, setFeedback] = useState<FeedbackItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [showArchived, setShowArchived] = useState(false);
   const [processing, setProcessing] = useState<string | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     const fetchFeedback = async () => {
@@ -65,8 +71,30 @@ export default function AdminFeedbackPage() {
       }
     };
 
-    fetchFeedback();
-  }, [categoryFilter, showArchived]);
+    const init = async () => {
+      try {
+        // Check admin access
+        const adminRes = await fetch('/api/check-admin');
+        if (!adminRes.ok) {
+          router.push('/login');
+          return;
+        }
+        const adminData = await adminRes.json();
+        if (!adminData.isAdmin) {
+          router.push('/homezone');
+          return;
+        }
+        setIsAdmin(true);
+        await fetchFeedback();
+      } catch (err) {
+        console.error('Error checking admin status:', err);
+        setError('Failed to verify admin status');
+        setLoading(false);
+      }
+    };
+
+    init();
+  }, [categoryFilter, showArchived, router]);
 
   const handleDelete = async (id: string) => {
     if (!confirm('Are you sure you want to delete this feedback? This action cannot be undone.')) {
@@ -120,32 +148,52 @@ export default function AdminFeedbackPage() {
     return { total, categories };
   }, [feedback]);
 
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    router.push('/');
+  };
+
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 p-6">
-        <div className="max-w-5xl mx-auto">
-          <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-200">
-            <p className="text-gray-600">Loading feedback...</p>
-          </div>
-        </div>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-gray-600 text-xl">Loading...</div>
       </div>
     );
   }
 
-  if (error) {
-    return (
-      <div className="min-h-screen bg-gray-50 p-6">
-        <div className="max-w-5xl mx-auto">
-          <div className="bg-white rounded-2xl p-8 shadow-sm border border-red-200">
-            <p className="text-red-600 font-medium">{error}</p>
-          </div>
-        </div>
-      </div>
-    );
+  if (!isAdmin) {
+    return null;
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-gray-50 flex flex-col">
+      {/* Header */}
+      <header className="bg-white border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <div className="flex items-center gap-3">
+              <img
+                src="/App Ideas Finder - logo - 200x200.png"
+                alt="App Ideas Finder"
+                className="h-8 w-8 rounded-lg"
+              />
+              <a href="/admin" className="text-xl font-bold text-[#3D405B] hover:text-gray-700">
+                Admin Dashboard
+              </a>
+              <span className="text-gray-400">/</span>
+              <h1 className="text-xl font-bold text-gray-900">Feedback & Ideas</h1>
+            </div>
+            <div className="flex items-center gap-3">
+              <a href="/homezone" className="text-gray-600 hover:text-gray-900">
+                Back to HomeZone
+              </a>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <main className="flex-1 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full">
       <div className="max-w-6xl mx-auto space-y-6">
         <div className="flex flex-col gap-4">
           <div>
@@ -280,7 +328,9 @@ export default function AdminFeedbackPage() {
             ))}
           </div>
         </div>
-      </div>
+      </main>
+
+      <Footer />
     </div>
   );
 }
