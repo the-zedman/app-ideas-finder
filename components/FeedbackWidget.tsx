@@ -128,7 +128,7 @@ export default function FeedbackWidget() {
             style={{
               position: 'fixed',
               inset: 0,
-              backgroundColor: '#ffffff',
+              backgroundColor: 'rgba(0,0,0,0.5)',
               zIndex: 2147483646,
             }}
             onClick={handleToggle}
