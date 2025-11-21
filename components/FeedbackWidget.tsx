@@ -125,12 +125,29 @@ export default function FeedbackWidget() {
         createPortal(
         <>
           <div
-            className="fixed inset-0 z-[100000] bg-white"
+            style={{
+              position: 'fixed',
+              inset: 0,
+              backgroundColor: '#ffffff',
+              zIndex: 2147483646,
+            }}
             onClick={handleToggle}
           />
-          <div className="fixed inset-y-0 right-0 z-[100001] flex justify-end">
+          <div
+            style={{
+              position: 'fixed',
+              top: 0,
+              right: 0,
+              height: '100vh',
+              width: '100%',
+              maxWidth: '420px',
+              zIndex: 2147483647,
+              display: 'flex',
+              justifyContent: 'flex-end',
+            }}
+          >
             <div
-              className="w-full max-w-md h-full bg-white shadow-2xl p-6 overflow-y-auto"
+              className="w-full h-full bg-white shadow-2xl p-6 overflow-y-auto"
               onClick={(e) => e.stopPropagation()}
             >
             <div className="flex items-center justify-between mb-6">
