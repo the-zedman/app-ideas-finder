@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { createClient } from '@/lib/supabase-client';
 import type { User } from '@supabase/supabase-js';
 
@@ -22,6 +23,7 @@ export default function FeedbackWidget() {
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [pageUrl, setPageUrl] = useState<string>('');
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setUser(data.user));
@@ -31,6 +33,10 @@ export default function FeedbackWidget() {
     if (typeof window !== 'undefined') {
       setPageUrl(window.location.href);
     }
+  }, []);
+
+  useEffect(() => {
+    setMounted(true);
   }, []);
 
   useEffect(() => {
@@ -109,7 +115,8 @@ export default function FeedbackWidget() {
         {user ? <span className="text-xs font-normal opacity-80">+1 search</span> : null}
       </button>
 
-      {showPanel && user && (
+      {mounted && showPanel && user && typeof document !== 'undefined' &&
+        createPortal(
         <>
           <div
             className="fixed inset-0 z-[9998] bg-white"
@@ -206,7 +213,8 @@ export default function FeedbackWidget() {
             </form>
             </div>
           </div>
-        </>
+        </>,
+        document.body
       )}
     </>
   );
