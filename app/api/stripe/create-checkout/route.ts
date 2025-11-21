@@ -40,16 +40,12 @@ export async function POST(request: Request) {
     // Use client-provided priceId if available, otherwise look up by plan type
     const priceId = clientPriceId || priceIdMap[planType];
     
+    // Log price ID lookup (without exposing full environment variables)
     console.log(`Price ID lookup for plan type "${planType}":`, {
-      clientPriceId,
-      mappedPriceId: priceIdMap[planType],
-      finalPriceId: priceId,
-      envVar: planType === 'core_monthly' ? process.env.STRIPE_PRICE_CORE_MONTHLY : 
-              planType === 'core_annual' ? process.env.STRIPE_PRICE_CORE_ANNUAL :
-              planType === 'prime_monthly' ? process.env.STRIPE_PRICE_PRIME_MONTHLY :
-              planType === 'prime_annual' ? process.env.STRIPE_PRICE_PRIME_ANNUAL :
-              'N/A',
-      allEnvVars: {
+      clientPriceId: clientPriceId ? `${clientPriceId.substring(0, 10)}...` : 'none',
+      mappedPriceId: priceIdMap[planType] ? `${priceIdMap[planType].substring(0, 10)}...` : 'NOT SET',
+      finalPriceId: priceId ? `${priceId.substring(0, 10)}...` : 'none',
+      envVarsStatus: {
         STRIPE_PRICE_CORE_MONTHLY: process.env.STRIPE_PRICE_CORE_MONTHLY ? 'SET' : 'NOT SET',
         STRIPE_PRICE_CORE_ANNUAL: process.env.STRIPE_PRICE_CORE_ANNUAL ? 'SET' : 'NOT SET',
         STRIPE_PRICE_PRIME_MONTHLY: process.env.STRIPE_PRICE_PRIME_MONTHLY ? 'SET' : 'NOT SET',
@@ -80,7 +76,7 @@ export async function POST(request: Request) {
     
     // Validate that the price exists in Stripe
     try {
-      console.log(`Validating price ID: ${priceId} for plan type: ${planType}`);
+      console.log(`Validating price ID: ${priceId.substring(0, 12)}... for plan type: ${planType}`);
       const price = await stripe.prices.retrieve(priceId);
       console.log(`Price validated successfully:`, {
         id: price.id,
@@ -100,16 +96,16 @@ export async function POST(request: Request) {
         }, { status: 400 });
       }
     } catch (priceError: any) {
-      console.error(`Invalid price ID ${priceId} for plan type ${planType}:`, {
+      console.error(`Invalid price ID ${priceId.substring(0, 12)}... for plan type ${planType}:`, {
         error: priceError.message,
         type: priceError.type,
         code: priceError.code,
         statusCode: priceError.statusCode
       });
       
-      let errorDetails = `The price ID for ${planType} (${priceId}) is invalid or not found in Stripe.`;
+      let errorDetails = `The price ID for ${planType} is invalid or not found in Stripe.`;
       if (priceError.code === 'resource_missing') {
-        errorDetails += ` The price ID does not exist. Please verify the STRIPE_PRICE_CORE_MONTHLY environment variable is set correctly.`;
+        errorDetails += ` The price ID does not exist. Please verify the environment variable is set correctly.`;
       } else if (priceError.message) {
         errorDetails += ` ${priceError.message}`;
       }
@@ -168,7 +164,7 @@ export async function POST(request: Request) {
     const isSubscription = planType !== 'trial' && planType !== 'search_pack';
     
     // Create checkout session
-    console.log(`Creating checkout session for plan type: ${planType}, price ID: ${priceId}`);
+    console.log(`Creating checkout session for plan type: ${planType}, price ID: ${priceId.substring(0, 12)}...`);
     const sessionConfig: any = {
       customer: customerId,
       line_items: [
