@@ -51,14 +51,14 @@ async function requireAdmin() {
 // DELETE - Delete feedback
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const context = await requireAdmin();
     if (context instanceof NextResponse) return context;
 
     const { supabaseAdmin } = context;
-    const { id } = params;
+    const { id } = await params;
 
     const { error } = await supabaseAdmin
       .from('user_feedback')
@@ -80,14 +80,14 @@ export async function DELETE(
 // PATCH - Archive/Unarchive feedback
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const context = await requireAdmin();
     if (context instanceof NextResponse) return context;
 
     const { supabaseAdmin } = context;
-    const { id } = params;
+    const { id } = await params;
     const body = await request.json();
     const { archived } = body;
 
