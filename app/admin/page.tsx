@@ -218,6 +218,13 @@ export default function AdminDashboard() {
               <div className="text-sm text-gray-600">Manage codes like WAITLISTTHANKYOU and other promos</div>
             </a>
             <a
+              href="/admin/feedback"
+              className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow border-blue-300"
+            >
+              <div className="text-lg font-semibold text-blue-900 mb-2">💡 Feedback Inbox</div>
+              <div className="text-sm text-gray-600">Read user ideas, bugs, and reward bonuses</div>
+            </a>
+            <a
               href="/admin/deletions"
               className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow border-red-300"
             >
