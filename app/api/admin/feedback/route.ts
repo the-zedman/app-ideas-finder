@@ -8,12 +8,13 @@ const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 
 async function requireAdmin() {
   const cookieStore = await cookies();
+  const allCookies = cookieStore.getAll();
   const { createServerClient } = await import('@supabase/ssr');
 
   const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
     cookies: {
       getAll() {
-        return cookieStore.getAll();
+        return allCookies;
       },
       setAll() {},
     },
@@ -55,6 +56,7 @@ export async function GET(request: Request) {
     const { supabaseAdmin } = context;
     const { searchParams } = new URL(request.url);
     const categoryFilter = searchParams.get('category');
+    const archivedFilter = searchParams.get('archived');
 
     let query = supabaseAdmin
       .from('user_feedback')
@@ -63,6 +65,14 @@ export async function GET(request: Request) {
 
     if (categoryFilter && categoryFilter !== 'all') {
       query = query.eq('category', categoryFilter);
+    }
+
+    // Filter by archived status
+    if (archivedFilter === 'true') {
+      query = query.eq('archived', true);
+    } else {
+      // Default: show only non-archived items (including null for backwards compatibility)
+      query = query.or('archived.eq.false,archived.is.null');
     }
 
     const { data, error } = await query;

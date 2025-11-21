@@ -13,6 +13,7 @@ type FeedbackItem = {
   reward_granted: boolean;
   reward_amount: number;
   created_at: string;
+  archived?: boolean;
 };
 
 type FeedbackResponse = {
@@ -36,6 +37,8 @@ export default function AdminFeedbackPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [categoryFilter, setCategoryFilter] = useState('all');
+  const [showArchived, setShowArchived] = useState(false);
+  const [processing, setProcessing] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchFeedback = async () => {
@@ -43,6 +46,9 @@ export default function AdminFeedbackPage() {
         const url = new URL('/api/admin/feedback', window.location.origin);
         if (categoryFilter !== 'all') {
           url.searchParams.set('category', categoryFilter);
+        }
+        if (showArchived) {
+          url.searchParams.set('archived', 'true');
         }
         const res = await fetch(url.toString(), { cache: 'no-store' });
         if (!res.ok) {
@@ -60,7 +66,49 @@ export default function AdminFeedbackPage() {
     };
 
     fetchFeedback();
-  }, [categoryFilter]);
+  }, [categoryFilter, showArchived]);
+
+  const handleDelete = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this feedback? This action cannot be undone.')) {
+      return;
+    }
+
+    setProcessing(id);
+    try {
+      const res = await fetch(`/api/admin/feedback/${id}`, {
+        method: 'DELETE',
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || 'Failed to delete feedback');
+      }
+      setFeedback(feedback.filter((item) => item.id !== id));
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Failed to delete feedback');
+    } finally {
+      setProcessing(null);
+    }
+  };
+
+  const handleArchive = async (id: string, archive: boolean) => {
+    setProcessing(id);
+    try {
+      const res = await fetch(`/api/admin/feedback/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ archived: archive }),
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || `Failed to ${archive ? 'archive' : 'unarchive'} feedback`);
+      }
+      setFeedback(feedback.filter((item) => item.id !== id));
+    } catch (err) {
+      alert(err instanceof Error ? err.message : `Failed to ${archive ? 'archive' : 'unarchive'} feedback`);
+    } finally {
+      setProcessing(null);
+    }
+  };
 
   const groupedStats = useMemo(() => {
     const total = feedback.length;
@@ -126,19 +174,33 @@ export default function AdminFeedbackPage() {
 
         <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-            <h2 className="text-xl font-semibold text-gray-900">Latest feedback</h2>
-            <select
-              value={categoryFilter}
-              onChange={(e) => setCategoryFilter(e.target.value)}
-              className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
-            >
-              <option value="all">All categories</option>
-              {Object.entries(categoryLabels).map(([value, label]) => (
-                <option key={value} value={value}>
-                  {label}
-                </option>
-              ))}
-            </select>
+            <h2 className="text-xl font-semibold text-gray-900">
+              {showArchived ? 'Archived feedback' : 'Latest feedback'}
+            </h2>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowArchived(!showArchived)}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  showArchived
+                    ? 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                    : 'bg-[#88D18A] text-white hover:bg-[#6bc070]'
+                }`}
+              >
+                {showArchived ? 'View Active' : 'View Archived'}
+              </button>
+              <select
+                value={categoryFilter}
+                onChange={(e) => setCategoryFilter(e.target.value)}
+                className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
+              >
+                <option value="all">All categories</option>
+                {Object.entries(categoryLabels).map(([value, label]) => (
+                  <option key={value} value={value}>
+                    {label}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
 
           <div className="space-y-4">
@@ -168,23 +230,51 @@ export default function AdminFeedbackPage() {
 
                 <p className="text-gray-900 whitespace-pre-wrap text-sm leading-relaxed">{item.message}</p>
 
-                <div className="mt-4 flex flex-wrap items-center gap-3 text-xs text-gray-500">
-                  {item.page_url && (
-                    <a
-                      href={item.page_url}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="underline hover:text-gray-800"
+                <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+                  <div className="flex flex-wrap items-center gap-3 text-xs text-gray-500">
+                    {item.page_url && (
+                      <a
+                        href={item.page_url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="underline hover:text-gray-800"
+                      >
+                        View page ↗
+                      </a>
+                    )}
+                    <span>
+                      Contact? <strong>{item.allow_contact ? 'Yes' : 'No'}</strong>
+                    </span>
+                    <span>
+                      Bonus: {item.reward_granted ? `+${item.reward_amount || 1} search` : 'pending'}
+                    </span>
+                  </div>
+                  <div className="flex gap-2">
+                    {!showArchived ? (
+                      <button
+                        onClick={() => handleArchive(item.id, true)}
+                        disabled={processing === item.id}
+                        className="px-3 py-1.5 text-xs font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors disabled:opacity-50"
+                      >
+                        {processing === item.id ? 'Archiving...' : 'Archive'}
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => handleArchive(item.id, false)}
+                        disabled={processing === item.id}
+                        className="px-3 py-1.5 text-xs font-medium text-blue-700 bg-blue-100 hover:bg-blue-200 rounded-lg transition-colors disabled:opacity-50"
+                      >
+                        {processing === item.id ? 'Unarchiving...' : 'Unarchive'}
+                      </button>
+                    )}
+                    <button
+                      onClick={() => handleDelete(item.id)}
+                      disabled={processing === item.id}
+                      className="px-3 py-1.5 text-xs font-medium text-red-700 bg-red-100 hover:bg-red-200 rounded-lg transition-colors disabled:opacity-50"
                     >
-                      View page ↗
-                    </a>
-                  )}
-                  <span>
-                    Contact? <strong>{item.allow_contact ? 'Yes' : 'No'}</strong>
-                  </span>
-                  <span>
-                    Bonus: {item.reward_granted ? `+${item.reward_amount || 1} search` : 'pending'}
-                  </span>
+                      {processing === item.id ? 'Deleting...' : 'Delete'}
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}

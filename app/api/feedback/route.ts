@@ -101,6 +101,26 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Feedback is too long (max 2000 characters)' }, { status: 400 });
     }
 
+    // Rate limiting: Check if user has submitted 3+ feedbacks today
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const todayStart = today.toISOString();
+    const todayEnd = new Date(today.getTime() + 24 * 60 * 60 * 1000).toISOString();
+
+    const { count: todayCount } = await supabaseAdmin
+      .from('user_feedback')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', user.id)
+      .gte('created_at', todayStart)
+      .lt('created_at', todayEnd);
+
+    if (todayCount && todayCount >= 3) {
+      return NextResponse.json(
+        { error: 'You can only submit 3 feedback items per day. Please try again tomorrow.' },
+        { status: 429 }
+      );
+    }
+
     const { data: feedback, error: insertError } = await supabaseAdmin
       .from('user_feedback')
       .insert({

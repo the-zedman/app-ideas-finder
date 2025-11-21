@@ -1,16 +1,23 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { usePathname } from 'next/navigation';
 import { createClient } from '@/lib/supabase-client';
 import type { User } from '@supabase/supabase-js';
 
 export default function FeedbackWidget() {
   const supabase = createClient();
+  const pathname = usePathname();
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setUser(data.user));
   }, [supabase]);
+
+  // Hide feedback button on landing page
+  if (pathname === '/') {
+    return null;
+  }
 
   const handleClick = () => {
     if (typeof window === 'undefined') return;
