@@ -166,10 +166,8 @@ export async function POST(request: Request) {
     // Create checkout session
     console.log(`Creating checkout session for plan type: ${planType}, price ID: ${priceId.substring(0, 12)}...`);
     
-    // For trial purchases, redirect to dashboard. For others, use provided success URL or billing page
-    const defaultSuccessUrl = planType === 'trial' 
-      ? `${request.headers.get('origin')}/homezone?trial_started=true`
-      : `${request.headers.get('origin')}/billing?success=true`;
+    // All successful purchases redirect to dashboard
+    const defaultSuccessUrl = `${request.headers.get('origin')}/homezone?purchase_success=true`;
     
     const sessionConfig: any = {
       customer: customerId,
