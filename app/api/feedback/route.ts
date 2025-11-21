@@ -142,7 +142,13 @@ export async function POST(request: Request) {
       <p>Bonus granted: ${bonusResult.granted ? '+1 search credit' : 'failed to grant'}</p>
     `;
 
-    await sendAdminAlert(`[Feedback] ${category} – ${user.email || user.id}`, html, message);
+    // Try to send admin alert, but don't fail the request if it fails
+    try {
+      await sendAdminAlert(`[Feedback] ${category} – ${user.email || user.id}`, html, message);
+    } catch (emailError) {
+      console.error('Failed to send admin alert email:', emailError);
+      // Continue anyway - feedback is saved and bonus is granted
+    }
 
     return NextResponse.json({
       success: true,

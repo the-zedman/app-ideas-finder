@@ -7,7 +7,6 @@ import { createClient } from '@/lib/supabase-client';
 import type { User } from '@supabase/supabase-js';
 import CryptoJS from 'crypto-js';
 import Footer from '@/components/Footer';
-import { getCanonicalUser } from '@/lib/canonical-user';
 
 const categories = [
   { value: 'feature', label: 'Feature request' },
@@ -34,7 +33,7 @@ export default function FeedbackPage() {
 
   useEffect(() => {
     const init = async () => {
-      const { user: currentUser, canonicalUserId } = await getCanonicalUser(supabase);
+      const { data: { user: currentUser } } = await supabase.auth.getUser();
       
       if (!currentUser) {
         window.location.href = '/login?redirectTo=/feedback';
@@ -43,21 +42,19 @@ export default function FeedbackPage() {
       
       setUser(currentUser);
       
-      if (canonicalUserId) {
-        // Fetch profile
-        const { data: profileData } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', canonicalUserId)
-          .single();
-        
-        setProfile(profileData);
-        
-        // Check admin status
-        const adminResponse = await fetch('/api/check-admin');
-        const adminData = await adminResponse.json();
-        setIsAdmin(adminData.isAdmin || false);
-      }
+      // Fetch profile
+      const { data: profileData } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', currentUser.id)
+        .single();
+      
+      setProfile(profileData);
+      
+      // Check admin status
+      const adminResponse = await fetch('/api/check-admin');
+      const adminData = await adminResponse.json();
+      setIsAdmin(adminData.isAdmin || false);
       
       setCheckingAuth(false);
     };
