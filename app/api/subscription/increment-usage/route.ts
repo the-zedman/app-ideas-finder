@@ -91,15 +91,17 @@ export async function POST() {
     }
 
     // 1) Consume fixed bonus searches first (never-expiring early access credits)
-    // Order by newest first so feedback bonuses are consumed before waitlist bonuses
+    // Exclude feedback bonuses - they add to monthly limit and are consumed as part of monthly quota
+    // Order by oldest first so waitlist bonuses are consumed first
     const { data: bonusRows, error: bonusError } = await supabaseAdmin
       .from('user_bonuses')
       .select('*')
       .eq('user_id', user.id)
       .eq('bonus_type', 'fixed_searches')
+      .neq('reason', 'feedback_reward') // Exclude feedback bonuses
       .eq('is_active', true)
       .gt('bonus_value', 0)
-      .order('awarded_at', { ascending: false })
+      .order('awarded_at', { ascending: true })
       .limit(1)
       .maybeSingle();
 

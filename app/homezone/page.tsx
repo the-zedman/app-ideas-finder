@@ -412,7 +412,7 @@ export default function HomeZone() {
         )}
 
         {/* Early Access / Bonus Searches */}
-        {usageData?.bonusSearchesRemaining > 0 && (
+        {(usageData?.waitlistBonusRemaining ?? usageData?.bonusSearchesRemaining ?? 0) > 0 && (
           <div className="bg-gradient-to-r from-[#88D18A]/10 to-[#6BC070]/10 border border-[#88D18A]/40 rounded-2xl p-5 mb-8">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div>
@@ -421,7 +421,7 @@ export default function HomeZone() {
                   <span className="uppercase tracking-wide">WAITLIST</span>
                 </div>
                 <h3 className="text-lg font-bold text-gray-900 mb-1">
-                  You have {usageData.bonusSearchesRemaining} of {WAITLIST_BONUS_AMOUNT} waitlist bonus searches
+                  You have {usageData.waitlistBonusRemaining ?? usageData.bonusSearchesRemaining ?? 0} of {WAITLIST_BONUS_AMOUNT} waitlist bonus searches
                 </h3>
                 <p className="text-sm text-gray-700">
                   These never expire and are used <span className="font-semibold">before</span> your monthly plan

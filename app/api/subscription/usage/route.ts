@@ -65,22 +65,35 @@ export async function GET() {
       .eq('is_active', true);
     
     // Calculate bonus searches
-    let bonusSearchesRemaining = 0; // fixed, never-expiring bonus searches (e.g. early access 75)
+    // Separate waitlist bonuses from feedback bonuses
+    let bonusSearchesRemaining = 0; // fixed, never-expiring bonus searches (e.g. early access 75) - waitlist only
+    let feedbackBonusSearches = 0; // feedback bonuses that add to monthly limit
     let percentageBonus = 0;
     
     bonuses?.forEach((bonus: any) => {
       if (bonus.bonus_type === 'fixed_searches') {
-        // Treat bonus_value as remaining fixed searches that never expire
-        bonusSearchesRemaining += bonus.bonus_value || 0;
+        // Separate waitlist bonuses from feedback bonuses
+        if (bonus.reason === 'feedback_reward') {
+          // Feedback bonuses add to monthly limit, not to bonus pool
+          feedbackBonusSearches += bonus.bonus_value || 0;
+        } else {
+          // Waitlist and other fixed bonuses go to bonus pool
+          bonusSearchesRemaining += bonus.bonus_value || 0;
+        }
       } else if (bonus.bonus_type === 'percentage_increase') {
         percentageBonus += bonus.bonus_value || 0;
       }
     });
     
     if (!subscription) {
-      if (bonusSearchesRemaining > 0 || packSearches > 0) {
+      // Calculate waitlist bonus remaining (only count waitlist bonuses, not feedback bonuses)
+      const waitlistBonusRemaining = bonuses?.filter((b: any) => 
+        b.bonus_type === 'fixed_searches' && b.reason === 'waitlist_75_free' && b.is_active
+      ).reduce((sum: number, b: any) => sum + (b.bonus_value || 0), 0) || 0;
+      
+      if (waitlistBonusRemaining > 0 || packSearches > 0) {
         // Calculate searches used for waitlist users: original amount - remaining amount
-        const waitlistSearchesUsed = WAITLIST_BONUS_AMOUNT - bonusSearchesRemaining;
+        const waitlistSearchesUsed = WAITLIST_BONUS_AMOUNT - waitlistBonusRemaining;
         return NextResponse.json({
           hasSubscription: false,
           planId: 'waitlist_bonus',
@@ -88,9 +101,9 @@ export async function GET() {
           status: 'waitlist_bonus',
           searchesUsed: waitlistSearchesUsed,
           searchesLimit: WAITLIST_BONUS_AMOUNT,
-          searchesRemaining: bonusSearchesRemaining + packSearches,
+          searchesRemaining: waitlistBonusRemaining + packSearches,
           packSearches,
-          bonusSearchesRemaining,
+          bonusSearchesRemaining: waitlistBonusRemaining,
           percentageBonus: 0,
           trialTimeRemaining: null,
           currentPeriodEnd: null,
@@ -112,8 +125,11 @@ export async function GET() {
     const baseLimit = usage?.searches_limit || subscription.subscription_plans?.searches_per_month || 0;
     const percentageBonusAmount = Math.floor((baseLimit * percentageBonus) / 100);
     
-    // Plan-based monthly limit does NOT include fixed bonus or search packs
-    const planSearchesLimit = subscription.status === 'free_unlimited' ? -1 : baseLimit + percentageBonusAmount;
+    // Plan-based monthly limit includes feedback bonuses (they add to monthly quota)
+    // but does NOT include waitlist bonus or search packs
+    const planSearchesLimit = subscription.status === 'free_unlimited' 
+      ? -1 
+      : baseLimit + percentageBonusAmount + feedbackBonusSearches;
     
     const searchesUsed = usage?.searches_used || 0;
     const planSearchesRemaining = subscription.status === 'free_unlimited'
@@ -156,6 +172,10 @@ export async function GET() {
       currentPeriodEnd: subscription.current_period_end,
       waitlistCouponCode: bonusSearchesRemaining > 0 ? WAITLIST_COUPON_CODE : null,
       waitlistBonusAmount: bonusSearchesRemaining > 0 ? WAITLIST_BONUS_AMOUNT : null,
+      // Separate waitlist bonus remaining for display (only waitlist bonuses, not feedback)
+      waitlistBonusRemaining: bonuses?.filter((b: any) => 
+        b.bonus_type === 'fixed_searches' && b.reason === 'waitlist_75_free' && b.is_active
+      ).reduce((sum: number, b: any) => sum + (b.bonus_value || 0), 0) || 0,
       canSearch: subscription.status === 'free_unlimited' || totalSearchesRemaining > 0
     });
     
