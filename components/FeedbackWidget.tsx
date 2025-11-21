@@ -99,11 +99,13 @@ export default function FeedbackWidget() {
       </button>
 
       {showPanel && user && (
-        <div className="fixed inset-0 z-50 flex justify-end bg-white" onClick={handleToggle}>
-          <div
-            className="w-full max-w-md h-full bg-white shadow-2xl p-6 overflow-y-auto"
-            onClick={(e) => e.stopPropagation()}
-          >
+        <div className="fixed inset-0 z-50">
+          <div className="absolute inset-0 bg-white" onClick={handleToggle} />
+          <div className="absolute inset-0 flex justify-end">
+            <div
+              className="w-full max-w-md h-full bg-white shadow-2xl p-6 overflow-y-auto"
+              onClick={(e) => e.stopPropagation()}
+            >
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h2 className="text-2xl font-bold text-gray-900">Help us get 1% better</h2>
@@ -188,6 +190,7 @@ export default function FeedbackWidget() {
                 Feedback powered by App Ideas Finder · {pageUrl ? new URL(pageUrl).pathname : ''}
               </p>
             </form>
+            </div>
           </div>
         </div>
       )}
