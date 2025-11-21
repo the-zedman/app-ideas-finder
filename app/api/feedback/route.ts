@@ -115,7 +115,10 @@ export async function POST(request: Request) {
 
     if (insertError || !feedback) {
       console.error('Failed to save feedback:', insertError);
-      return NextResponse.json({ error: 'Failed to save feedback' }, { status: 500 });
+      return NextResponse.json(
+        { error: 'Failed to save feedback', details: insertError?.message },
+        { status: 500 }
+      );
     }
 
     const bonusResult = await grantFeedbackBonus(supabaseAdmin, user.id);
@@ -149,7 +152,13 @@ export async function POST(request: Request) {
     });
   } catch (error) {
     console.error('POST /api/feedback error:', error);
-    return NextResponse.json({ error: 'Unexpected error submitting feedback' }, { status: 500 });
+    return NextResponse.json(
+      {
+        error: 'Unexpected error submitting feedback',
+        details: error instanceof Error ? error.message : String(error),
+      },
+      { status: 500 }
+    );
   }
 }
 
