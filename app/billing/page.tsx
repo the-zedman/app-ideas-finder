@@ -90,15 +90,23 @@ function BillingContent() {
 
       const data = await response.json();
 
+      if (!response.ok) {
+        console.error('Checkout error:', data);
+        alert(`Error: ${data.error || 'Failed to create checkout session'}\n${data.message || ''}\n${data.details || ''}`);
+        setProcessingCheckout(false);
+        return;
+      }
+
       if (data.url) {
         window.location.href = data.url;
       } else {
-        alert('Error creating checkout session');
+        console.error('No URL in checkout response:', data);
+        alert('Error creating checkout session: No redirect URL received');
         setProcessingCheckout(false);
       }
     } catch (error) {
       console.error('Error:', error);
-      alert('Failed to start checkout');
+      alert(`Failed to start checkout: ${error instanceof Error ? error.message : 'Unknown error'}`);
       setProcessingCheckout(false);
     }
   };
