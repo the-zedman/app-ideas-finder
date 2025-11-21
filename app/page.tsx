@@ -259,18 +259,25 @@ export default function LandingTest() {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-6 sm:mb-8">
-              <a 
-                href="/onboarding"
-                className="bg-[#88D18A] hover:bg-[#6bc070] text-white px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-semibold text-base sm:text-lg text-center w-full transition-colors"
-              >
-                Start the generator!
-              </a>
-              <a 
-                href="#trending" 
-                className="hidden sm:flex bg-white hover:bg-gray-50 text-gray-900 px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-semibold text-base sm:text-lg border-2 border-gray-300 transition-colors text-center items-center justify-center"
-              >
-                Explore trending apps
-              </a>
+              <div className="relative">
+                <a 
+                  href="/onboarding"
+                  className="bg-[#88D18A] text-white px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-semibold text-base sm:text-lg text-center w-full block"
+                >
+                  Start the generator!
+                </a>
+              </div>
+              <div className="relative">
+                <a 
+                  href="#trending" 
+                  className="hidden sm:flex bg-white hover:bg-gray-50 text-gray-900 px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-semibold text-base sm:text-lg border-2 border-gray-300 transition-colors text-center items-center justify-center"
+                >
+                  Explore trending apps
+                </a>
+                <div className="absolute -top-2 -right-2 bg-gradient-to-r from-orange-400 to-orange-500 text-white px-2 sm:px-3 py-1 rounded-full text-xs font-bold shadow-lg animate-pulse">
+                  COMING SOON
+                </div>
+              </div>
             </div>
             
             {/* Waitlist Section */}
