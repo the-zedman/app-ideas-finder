@@ -46,7 +46,7 @@ export async function POST() {
         .from('user_subscriptions')
         .select('*, subscription_plans(*)')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
       
       const searchesLimit = subscription?.subscription_plans?.monthly_searches || 0;
       
@@ -83,7 +83,7 @@ export async function POST() {
       .from('user_subscriptions')
       .select('status')
       .eq('user_id', user.id)
-      .single();
+      .maybeSingle();
     
     if (subscription?.status === 'free_unlimited') {
       // Don't decrement anything for unlimited users
@@ -91,19 +91,29 @@ export async function POST() {
     }
 
     // 1) Consume fixed bonus searches first (never-expiring early access credits)
-    // Exclude feedback bonuses - they add to monthly limit and are consumed as part of monthly quota
-    // Order by oldest first so waitlist bonuses are consumed first
-    const { data: bonusRows, error: bonusError } = await supabaseAdmin
+    // For users with subscriptions: exclude feedback bonuses (they add to monthly limit)
+    // For waitlist users: consume waitlist bonuses first, then feedback bonuses
+    let bonusQuery = supabaseAdmin
       .from('user_bonuses')
       .select('*')
       .eq('user_id', user.id)
       .eq('bonus_type', 'fixed_searches')
-      .neq('reason', 'feedback_reward') // Exclude feedback bonuses
       .eq('is_active', true)
-      .gt('bonus_value', 0)
-      .order('awarded_at', { ascending: true })
-      .limit(1)
-      .maybeSingle();
+      .gt('bonus_value', 0);
+
+    // For users with subscriptions, exclude feedback bonuses (they're part of monthly quota)
+    // For waitlist users, consume waitlist bonuses first (oldest), then feedback bonuses (newest)
+    if (subscription) {
+      bonusQuery = bonusQuery.neq('reason', 'feedback_reward');
+      bonusQuery = bonusQuery.order('awarded_at', { ascending: true });
+    } else {
+      // Waitlist users: consume waitlist bonuses first (oldest), then feedback bonuses (newest)
+      // First try waitlist bonuses
+      bonusQuery = bonusQuery.neq('reason', 'feedback_reward');
+      bonusQuery = bonusQuery.order('awarded_at', { ascending: true });
+    }
+
+    const { data: bonusRows, error: bonusError } = await bonusQuery.limit(1).maybeSingle();
 
     if (bonusError) {
       console.error('Error fetching bonus searches:', bonusError);
@@ -131,6 +141,47 @@ export async function POST() {
         success: true,
         source: 'bonus_search',
       });
+    }
+
+    // For waitlist users, if no waitlist bonuses found, try feedback bonuses
+    if (!subscription) {
+      const { data: feedbackBonusRows, error: feedbackBonusError } = await supabaseAdmin
+        .from('user_bonuses')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('bonus_type', 'fixed_searches')
+        .eq('reason', 'feedback_reward')
+        .eq('is_active', true)
+        .gt('bonus_value', 0)
+        .order('awarded_at', { ascending: false }) // Consume newest feedback bonuses first
+        .limit(1)
+        .maybeSingle();
+
+      if (!feedbackBonusError && feedbackBonusRows) {
+        const newValue = (feedbackBonusRows.bonus_value || 0) - 1;
+        const updatePayload: any = { bonus_value: newValue };
+        if (newValue <= 0) {
+          updatePayload.is_active = false;
+        }
+
+        const { error: updateFeedbackBonusError } = await supabaseAdmin
+          .from('user_bonuses')
+          .update(updatePayload)
+          .eq('id', feedbackBonusRows.id);
+
+        if (updateFeedbackBonusError) {
+          console.error('Error updating feedback bonus searches:', updateFeedbackBonusError);
+          return NextResponse.json(
+            { error: 'Failed to consume feedback bonus search', message: updateFeedbackBonusError.message },
+            { status: 500 }
+          );
+        }
+
+        return NextResponse.json({
+          success: true,
+          source: 'feedback_bonus_search',
+        });
+      }
     }
 
     // 2) Consume Search Pack credits next (never-expiring paid packs)

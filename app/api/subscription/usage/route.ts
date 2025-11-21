@@ -91,7 +91,10 @@ export async function GET() {
         b.bonus_type === 'fixed_searches' && b.reason === 'waitlist_75_free' && b.is_active
       ).reduce((sum: number, b: any) => sum + (b.bonus_value || 0), 0) || 0;
       
-      if (waitlistBonusRemaining > 0 || packSearches > 0) {
+      // For waitlist users, feedback bonuses add to the total limit
+      const totalWaitlistLimit = WAITLIST_BONUS_AMOUNT + feedbackBonusSearches;
+      
+      if (waitlistBonusRemaining > 0 || packSearches > 0 || feedbackBonusSearches > 0) {
         // Calculate searches used for waitlist users: original amount - remaining amount
         const waitlistSearchesUsed = WAITLIST_BONUS_AMOUNT - waitlistBonusRemaining;
         return NextResponse.json({
@@ -100,16 +103,17 @@ export async function GET() {
           planName: 'Waitlist Early Access',
           status: 'waitlist_bonus',
           searchesUsed: waitlistSearchesUsed,
-          searchesLimit: WAITLIST_BONUS_AMOUNT,
-          searchesRemaining: waitlistBonusRemaining + packSearches,
+          searchesLimit: totalWaitlistLimit, // Include feedback bonuses in limit
+          searchesRemaining: waitlistBonusRemaining + packSearches + feedbackBonusSearches,
           packSearches,
           bonusSearchesRemaining: waitlistBonusRemaining,
+          feedbackBonusSearches, // Include feedback bonuses separately for display
           percentageBonus: 0,
           trialTimeRemaining: null,
           currentPeriodEnd: null,
           waitlistCouponCode: WAITLIST_COUPON_CODE,
           waitlistBonusAmount: WAITLIST_BONUS_AMOUNT,
-          canSearch: bonusSearchesRemaining + packSearches > 0,
+          canSearch: waitlistBonusRemaining + packSearches + feedbackBonusSearches > 0,
         });
       }
 
