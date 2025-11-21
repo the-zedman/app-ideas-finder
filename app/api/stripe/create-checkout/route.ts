@@ -44,7 +44,17 @@ export async function POST(request: Request) {
       clientPriceId,
       mappedPriceId: priceIdMap[planType],
       finalPriceId: priceId,
-      envVar: planType === 'core_monthly' ? process.env.STRIPE_PRICE_CORE_MONTHLY : 'N/A'
+      envVar: planType === 'core_monthly' ? process.env.STRIPE_PRICE_CORE_MONTHLY : 
+              planType === 'core_annual' ? process.env.STRIPE_PRICE_CORE_ANNUAL :
+              planType === 'prime_monthly' ? process.env.STRIPE_PRICE_PRIME_MONTHLY :
+              planType === 'prime_annual' ? process.env.STRIPE_PRICE_PRIME_ANNUAL :
+              'N/A',
+      allEnvVars: {
+        STRIPE_PRICE_CORE_MONTHLY: process.env.STRIPE_PRICE_CORE_MONTHLY ? 'SET' : 'NOT SET',
+        STRIPE_PRICE_CORE_ANNUAL: process.env.STRIPE_PRICE_CORE_ANNUAL ? 'SET' : 'NOT SET',
+        STRIPE_PRICE_PRIME_MONTHLY: process.env.STRIPE_PRICE_PRIME_MONTHLY ? 'SET' : 'NOT SET',
+        STRIPE_PRICE_PRIME_ANNUAL: process.env.STRIPE_PRICE_PRIME_ANNUAL ? 'SET' : 'NOT SET',
+      }
     });
     
     if (!priceId) {
@@ -63,15 +73,53 @@ export async function POST(request: Request) {
       }, { status: 500 });
     }
     
+    // Verify Stripe mode (test vs live)
+    try {
+      const account = await stripe.account.retrieve();
+      console.log(`Stripe mode: ${account.livemode ? 'LIVE' : 'TEST'}, account ID: ${account.id}`);
+    } catch (accountError) {
+      console.warn('Could not retrieve Stripe account info:', accountError);
+    }
+    
     // Validate that the price exists in Stripe
     try {
+      console.log(`Validating price ID: ${priceId} for plan type: ${planType}`);
       const price = await stripe.prices.retrieve(priceId);
-      console.log(`Price validated: ${priceId}, amount: ${price.unit_amount}, currency: ${price.currency}`);
+      console.log(`Price validated successfully:`, {
+        id: price.id,
+        amount: price.unit_amount,
+        currency: price.currency,
+        type: price.type,
+        active: price.active,
+        nickname: price.nickname
+      });
+      
+      // Check if price is active
+      if (!price.active) {
+        console.warn(`Price ${priceId} exists but is not active`);
+        return NextResponse.json({ 
+          error: 'Price is not active', 
+          details: `The price ID for ${planType} (${priceId}) exists in Stripe but is not active. Please activate it in Stripe.` 
+        }, { status: 400 });
+      }
     } catch (priceError: any) {
-      console.error(`Invalid price ID ${priceId} for plan type ${planType}:`, priceError);
+      console.error(`Invalid price ID ${priceId} for plan type ${planType}:`, {
+        error: priceError.message,
+        type: priceError.type,
+        code: priceError.code,
+        statusCode: priceError.statusCode
+      });
+      
+      let errorDetails = `The price ID for ${planType} (${priceId}) is invalid or not found in Stripe.`;
+      if (priceError.code === 'resource_missing') {
+        errorDetails += ` The price ID does not exist. Please verify the STRIPE_PRICE_CORE_MONTHLY environment variable is set correctly.`;
+      } else if (priceError.message) {
+        errorDetails += ` ${priceError.message}`;
+      }
+      
       return NextResponse.json({ 
         error: 'Invalid price configuration', 
-        details: `The price ID for ${planType} (${priceId}) is invalid or not found in Stripe. ${priceError.message || 'Please create a new price in Stripe and update the environment variable.'}` 
+        details: errorDetails
       }, { status: 400 });
     }
     
