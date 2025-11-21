@@ -119,10 +119,10 @@ export default function FeedbackWidget() {
         createPortal(
         <>
           <div
-            className="fixed inset-0 z-[9998] bg-white"
+            className="fixed inset-0 z-[100000] bg-white"
             onClick={handleToggle}
           />
-          <div className="fixed inset-y-0 right-0 z-[9999] flex justify-end">
+          <div className="fixed inset-y-0 right-0 z-[100001] flex justify-end">
             <div
               className="w-full max-w-md h-full bg-white shadow-2xl p-6 overflow-y-auto"
               onClick={(e) => e.stopPropagation()}
