@@ -2,9 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
-import dynamic from "next/dynamic";
-
-const FeedbackWidget = dynamic(() => import('@/components/FeedbackWidget'), { ssr: false });
+import FeedbackWidget from "@/components/FeedbackWidget";
 
 const inter = Inter({
   subsets: ["latin"],
