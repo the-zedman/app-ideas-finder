@@ -42,7 +42,7 @@ async function grantFeedbackBonus(supabaseAdmin: ReturnType<typeof createClient>
     .eq('bonus_type', 'fixed_searches')
     .eq('reason', FEEDBACK_REASON)
     .eq('is_active', true)
-    .maybeSingle();
+    .maybeSingle<{ id: string; bonus_value: number | null }>();
 
   if (existingBonus) {
     const nextValue = (existingBonus.bonus_value || 0) + 1;
