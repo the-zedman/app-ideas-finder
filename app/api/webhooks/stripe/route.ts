@@ -130,7 +130,7 @@ export async function POST(request: Request) {
                           stripeSubscription.status === 'canceled' ? 'cancelled' : 'expired';
             
             // Upsert user subscription
-            await supabase
+            const { error: subError } = await supabase
               .from('user_subscriptions')
               .upsert({
                 user_id: userId,
@@ -144,8 +144,13 @@ export async function POST(request: Request) {
                 onConflict: 'user_id'
               });
             
+            if (subError) {
+              console.error(`[checkout.session.completed] Error upserting subscription for user ${userId}:`, subError);
+              throw subError;
+            }
+            
             // Upsert usage limits
-            await supabase
+            const { error: usageError } = await supabase
               .from('monthly_usage')
               .upsert({
                 user_id: userId,
@@ -157,9 +162,14 @@ export async function POST(request: Request) {
                 onConflict: 'user_id,period_start'
               });
             
-            console.log(`Successfully created subscription record for user ${userId}, plan: ${planId}, status: ${status}`);
+            if (usageError) {
+              console.error(`[checkout.session.completed] Error upserting usage for user ${userId}:`, usageError);
+              throw usageError;
+            }
+            
+            console.log(`[checkout.session.completed] Successfully created subscription record for user ${userId}, plan: ${planId}, status: ${status}`);
           } catch (error) {
-            console.error(`Error processing subscription from checkout session:`, error);
+            console.error(`[checkout.session.completed] Error processing subscription from checkout session:`, error);
             // Don't break - let subscription.created event handle it as fallback
           }
         }
@@ -170,18 +180,47 @@ export async function POST(request: Request) {
       case 'customer.subscription.created':
       case 'customer.subscription.updated': {
         const subscription = event.data.object as Stripe.Subscription;
-        const userId = subscription.metadata?.user_id;
+        let userId = subscription.metadata?.user_id;
         
         if (!userId) {
-          // Try to find user by customer ID
+          console.log(`[subscription.${event.type}] No user_id in subscription metadata, looking up by customer_id: ${subscription.customer}`);
+          
+          // Try to find user by customer ID in existing subscriptions
           const { data: subData } = await supabase
             .from('user_subscriptions')
             .select('user_id')
             .eq('stripe_customer_id', subscription.customer as string)
             .maybeSingle();
           
-          if (!subData) {
-            console.error('No user found for subscription');
+          if (subData) {
+            userId = subData.user_id;
+            console.log(`[subscription.${event.type}] Found user_id from existing subscription: ${userId}`);
+          } else {
+            // Try to find user by looking up the customer in Stripe and matching by email
+            try {
+              const customer = await stripe.customers.retrieve(subscription.customer as string);
+              if (customer && !customer.deleted && (customer as any).email) {
+                const customerEmail = (customer as any).email;
+                console.log(`[subscription.${event.type}] Looking up user by email: ${customerEmail}`);
+                
+                // Find user by email in auth.users
+                const { data: authUsers } = await supabase.auth.admin.listUsers();
+                const matchingUser = authUsers?.users.find(u => u.email === customerEmail);
+                
+                if (matchingUser) {
+                  userId = matchingUser.id;
+                  console.log(`[subscription.${event.type}] Found user_id by email lookup: ${userId}`);
+                } else {
+                  console.error(`[subscription.${event.type}] No user found with email ${customerEmail}`);
+                }
+              }
+            } catch (error) {
+              console.error(`[subscription.${event.type}] Error looking up customer:`, error);
+            }
+          }
+          
+          if (!userId) {
+            console.error(`[subscription.${event.type}] No user_id found for subscription ${subscription.id}, customer: ${subscription.customer}`);
             break;
           }
         }
@@ -212,29 +251,11 @@ export async function POST(request: Request) {
                       subscription.status === 'trialing' ? 'trial' : 
                       subscription.status === 'canceled' ? 'cancelled' : 'expired';
         
-        // Get user_id from subscription metadata or find by customer_id
-        let finalUserId = userId;
-        if (!finalUserId) {
-          const { data: subData } = await supabase
-            .from('user_subscriptions')
-            .select('user_id')
-            .eq('stripe_customer_id', subscription.customer as string)
-            .maybeSingle();
-          if (subData) {
-            finalUserId = subData.user_id;
-          }
-        }
-        
-        if (!finalUserId) {
-          console.error('No user_id found for subscription');
-          break;
-        }
-        
         // Upsert user subscription (create if doesn't exist, update if it does)
-        await supabase
+        const { error: subError } = await supabase
           .from('user_subscriptions')
           .upsert({
-            user_id: finalUserId,
+            user_id: userId,
             plan_id: planId,
             status: status,
             stripe_customer_id: subscription.customer as string,
@@ -245,11 +266,17 @@ export async function POST(request: Request) {
             onConflict: 'user_id'
           });
         
+        if (subError) {
+          console.error(`[subscription.${event.type}] Error upserting subscription for user ${userId}:`, subError);
+        } else {
+          console.log(`[subscription.${event.type}] Successfully upserted subscription for user ${userId}, plan: ${planId}, status: ${status}`);
+        }
+        
         // Upsert usage limits (create if doesn't exist, update if it does)
-        await supabase
+        const { error: usageError } = await supabase
           .from('monthly_usage')
           .upsert({
-            user_id: finalUserId,
+            user_id: userId,
             period_start: periodStart.toISOString(),
             period_end: periodEnd.toISOString(),
             searches_used: 0,
@@ -257,6 +284,12 @@ export async function POST(request: Request) {
           }, {
             onConflict: 'user_id,period_start'
           });
+        
+        if (usageError) {
+          console.error(`[subscription.${event.type}] Error upserting usage for user ${userId}:`, usageError);
+        } else {
+          console.log(`[subscription.${event.type}] Successfully upserted usage for user ${userId}`);
+        }
         
         break;
       }
