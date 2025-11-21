@@ -328,6 +328,7 @@ export default function AdminFeedbackPage() {
             ))}
           </div>
         </div>
+      </div>
       </main>
 
       <Footer />
