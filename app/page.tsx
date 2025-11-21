@@ -47,8 +47,9 @@ function CountdownTimer() {
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
   
   useEffect(() => {
-    // Fixed launch date: November 21, 2025 at 4:00 PM Sydney time (AEDT = UTC+11)
-    const launchDate = new Date('2025-11-21T16:00:00+11:00');
+    // Set deadline to midnight Sydney time (AEDT = UTC+11)
+    // November 22, 2025 at 00:00:00 Sydney time
+    const launchDate = new Date('2025-11-22T00:00:00+11:00');
     
     const updateCountdown = () => {
       const now = new Date();
