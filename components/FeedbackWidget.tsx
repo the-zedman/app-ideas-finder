@@ -86,10 +86,16 @@ export default function FeedbackWidget() {
         }),
       });
 
-      const data = await response.json();
+      const text = await response.text();
+      let data: any = {};
+      try {
+        data = text ? JSON.parse(text) : {};
+      } catch {
+        data = { error: text };
+      }
 
       if (!response.ok) {
-        setErrorMessage(data.error || 'Failed to send feedback. Please try again.');
+        setErrorMessage(data.error || data.details || 'Failed to send feedback. Please try again.');
       } else {
         setMessage('');
         setStatusMessage(
