@@ -56,7 +56,7 @@ export default function Pricing() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           planType,
-          successUrl: `${window.location.origin}/homezone?success=true`,
+          successUrl: `${window.location.origin}/homezone?purchase_success=true`,
           cancelUrl: `${window.location.origin}/pricing?canceled=true`,
         }),
       });
