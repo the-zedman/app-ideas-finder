@@ -5,8 +5,8 @@ import type { NextRequest } from 'next/server';
 import { sendAdminAlert } from '@/lib/email';
 import { hasActiveSubscription } from '@/lib/check-subscription';
 
-const DEFAULT_REDIRECT = '/pricing';
-const SIGNUP_REDIRECT = '/pricing';
+const DEFAULT_REDIRECT = '/homezone';
+const SIGNUP_REDIRECT = '/homezone';
 
 const decodeValue = (value: string | null) => {
   if (!value) return null;
@@ -133,14 +133,14 @@ export async function GET(request: NextRequest) {
               data.user.email
             );
             if (userHasSubscription) {
-              // User has subscription - redirect to /homezone (or use nextPath if it's also /homezone)
+              // User has subscription - redirect to /homezone
               finalPath = '/homezone';
               console.log(`[auth/callback] User ${data.user.id} has subscription, redirecting to /homezone`);
             } else {
-              // User has no subscription - always redirect to /pricing
-              // (middleware will catch them if they try to access protected routes)
-              finalPath = '/pricing';
-              console.log(`[auth/callback] User ${data.user.id} has no subscription, redirecting to /pricing`);
+              // User has no subscription - redirect to /homezone (let them see the dashboard)
+              // Middleware will handle redirecting to pricing if needed
+              finalPath = '/homezone';
+              console.log(`[auth/callback] User ${data.user.id} has no subscription, redirecting to /homezone`);
             }
           } catch (error) {
             console.error(`[auth/callback] Error checking subscription for ${data.user.id}:`, error);

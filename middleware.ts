@@ -74,7 +74,8 @@ export async function middleware(request: NextRequest) {
   }
 
   // Check subscription status for protected routes (user must be authenticated at this point)
-  if (isProtectedRoute && user && !isAdminRoute) {
+  // Allow access to /homezone even without subscription - let the page handle the UI
+  if (isProtectedRoute && user && !isAdminRoute && request.nextUrl.pathname !== '/homezone') {
     const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
     if (serviceRoleKey) {
       const hasSubscription = await hasActiveSubscription(
@@ -85,7 +86,7 @@ export async function middleware(request: NextRequest) {
       )
       
       if (!hasSubscription) {
-        // No active subscription - redirect to pricing
+        // No active subscription - redirect to pricing (except for /homezone)
         const redirectUrl = request.nextUrl.clone()
         redirectUrl.pathname = '/pricing'
         return NextResponse.redirect(redirectUrl)
@@ -108,7 +109,8 @@ export async function middleware(request: NextRequest) {
         
         console.log(`[middleware] Subscription check result for ${user.id}: ${hasSubscription}`);
         const redirectUrl = request.nextUrl.clone()
-        redirectUrl.pathname = hasSubscription ? '/homezone' : '/pricing'
+        // Always redirect authenticated users to homezone (let the page handle subscription UI)
+        redirectUrl.pathname = '/homezone'
         return NextResponse.redirect(redirectUrl)
       } catch (error) {
         console.error(`[middleware] Error checking subscription for ${user.id}:`, error);
