@@ -40,10 +40,17 @@ export async function POST(request: Request) {
     // Use client-provided priceId if available, otherwise look up by plan type
     const priceId = clientPriceId || priceIdMap[planType];
     
+    console.log(`Price ID lookup for plan type "${planType}":`, {
+      clientPriceId,
+      mappedPriceId: priceIdMap[planType],
+      finalPriceId: priceId,
+      envVar: planType === 'core_monthly' ? process.env.STRIPE_PRICE_CORE_MONTHLY : 'N/A'
+    });
+    
     if (!priceId) {
       return NextResponse.json({ 
         error: 'Price ID not configured', 
-        details: `No price ID found for plan type: ${planType}` 
+        details: `No price ID found for plan type: ${planType}. Please check environment variables.` 
       }, { status: 400 });
     }
     
@@ -54,6 +61,18 @@ export async function POST(request: Request) {
         error: 'Payment service not configured', 
         details: 'Stripe is not properly configured' 
       }, { status: 500 });
+    }
+    
+    // Validate that the price exists in Stripe
+    try {
+      const price = await stripe.prices.retrieve(priceId);
+      console.log(`Price validated: ${priceId}, amount: ${price.unit_amount}, currency: ${price.currency}`);
+    } catch (priceError: any) {
+      console.error(`Invalid price ID ${priceId} for plan type ${planType}:`, priceError);
+      return NextResponse.json({ 
+        error: 'Invalid price configuration', 
+        details: `The price ID for ${planType} (${priceId}) is invalid or not found in Stripe. ${priceError.message || 'Please create a new price in Stripe and update the environment variable.'}` 
+      }, { status: 400 });
     }
     
     // Get or create Stripe customer
