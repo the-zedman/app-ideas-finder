@@ -274,7 +274,7 @@ export default function OnboardingPage() {
               <p className="text-lg mb-6">Ready to analyze your own app? Start your 3-day trial for just $1</p>
               <button
                 onClick={handleStartTrial}
-                className="bg-white text-[#88D18A] px-8 py-4 rounded-lg font-bold text-lg hover:bg-gray-100 transition-colors"
+                className="bg-white text-gray-900 px-8 py-4 rounded-lg font-bold text-lg hover:bg-gray-100 transition-colors shadow-lg border-2 border-white"
               >
                 Start Your Trial →
               </button>

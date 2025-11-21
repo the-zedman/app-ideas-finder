@@ -335,7 +335,7 @@ function BillingContent() {
               <div className="text-center mb-4">
                 <h3 className="text-2xl font-bold text-gray-900 mb-2">Core</h3>
                 <div className="text-4xl font-bold text-gray-900 mb-2">
-                  ${billingInterval === 'monthly' ? '39' : '399'}
+                  ${billingInterval === 'monthly' ? '37' : '399'}
                 </div>
                 <div className="text-gray-600">per {billingInterval === 'monthly' ? 'month' : 'year'}</div>
                 <div className="text-sm text-gray-500 mt-2">73 searches/month</div>
@@ -482,7 +482,7 @@ function BillingContent() {
                 <div>
                   <div className="text-5xl font-bold text-gray-900">$29</div>
                   <div className="text-sm text-gray-500 text-center mt-1">one-time payment</div>
-                  <div className="text-xs text-gray-400 text-center mt-1">$0.55 per search</div>
+                  <div className="text-xs text-gray-400 text-center mt-1">$1.00 per search</div>
                 </div>
                 <button
                   onClick={() => handleCheckout('search_pack', '')} // Server will look up the price ID
