@@ -73,13 +73,10 @@ export async function POST(request: Request) {
       }, { status: 500 });
     }
     
-    // Verify Stripe mode (test vs live)
-    try {
-      const account = await stripe.accounts.retrieve();
-      console.log(`Stripe mode: ${account.livemode ? 'LIVE' : 'TEST'}, account ID: ${account.id}`);
-    } catch (accountError) {
-      console.warn('Could not retrieve Stripe account info:', accountError);
-    }
+    // Verify Stripe mode (test vs live) - check secret key prefix
+    const stripeKey = process.env.STRIPE_SECRET_KEY || '';
+    const isLiveMode = stripeKey.startsWith('sk_live_');
+    console.log(`Stripe mode: ${isLiveMode ? 'LIVE' : 'TEST'}`);
     
     // Validate that the price exists in Stripe
     try {
