@@ -95,8 +95,73 @@ export async function POST(request: Request) {
             });
             
         } else if (session.subscription) {
-          // Subscription created - will be handled by subscription.created event
-          console.log('Subscription will be handled by subscription.created event');
+          // Subscription created via checkout - handle it immediately
+          // This ensures subscriptions with coupons (100% discount) are still processed
+          console.log(`Subscription created via checkout for user ${userId}, subscription: ${session.subscription}`);
+          
+          try {
+            // Fetch the subscription from Stripe to get full details
+            const stripeSubscription = await stripe.subscriptions.retrieve(session.subscription as string);
+            
+            const periodStart = new Date((stripeSubscription as any).current_period_start * 1000);
+            const periodEnd = new Date((stripeSubscription as any).current_period_end * 1000);
+            
+            // Determine plan type from price ID
+            const priceId = stripeSubscription.items.data[0]?.price.id;
+            let planId = 'core_monthly';
+            let searchesLimit = 75;
+            
+            if (priceId === process.env.STRIPE_PRICE_CORE_MONTHLY) {
+              planId = 'core_monthly';
+              searchesLimit = 75;
+            } else if (priceId === process.env.STRIPE_PRICE_CORE_ANNUAL) {
+              planId = 'core_annual';
+              searchesLimit = 75;
+            } else if (priceId === process.env.STRIPE_PRICE_PRIME_MONTHLY) {
+              planId = 'prime_monthly';
+              searchesLimit = 225;
+            } else if (priceId === process.env.STRIPE_PRICE_PRIME_ANNUAL) {
+              planId = 'prime_annual';
+              searchesLimit = 225;
+            }
+            
+            const status = stripeSubscription.status === 'active' ? 'active' : 
+                          stripeSubscription.status === 'trialing' ? 'trial' : 
+                          stripeSubscription.status === 'canceled' ? 'cancelled' : 'expired';
+            
+            // Upsert user subscription
+            await supabase
+              .from('user_subscriptions')
+              .upsert({
+                user_id: userId,
+                plan_id: planId,
+                status: status,
+                stripe_customer_id: session.customer as string || null,
+                stripe_subscription_id: stripeSubscription.id,
+                current_period_start: periodStart.toISOString(),
+                current_period_end: periodEnd.toISOString(),
+              }, {
+                onConflict: 'user_id'
+              });
+            
+            // Upsert usage limits
+            await supabase
+              .from('monthly_usage')
+              .upsert({
+                user_id: userId,
+                period_start: periodStart.toISOString(),
+                period_end: periodEnd.toISOString(),
+                searches_used: 0,
+                searches_limit: searchesLimit,
+              }, {
+                onConflict: 'user_id,period_start'
+              });
+            
+            console.log(`Successfully created subscription record for user ${userId}, plan: ${planId}, status: ${status}`);
+          } catch (error) {
+            console.error(`Error processing subscription from checkout session:`, error);
+            // Don't break - let subscription.created event handle it as fallback
+          }
         }
         
         break;

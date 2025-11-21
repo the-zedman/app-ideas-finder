@@ -187,11 +187,17 @@ export async function POST(request: Request) {
       },
     };
     
-    // For subscriptions, add trial period if applicable
-    if (isSubscription && planType === 'trial') {
+    // For subscriptions, add trial period if applicable and set metadata
+    if (isSubscription) {
       sessionConfig.subscription_data = {
-        trial_period_days: 3,
+        metadata: {
+          user_id: user.id,
+          plan_type: planType,
+        },
       };
+      if (planType === 'trial') {
+        sessionConfig.subscription_data.trial_period_days = 3;
+      }
     }
     
     console.log('Checkout session config:', JSON.stringify(sessionConfig, null, 2));
