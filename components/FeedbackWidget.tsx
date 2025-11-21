@@ -33,6 +33,17 @@ export default function FeedbackWidget() {
     }
   }, []);
 
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+    if (showPanel && user) {
+      const originalOverflow = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = originalOverflow;
+      };
+    }
+  }, [showPanel, user]);
+
   const handleToggle = () => {
     if (!user) {
       const redirect = typeof window !== 'undefined' ? window.location.pathname : '/';
@@ -99,9 +110,8 @@ export default function FeedbackWidget() {
       </button>
 
       {showPanel && user && (
-        <div className="fixed inset-0 z-50">
-          <div className="absolute inset-0 bg-white" onClick={handleToggle} />
-          <div className="absolute inset-0 flex justify-end">
+        <div className="fixed inset-0 z-[9999] bg-white">
+          <div className="h-full w-full flex justify-end" onClick={handleToggle}>
             <div
               className="w-full max-w-md h-full bg-white shadow-2xl p-6 overflow-y-auto"
               onClick={(e) => e.stopPropagation()}
