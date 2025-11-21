@@ -226,10 +226,10 @@ export default function LandingTest() {
               <span className="text-sm sm:text-lg lg:text-xl font-bold text-gray-900">APP IDEAS FINDER</span>
             </div>
             <div className="flex items-center gap-3 sm:gap-6">
-              <button disabled className="text-gray-400 cursor-not-allowed text-sm sm:text-base">Sign in</button>
-              <button disabled className="bg-gray-300 text-gray-500 px-3 sm:px-6 py-1.5 sm:py-2 rounded-lg font-semibold cursor-not-allowed text-sm sm:text-base">
+              <a href="/login" className="text-gray-900 hover:text-gray-700 text-sm sm:text-base transition-colors">Sign in</a>
+              <a href="/onboarding" className="bg-[#88D18A] hover:bg-[#6bc070] text-white px-3 sm:px-6 py-1.5 sm:py-2 rounded-lg font-semibold text-sm sm:text-base transition-colors">
                 Sign up
-              </button>
+              </a>
             </div>
           </div>
         </div>
@@ -259,28 +259,18 @@ export default function LandingTest() {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-6 sm:mb-8">
-              <div className="relative">
-                <button 
-                  disabled
-                  className="bg-[#88D18A] text-white px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-semibold text-base sm:text-lg text-center w-full opacity-75 cursor-not-allowed"
-                >
-                  Start the generator!
-                </button>
-                <div className="absolute -top-2 -right-2 bg-gradient-to-r from-orange-400 to-orange-500 text-white px-2 sm:px-3 py-1 rounded-full text-xs font-bold shadow-lg animate-pulse">
-                  LAUNCHING SOON
-                </div>
-              </div>
+              <a 
+                href="/onboarding"
+                className="bg-[#88D18A] hover:bg-[#6bc070] text-white px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-semibold text-base sm:text-lg text-center w-full transition-colors"
+              >
+                Start the generator!
+              </a>
               <a 
                 href="#trending" 
                 className="hidden sm:flex bg-white hover:bg-gray-50 text-gray-900 px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-semibold text-base sm:text-lg border-2 border-gray-300 transition-colors text-center items-center justify-center"
               >
                 Explore trending apps
               </a>
-            </div>
-            
-            {/* Mobile Countdown - Shows after buttons on mobile only */}
-            <div className="lg:hidden mb-6">
-              <CountdownTimer />
             </div>
             
             {/* Waitlist Section */}
@@ -333,18 +323,13 @@ export default function LandingTest() {
             </div>
           </div>
           
-          {/* Right Column - Image and Countdown (Desktop only) */}
+          {/* Right Column - Image (Desktop only) */}
           <div className="hidden lg:block relative lg:-mr-20">
             <img 
               src="/ideas-devices-compressed.png" 
               alt="App Ideas Finder on devices" 
               className="w-full h-auto mb-4 sm:mb-8 lg:scale-120 lg:origin-center"
             />
-            
-            {/* Desktop Countdown Timer */}
-            <div className="flex justify-center mt-4 sm:mt-8">
-              <CountdownTimer />
-            </div>
           </div>
         </div>
       </section>
