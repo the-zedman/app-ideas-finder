@@ -99,7 +99,7 @@ export default function FeedbackWidget() {
       </button>
 
       {showPanel && user && (
-        <div className="fixed inset-0 z-50 flex justify-end bg-white/90" onClick={handleToggle}>
+        <div className="fixed inset-0 z-50 flex justify-end bg-white" onClick={handleToggle}>
           <div
             className="w-full max-w-md h-full bg-white shadow-2xl p-6 overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
