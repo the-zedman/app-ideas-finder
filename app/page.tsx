@@ -656,45 +656,14 @@ export default function LandingTest() {
             Join developers who are building smarter, not harder.
           </p>
           
-          {/* Email Capture Form */}
-          <form onSubmit={handleSubmit} className="max-w-2xl mx-auto mb-6">
-            <div className="flex flex-col sm:flex-row gap-4">
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter your email to get early access"
-                required
-                disabled={isSubmitting}
-                className="flex-1 px-6 py-4 rounded-xl text-lg border-2 border-white/30 bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:border-yellow-400 transition-all disabled:opacity-50 shadow-lg"
-                style={{ backgroundColor: '#FFFFFF', color: '#111827' }}
-              />
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="px-8 py-4 bg-yellow-400 hover:bg-yellow-300 text-gray-900 font-black rounded-xl text-lg shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 whitespace-nowrap"
-              >
-                {isSubmitting ? 'Joining...' : 'Join the Waitlist →'}
-              </button>
-            </div>
-          </form>
-          
-          {/* Status Message */}
-          {message && (
-            <div className={`max-w-2xl mx-auto mb-4 p-4 rounded-xl ${
-              message.includes('already') || message.includes('wrong')
-                ? 'bg-red-500/20 border-2 border-red-300 text-white'
-                : 'bg-white/20 border-2 border-white/30 text-white'
-            }`}>
-              {message}
-            </div>
-          )}
-          
-          {/* Waitlist Count */}
-          <div className="bg-white rounded-full px-6 py-3 inline-block shadow-lg" style={{ backgroundColor: '#FFFFFF' }}>
-            <p className="text-gray-900 font-semibold">
-              🔥 <span className="font-black text-[#88D18A]">{waitlistCount.toLocaleString()}</span> developers already on the waitlist
-            </p>
+          {/* Start The Generator Button */}
+          <div className="mb-8">
+            <a
+              href="/onboarding"
+              className="inline-block bg-yellow-400 hover:bg-yellow-300 text-gray-900 font-black px-8 py-4 rounded-xl text-lg shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all"
+            >
+              Start The Generator →
+            </a>
           </div>
           
           {/* Social Proof Points */}
