@@ -10,12 +10,13 @@ const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 
 async function requireUser() {
   const cookieStore = await cookies();
+  const allCookies = cookieStore.getAll();
   const { createServerClient } = await import('@supabase/ssr');
 
   const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
     cookies: {
       getAll() {
-        return cookieStore.getAll();
+        return allCookies;
       },
       setAll() {},
     },

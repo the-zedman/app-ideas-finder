@@ -1,10 +1,13 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase-client';
 import type { User } from '@supabase/supabase-js';
+import CryptoJS from 'crypto-js';
 import Footer from '@/components/Footer';
+import { getCanonicalUser } from '@/lib/canonical-user';
 
 const categories = [
   { value: 'feature', label: 'Feature request' },
@@ -14,9 +17,13 @@ const categories = [
 ];
 
 export default function FeedbackPage() {
+  const router = useRouter();
   const supabase = createClient();
   const [user, setUser] = useState<User | null>(null);
+  const [profile, setProfile] = useState<any>(null);
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [checkingAuth, setCheckingAuth] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [category, setCategory] = useState('feature');
   const [message, setMessage] = useState('');
   const [allowContact, setAllowContact] = useState(true);
@@ -26,13 +33,36 @@ export default function FeedbackPage() {
   const [pageUrl, setPageUrl] = useState<string>('');
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => {
-      if (!data.user) {
+    const init = async () => {
+      const { user: currentUser, canonicalUserId } = await getCanonicalUser(supabase);
+      
+      if (!currentUser) {
         window.location.href = '/login?redirectTo=/feedback';
-      } else {
-        setUser(data.user);
+        return;
       }
-    }).finally(() => setCheckingAuth(false));
+      
+      setUser(currentUser);
+      
+      if (canonicalUserId) {
+        // Fetch profile
+        const { data: profileData } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', canonicalUserId)
+          .single();
+        
+        setProfile(profileData);
+        
+        // Check admin status
+        const adminResponse = await fetch('/api/check-admin');
+        const adminData = await adminResponse.json();
+        setIsAdmin(adminData.isAdmin || false);
+      }
+      
+      setCheckingAuth(false);
+    };
+    
+    init();
   }, [supabase]);
 
   useEffect(() => {
@@ -40,6 +70,21 @@ export default function FeedbackPage() {
       setPageUrl(window.location.href);
     }
   }, []);
+
+  // Close profile menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      if (showProfileMenu && !target.closest('.profile-menu-container')) {
+        setShowProfileMenu(false);
+      }
+    };
+
+    if (showProfileMenu) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [showProfileMenu]);
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -90,6 +135,32 @@ export default function FeedbackPage() {
     }
   };
 
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    router.push('/');
+  };
+
+  const getDisplayName = () => {
+    const firstName = profile?.first_name || '';
+    const lastName = profile?.last_name || '';
+    const fullName = `${firstName} ${lastName}`.trim();
+    return fullName || user?.email?.split('@')[0] || 'User';
+  };
+
+  const getInitials = () => {
+    // Use custom initials if set, otherwise calculate from name
+    if (profile?.custom_initials) {
+      return profile.custom_initials.toUpperCase();
+    }
+    const name = getDisplayName();
+    return name.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2);
+  };
+
+  const getGravatarUrl = (email: string) => {
+    const hash = CryptoJS.MD5(email.toLowerCase()).toString();
+    return `https://www.gravatar.com/avatar/${hash}?d=identicon&s=200`;
+  };
+
   if (checkingAuth || !user) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -101,51 +172,110 @@ export default function FeedbackPage() {
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       <header className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-wrap items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <Link href="/" className="flex items-center gap-2">
-              <img
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            {/* Logo */}
+            <div className="flex items-center gap-3">
+              <img 
                 src="/App Ideas Finder - logo - 200x200.png"
-                alt="App Ideas Finder logo"
-                className="h-8 w-8 rounded-lg"
+                alt="App Ideas Finder"
+                className="h-8 w-8"
               />
-              <span className="text-base sm:text-lg font-bold tracking-tight text-gray-900">
-                APP IDEAS FINDER
-              </span>
-            </Link>
-            <nav className="hidden md:flex items-center gap-4 text-sm text-gray-600">
-              <Link href="/homezone" className="hover:text-gray-900 transition-colors">
+              <h1 className="text-xl font-bold text-[#3D405B]">App Ideas Finder</h1>
+            </div>
+            
+            {/* Main Navigation */}
+            <nav className="flex items-center gap-6">
+              <a href="/homezone" className="text-[#3D405B] font-semibold">
                 Dashboard
-              </Link>
-              <Link href="/pricing" className="hover:text-gray-900 transition-colors">
-                Pricing
-              </Link>
-              <Link href="/contact" className="hover:text-gray-900 transition-colors">
-                Contact
-              </Link>
+              </a>
+              <a href="/appengine" className="text-gray-600 hover:text-[#3D405B] transition-colors">
+                App Engine
+              </a>
             </nav>
-          </div>
-          <div className="flex items-center gap-3">
-            <div className="text-right">
-              <p className="text-xs uppercase tracking-wide text-gray-500">Signed in as</p>
-              <p className="text-sm font-semibold text-gray-900">{user.email}</p>
+
+            {/* Profile Dropdown */}
+            <div className="relative profile-menu-container">
+              <button 
+                onClick={() => setShowProfileMenu(!showProfileMenu)}
+                className="flex items-center space-x-3 hover:bg-gray-100 rounded-lg px-3 py-2 transition-colors"
+              >
+                <div className="relative w-8 h-8 rounded-full overflow-hidden">
+                  <div className="absolute inset-0 flex items-center justify-center bg-[#88D18A] text-white text-sm font-semibold">
+                    {getInitials()}
+                  </div>
+                  {user?.email ? (
+                    <img 
+                      src={getGravatarUrl(user.email)}
+                      alt="Profile" 
+                      className="w-full h-full object-cover absolute inset-0 z-10"
+                      onError={(e) => {
+                        e.currentTarget.style.display = 'none';
+                      }}
+                    />
+                  ) : null}
+                </div>
+                <span className="hidden sm:block text-gray-900">{getDisplayName()}</span>
+              </button>
+
+              {showProfileMenu && (
+                <div className="absolute right-0 mt-2 w-64 rounded-lg shadow-xl border border-gray-200 z-50" style={{ backgroundColor: '#ffffff', opacity: 1 }}>
+                  <div className="p-4 border-b border-gray-200" style={{ backgroundColor: '#ffffff' }}>
+                    <p className="font-semibold text-gray-900">{getDisplayName()}</p>
+                    <p className="text-sm text-gray-600 truncate">{user?.email}</p>
+                  </div>
+                  <div className="p-2" style={{ backgroundColor: '#ffffff' }}>
+                    {isAdmin && (
+                      <button
+                        onClick={() => {
+                          setShowProfileMenu(false);
+                          router.push('/admin');
+                        }}
+                        className="w-full text-left px-4 py-3 rounded-lg hover:bg-purple-50 text-purple-600 transition-colors font-medium"
+                      >
+                        🔐 Admin Dashboard
+                      </button>
+                    )}
+                    <button
+                      onClick={() => {
+                        setShowProfileMenu(false);
+                        router.push('/analyses');
+                      }}
+                      className="w-full text-left px-4 py-3 rounded-lg hover:bg-gray-50 text-gray-900 transition-colors"
+                    >
+                      📊 Analysis History
+                    </button>
+                    <button
+                      onClick={() => {
+                        setShowProfileMenu(false);
+                        router.push('/billing');
+                      }}
+                      className="w-full text-left px-4 py-3 rounded-lg hover:bg-gray-50 text-gray-900 transition-colors"
+                    >
+                      💳 Billing & Subscription
+                    </button>
+                    <button
+                      onClick={() => {
+                        setShowProfileMenu(false);
+                        router.push('/profile');
+                      }}
+                      className="w-full text-left px-4 py-3 rounded-lg hover:bg-gray-50 text-gray-900 transition-colors"
+                    >
+                      👤 Profile Settings
+                    </button>
+                    <button
+                      onClick={() => {
+                        setShowProfileMenu(false);
+                        handleLogout();
+                      }}
+                      className="w-full text-left px-4 py-3 rounded-lg hover:bg-red-50 text-red-600 transition-colors"
+                    >
+                      Sign Out
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
-            <div className="h-10 w-10 rounded-full bg-[#eef2ff] flex items-center justify-center text-[#3D405B] font-semibold">
-              {user.email?.[0]?.toUpperCase()}
-            </div>
-          </div>
-        </div>
-        <div className="md:hidden border-t border-gray-100 bg-white">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between text-sm font-semibold text-gray-600">
-            <Link href="/homezone" className="hover:text-gray-900">
-              Dashboard
-            </Link>
-            <Link href="/pricing" className="hover:text-gray-900">
-              Pricing
-            </Link>
-            <Link href="/contact" className="hover:text-gray-900">
-              Contact
-            </Link>
           </div>
         </div>
       </header>
