@@ -50,7 +50,7 @@ async function grantFeedbackBonus(supabaseAdmin: ReturnType<typeof createClient>
     const nextValue = (typedBonus.bonus_value || 0) + 1;
     const { error } = await supabaseAdmin
       .from('user_bonuses')
-      .update({ bonus_value: nextValue })
+      .update({ bonus_value: nextValue } as Record<string, number>)
       .eq('id', typedBonus.id);
 
     if (error) {
