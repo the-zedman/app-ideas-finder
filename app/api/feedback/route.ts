@@ -28,7 +28,7 @@ async function requireUser() {
     return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
   }
 
-  const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey) as SupabaseClient<any, any, any>;
+  const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey) as any;
   return { user, supabaseAdmin };
 }
 
