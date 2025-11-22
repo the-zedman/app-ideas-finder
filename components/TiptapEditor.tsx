@@ -2,8 +2,6 @@
 
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
-import { TextStyle } from '@tiptap/extension-text-style';
-import { Color } from '@tiptap/extension-color';
 import { useEffect, useState } from 'react';
 
 interface TiptapEditorProps {
@@ -22,8 +20,6 @@ export default function TiptapEditor({ value, onChange, placeholder }: TiptapEdi
   const editor = useEditor({
     extensions: [
       StarterKit,
-      TextStyle,
-      Color,
     ],
     content: value,
     onUpdate: ({ editor }) => {
@@ -132,13 +128,6 @@ export default function TiptapEditor({ value, onChange, placeholder }: TiptapEdi
           Numbered List
         </button>
         <div className="border-l border-gray-300 mx-1" />
-        <button
-          type="button"
-          onClick={() => editor.chain().focus().setColor('#000000').run()}
-          className="px-3 py-1 rounded text-sm font-semibold bg-white text-gray-700 hover:bg-gray-100"
-        >
-          Color
-        </button>
         <button
           type="button"
           onClick={() => editor.chain().focus().unsetAllMarks().run()}
