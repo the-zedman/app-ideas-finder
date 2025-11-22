@@ -78,7 +78,11 @@ export default function AdminEmailPage() {
 
   useEffect(() => {
     // Set mounted to true after component mounts (client-side only)
-    setMounted(true);
+    // Add a small delay to ensure DOM is fully ready
+    const timer = setTimeout(() => {
+      setMounted(true);
+    }, 100);
+    return () => clearTimeout(timer);
   }, []);
 
   useEffect(() => {
@@ -582,7 +586,7 @@ export default function AdminEmailPage() {
                 Email Content *
               </label>
               <div className="border border-gray-300 rounded-lg">
-                {mounted && (
+                {mounted && typeof window !== 'undefined' ? (
                   <ReactQuill
                     theme="snow"
                     value={htmlContent}
@@ -600,10 +604,9 @@ export default function AdminEmailPage() {
                     }}
                     style={{ minHeight: '300px' }}
                   />
-                )}
-                {!mounted && (
-                  <div className="h-[300px] flex items-center justify-center text-gray-500">
-                    Loading editor...
+                ) : (
+                  <div className="h-[300px] flex items-center justify-center text-gray-500 border border-gray-200 rounded-lg">
+                    <div>Loading editor...</div>
                   </div>
                 )}
               </div>
