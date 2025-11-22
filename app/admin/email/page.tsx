@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import Footer from '@/components/Footer';
@@ -60,6 +60,7 @@ export default function AdminEmailPage() {
   const [showPreview, setShowPreview] = useState(false);
   const [previewHTML, setPreviewHTML] = useState('');
   const [mounted, setMounted] = useState(false);
+  const editorRef = useRef<HTMLDivElement>(null);
   
   // Settings
   const [showSettings, setShowSettings] = useState(false);
@@ -78,11 +79,15 @@ export default function AdminEmailPage() {
 
   useEffect(() => {
     // Set mounted to true after component mounts (client-side only)
-    // Add a small delay to ensure DOM is fully ready
-    const timer = setTimeout(() => {
-      setMounted(true);
-    }, 100);
-    return () => clearTimeout(timer);
+    // Wait for both window and the editor container to be ready
+    if (typeof window !== 'undefined') {
+      const timer = setTimeout(() => {
+        if (editorRef.current) {
+          setMounted(true);
+        }
+      }, 200);
+      return () => clearTimeout(timer);
+    }
   }, []);
 
   useEffect(() => {
@@ -585,8 +590,8 @@ export default function AdminEmailPage() {
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Email Content *
               </label>
-              <div className="border border-gray-300 rounded-lg">
-                {mounted && typeof window !== 'undefined' ? (
+              <div ref={editorRef} className="border border-gray-300 rounded-lg">
+                {mounted && typeof window !== 'undefined' && editorRef.current ? (
                   <ReactQuill
                     theme="snow"
                     value={htmlContent}
