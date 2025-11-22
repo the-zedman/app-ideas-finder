@@ -1,15 +1,9 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import dynamic from 'next/dynamic';
 import Footer from '@/components/Footer';
-
-// Dynamically import ReactQuill to avoid SSR issues
-const ReactQuill = dynamic(() => import('react-quill'), { 
-  ssr: false,
-  loading: () => <div className="h-[300px] border border-gray-300 rounded-lg flex items-center justify-center text-gray-500">Loading editor...</div>
-});
+import QuillEditor from '@/components/QuillEditor';
 import 'react-quill/dist/quill.snow.css';
 
 type RecipientType = 'waitlist' | 'all_users' | 'subscribers' | 'adhoc';
@@ -59,8 +53,6 @@ export default function AdminEmailPage() {
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [showPreview, setShowPreview] = useState(false);
   const [previewHTML, setPreviewHTML] = useState('');
-  const [mounted, setMounted] = useState(false);
-  const editorRef = useRef<HTMLDivElement>(null);
   
   // Settings
   const [showSettings, setShowSettings] = useState(false);
@@ -76,17 +68,6 @@ export default function AdminEmailPage() {
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [loadingCampaigns, setLoadingCampaigns] = useState(false);
   const [selectedCampaign, setSelectedCampaign] = useState<Campaign | null>(null);
-
-  useEffect(() => {
-    // Set mounted to true after component mounts (client-side only)
-    // Wait for window to be available and DOM to be ready
-    if (typeof window !== 'undefined') {
-      const timer = setTimeout(() => {
-        setMounted(true);
-      }, 300);
-      return () => clearTimeout(timer);
-    }
-  }, []);
 
   useEffect(() => {
     const checkAdmin = async () => {
@@ -588,30 +569,12 @@ export default function AdminEmailPage() {
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Email Content *
               </label>
-              <div ref={editorRef} className="border border-gray-300 rounded-lg">
-                {mounted && typeof window !== 'undefined' ? (
-                  <ReactQuill
-                    theme="snow"
-                    value={htmlContent}
-                    onChange={setHtmlContent}
-                    placeholder="Write your email content here..."
-                    modules={{
-                      toolbar: [
-                        [{ 'header': [1, 2, 3, false] }],
-                        ['bold', 'italic', 'underline', 'strike'],
-                        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-                        [{ 'color': [] }, { 'background': [] }],
-                        ['link'],
-                        ['clean']
-                      ],
-                    }}
-                    style={{ minHeight: '300px' }}
-                  />
-                ) : (
-                  <div className="h-[300px] flex items-center justify-center text-gray-500">
-                    <div>Loading editor...</div>
-                  </div>
-                )}
+              <div className="border border-gray-300 rounded-lg">
+                <QuillEditor
+                  value={htmlContent}
+                  onChange={setHtmlContent}
+                  placeholder="Write your email content here..."
+                />
               </div>
             </div>
 
