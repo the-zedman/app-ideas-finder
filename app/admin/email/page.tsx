@@ -3,8 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Footer from '@/components/Footer';
-import QuillEditor from '@/components/QuillEditor';
-import 'react-quill/dist/quill.snow.css';
+import TiptapEditor from '@/components/TiptapEditor';
 
 type RecipientType = 'waitlist' | 'all_users' | 'subscribers' | 'adhoc';
 type TabType = 'compose' | 'campaigns' | 'templates' | 'analytics';
@@ -569,13 +568,11 @@ export default function AdminEmailPage() {
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Email Content *
               </label>
-              <div className="border border-gray-300 rounded-lg">
-                <QuillEditor
-                  value={htmlContent}
-                  onChange={setHtmlContent}
-                  placeholder="Write your email content here..."
-                />
-              </div>
+              <TiptapEditor
+                value={htmlContent}
+                onChange={setHtmlContent}
+                placeholder="Write your email content here..."
+              />
             </div>
 
             {/* Action Buttons */}
