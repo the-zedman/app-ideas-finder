@@ -26,8 +26,9 @@ type EmailPayload = {
 
 export async function sendEmail({ to, subject, html, text }: EmailPayload) {
   if (!sesClient) {
-    console.warn('SES client not configured; skipping email send.');
-    return;
+    const error = new Error('SES client not configured - AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY must be set');
+    console.error('SES client not configured; cannot send email.', error);
+    throw error;
   }
 
   const toAddresses = Array.isArray(to) ? to : [to];
@@ -48,14 +49,21 @@ export async function sendEmail({ to, subject, html, text }: EmailPayload) {
           Charset: 'UTF-8',
         },
         Text: {
-          Data: text || '',
+          Data: text || html.replace(/<[^>]*>/g, '') || '',
           Charset: 'UTF-8',
         },
       },
     },
   });
 
-  await sesClient.send(command);
+  try {
+    const result = await sesClient.send(command);
+    console.log(`Email sent successfully to ${toAddresses.join(', ')}. MessageId: ${result.MessageId}`);
+    return result;
+  } catch (error) {
+    console.error('SES send error:', error);
+    throw error;
+  }
 }
 
 export async function sendAdminAlert(subject: string, html: string, text?: string) {

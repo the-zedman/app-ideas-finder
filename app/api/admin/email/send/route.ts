@@ -214,12 +214,15 @@ export async function POST(request: Request) {
 
           sentCount++;
         } catch (error) {
-          console.error(`Error sending email to ${recipient.email}:`, error);
+          const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+          const errorDetails = error instanceof Error ? error.stack : String(error);
+          console.error(`Error sending email to ${recipient.email}:`, errorMessage, errorDetails);
+          
           await supabaseAdmin
             .from('email_recipients')
             .update({
               sent_status: 'failed',
-              error_message: error instanceof Error ? error.message : 'Unknown error',
+              error_message: errorMessage,
             })
             .eq('id', recipient.id);
           failedCount++;
@@ -232,12 +235,13 @@ export async function POST(request: Request) {
       }
     }
 
-    // Update campaign status
+    // Update campaign status based on results
+    const finalStatus = failedCount === recipientEmails.length ? 'failed' : sentCount > 0 ? 'sent' : 'failed';
     await supabaseAdmin
       .from('email_campaigns')
       .update({
-        status: 'sent',
-        sent_at: new Date().toISOString(),
+        status: finalStatus,
+        sent_at: sentCount > 0 ? new Date().toISOString() : null,
         total_sent: sentCount,
         total_failed: failedCount,
       })
