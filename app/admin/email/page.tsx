@@ -6,7 +6,10 @@ import dynamic from 'next/dynamic';
 import Footer from '@/components/Footer';
 
 // Dynamically import ReactQuill to avoid SSR issues
-const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
+const ReactQuill = dynamic(() => import('react-quill'), { 
+  ssr: false,
+  loading: () => <div className="h-[300px] border border-gray-300 rounded-lg flex items-center justify-center text-gray-500">Loading editor...</div>
+});
 import 'react-quill/dist/quill.snow.css';
 
 type RecipientType = 'waitlist' | 'all_users' | 'subscribers' | 'adhoc';
@@ -58,6 +61,7 @@ export default function AdminEmailPage() {
   const [scheduledFor, setScheduledFor] = useState('');
   const [showPreview, setShowPreview] = useState(false);
   const [previewHTML, setPreviewHTML] = useState('');
+  const [mounted, setMounted] = useState(false);
   
   // Settings
   const [showSettings, setShowSettings] = useState(false);
@@ -73,6 +77,11 @@ export default function AdminEmailPage() {
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [loadingCampaigns, setLoadingCampaigns] = useState(false);
   const [selectedCampaign, setSelectedCampaign] = useState<Campaign | null>(null);
+
+  useEffect(() => {
+    // Set mounted to true after component mounts (client-side only)
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     const checkAdmin = async () => {
@@ -609,7 +618,7 @@ export default function AdminEmailPage() {
                 Email Content *
               </label>
               <div className="border border-gray-300 rounded-lg">
-                {typeof window !== 'undefined' && (
+                {mounted && (
                   <ReactQuill
                     theme="snow"
                     value={htmlContent}
@@ -627,6 +636,11 @@ export default function AdminEmailPage() {
                     }}
                     style={{ minHeight: '300px' }}
                   />
+                )}
+                {!mounted && (
+                  <div className="h-[300px] flex items-center justify-center text-gray-500">
+                    Loading editor...
+                  </div>
                 )}
               </div>
             </div>
