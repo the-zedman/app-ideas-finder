@@ -64,10 +64,10 @@ export async function GET(request: Request) {
         return NextResponse.json({ error: 'Campaign not found' }, { status: 404 });
       }
 
-      // Get recipient stats
+      // Get recipient stats with error messages
       const { data: recipients } = await supabaseAdmin
         .from('email_recipients')
-        .select('sent_status, opened_count, clicked_count')
+        .select('sent_status, opened_count, clicked_count, error_message')
         .eq('campaign_id', campaignId);
 
       const total = recipients?.length || 0;
@@ -75,6 +75,13 @@ export async function GET(request: Request) {
       const failed = recipients?.filter((r) => r.sent_status === 'failed').length || 0;
       const opened = recipients?.filter((r) => (r.opened_count || 0) > 0).length || 0;
       const clicked = recipients?.filter((r) => (r.clicked_count || 0) > 0).length || 0;
+
+      // Get failed recipients with error messages
+      const failedRecipients = recipients?.filter((r) => r.sent_status === 'failed') || [];
+      const errorMessages = failedRecipients
+        .map((r) => r.error_message)
+        .filter(Boolean)
+        .slice(0, 5); // Limit to first 5 errors
 
       const stats = {
         total,
@@ -84,6 +91,7 @@ export async function GET(request: Request) {
         clicked,
         openRate: sent > 0 ? ((opened / sent) * 100).toFixed(2) : '0.00',
         clickRate: sent > 0 ? ((clicked / sent) * 100).toFixed(2) : '0.00',
+        errorMessages: errorMessages.length > 0 ? errorMessages : undefined,
       };
 
       return NextResponse.json({ campaign, stats });

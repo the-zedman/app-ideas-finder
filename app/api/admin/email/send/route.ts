@@ -201,6 +201,7 @@ export async function POST(request: Request) {
             subject,
             html: emailHTML,
             text: textContent || '',
+            replyTo: replyToEmail,
           });
 
           // Update recipient as sent

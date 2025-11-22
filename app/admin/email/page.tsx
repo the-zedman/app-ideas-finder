@@ -309,6 +309,7 @@ export default function AdminEmailPage() {
       }
     } catch (error) {
       console.error('Error loading campaign:', error);
+      setMessage({ type: 'error', text: 'Failed to load campaign details' });
     }
   };
 

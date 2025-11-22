@@ -22,9 +22,10 @@ type EmailPayload = {
   subject: string;
   html: string;
   text?: string;
+  replyTo?: string;
 };
 
-export async function sendEmail({ to, subject, html, text }: EmailPayload) {
+export async function sendEmail({ to, subject, html, text, replyTo }: EmailPayload) {
   if (!sesClient) {
     const error = new Error('SES client not configured - AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY must be set');
     console.error('SES client not configured; cannot send email.', error);
@@ -38,6 +39,7 @@ export async function sendEmail({ to, subject, html, text }: EmailPayload) {
     Destination: {
       ToAddresses: toAddresses,
     },
+    ReplyToAddresses: replyTo ? [replyTo] : undefined,
     Message: {
       Subject: {
         Data: subject,
