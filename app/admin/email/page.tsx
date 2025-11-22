@@ -19,7 +19,6 @@ interface Campaign {
   id: string;
   subject: string;
   status: string;
-  scheduled_for?: string;
   sent_at?: string;
   total_recipients: number;
   total_sent: number;
@@ -58,7 +57,6 @@ export default function AdminEmailPage() {
   const [recipientCount, setRecipientCount] = useState(0);
   const [sending, setSending] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
-  const [scheduledFor, setScheduledFor] = useState('');
   const [showPreview, setShowPreview] = useState(false);
   const [previewHTML, setPreviewHTML] = useState('');
   const [mounted, setMounted] = useState(false);
@@ -264,20 +262,11 @@ export default function AdminEmailPage() {
       return;
     }
 
-    if (scheduledFor) {
-      const scheduled = new Date(scheduledFor);
-      if (scheduled <= new Date()) {
-        setMessage({ type: 'error', text: 'Scheduled date must be in the future' });
-        return;
-      }
-    }
-
     const recipientCountText = recipientType === 'adhoc' 
       ? adhocEmails.split(',').filter(e => e.trim()).length 
       : recipientCount;
     
-    const actionText = scheduledFor ? 'Schedule' : 'Send';
-    if (!confirm(`${actionText} email to ${recipientCountText} recipient(s)?`)) {
+    if (!confirm(`Send email to ${recipientCountText} recipient(s)?`)) {
       return;
     }
 
@@ -292,36 +281,27 @@ export default function AdminEmailPage() {
       const response = await fetch('/api/admin/email/send', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          subject,
-          htmlContent,
-          textContent: htmlContent.replace(/<[^>]*>/g, ''),
-          recipientType,
-          adhocEmails: adhocEmailsArray,
-          replyTo: replyToEmail,
-          scheduledFor: scheduledFor || undefined,
-        }),
+          body: JSON.stringify({
+            subject,
+            htmlContent,
+            textContent: htmlContent.replace(/<[^>]*>/g, ''),
+            recipientType,
+            adhocEmails: adhocEmailsArray,
+            replyTo: replyToEmail,
+          }),
       });
 
       const data = await response.json();
 
       if (data.success) {
-        if (data.scheduled) {
-          setMessage({ 
-            type: 'success', 
-            text: `Email scheduled successfully for ${new Date(data.scheduledFor).toLocaleString()}` 
-          });
-        } else {
-          setMessage({ 
-            type: 'success', 
-            text: `Email sent successfully! Sent: ${data.sent}, Failed: ${data.failed}` 
-          });
-        }
+        setMessage({ 
+          type: 'success', 
+          text: `Email sent successfully! Sent: ${data.sent}, Failed: ${data.failed}` 
+        });
         // Reset form
         setSubject('');
         setHtmlContent('');
         setAdhocEmails('');
-        setScheduledFor('');
         loadCampaigns();
       } else {
         setMessage({ type: 'error', text: data.error || 'Failed to send email' });
@@ -596,22 +576,6 @@ export default function AdminEmailPage() {
               </p>
             </div>
 
-            {/* Schedule */}
-            <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Schedule Email (Optional)
-              </label>
-              <input
-                type="datetime-local"
-                value={scheduledFor}
-                onChange={(e) => setScheduledFor(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#88D18A] focus:border-transparent"
-              />
-              <p className="mt-2 text-sm text-gray-500">
-                Leave empty to send immediately. Scheduled emails will be processed automatically.
-              </p>
-            </div>
-
             {/* Email Content Editor */}
             <div className="mb-6">
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -660,7 +624,6 @@ export default function AdminEmailPage() {
                     setSubject('');
                     setHtmlContent('');
                     setAdhocEmails('');
-                    setScheduledFor('');
                     setMessage(null);
                   }}
                   className="px-4 py-2 border border-gray-300 rounded-lg font-semibold text-gray-700 hover:bg-gray-50 transition-colors"
@@ -674,12 +637,7 @@ export default function AdminEmailPage() {
                   disabled={sending || !subject.trim() || !htmlContent.trim()}
                   className="px-8 py-2 bg-[#88D18A] text-white rounded-lg font-semibold hover:bg-[#6bc070] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {sending 
-                    ? 'Sending...' 
-                    : scheduledFor 
-                      ? `Schedule Email${recipientType !== 'adhoc' ? ` (${recipientCount})` : ''}`
-                      : `Send Email${recipientType !== 'adhoc' ? ` (${recipientCount})` : ''}`
-                  }
+                  {sending ? 'Sending...' : `Send Email${recipientType !== 'adhoc' ? ` (${recipientCount})` : ''}`}
                 </button>
               </div>
             </div>
@@ -714,9 +672,6 @@ export default function AdminEmailPage() {
                             campaign.status === 'failed' ? 'text-red-600' :
                             'text-gray-600'
                           }`}>{campaign.status}</span></span>
-                          {campaign.scheduled_for && (
-                            <span>Scheduled: {new Date(campaign.scheduled_for).toLocaleString()}</span>
-                          )}
                           {campaign.sent_at && (
                             <span>Sent: {new Date(campaign.sent_at).toLocaleString()}</span>
                           )}
@@ -900,9 +855,7 @@ export default function AdminEmailPage() {
                             <div className="text-gray-600">
                               {campaign.sent_at 
                                 ? new Date(campaign.sent_at).toLocaleDateString()
-                                : campaign.scheduled_for
-                                  ? new Date(campaign.scheduled_for).toLocaleDateString()
-                                  : 'N/A'
+                                : 'N/A'
                               }
                             </div>
                           </div>
@@ -952,7 +905,6 @@ export default function AdminEmailPage() {
             <ul className="text-sm text-blue-800 space-y-1">
               <li>• Emails include header with logo (used for open tracking) and footer</li>
               <li>• Open tracking: Logo pixel tracks when emails are opened</li>
-              <li>• Schedule emails for future delivery</li>
               <li>• Save and reuse email templates</li>
               <li>• Preview emails before sending</li>
               <li>• Unsubscribed emails are automatically excluded</li>
