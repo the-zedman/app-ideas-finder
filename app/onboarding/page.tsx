@@ -281,24 +281,12 @@ export default function OnboardingPage() {
             </p>
             <button
               onClick={handleStartTrial}
-              className="bg-white text-[#88D18A] px-8 py-4 rounded-lg font-bold text-lg hover:bg-gray-100 transition-colors shadow-lg border-2 border-white transform hover:scale-105"
+              className="bg-white text-[#88D18A] px-10 py-5 rounded-lg font-black text-xl hover:bg-gray-50 transition-all shadow-2xl border-4 border-white transform hover:scale-105"
+              style={{ backgroundColor: '#FFFFFF', color: '#256029' }}
             >
               Generate Your Own Analysis →
             </button>
           </div>
-
-          {previewCount >= 2 && (
-            <div className="text-center bg-gradient-to-r from-[#88D18A] to-[#6BC070] rounded-2xl p-8 text-white">
-              <h3 className="text-2xl font-bold mb-4">You've Seen What's Possible</h3>
-              <p className="text-lg mb-6">Ready to analyze your own app? Start your 3-day trial for just $1</p>
-              <button
-                onClick={handleStartTrial}
-                className="bg-white text-gray-900 px-8 py-4 rounded-lg font-bold text-lg hover:bg-gray-100 transition-colors shadow-lg border-2 border-white"
-              >
-                Start Your Trial →
-              </button>
-            </div>
-          )}
         </section>
       </main>
 
