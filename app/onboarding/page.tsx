@@ -281,8 +281,7 @@ export default function OnboardingPage() {
             </p>
             <button
               onClick={handleStartTrial}
-              className="bg-white text-[#88D18A] px-10 py-5 rounded-lg font-black text-xl hover:bg-gray-50 transition-all shadow-2xl border-4 border-white transform hover:scale-105"
-              style={{ backgroundColor: '#FFFFFF', color: '#256029' }}
+              className="bg-yellow-400 hover:bg-yellow-300 text-gray-900 px-10 py-5 rounded-lg font-black text-xl transition-all shadow-2xl border-4 border-yellow-300 transform hover:scale-105"
             >
               Generate Your Own Analysis →
             </button>
