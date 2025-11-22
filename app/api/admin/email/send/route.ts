@@ -52,10 +52,23 @@ export async function POST(request: Request) {
 
     const { supabaseAdmin, user } = context;
     const body = await request.json();
-    const { subject, htmlContent, textContent, recipientType, adhocEmails, replyTo } = body;
+    const { subject, htmlContent, textContent, recipientType, adhocEmails, replyTo, scheduledFor } = body;
 
     if (!subject || !htmlContent || !recipientType) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+    }
+
+    // Validate scheduled date if provided
+    let scheduledDate: string | null = null;
+    if (scheduledFor) {
+      const scheduled = new Date(scheduledFor);
+      if (isNaN(scheduled.getTime())) {
+        return NextResponse.json({ error: 'Invalid scheduled date' }, { status: 400 });
+      }
+      if (scheduled <= new Date()) {
+        return NextResponse.json({ error: 'Scheduled date must be in the future' }, { status: 400 });
+      }
+      scheduledDate = scheduled.toISOString();
     }
 
     // Get reply-to email from settings or use provided/default
@@ -131,6 +144,7 @@ export async function POST(request: Request) {
     }
 
     // Create campaign record
+    const campaignStatus = scheduledDate ? 'scheduled' : 'sending';
     const { data: campaign, error: campaignError } = await supabaseAdmin
       .from('email_campaigns')
       .insert({
@@ -142,7 +156,8 @@ export async function POST(request: Request) {
         reply_to_email: replyToEmail,
         sent_by: user.id,
         total_recipients: recipientEmails.length,
-        status: 'sending',
+        scheduled_for: scheduledDate,
+        status: campaignStatus,
       })
       .select()
       .single();
@@ -150,6 +165,18 @@ export async function POST(request: Request) {
     if (campaignError || !campaign) {
       console.error('Error creating campaign:', campaignError);
       return NextResponse.json({ error: 'Failed to create campaign' }, { status: 500 });
+    }
+
+    // If scheduled, don't send now - just return success
+    if (scheduledDate) {
+      return NextResponse.json({
+        success: true,
+        campaignId: campaign.id,
+        totalRecipients: recipientEmails.length,
+        scheduled: true,
+        scheduledFor: scheduledDate,
+        message: `Email scheduled for ${new Date(scheduledDate).toLocaleString()}`,
+      });
     }
 
     // Get user IDs for recipients (for tracking)

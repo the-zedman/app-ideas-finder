@@ -67,20 +67,29 @@ export async function GET(request: Request) {
       // Get recipient stats
       const { data: recipients } = await supabaseAdmin
         .from('email_recipients')
-        .select('sent_status, opened_count')
+        .select('sent_status, opened_count, clicked_count')
         .eq('campaign_id', campaignId);
 
+      const total = recipients?.length || 0;
+      const sent = recipients?.filter((r) => r.sent_status === 'sent').length || 0;
+      const failed = recipients?.filter((r) => r.sent_status === 'failed').length || 0;
+      const opened = recipients?.filter((r) => (r.opened_count || 0) > 0).length || 0;
+      const clicked = recipients?.filter((r) => (r.clicked_count || 0) > 0).length || 0;
+
       const stats = {
-        total: recipients?.length || 0,
-        sent: recipients?.filter((r) => r.sent_status === 'sent').length || 0,
-        failed: recipients?.filter((r) => r.sent_status === 'failed').length || 0,
-        opened: recipients?.filter((r) => (r.opened_count || 0) > 0).length || 0,
+        total,
+        sent,
+        failed,
+        opened,
+        clicked,
+        openRate: sent > 0 ? ((opened / sent) * 100).toFixed(2) : '0.00',
+        clickRate: sent > 0 ? ((clicked / sent) * 100).toFixed(2) : '0.00',
       };
 
       return NextResponse.json({ campaign, stats });
     }
 
-    // Get all campaigns
+    // Get all campaigns with basic stats
     const { data: campaigns, error } = await supabaseAdmin
       .from('email_campaigns')
       .select('*')
@@ -92,7 +101,32 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'Failed to fetch campaigns' }, { status: 500 });
     }
 
-    return NextResponse.json({ campaigns: campaigns || [] });
+    // Get stats for each campaign
+    const campaignsWithStats = await Promise.all(
+      (campaigns || []).map(async (campaign) => {
+        const { data: recipients } = await supabaseAdmin
+          .from('email_recipients')
+          .select('sent_status, opened_count, clicked_count')
+          .eq('campaign_id', campaign.id);
+
+        const sent = recipients?.filter((r) => r.sent_status === 'sent').length || 0;
+        const opened = recipients?.filter((r) => (r.opened_count || 0) > 0).length || 0;
+        const clicked = recipients?.filter((r) => (r.clicked_count || 0) > 0).length || 0;
+
+        return {
+          ...campaign,
+          stats: {
+            sent,
+            opened,
+            clicked,
+            openRate: sent > 0 ? ((opened / sent) * 100).toFixed(2) : '0.00',
+            clickRate: sent > 0 ? ((clicked / sent) * 100).toFixed(2) : '0.00',
+          },
+        };
+      })
+    );
+
+    return NextResponse.json({ campaigns: campaignsWithStats });
   } catch (error) {
     console.error('Error fetching campaigns:', error);
     return NextResponse.json({ error: 'Failed to fetch campaigns' }, { status: 500 });
