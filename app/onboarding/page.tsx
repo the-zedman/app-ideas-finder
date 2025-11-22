@@ -268,6 +268,25 @@ export default function OnboardingPage() {
             </div>
           )}
 
+          {/* CTA Section - Jump Right In */}
+          <div className="text-center bg-gradient-to-r from-[#88D18A] to-[#6BC070] rounded-2xl p-8 md:p-12 mb-8 text-white">
+            <h3 className="text-3xl md:text-4xl font-black mb-4" style={{ letterSpacing: '-0.02em' }}>
+              Ready to Find Your 1% Edge?
+            </h3>
+            <p className="text-lg md:text-xl mb-2 opacity-95">
+              Don't wait—analyze any app right now and discover hidden opportunities in minutes.
+            </p>
+            <p className="text-base md:text-lg mb-8 opacity-90">
+              Get instant insights from hundreds of real user reviews. Your competitive advantage starts here.
+            </p>
+            <button
+              onClick={handleStartTrial}
+              className="bg-white text-[#88D18A] px-8 py-4 rounded-lg font-bold text-lg hover:bg-gray-100 transition-colors shadow-lg border-2 border-white transform hover:scale-105"
+            >
+              Generate Your Own Analysis →
+            </button>
+          </div>
+
           {previewCount >= 2 && (
             <div className="text-center bg-gradient-to-r from-[#88D18A] to-[#6BC070] rounded-2xl p-8 text-white">
               <h3 className="text-2xl font-bold mb-4">You've Seen What's Possible</h3>
