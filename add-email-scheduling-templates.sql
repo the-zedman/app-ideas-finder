@@ -34,22 +34,27 @@ CREATE INDEX IF NOT EXISTS idx_email_templates_created_by ON public.email_templa
 ALTER TABLE public.email_templates ENABLE ROW LEVEL SECURITY;
 
 -- RLS Policies for email_templates
-CREATE POLICY IF NOT EXISTS "Admins can view templates" ON public.email_templates
+-- Drop policies if they exist, then create them
+DROP POLICY IF EXISTS "Admins can view templates" ON public.email_templates;
+CREATE POLICY "Admins can view templates" ON public.email_templates
   FOR SELECT USING (
     auth.uid() IN (SELECT user_id FROM public.admins)
   );
 
-CREATE POLICY IF NOT EXISTS "Admins can insert templates" ON public.email_templates
+DROP POLICY IF EXISTS "Admins can insert templates" ON public.email_templates;
+CREATE POLICY "Admins can insert templates" ON public.email_templates
   FOR INSERT WITH CHECK (
     auth.uid() IN (SELECT user_id FROM public.admins)
   );
 
-CREATE POLICY IF NOT EXISTS "Admins can update templates" ON public.email_templates
+DROP POLICY IF EXISTS "Admins can update templates" ON public.email_templates;
+CREATE POLICY "Admins can update templates" ON public.email_templates
   FOR UPDATE USING (
     auth.uid() IN (SELECT user_id FROM public.admins)
   );
 
-CREATE POLICY IF NOT EXISTS "Admins can delete templates" ON public.email_templates
+DROP POLICY IF EXISTS "Admins can delete templates" ON public.email_templates;
+CREATE POLICY "Admins can delete templates" ON public.email_templates
   FOR DELETE USING (
     auth.uid() IN (SELECT user_id FROM public.admins)
   );
