@@ -14,34 +14,33 @@ export async function GET(request: Request) {
       // Don't await - track in background so we can return image quickly
       const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey);
       
-      supabaseAdmin
-        .from('email_recipients')
-        .select('id, opened_at, opened_count')
-        .eq('tracking_token', token)
-        .maybeSingle()
-        .then(({ data: recipient }) => {
+      // Track in background without blocking
+      (async () => {
+        try {
+          const { data: recipient } = await supabaseAdmin
+            .from('email_recipients')
+            .select('id, opened_at, opened_count')
+            .eq('tracking_token', token)
+            .maybeSingle();
+
           if (recipient) {
             const now = new Date().toISOString();
             const newOpenedCount = (recipient.opened_count || 0) + 1;
 
-            supabaseAdmin
+            await supabaseAdmin
               .from('email_recipients')
               .update({
                 opened_at: recipient.opened_at || now,
                 opened_count: newOpenedCount,
               })
-              .eq('id', recipient.id)
-              .then(() => {
-                console.log(`Email opened: token ${token.substring(0, 8)}...`);
-              })
-              .catch((err) => {
-                console.error('Error updating open count:', err);
-              });
+              .eq('id', recipient.id);
+
+            console.log(`Email opened: token ${token.substring(0, 8)}...`);
           }
-        })
-        .catch((err) => {
+        } catch (err) {
           console.error('Error tracking email open:', err);
-        });
+        }
+      })();
     }
 
     // Fetch and return the logo image
