@@ -21,7 +21,15 @@ function SignupContent() {
     const refFromUrl = searchParams.get('ref');
     const refFromCookie = typeof document !== 'undefined' ? 
       document.cookie.split('; ').find(row => row.startsWith('affiliate_ref='))?.split('=')[1] : null;
-    const affiliateRef = refFromUrl || refFromCookie;
+    const refFromLocalStorage = typeof window !== 'undefined' ? localStorage.getItem('affiliate_ref') : null;
+    const affiliateRef = refFromUrl || refFromCookie || refFromLocalStorage;
+    
+    console.log('[signup] Affiliate ref check:', { 
+      refFromUrl, 
+      refFromCookie, 
+      refFromLocalStorage, 
+      finalRef: affiliateRef 
+    });
     
     if (affiliateRef && typeof window !== 'undefined') {
       // Store in localStorage as backup (works in private browsing)
@@ -30,6 +38,7 @@ function SignupContent() {
       if (!refFromCookie) {
         document.cookie = `affiliate_ref=${affiliateRef}; path=/; max-age=${30 * 24 * 60 * 60}; SameSite=Lax`;
       }
+      console.log('[signup] Stored affiliate ref:', affiliateRef);
     }
   }, [searchParams]);
 
@@ -51,18 +60,27 @@ function SignupContent() {
       (localStorage.getItem('affiliate_ref') || 
        document.cookie.split('; ').find(row => row.startsWith('affiliate_ref='))?.split('=')[1]) : null;
     
+    console.log('[signup] Magic link - affiliate ref:', affiliateRef);
+    
     // Include affiliate ref in the callback URL
     const callbackUrl = affiliateRef 
       ? `${window.location.origin}/auth/callback?next=${encodeURIComponent(redirectTo)}&ref=${encodeURIComponent(affiliateRef)}`
       : `${window.location.origin}/auth/callback?next=${encodeURIComponent(redirectTo)}`;
+    
+    console.log('[signup] Magic link callback URL:', callbackUrl);
+    console.log('[signup] Full callback URL length:', callbackUrl.length);
 
     try {
       const { data, error } = await supabase.auth.signInWithOtp({
         email,
         options: {
           emailRedirectTo: callbackUrl,
+          // Also store ref in data/metadata as backup
+          data: affiliateRef ? { affiliate_ref: affiliateRef } : undefined,
         },
       });
+      
+      console.log('[signup] Magic link sent, response:', { data, error: error?.message });
 
       if (error) {
         setMessage(error.message);

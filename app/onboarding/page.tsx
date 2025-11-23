@@ -98,6 +98,26 @@ export default function OnboardingPage() {
   const [selectedAnalysis, setSelectedAnalysis] = useState<Analysis | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [previewCount, setPreviewCount] = useState(0);
+  
+  // Capture and store affiliate ref from URL or cookie
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      const refFromUrl = urlParams.get('ref');
+      const refFromCookie = document.cookie.split('; ').find(row => row.startsWith('affiliate_ref='))?.split('=')[1];
+      const refFromLocalStorage = localStorage.getItem('affiliate_ref');
+      const affiliateRef = refFromUrl || refFromCookie || refFromLocalStorage;
+      
+      if (affiliateRef) {
+        // Store in localStorage and cookie
+        localStorage.setItem('affiliate_ref', affiliateRef);
+        if (!refFromCookie) {
+          document.cookie = `affiliate_ref=${affiliateRef}; path=/; max-age=${30 * 24 * 60 * 60}; SameSite=Lax`;
+        }
+        console.log('[onboarding] Captured and stored affiliate ref:', affiliateRef);
+      }
+    }
+  }, []);
   const [loadingAnalysis, setLoadingAnalysis] = useState(false);
   const normalizedBacklog = normalizeBacklog(selectedAnalysis?.backlog || []);
   const keywords = selectedAnalysis?.keywords || [];
@@ -153,8 +173,16 @@ export default function OnboardingPage() {
   };
 
   const handleStartTrial = () => {
+    // Get affiliate ref to pass through
+    const affiliateRef = typeof window !== 'undefined' ? 
+      (localStorage.getItem('affiliate_ref') || 
+       document.cookie.split('; ').find(row => row.startsWith('affiliate_ref='))?.split('=')[1]) : null;
+    
     // Redirect to signup/login, then trial checkout
-    router.push('/signup?onboarding=true');
+    const signupUrl = affiliateRef 
+      ? `/signup?onboarding=true&ref=${encodeURIComponent(affiliateRef)}`
+      : '/signup?onboarding=true';
+    router.push(signupUrl);
   };
 
   const handleCloseModal = () => {
