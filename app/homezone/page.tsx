@@ -91,12 +91,60 @@ export default function HomeZone() {
         console.log('📊 Recent analyses fetched:', analyses?.length || 0);
         setRecentAnalyses(analyses || []);
         
-        // Fetch affiliate data
-        const { data: affiliateInfo } = await supabase
+        // Fetch or create affiliate data
+        let { data: affiliateInfo } = await supabase
           .from('user_affiliates')
           .select('*')
           .eq('user_id', canonicalUserId)
           .single();
+        
+        // If no affiliate record exists, create one
+        if (!affiliateInfo) {
+          // Generate a unique affiliate code
+          const generateCode = () => {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let code = '';
+            for (let i = 0; i < 8; i++) {
+              code += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return code;
+          };
+          
+          let affiliateCode = generateCode();
+          let codeExists = true;
+          
+          // Ensure code is unique
+          while (codeExists) {
+            const { data: existing } = await supabase
+              .from('user_affiliates')
+              .select('affiliate_code')
+              .eq('affiliate_code', affiliateCode)
+              .single();
+            
+            if (!existing) {
+              codeExists = false;
+            } else {
+              affiliateCode = generateCode();
+            }
+          }
+          
+          // Create affiliate record
+          const { data: newAffiliateInfo, error: createError } = await supabase
+            .from('user_affiliates')
+            .insert({
+              user_id: canonicalUserId,
+              affiliate_code: affiliateCode,
+              total_referrals: 0,
+              paying_referrals: 0,
+              total_bonuses_earned: 0
+            })
+            .select()
+            .single();
+          
+          if (!createError && newAffiliateInfo) {
+            affiliateInfo = newAffiliateInfo;
+          }
+        }
         
         if (affiliateInfo) {
           // Fetch commission stats
