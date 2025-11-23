@@ -134,10 +134,30 @@ export async function GET(request: NextRequest) {
                 
                 if (!conversionError) {
                   // Update total_referrals count
-                  await supabaseAdmin.rpc('increment_affiliate_referrals', {
-                    affiliate_code_param: affiliateRef
-                  }).catch(async () => {
+                  try {
+                    const { error: rpcError } = await supabaseAdmin.rpc('increment_affiliate_referrals', {
+                      affiliate_code_param: affiliateRef
+                    });
+                    
+                    if (rpcError) {
+                      // If RPC doesn't exist, manually update
+                      console.warn('[auth/callback] RPC function failed, using manual update:', rpcError);
+                      const { data: currentData } = await supabaseAdmin
+                        .from('user_affiliates')
+                        .select('total_referrals')
+                        .eq('affiliate_code', affiliateRef)
+                        .single();
+                      
+                      if (currentData) {
+                        await supabaseAdmin
+                          .from('user_affiliates')
+                          .update({ total_referrals: (currentData.total_referrals || 0) + 1 })
+                          .eq('affiliate_code', affiliateRef);
+                      }
+                    }
+                  } catch (rpcException) {
                     // If RPC doesn't exist, manually update
+                    console.warn('[auth/callback] RPC function exception, using manual update:', rpcException);
                     const { data: currentData } = await supabaseAdmin
                       .from('user_affiliates')
                       .select('total_referrals')
@@ -150,7 +170,7 @@ export async function GET(request: NextRequest) {
                         .update({ total_referrals: (currentData.total_referrals || 0) + 1 })
                         .eq('affiliate_code', affiliateRef);
                     }
-                  });
+                  }
                   
                   console.log(`[auth/callback] Affiliate referral tracked: ${affiliateRef} -> ${data.user.id}`);
                 } else {
