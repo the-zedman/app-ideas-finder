@@ -1,6 +1,7 @@
 import { SESClient, SendEmailCommand } from '@aws-sdk/client-ses';
 
-const REGION = process.env.AWS_REGION || 'ap-southeast-2';
+// Force region to ap-southeast-2 (Sydney) to match other email services
+const REGION = 'ap-southeast-2';
 const SOURCE_EMAIL = process.env.SES_SOURCE_EMAIL || 'App Ideas Finder <info@appideasfinder.com>';
 const ADMIN_ALERT_EMAIL = process.env.ADMIN_ALERT_EMAIL || 'info@appideasfinder.com';
 
@@ -62,8 +63,21 @@ export async function sendEmail({ to, subject, html, text, replyTo }: EmailPaylo
     const result = await sesClient.send(command);
     console.log(`Email sent successfully to ${toAddresses.join(', ')}. MessageId: ${result.MessageId}`);
     return result;
-  } catch (error) {
+  } catch (error: any) {
     console.error('SES send error:', error);
+    
+    // Provide more helpful error messages
+    if (error.name === 'MessageRejected') {
+      const errorMsg = error.message || 'Email rejected by SES';
+      if (errorMsg.includes('not verified')) {
+        throw new Error(
+          `Email verification required. Please verify the sender email (${SOURCE_EMAIL}) and recipient email(s) in AWS SES. ` +
+          `If SES is in sandbox mode, all recipient emails must be verified. Error: ${errorMsg}`
+        );
+      }
+      throw new Error(`SES rejected the email: ${errorMsg}`);
+    }
+    
     throw error;
   }
 }
