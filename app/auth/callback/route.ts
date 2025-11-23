@@ -100,23 +100,28 @@ export async function GET(request: NextRequest) {
     const { data, error } = await supabase.auth.exchangeCodeForSession(code);
     
     if (!error && data?.user) {
-      // Check if this is a new user (signup) by checking if profile exists
-      const { data: existingProfile } = await supabase
-        .from('profiles')
-        .select('id')
-        .eq('id', data.user.id)
-        .single();
+      // Get affiliate ref from cookie FIRST, before any other operations
+      // This ensures we capture it even if the user was just created
+      const affiliateRef = cookieStore.get('affiliate_ref')?.value;
       
-      const isNewUser = !existingProfile;
+      // Also check URL params as fallback (in case cookie didn't persist)
+      const urlParams = new URL(request.url).searchParams;
+      const refFromUrl = urlParams.get('ref') || urlParams.get('affiliate_ref');
+      const finalAffiliateRef = affiliateRef || refFromUrl;
+      
+      // Check if this is a new user (signup) by checking user creation time
+      // A user is "new" if they were created in the last 5 seconds (just now)
+      const userCreatedAt = new Date(data.user.created_at);
+      const now = new Date();
+      const secondsSinceCreation = (now.getTime() - userCreatedAt.getTime()) / 1000;
+      const isNewUser = secondsSinceCreation < 5 || type === 'signup';
       
       // Handle affiliate referral tracking for new signups
       // Check both type === 'signup' OR if it's a new user (first time)
       if ((type === 'signup' || isNewUser) && data?.user) {
-        const affiliateRef = cookieStore.get('affiliate_ref')?.value;
+        console.log(`[auth/callback] Processing signup for user ${data.user.id}, type: ${type}, isNewUser: ${isNewUser}, secondsSinceCreation: ${secondsSinceCreation}, affiliateRef: ${finalAffiliateRef || 'none'}, cookie: ${affiliateRef || 'none'}, url: ${refFromUrl || 'none'}`);
         
-        console.log(`[auth/callback] Processing signup for user ${data.user.id}, type: ${type}, isNewUser: ${isNewUser}, affiliateRef: ${affiliateRef || 'none'}`);
-        
-        if (affiliateRef) {
+        if (finalAffiliateRef) {
           // Process affiliate referral
           const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
           if (serviceRoleKey) {
@@ -130,11 +135,11 @@ export async function GET(request: NextRequest) {
               const { data: affiliateData, error: affiliateCheckError } = await supabaseAdmin
                 .from('user_affiliates')
                 .select('user_id, affiliate_code')
-                .eq('affiliate_code', affiliateRef)
+                .eq('affiliate_code', finalAffiliateRef)
                 .single();
               
               console.log(`[auth/callback] Affiliate code check:`, { 
-                affiliateRef, 
+                affiliateRef: finalAffiliateRef, 
                 found: !!affiliateData, 
                 error: affiliateCheckError?.message 
               });
@@ -144,7 +149,7 @@ export async function GET(request: NextRequest) {
                 const { error: conversionError } = await supabaseAdmin
                   .from('affiliate_conversions')
                   .insert({
-                    affiliate_code: affiliateRef,
+                    affiliate_code: finalAffiliateRef,
                     referred_user_id: data.user.id,
                     converted_to_paid: false,
                     bonus_awarded: false
@@ -154,7 +159,7 @@ export async function GET(request: NextRequest) {
                   // Update total_referrals count
                   try {
                     const { error: rpcError } = await supabaseAdmin.rpc('increment_affiliate_referrals', {
-                      affiliate_code_param: affiliateRef
+                      affiliate_code_param: finalAffiliateRef
                     });
                     
                     if (rpcError) {
@@ -163,7 +168,7 @@ export async function GET(request: NextRequest) {
                       const { data: currentData, error: fetchError } = await supabaseAdmin
                         .from('user_affiliates')
                         .select('total_referrals')
-                        .eq('affiliate_code', affiliateRef)
+                        .eq('affiliate_code', finalAffiliateRef)
                         .single();
                       
                       console.log(`[auth/callback] Current affiliate data:`, { currentData, fetchError });
@@ -173,18 +178,18 @@ export async function GET(request: NextRequest) {
                         const { error: updateError } = await supabaseAdmin
                           .from('user_affiliates')
                           .update({ total_referrals: newCount })
-                          .eq('affiliate_code', affiliateRef);
+                          .eq('affiliate_code', finalAffiliateRef);
                         
                         if (updateError) {
                           console.error('[auth/callback] Error updating total_referrals:', updateError);
                         } else {
-                          console.log(`[auth/callback] Successfully updated total_referrals to ${newCount} for affiliate ${affiliateRef}`);
+                          console.log(`[auth/callback] Successfully updated total_referrals to ${newCount} for affiliate ${finalAffiliateRef}`);
                         }
                       } else {
                         console.error('[auth/callback] Could not fetch current affiliate data for update');
                       }
                     } else {
-                      console.log(`[auth/callback] Successfully incremented referrals via RPC for affiliate ${affiliateRef}`);
+                      console.log(`[auth/callback] Successfully incremented referrals via RPC for affiliate ${finalAffiliateRef}`);
                     }
                   } catch (rpcException) {
                     // If RPC doesn't exist, manually update
@@ -192,7 +197,7 @@ export async function GET(request: NextRequest) {
                     const { data: currentData, error: fetchError } = await supabaseAdmin
                       .from('user_affiliates')
                       .select('total_referrals')
-                      .eq('affiliate_code', affiliateRef)
+                      .eq('affiliate_code', finalAffiliateRef)
                       .single();
                     
                     console.log(`[auth/callback] Current affiliate data (exception path):`, { currentData, fetchError });
@@ -202,19 +207,19 @@ export async function GET(request: NextRequest) {
                       const { error: updateError } = await supabaseAdmin
                         .from('user_affiliates')
                         .update({ total_referrals: newCount })
-                        .eq('affiliate_code', affiliateRef);
+                        .eq('affiliate_code', finalAffiliateRef);
                       
                       if (updateError) {
                         console.error('[auth/callback] Error updating total_referrals (exception path):', updateError);
                       } else {
-                        console.log(`[auth/callback] Successfully updated total_referrals to ${newCount} for affiliate ${affiliateRef} (exception path)`);
+                        console.log(`[auth/callback] Successfully updated total_referrals to ${newCount} for affiliate ${finalAffiliateRef} (exception path)`);
                       }
                     } else {
                       console.error('[auth/callback] Could not fetch current affiliate data for update (exception path)');
                     }
                   }
                   
-                  console.log(`[auth/callback] Affiliate referral tracked: ${affiliateRef} -> ${data.user.id}`);
+                  console.log(`[auth/callback] Affiliate referral tracked: ${finalAffiliateRef} -> ${data.user.id}`);
                 } else {
                   console.error('[auth/callback] Error creating affiliate conversion:', conversionError);
                 }
@@ -232,13 +237,13 @@ export async function GET(request: NextRequest) {
         
         if (data.user.email) {
           const email = data.user.email;
-          const text = `New signup: ${email}\nUser ID: ${data.user.id}\nSigned up at: ${new Date().toISOString()}${affiliateRef ? `\nReferred by: ${affiliateRef}` : ''}`;
+          const text = `New signup: ${email}\nUser ID: ${data.user.id}\nSigned up at: ${new Date().toISOString()}${finalAffiliateRef ? `\nReferred by: ${finalAffiliateRef}` : ''}`;
           const html = `
             <h2>🎉 New Signup</h2>
             <p><strong>Email:</strong> ${email}</p>
             <p><strong>User ID:</strong> ${data.user.id}</p>
             <p><strong>Time:</strong> ${new Date().toLocaleString()}</p>
-            ${affiliateRef ? `<p><strong>Referred by affiliate code:</strong> ${affiliateRef}</p>` : ''}
+            ${finalAffiliateRef ? `<p><strong>Referred by affiliate code:</strong> ${finalAffiliateRef}</p>` : ''}
           `;
           sendAdminAlert(`[New Signup] ${email}`, html, text).catch((err) =>
             console.error('Failed to send signup alert:', err)
