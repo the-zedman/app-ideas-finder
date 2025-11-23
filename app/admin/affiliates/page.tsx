@@ -91,7 +91,10 @@ export default function AdminAffiliatesPage() {
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (!conversionsError && conversionsData) {
+      if (conversionsError) {
+        console.error('Error fetching conversions:', conversionsError);
+        setConversions([]);
+      } else if (conversionsData) {
         // Fetch user details and affiliate owner details via API
         const enriched = await Promise.all(conversionsData.map(async (conv: any) => {
           // Get referred user details via API
@@ -122,6 +125,8 @@ export default function AdminAffiliatesPage() {
           };
         }));
         setConversions(enriched);
+      } else {
+        setConversions([]);
       }
 
       // Fetch all commissions
