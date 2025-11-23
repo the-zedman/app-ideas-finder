@@ -266,10 +266,10 @@ export async function GET(request: NextRequest) {
           // Clear the affiliate cookie after processing
           cookieStore.delete('affiliate_ref');
         }
-        
-        if (data.user.email) {
+      
+      if (data.user.email) {
         const email = data.user.email;
-          const text = `New signup: ${email}\nUser ID: ${data.user.id}\nSigned up at: ${new Date().toISOString()}${finalAffiliateRef ? `\nReferred by: ${finalAffiliateRef}` : ''}`;
+        const text = `New signup: ${email}\nUser ID: ${data.user.id}\nSigned up at: ${new Date().toISOString()}${finalAffiliateRef ? `\nReferred by: ${finalAffiliateRef}` : ''}`;
         const html = `
           <h2>🎉 New Signup</h2>
           <p><strong>Email:</strong> ${email}</p>
@@ -280,7 +280,6 @@ export async function GET(request: NextRequest) {
         sendAdminAlert(`[New Signup] ${email}`, html, text).catch((err) =>
           console.error('Failed to send signup alert:', err)
         );
-        }
       }
 
       const cookieOverride = cookieStore.get('pending_signup_redirect')?.value;
