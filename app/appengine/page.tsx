@@ -2484,7 +2484,7 @@ Base recommendations on competitive pricing data and actual user feedback about 
               {/* App Input */}
               <div className="mb-6 overflow-visible">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  App Store URL, App ID, App Name, or keyword
+                  App Name, or keyword, or App Store URL, or App ID
                 </label>
                 <div className="relative overflow-visible">
                   <input
@@ -2492,7 +2492,7 @@ Base recommendations on competitive pricing data and actual user feedback about 
                     type="text"
                     value={appInput}
                     onChange={(e) => handleInputChange(e.target.value)}
-                    placeholder="e.g. https://apps.apple.com/us/app/.../id6475137430, 6475137430, or 'Instagram'"
+                    placeholder="e.g. Instagram or Hiking"
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#88D18A] focus:border-transparent"
                   />
                   {showSearchResults && searchResults.length > 0 && (
