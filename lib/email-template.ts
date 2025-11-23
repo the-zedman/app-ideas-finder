@@ -63,6 +63,7 @@ export function generateEmailHTML({
                   <td style="text-align: center; padding: 20px 0; border-bottom: 3px solid #f78937;" class="mobile-padding">
                     <img src="${logoUrl}" alt="App Ideas Finder Logo" width="80" height="80" style="display: block; margin: 0 auto 15px auto; border: 0; outline: none; max-width: 80px; height: auto;">
                     <h1 style="color: #0a3a5f; margin: 0; font-size: 24px; font-weight: bold;" class="mobile-header">App Ideas Finder</h1>
+                    <p style="color: #666; margin: 5px 0 0 0; font-size: 14px;" class="mobile-text">The super fast app ideas generator</p>
                   </td>
                 </tr>
                 
@@ -76,38 +77,18 @@ export function generateEmailHTML({
                 <!-- Footer -->
                 <tr>
                   <td style="text-align: center; padding: 30px 20px;" class="mobile-padding">
-                    <!-- Social Media Links -->
-                    <table cellpadding="0" cellspacing="0" border="0" align="center" style="margin: 20px auto;">
-                      <tr>
-                        <td style="padding: 0 10px;">
-                          <a href="https://x.com/appideasfinder" style="display: inline-block; background-color: #000000; color: #ffffff; padding: 10px 20px; text-decoration: none; border-radius: 4px; font-size: 14px; font-weight: bold;" class="mobile-button">
-                            𝕏 Follow us on X
-                          </a>
-                        </td>
-                        <td style="padding: 0 10px;">
-                          <a href="https://discord.gg/nK2fNbe7" style="display: inline-block; background-color: #f78937; color: #ffffff; padding: 10px 20px; text-decoration: none; border-radius: 4px; font-size: 14px; font-weight: bold;" class="mobile-button">
-                            <img src="https://www.appideasfinder.com/discord-white-logo.png" alt="Discord" width="20" height="20" style="display: inline-block; vertical-align: middle; margin-right: 8px; border: 0; outline: none; max-width: 20px; height: auto;">
-                            Join us on Discord
-                          </a>
-                        </td>
-                      </tr>
-                    </table>
-                    
-                    <!-- Privacy Message -->
-                    <div style="text-align: center; margin-top: 30px;">
-                      <span style="color: #888; font-size: 11px;">🔒 We respect your privacy. No spam, ever.</span>
-                    </div>
-                    
-                    <!-- Unsubscribe Link -->
-                    <div style="text-align: center; margin-top: 10px;">
-                      <a href="https://www.appideasfinder.com/unsubscribe" style="color: #999; font-size: 10px; text-decoration: underline;">Unsubscribe</a>
-                    </div>
-                    
                     <!-- Footer -->
                     <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
-                      <p style="color: #999; font-size: 12px; margin: 0 0 10px 0;">
-                        App Ideas Finder Team
-                      </p>
+                      <!-- Privacy Message -->
+                      <div style="text-align: center; margin-bottom: 10px;">
+                        <span style="color: #888; font-size: 11px;">🔒 We respect your privacy. No spam, ever.</span>
+                      </div>
+                      
+                      <!-- Unsubscribe Link -->
+                      <div style="text-align: center; margin-bottom: 20px;">
+                        <a href="https://www.appideasfinder.com/unsubscribe" style="color: #999; font-size: 10px; text-decoration: underline;">Unsubscribe</a>
+                      </div>
+                      
                       <p style="color: #999; font-size: 11px; margin: 0;">
                         © 2025 App Ideas Finder. All rights reserved.
                       </p>
