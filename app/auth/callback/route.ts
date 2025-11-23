@@ -119,42 +119,80 @@ export async function GET(request: NextRequest) {
         finalAffiliateRef
       });
       
-      // Check if this is a new user (signup) by checking user creation time
-      // A user is "new" if they were created in the last 5 seconds (just now)
+      // Check if this is a new user (signup) by checking:
+      // 1. type === 'signup'
+      // 2. User was created recently (within last 60 seconds)
+      // 3. No existing affiliate_conversions record for this user
       const userCreatedAt = new Date(data.user.created_at);
       const now = new Date();
       const secondsSinceCreation = (now.getTime() - userCreatedAt.getTime()) / 1000;
-      const isNewUser = secondsSinceCreation < 5 || type === 'signup';
+      const isRecentlyCreated = secondsSinceCreation < 60;
+      
+      // Check if affiliate conversion already exists for this user
+      const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+      let existingConversion = null;
+      if (serviceRoleKey) {
+        try {
+          const supabaseAdmin = createClient(
+            process.env.NEXT_PUBLIC_SUPABASE_URL!,
+            serviceRoleKey
+          );
+          const { data: conversionData } = await supabaseAdmin
+            .from('affiliate_conversions')
+            .select('id')
+            .eq('referred_user_id', data.user.id)
+            .maybeSingle();
+          existingConversion = conversionData;
+        } catch (err) {
+          console.error('[auth/callback] Error checking existing conversion:', err);
+        }
+      }
+      
+      const isNewUser = type === 'signup' || (isRecentlyCreated && !existingConversion);
+      
+      // Also check if we should process affiliate even if user wasn't just created
+      // This handles cases where magic link was clicked later
+      const shouldProcessAffiliate = finalAffiliateRef && !existingConversion && data?.user;
+      
+      console.log(`[auth/callback] User check:`, {
+        userId: data.user.id,
+        type,
+        secondsSinceCreation,
+        isRecentlyCreated,
+        existingConversion: !!existingConversion,
+        isNewUser,
+        shouldProcessAffiliate,
+        finalAffiliateRef: finalAffiliateRef || 'none'
+      });
       
       // Handle affiliate referral tracking for new signups
-      // Check both type === 'signup' OR if it's a new user (first time)
-      if ((type === 'signup' || isNewUser) && data?.user) {
-        console.log(`[auth/callback] Processing signup for user ${data.user.id}, type: ${type}, isNewUser: ${isNewUser}, secondsSinceCreation: ${secondsSinceCreation}, affiliateRef: ${finalAffiliateRef || 'none'}, cookie: ${affiliateRef || 'none'}, url: ${refFromUrl || 'none'}`);
+      // Process if: (1) it's a new user signup, OR (2) we have affiliate ref and no existing conversion
+      if (shouldProcessAffiliate) {
+        console.log(`[auth/callback] ✅ Processing affiliate referral: ${finalAffiliateRef} for user ${data.user.id} (isNewUser: ${isNewUser}, type: ${type})`);
         
-        if (finalAffiliateRef) {
+        if (serviceRoleKey) {
           // Process affiliate referral
-          const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-          if (serviceRoleKey) {
-            try {
-              const supabaseAdmin = createClient(
-                process.env.NEXT_PUBLIC_SUPABASE_URL!,
-                serviceRoleKey
-              );
-              
-              // Verify the affiliate code exists
-              const { data: affiliateData, error: affiliateCheckError } = await supabaseAdmin
-                .from('user_affiliates')
-                .select('user_id, affiliate_code')
-                .eq('affiliate_code', finalAffiliateRef)
-                .single();
-              
-              console.log(`[auth/callback] Affiliate code check:`, { 
-                affiliateRef: finalAffiliateRef, 
-                found: !!affiliateData, 
-                error: affiliateCheckError?.message 
-              });
-              
-              if (affiliateData) {
+          try {
+            const supabaseAdmin = createClient(
+              process.env.NEXT_PUBLIC_SUPABASE_URL!,
+              serviceRoleKey
+            );
+            
+            // Verify the affiliate code exists
+            const { data: affiliateData, error: affiliateCheckError } = await supabaseAdmin
+              .from('user_affiliates')
+              .select('user_id, affiliate_code, total_referrals')
+              .eq('affiliate_code', finalAffiliateRef)
+              .single();
+            
+            console.log(`[auth/callback] Affiliate code check:`, { 
+              affiliateRef: finalAffiliateRef, 
+              found: !!affiliateData, 
+              currentTotalReferrals: affiliateData?.total_referrals,
+              error: affiliateCheckError?.message 
+            });
+            
+            if (affiliateData) {
                 // Create affiliate conversion record
                 const { error: conversionError } = await supabaseAdmin
                   .from('affiliate_conversions')
@@ -230,18 +268,18 @@ export async function GET(request: NextRequest) {
         }
         
         if (data.user.email) {
-          const email = data.user.email;
+        const email = data.user.email;
           const text = `New signup: ${email}\nUser ID: ${data.user.id}\nSigned up at: ${new Date().toISOString()}${finalAffiliateRef ? `\nReferred by: ${finalAffiliateRef}` : ''}`;
-          const html = `
-            <h2>🎉 New Signup</h2>
-            <p><strong>Email:</strong> ${email}</p>
-            <p><strong>User ID:</strong> ${data.user.id}</p>
-            <p><strong>Time:</strong> ${new Date().toLocaleString()}</p>
+        const html = `
+          <h2>🎉 New Signup</h2>
+          <p><strong>Email:</strong> ${email}</p>
+          <p><strong>User ID:</strong> ${data.user.id}</p>
+          <p><strong>Time:</strong> ${new Date().toLocaleString()}</p>
             ${finalAffiliateRef ? `<p><strong>Referred by affiliate code:</strong> ${finalAffiliateRef}</p>` : ''}
-          `;
-          sendAdminAlert(`[New Signup] ${email}`, html, text).catch((err) =>
-            console.error('Failed to send signup alert:', err)
-          );
+        `;
+        sendAdminAlert(`[New Signup] ${email}`, html, text).catch((err) =>
+          console.error('Failed to send signup alert:', err)
+        );
         }
       }
 
