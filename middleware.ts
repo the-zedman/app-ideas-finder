@@ -128,6 +128,19 @@ export async function middleware(request: NextRequest) {
     }
   }
 
+  // Capture affiliate referral code from URL and store in cookie
+  const refCode = request.nextUrl.searchParams.get('ref')
+  if (refCode && !user) {
+    // Only set affiliate cookie if user is not logged in (to avoid overwriting)
+    // Cookie expires in 30 days
+    supabaseResponse.cookies.set('affiliate_ref', refCode, {
+      maxAge: 30 * 24 * 60 * 60, // 30 days
+      httpOnly: false, // Allow client-side access
+      sameSite: 'lax',
+      path: '/',
+    })
+  }
+
   // Check admin access for admin routes
   if (isAdminRoute && !isDevelopmentBypass) {
     if (!user) {

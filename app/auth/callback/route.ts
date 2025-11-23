@@ -4,6 +4,7 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { sendAdminAlert } from '@/lib/email';
 import { hasActiveSubscription } from '@/lib/check-subscription';
+import { createClient } from '@supabase/supabase-js';
 
 const DEFAULT_REDIRECT = '/homezone';
 const SIGNUP_REDIRECT = '/homezone';
@@ -99,18 +100,88 @@ export async function GET(request: NextRequest) {
     const { data, error } = await supabase.auth.exchangeCodeForSession(code);
     
     if (!error) {
-      if (type === 'signup' && data?.user?.email) {
-        const email = data.user.email;
-        const text = `New signup: ${email}\nUser ID: ${data.user.id}\nSigned up at: ${new Date().toISOString()}`;
-        const html = `
-          <h2>🎉 New Signup</h2>
-          <p><strong>Email:</strong> ${email}</p>
-          <p><strong>User ID:</strong> ${data.user.id}</p>
-          <p><strong>Time:</strong> ${new Date().toLocaleString()}</p>
-        `;
-        sendAdminAlert(`[New Signup] ${email}`, html, text).catch((err) =>
-          console.error('Failed to send signup alert:', err)
-        );
+      // Handle affiliate referral tracking for new signups
+      if (type === 'signup' && data?.user) {
+        const affiliateRef = cookieStore.get('affiliate_ref')?.value;
+        
+        if (affiliateRef) {
+          // Process affiliate referral
+          const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+          if (serviceRoleKey) {
+            try {
+              const supabaseAdmin = createClient(
+                process.env.NEXT_PUBLIC_SUPABASE_URL!,
+                serviceRoleKey
+              );
+              
+              // Verify the affiliate code exists
+              const { data: affiliateData } = await supabaseAdmin
+                .from('user_affiliates')
+                .select('user_id')
+                .eq('affiliate_code', affiliateRef)
+                .single();
+              
+              if (affiliateData) {
+                // Create affiliate conversion record
+                const { error: conversionError } = await supabaseAdmin
+                  .from('affiliate_conversions')
+                  .insert({
+                    affiliate_code: affiliateRef,
+                    referred_user_id: data.user.id,
+                    converted_to_paid: false,
+                    bonus_awarded: false
+                  });
+                
+                if (!conversionError) {
+                  // Update total_referrals count
+                  await supabaseAdmin.rpc('increment_affiliate_referrals', {
+                    affiliate_code_param: affiliateRef
+                  }).catch(async () => {
+                    // If RPC doesn't exist, manually update
+                    const { data: currentData } = await supabaseAdmin
+                      .from('user_affiliates')
+                      .select('total_referrals')
+                      .eq('affiliate_code', affiliateRef)
+                      .single();
+                    
+                    if (currentData) {
+                      await supabaseAdmin
+                        .from('user_affiliates')
+                        .update({ total_referrals: (currentData.total_referrals || 0) + 1 })
+                        .eq('affiliate_code', affiliateRef);
+                    }
+                  });
+                  
+                  console.log(`[auth/callback] Affiliate referral tracked: ${affiliateRef} -> ${data.user.id}`);
+                } else {
+                  console.error('[auth/callback] Error creating affiliate conversion:', conversionError);
+                }
+              } else {
+                console.warn(`[auth/callback] Invalid affiliate code: ${affiliateRef}`);
+              }
+            } catch (affiliateError) {
+              console.error('[auth/callback] Error processing affiliate referral:', affiliateError);
+            }
+          }
+          
+          // Clear the affiliate cookie after processing
+          cookieStore.delete('affiliate_ref');
+        }
+        
+        if (data.user.email) {
+          const email = data.user.email;
+          const text = `New signup: ${email}\nUser ID: ${data.user.id}\nSigned up at: ${new Date().toISOString()}${affiliateRef ? `\nReferred by: ${affiliateRef}` : ''}`;
+          const html = `
+            <h2>🎉 New Signup</h2>
+            <p><strong>Email:</strong> ${email}</p>
+            <p><strong>User ID:</strong> ${data.user.id}</p>
+            <p><strong>Time:</strong> ${new Date().toLocaleString()}</p>
+            ${affiliateRef ? `<p><strong>Referred by affiliate code:</strong> ${affiliateRef}</p>` : ''}
+          `;
+          sendAdminAlert(`[New Signup] ${email}`, html, text).catch((err) =>
+            console.error('Failed to send signup alert:', err)
+          );
+        }
       }
 
       const cookieOverride = cookieStore.get('pending_signup_redirect')?.value;
@@ -163,8 +234,10 @@ export async function GET(request: NextRequest) {
 
       try {
         response.cookies.delete('pending_signup_redirect');
+        // Also clear affiliate_ref cookie after processing
+        response.cookies.delete('affiliate_ref');
       } catch (err) {
-        console.warn('Failed to clear pending signup redirect cookie', err);
+        console.warn('Failed to clear cookies', err);
       }
 
       return response;
