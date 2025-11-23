@@ -179,23 +179,51 @@ export default function AdminAffiliatesPage() {
           }
         }));
         setCommissions(enrichedCommissions);
+        
+        // Calculate overall stats using enriched commissions
+        const totalPending = enrichedCommissions.filter((c: any) => c.status === 'pending').reduce((sum: number, c: any) => sum + parseFloat(c.commission_amount || 0), 0) || 0;
+        const totalApproved = enrichedCommissions.filter((c: any) => c.status === 'approved').reduce((sum: number, c: any) => sum + parseFloat(c.commission_amount || 0), 0) || 0;
+        const totalPaid = enrichedCommissions.filter((c: any) => c.status === 'paid').reduce((sum: number, c: any) => sum + parseFloat(c.commission_amount || 0), 0) || 0;
+
+        setStats({
+          totalAffiliates: affiliatesData?.length || 0,
+          totalConversions: conversionsData?.length || 0,
+          totalPending,
+          totalApproved,
+          totalPaid,
+          totalCommissions: totalPending + totalApproved + totalPaid
+        });
+        
+        console.log('✅ Affiliate stats calculated:', {
+          totalAffiliates: affiliatesData?.length || 0,
+          totalConversions: conversionsData?.length || 0,
+          totalCommissions: enrichedCommissions.length,
+          totalPending,
+          totalApproved,
+          totalPaid
+        });
       } else if (commissionsError) {
         console.error('Error fetching commissions:', commissionsError);
+        // Set stats with zeros if commissions fail
+        setStats({
+          totalAffiliates: affiliatesData?.length || 0,
+          totalConversions: conversionsData?.length || 0,
+          totalPending: 0,
+          totalApproved: 0,
+          totalPaid: 0,
+          totalCommissions: 0
+        });
+      } else {
+        // No commissions - set stats with zeros
+        setStats({
+          totalAffiliates: affiliatesData?.length || 0,
+          totalConversions: conversionsData?.length || 0,
+          totalPending: 0,
+          totalApproved: 0,
+          totalPaid: 0,
+          totalCommissions: 0
+        });
       }
-
-      // Calculate overall stats
-      const totalPending = commissionsData?.filter((c: any) => c.status === 'pending').reduce((sum: number, c: any) => sum + parseFloat(c.commission_amount || 0), 0) || 0;
-      const totalApproved = commissionsData?.filter((c: any) => c.status === 'approved').reduce((sum: number, c: any) => sum + parseFloat(c.commission_amount || 0), 0) || 0;
-      const totalPaid = commissionsData?.filter((c: any) => c.status === 'paid').reduce((sum: number, c: any) => sum + parseFloat(c.commission_amount || 0), 0) || 0;
-
-      setStats({
-        totalAffiliates: affiliatesData?.length || 0,
-        totalConversions: conversionsData?.length || 0,
-        totalPending,
-        totalApproved,
-        totalPaid,
-        totalCommissions: totalPending + totalApproved + totalPaid
-      });
 
     } catch (error) {
       console.error('Error fetching affiliate data:', error);
