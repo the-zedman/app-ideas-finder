@@ -57,6 +57,12 @@ async function createAffiliateCommission(
     const commissionRate = 25.00;
     const commissionAmount = Math.round((amountPaid * commissionRate / 100) * 100) / 100;
 
+    // Only create commission if amount paid > 0 (no commission for 100% discount coupons)
+    if (amountPaid <= 0 || commissionAmount <= 0) {
+      console.log(`[webhook] Skipping commission creation: amountPaid=${amountPaid}, commissionAmount=${commissionAmount} (likely 100% discount coupon)`);
+      return;
+    }
+
     // Payment due date: 30 days after subscription starts
     const pendingUntil = new Date(subscriptionStart);
     pendingUntil.setDate(pendingUntil.getDate() + 30);
@@ -105,7 +111,7 @@ async function createAffiliateCommission(
           })
           .eq('referred_user_id', referredUserId);
 
-        // Update paying_referrals count
+        // Update paying_referrals count - only increment if commission was actually created (amountPaid > 0)
         const { data: affiliate } = await supabase
           .from('user_affiliates')
           .select('paying_referrals')
