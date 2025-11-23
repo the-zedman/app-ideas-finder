@@ -14,8 +14,7 @@ function SignupContent() {
   const [messageType, setMessageType] = useState<'success' | 'error'>('success');
   
   const supabase = createClient();
-  const isOnboarding = searchParams.get('onboarding') === 'true';
-  const redirectTo = isOnboarding ? '/billing?onboarding=true&trial=true' : (searchParams.get('redirectTo') || '/homezone');
+  const redirectTo = searchParams.get('redirectTo') || '/homezone';
 
   useEffect(() => {
     const error = searchParams.get('error');
@@ -24,23 +23,6 @@ function SignupContent() {
       setMessageType('error');
     }
   }, [searchParams]);
-
-  useEffect(() => {
-    if (isOnboarding && typeof window !== 'undefined' && 'cookieStore' in window) {
-      try {
-        (window as any).cookieStore?.set({
-          name: 'pending_signup_redirect',
-          value: encodeURIComponent(redirectTo),
-          expires: Date.now() + 15 * 60 * 1000,
-          path: '/',
-          sameSite: 'lax'
-        });
-      } catch (error) {
-        console.warn('Failed to set pending signup redirect cookie', error);
-        document.cookie = `pending_signup_redirect=${encodeURIComponent(redirectTo)}; Path=/; Max-Age=900; SameSite=Lax`;
-      }
-    }
-  }, [isOnboarding, redirectTo]);
 
   const handleMagicLinkSignup = async (e: React.FormEvent) => {
     e.preventDefault();
