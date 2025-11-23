@@ -26,6 +26,25 @@ export function generateEmailHTML({
     ? `https://www.appideasfinder.com/api/admin/email/track-open?token=${trackingToken}`
     : 'https://www.appideasfinder.com/App%20Ideas%20Finder%20-%20logo%20-%20200x200.png';
 
+  // Wrap all links in the HTML content with click tracking
+  let trackedContent = htmlContent;
+  if (trackingToken) {
+    // Match all <a> tags with href attributes
+    trackedContent = trackedContent.replace(
+      /<a\s+([^>]*\s+)?href=["']([^"']+)["']([^>]*)>/gi,
+      (match, before, url, after) => {
+        // Skip if it's already a tracking URL or mailto: link
+        if (url.includes('/api/admin/email/track-click') || url.startsWith('mailto:')) {
+          return match;
+        }
+        // Encode the URL for the tracking endpoint
+        const encodedUrl = encodeURIComponent(url);
+        const trackingUrl = `https://www.appideasfinder.com/api/admin/email/track-click?token=${trackingToken}&url=${encodedUrl}`;
+        return `<a ${before || ''}href="${trackingUrl}"${after || ''}>`;
+      }
+    );
+  }
+
   return `
     <!DOCTYPE html>
     <html>
@@ -63,14 +82,14 @@ export function generateEmailHTML({
                   <td style="text-align: center; padding: 20px 0; border-bottom: 3px solid #f78937;" class="mobile-padding">
                     <img src="${logoUrl}" alt="App Ideas Finder Logo" width="80" height="80" style="display: block; margin: 0 auto 15px auto; border: 0; outline: none; max-width: 80px; height: auto;">
                     <h1 style="color: #0a3a5f; margin: 0; font-size: 24px; font-weight: bold;" class="mobile-header">App Ideas Finder</h1>
-                    <p style="color: #666; margin: 5px 0 0 0; font-size: 14px;" class="mobile-text">The super fast app ideas generator</p>
+                    <p style="color: #666; margin: 5px 0 0 0; font-size: 14px;" class="mobile-text">Discover your next app idea in seconds</p>
                   </td>
                 </tr>
                 
                 <!-- Main Content -->
                 <tr>
                   <td style="padding: 30px 20px;" class="mobile-padding">
-                    ${htmlContent}
+                    ${trackedContent}
                   </td>
                 </tr>
                 
