@@ -203,8 +203,8 @@ export async function GET(request: NextRequest) {
                 
                 if (existingConversion) {
                   console.log(`[auth/callback] ⚠️ Conversion already exists for user ${data.user.id} with affiliate ${finalAffiliateRef}, skipping`);
-                  break; // Exit early to prevent duplicate counting
-                }
+                  // Skip creating duplicate conversion - continue to next part of code
+                } else {
                 
                 // Create affiliate conversion record
                 const { error: conversionError } = await supabaseAdmin
@@ -248,8 +248,9 @@ export async function GET(request: NextRequest) {
                 } else {
                   console.error('[auth/callback] ❌ Error creating affiliate conversion:', conversionError);
                 }
+                }
               } else {
-                console.warn(`[auth/callback] Invalid affiliate code: ${affiliateRef}`);
+                console.warn(`[auth/callback] Invalid affiliate code: ${finalAffiliateRef}`);
               }
             } catch (affiliateError) {
               console.error('[auth/callback] Error processing affiliate referral:', affiliateError);
