@@ -204,18 +204,45 @@ export async function POST(request: Request) {
             }, {
               onConflict: 'user_id,period_start'
             });
+          
+          // Create affiliate commission for trial
+          const amountPaid = (session.amount_total || 0) / 100;
+          await createAffiliateCommission(
+            supabase,
+            userId,
+            'trial',
+            amountPaid,
+            trialStart,
+            'subscription',
+            session.customer as string || undefined,
+            session.subscription as string || undefined
+          );
             
         } else if (planType === 'search_pack') {
           // Search pack purchased - add to search_packs table
+          const amountPaid = (session.amount_total || 0) / 100;
+          const purchaseDate = new Date();
+          
           await supabase
             .from('search_packs')
             .insert({
               user_id: userId,
               searches_purchased: 29,
               searches_remaining: 29,
-              price_paid: (session.amount_total || 0) / 100,
+              price_paid: amountPaid,
               expires_at: null, // Never expires
             });
+          
+          // Create affiliate commission for search pack
+          await createAffiliateCommission(
+            supabase,
+            userId,
+            'search_pack',
+            amountPaid,
+            purchaseDate,
+            'search_pack',
+            session.customer as string || undefined
+          );
             
         } else if (session.subscription) {
           // Subscription created via checkout - handle it immediately
@@ -289,6 +316,19 @@ export async function POST(request: Request) {
               console.error(`[checkout.session.completed] Error upserting usage for user ${userId}:`, usageError);
               throw usageError;
             }
+            
+            // Create affiliate commission for subscription
+            const amountPaid = (session.amount_total || 0) / 100;
+            await createAffiliateCommission(
+              supabase,
+              userId,
+              planId,
+              amountPaid,
+              periodStart,
+              'subscription',
+              session.customer as string || undefined,
+              stripeSubscription.id
+            );
             
             console.log(`[checkout.session.completed] Successfully created subscription record for user ${userId}, plan: ${planId}, status: ${status}`);
           } catch (error) {
