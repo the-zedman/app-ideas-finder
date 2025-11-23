@@ -53,14 +53,36 @@ export default function AdminAffiliatesPage() {
       // Fetch all affiliates with their stats
       const { data: affiliatesData, error: affiliatesError } = await supabase
         .from('user_affiliates')
-        .select(`
-          *,
-          owner:user_id (id, email)
-        `)
+        .select('*')
         .order('total_commission_earned', { ascending: false });
 
       if (!affiliatesError && affiliatesData) {
-        setAffiliates(affiliatesData);
+        // Fetch user emails via API for each affiliate
+        const enrichedAffiliates = await Promise.all(affiliatesData.map(async (affiliate: any) => {
+          try {
+            const userRes = await fetch(`/api/admin/user/${affiliate.user_id}`);
+            const userData = userRes.ok ? await userRes.json() : null;
+            return {
+              ...affiliate,
+              owner: {
+                id: affiliate.user_id,
+                email: userData?.email || 'N/A'
+              }
+            };
+          } catch (err) {
+            console.error(`Error fetching user ${affiliate.user_id}:`, err);
+            return {
+              ...affiliate,
+              owner: {
+                id: affiliate.user_id,
+                email: 'N/A'
+              }
+            };
+          }
+        }));
+        setAffiliates(enrichedAffiliates);
+      } else if (affiliatesError) {
+        console.error('Error fetching affiliates:', affiliatesError);
       }
 
       // Fetch all conversions with full details
@@ -102,26 +124,58 @@ export default function AdminAffiliatesPage() {
         setConversions(enriched);
       }
 
-      // Fetch all commissions with subscription details
+      // Fetch all commissions
       const { data: commissionsData, error: commissionsError } = await supabase
         .from('affiliate_commissions')
-        .select(`
-          *,
-          affiliate:affiliate_user_id (id, email),
-          referred:referred_user_id (id, email),
-          subscription:referred_user_id (
-            user_subscriptions!user_id (
-              plan_id,
-              status,
-              current_period_start,
-              current_period_end
-            )
-          )
-        `)
+        .select('*')
         .order('created_at', { ascending: false });
 
       if (!commissionsError && commissionsData) {
-        setCommissions(commissionsData);
+        // Fetch user emails and subscription details via API
+        const enrichedCommissions = await Promise.all(commissionsData.map(async (commission: any) => {
+          try {
+            // Fetch affiliate user email
+            const affiliateRes = await fetch(`/api/admin/user/${commission.affiliate_user_id}`);
+            const affiliateData = affiliateRes.ok ? await affiliateRes.json() : null;
+            
+            // Fetch referred user email
+            const referredRes = commission.referred_user_id 
+              ? await fetch(`/api/admin/user/${commission.referred_user_id}`)
+              : null;
+            const referredData = referredRes?.ok ? await referredRes.json() : null;
+            
+            // Fetch subscription details
+            const { data: subscriptionData } = await supabase
+              .from('user_subscriptions')
+              .select('plan_id, status, current_period_start, current_period_end')
+              .eq('user_id', commission.referred_user_id)
+              .maybeSingle();
+            
+            return {
+              ...commission,
+              affiliate: {
+                id: commission.affiliate_user_id,
+                email: affiliateData?.email || 'N/A'
+              },
+              referred: {
+                id: commission.referred_user_id,
+                email: referredData?.email || 'N/A'
+              },
+              subscription: subscriptionData ? [subscriptionData] : []
+            };
+          } catch (err) {
+            console.error(`Error enriching commission ${commission.id}:`, err);
+            return {
+              ...commission,
+              affiliate: { id: commission.affiliate_user_id, email: 'N/A' },
+              referred: { id: commission.referred_user_id, email: 'N/A' },
+              subscription: []
+            };
+          }
+        }));
+        setCommissions(enrichedCommissions);
+      } else if (commissionsError) {
+        console.error('Error fetching commissions:', commissionsError);
       }
 
       // Calculate overall stats
