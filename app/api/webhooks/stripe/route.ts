@@ -3,6 +3,7 @@ import { headers } from 'next/headers';
 import { stripe } from '@/lib/stripe';
 import { createClient } from '@supabase/supabase-js';
 import Stripe from 'stripe';
+import { sendAdminAlert } from '@/lib/email';
 
 // Helper function to create affiliate commission
 async function createAffiliateCommission(
@@ -173,6 +174,14 @@ export async function POST(request: Request) {
         
         console.log(`Checkout completed for user ${userId}, plan: ${planType}`);
         
+        // Get user email for notifications
+        const { data: userData } = await supabase.auth.admin.getUserById(userId);
+        const userEmail = userData?.user?.email || 'Unknown';
+        const amountPaid = (session.amount_total || 0) / 100;
+        const currency = session.currency?.toUpperCase() || 'USD';
+        const couponCode = session.total_details?.amount_discount ? 'Applied' : 'None';
+        const discountAmount = session.total_details?.amount_discount ? (session.total_details.amount_discount / 100) : 0;
+        
         // Handle different payment types
         if (planType === 'trial') {
           // Trial payment completed - activate trial
@@ -212,7 +221,6 @@ export async function POST(request: Request) {
             });
           
           // Create affiliate commission for trial
-          const amountPaid = (session.amount_total || 0) / 100;
           await createAffiliateCommission(
             supabase,
             userId,
@@ -223,10 +231,30 @@ export async function POST(request: Request) {
             session.customer as string || undefined,
             session.subscription as string || undefined
           );
+          
+          // Send admin notification email
+          try {
+            const html = `
+              <h2>🎉 New Trial Purchase</h2>
+              <p><strong>User Email:</strong> ${userEmail}</p>
+              <p><strong>User ID:</strong> ${userId}</p>
+              <p><strong>Plan:</strong> Trial (3 days)</p>
+              <p><strong>Amount Paid:</strong> ${currency} $${amountPaid.toFixed(2)}</p>
+              <p><strong>Coupon:</strong> ${couponCode}${discountAmount > 0 ? ` (Discount: ${currency} $${discountAmount.toFixed(2)})` : ''}</p>
+              <p><strong>Stripe Customer ID:</strong> ${session.customer || 'N/A'}</p>
+              <p><strong>Stripe Subscription ID:</strong> ${session.subscription || 'N/A'}</p>
+              <p><strong>Trial Start:</strong> ${trialStart.toLocaleString()}</p>
+              <p><strong>Trial End:</strong> ${trialEndDate.toLocaleString()}</p>
+              <p><strong>Time:</strong> ${new Date().toLocaleString()}</p>
+            `;
+            const text = `New Trial Purchase\n\nUser: ${userEmail}\nUser ID: ${userId}\nPlan: Trial\nAmount: ${currency} $${amountPaid.toFixed(2)}\nCoupon: ${couponCode}${discountAmount > 0 ? ` (Discount: ${currency} $${discountAmount.toFixed(2)})` : ''}\nStripe Customer: ${session.customer || 'N/A'}\nTrial Period: ${trialStart.toLocaleString()} to ${trialEndDate.toLocaleString()}`;
+            await sendAdminAlert(`[New Trial Purchase] ${userEmail} - ${currency} $${amountPaid.toFixed(2)}`, html, text);
+          } catch (emailError) {
+            console.error('Error sending trial purchase notification:', emailError);
+          }
             
         } else if (planType === 'search_pack') {
           // Search pack purchased - add to search_packs table
-          const amountPaid = (session.amount_total || 0) / 100;
           const purchaseDate = new Date();
           
           await supabase
@@ -249,6 +277,25 @@ export async function POST(request: Request) {
             'search_pack',
             session.customer as string || undefined
           );
+          
+          // Send admin notification email
+          try {
+            const html = `
+              <h2>📦 New Search Pack Purchase</h2>
+              <p><strong>User Email:</strong> ${userEmail}</p>
+              <p><strong>User ID:</strong> ${userId}</p>
+              <p><strong>Product:</strong> Search Pack (29 searches)</p>
+              <p><strong>Amount Paid:</strong> ${currency} $${amountPaid.toFixed(2)}</p>
+              <p><strong>Coupon:</strong> ${couponCode}${discountAmount > 0 ? ` (Discount: ${currency} $${discountAmount.toFixed(2)})` : ''}</p>
+              <p><strong>Stripe Customer ID:</strong> ${session.customer || 'N/A'}</p>
+              <p><strong>Purchase Date:</strong> ${purchaseDate.toLocaleString()}</p>
+              <p><strong>Time:</strong> ${new Date().toLocaleString()}</p>
+            `;
+            const text = `New Search Pack Purchase\n\nUser: ${userEmail}\nUser ID: ${userId}\nProduct: Search Pack (29 searches)\nAmount: ${currency} $${amountPaid.toFixed(2)}\nCoupon: ${couponCode}${discountAmount > 0 ? ` (Discount: ${currency} $${discountAmount.toFixed(2)})` : ''}\nStripe Customer: ${session.customer || 'N/A'}`;
+            await sendAdminAlert(`[New Search Pack Purchase] ${userEmail} - ${currency} $${amountPaid.toFixed(2)}`, html, text);
+          } catch (emailError) {
+            console.error('Error sending search pack purchase notification:', emailError);
+          }
             
         } else if (session.subscription) {
           // Subscription created via checkout - handle it immediately
@@ -324,7 +371,6 @@ export async function POST(request: Request) {
             }
             
             // Create affiliate commission for subscription
-            const amountPaid = (session.amount_total || 0) / 100;
             await createAffiliateCommission(
               supabase,
               userId,
@@ -335,6 +381,33 @@ export async function POST(request: Request) {
               session.customer as string || undefined,
               stripeSubscription.id
             );
+            
+            // Send admin notification email
+            try {
+              const planName = planId === 'core_monthly' ? 'Core Monthly' :
+                              planId === 'core_annual' ? 'Core Annual' :
+                              planId === 'prime_monthly' ? 'Prime Monthly' :
+                              planId === 'prime_annual' ? 'Prime Annual' : planId;
+              
+              const html = `
+                <h2>💳 New Subscription Purchase</h2>
+                <p><strong>User Email:</strong> ${userEmail}</p>
+                <p><strong>User ID:</strong> ${userId}</p>
+                <p><strong>Plan:</strong> ${planName} (${planId})</p>
+                <p><strong>Status:</strong> ${status}</p>
+                <p><strong>Amount Paid:</strong> ${currency} $${amountPaid.toFixed(2)}</p>
+                <p><strong>Coupon:</strong> ${couponCode}${discountAmount > 0 ? ` (Discount: ${currency} $${discountAmount.toFixed(2)})` : ''}</p>
+                <p><strong>Stripe Customer ID:</strong> ${session.customer || 'N/A'}</p>
+                <p><strong>Stripe Subscription ID:</strong> ${stripeSubscription.id}</p>
+                <p><strong>Billing Period:</strong> ${periodStart.toLocaleString()} to ${periodEnd.toLocaleString()}</p>
+                <p><strong>Searches Limit:</strong> ${searchesLimit} per month</p>
+                <p><strong>Time:</strong> ${new Date().toLocaleString()}</p>
+              `;
+              const text = `New Subscription Purchase\n\nUser: ${userEmail}\nUser ID: ${userId}\nPlan: ${planName} (${planId})\nStatus: ${status}\nAmount: ${currency} $${amountPaid.toFixed(2)}\nCoupon: ${couponCode}${discountAmount > 0 ? ` (Discount: ${currency} $${discountAmount.toFixed(2)})` : ''}\nStripe Customer: ${session.customer || 'N/A'}\nStripe Subscription: ${stripeSubscription.id}\nBilling Period: ${periodStart.toLocaleString()} to ${periodEnd.toLocaleString()}\nSearches Limit: ${searchesLimit} per month`;
+              await sendAdminAlert(`[New Subscription Purchase] ${userEmail} - ${planName} (${currency} $${amountPaid.toFixed(2)})`, html, text);
+            } catch (emailError) {
+              console.error('Error sending subscription purchase notification:', emailError);
+            }
             
             console.log(`[checkout.session.completed] Successfully created subscription record for user ${userId}, plan: ${planId}, status: ${status}`);
           } catch (error) {
