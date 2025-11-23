@@ -257,9 +257,44 @@ export async function GET(request: NextRequest) {
         nextPath ||
         DEFAULT_REDIRECT;
 
+      // For signups, check if user is on waitlist to determine redirect
+      // Waitlist users → /homezone, Normal users → /pricing
+      if ((type === 'signup' || isNewUser) && data?.user?.email) {
+        const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+        if (serviceRoleKey) {
+          try {
+            const supabaseAdmin = createClient(
+              process.env.NEXT_PUBLIC_SUPABASE_URL!,
+              serviceRoleKey
+            );
+            
+            // Check if user email is in waitlist
+            const { data: waitlistEntry } = await supabaseAdmin
+              .from('waitlist')
+              .select('email')
+              .eq('email', data.user.email.toLowerCase())
+              .single();
+            
+            if (waitlistEntry) {
+              // Waitlist user → redirect to /homezone
+              finalPath = '/homezone';
+              console.log(`[auth/callback] Waitlist user ${data.user.email} signing up, redirecting to /homezone`);
+            } else {
+              // Normal user → redirect to /pricing
+              finalPath = '/pricing';
+              console.log(`[auth/callback] Normal user ${data.user.email} signing up, redirecting to /pricing`);
+            }
+          } catch (error) {
+            console.error(`[auth/callback] Error checking waitlist for ${data.user.id}:`, error);
+            // On error, default to pricing for normal users
+            finalPath = '/pricing';
+          }
+        }
+      }
+
       // For logins (not signups), always check subscription status to determine redirect
       // This ensures users with subscriptions go to /homezone, not /pricing
-      if (!cookieOverride && type !== 'signup' && data?.user) {
+      if (!cookieOverride && type !== 'signup' && !isNewUser && data?.user) {
         const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
         if (serviceRoleKey) {
           try {
@@ -275,10 +310,9 @@ export async function GET(request: NextRequest) {
               finalPath = '/homezone';
               console.log(`[auth/callback] User ${data.user.id} has subscription, redirecting to /homezone`);
             } else {
-              // User has no subscription - redirect to /homezone (let them see the dashboard)
-              // Middleware will handle redirecting to pricing if needed
-              finalPath = '/homezone';
-              console.log(`[auth/callback] User ${data.user.id} has no subscription, redirecting to /homezone`);
+              // User has no subscription - redirect to /pricing
+              finalPath = '/pricing';
+              console.log(`[auth/callback] User ${data.user.id} has no subscription, redirecting to /pricing`);
             }
           } catch (error) {
             console.error(`[auth/callback] Error checking subscription for ${data.user.id}:`, error);
