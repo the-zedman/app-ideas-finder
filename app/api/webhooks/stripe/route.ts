@@ -4,6 +4,129 @@ import { stripe } from '@/lib/stripe';
 import { createClient } from '@supabase/supabase-js';
 import Stripe from 'stripe';
 
+// Helper function to create affiliate commission
+async function createAffiliateCommission(
+  supabase: any,
+  referredUserId: string,
+  planId: string,
+  amountPaid: number,
+  subscriptionStart: Date,
+  transactionType: 'subscription' | 'search_pack',
+  stripeCustomerId?: string,
+  stripeSubscriptionId?: string
+) {
+  try {
+    // Find affiliate conversion for this user
+    const { data: conversion } = await supabase
+      .from('affiliate_conversions')
+      .select('affiliate_code')
+      .eq('referred_user_id', referredUserId)
+      .maybeSingle();
+
+    if (!conversion || !conversion.affiliate_code) {
+      console.log(`[webhook] No affiliate conversion found for user ${referredUserId}`);
+      return;
+    }
+
+    // Get affiliate owner
+    const { data: affiliateData } = await supabase
+      .from('user_affiliates')
+      .select('user_id')
+      .eq('affiliate_code', conversion.affiliate_code)
+      .single();
+
+    if (!affiliateData) {
+      console.log(`[webhook] No affiliate found for code ${conversion.affiliate_code}`);
+      return;
+    }
+
+    // Check if commission already exists
+    const { data: existingCommission } = await supabase
+      .from('affiliate_commissions')
+      .select('id')
+      .eq('referred_user_id', referredUserId)
+      .eq('transaction_type', transactionType)
+      .maybeSingle();
+
+    if (existingCommission) {
+      console.log(`[webhook] Commission already exists for user ${referredUserId}, transaction ${transactionType}`);
+      return;
+    }
+
+    // Calculate commission (25%)
+    const commissionRate = 25.00;
+    const commissionAmount = Math.round((amountPaid * commissionRate / 100) * 100) / 100;
+
+    // Payment due date: 30 days after subscription starts
+    const pendingUntil = new Date(subscriptionStart);
+    pendingUntil.setDate(pendingUntil.getDate() + 30);
+
+    // Create commission record
+    const { error: commissionError } = await supabase
+      .from('affiliate_commissions')
+      .insert({
+        affiliate_user_id: affiliateData.user_id,
+        affiliate_code: conversion.affiliate_code,
+        referred_user_id: referredUserId,
+        transaction_type: transactionType,
+        plan_id: planId,
+        amount_paid: amountPaid,
+        commission_rate: commissionRate,
+        commission_amount: commissionAmount,
+        status: 'pending',
+        pending_until: pendingUntil.toISOString(),
+        stripe_customer_id: stripeCustomerId || null,
+        stripe_subscription_id: stripeSubscriptionId || null
+      });
+
+    if (commissionError) {
+      console.error(`[webhook] Error creating commission:`, commissionError);
+    } else {
+      // Update affiliate's pending commission total
+      const { data: currentAffiliate } = await supabase
+        .from('user_affiliates')
+        .select('pending_commission')
+        .eq('user_id', affiliateData.user_id)
+        .single();
+
+      if (currentAffiliate) {
+        const newPending = (currentAffiliate.pending_commission || 0) + commissionAmount;
+        await supabase
+          .from('user_affiliates')
+          .update({ pending_commission: newPending })
+          .eq('user_id', affiliateData.user_id);
+
+        // Update conversion to paid
+        await supabase
+          .from('affiliate_conversions')
+          .update({ 
+            converted_to_paid: true,
+            conversion_date: subscriptionStart.toISOString()
+          })
+          .eq('referred_user_id', referredUserId);
+
+        // Update paying_referrals count
+        const { data: affiliate } = await supabase
+          .from('user_affiliates')
+          .select('paying_referrals')
+          .eq('user_id', affiliateData.user_id)
+          .single();
+
+        if (affiliate) {
+          await supabase
+            .from('user_affiliates')
+            .update({ paying_referrals: (affiliate.paying_referrals || 0) + 1 })
+            .eq('user_id', affiliateData.user_id);
+        }
+
+        console.log(`[webhook] ✅ Created commission $${commissionAmount} for affiliate ${conversion.affiliate_code}`);
+      }
+    }
+  } catch (error) {
+    console.error(`[webhook] Error in createAffiliateCommission:`, error);
+  }
+}
+
 export async function POST(request: Request) {
   const body = await request.text();
   const headersList = await headers();

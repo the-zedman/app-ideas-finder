@@ -4,15 +4,17 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase-client';
 import Link from 'next/link';
+import Footer from '@/components/Footer';
 
 export default function AdminAffiliatesPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
   const [affiliates, setAffiliates] = useState<any[]>([]);
+  const [conversions, setConversions] = useState<any[]>([]);
   const [commissions, setCommissions] = useState<any[]>([]);
   const [stats, setStats] = useState<any>(null);
-  const [filter, setFilter] = useState<'all' | 'pending' | 'approved' | 'paid'>('all');
+  const [activeTab, setActiveTab] = useState<'overview' | 'signups' | 'commissions' | 'payouts'>('overview');
   const supabase = createClient();
 
   useEffect(() => {
@@ -53,7 +55,7 @@ export default function AdminAffiliatesPage() {
         .from('user_affiliates')
         .select(`
           *,
-          profiles:user_id (email, full_name)
+          owner:user_id (id, email)
         `)
         .order('total_commission_earned', { ascending: false });
 
@@ -61,28 +63,73 @@ export default function AdminAffiliatesPage() {
         setAffiliates(affiliatesData);
       }
 
-      // Fetch all commissions
+      // Fetch all conversions with full details
+      const { data: conversionsData, error: conversionsError } = await supabase
+        .from('affiliate_conversions')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (!conversionsError && conversionsData) {
+        // Fetch user details and affiliate owner details separately
+        const enriched = await Promise.all(conversionsData.map(async (conv: any) => {
+          // Get referred user details
+          const { data: referredUser } = await supabase.auth.admin.getUserById(conv.referred_user_id);
+          
+          // Get affiliate owner
+          const { data: affiliateData } = await supabase
+            .from('user_affiliates')
+            .select('user_id')
+            .eq('affiliate_code', conv.affiliate_code)
+            .single();
+          
+          let ownerEmail = 'N/A';
+          if (affiliateData) {
+            const { data: ownerUser } = await supabase.auth.admin.getUserById(affiliateData.user_id);
+            ownerEmail = ownerUser?.user?.email || 'N/A';
+          }
+
+          return {
+            ...conv,
+            referred_user_email: referredUser?.user?.email || 'N/A',
+            referred_user_id: conv.referred_user_id,
+            signup_date: referredUser?.user?.created_at || conv.created_at,
+            owner_email: ownerEmail,
+            owner_id: affiliateData?.user_id
+          };
+        }));
+        setConversions(enriched);
+      }
+
+      // Fetch all commissions with subscription details
       const { data: commissionsData, error: commissionsError } = await supabase
         .from('affiliate_commissions')
         .select(`
           *,
-          affiliate:affiliate_user_id (email),
-          referred:referred_user_id (email)
+          affiliate:affiliate_user_id (id, email),
+          referred:referred_user_id (id, email),
+          subscription:referred_user_id (
+            user_subscriptions!user_id (
+              plan_id,
+              status,
+              current_period_start,
+              current_period_end
+            )
+          )
         `)
-        .order('created_at', { ascending: false })
-        .limit(100);
+        .order('created_at', { ascending: false });
 
       if (!commissionsError && commissionsData) {
         setCommissions(commissionsData);
       }
 
       // Calculate overall stats
-      const totalPending = commissionsData?.filter((c: any) => c.status === 'pending').reduce((sum: number, c: any) => sum + parseFloat(c.commission_amount), 0) || 0;
-      const totalApproved = commissionsData?.filter((c: any) => c.status === 'approved').reduce((sum: number, c: any) => sum + parseFloat(c.commission_amount), 0) || 0;
-      const totalPaid = commissionsData?.filter((c: any) => c.status === 'paid').reduce((sum: number, c: any) => sum + parseFloat(c.commission_amount), 0) || 0;
+      const totalPending = commissionsData?.filter((c: any) => c.status === 'pending').reduce((sum: number, c: any) => sum + parseFloat(c.commission_amount || 0), 0) || 0;
+      const totalApproved = commissionsData?.filter((c: any) => c.status === 'approved').reduce((sum: number, c: any) => sum + parseFloat(c.commission_amount || 0), 0) || 0;
+      const totalPaid = commissionsData?.filter((c: any) => c.status === 'paid').reduce((sum: number, c: any) => sum + parseFloat(c.commission_amount || 0), 0) || 0;
 
       setStats({
         totalAffiliates: affiliatesData?.length || 0,
+        totalConversions: conversionsData?.length || 0,
         totalPending,
         totalApproved,
         totalPaid,
@@ -92,6 +139,31 @@ export default function AdminAffiliatesPage() {
     } catch (error) {
       console.error('Error fetching affiliate data:', error);
     }
+  };
+
+  const getPlanName = (planId: string) => {
+    const planMap: { [key: string]: string } = {
+      'trial': 'Trial ($1)',
+      'core_monthly': 'Core Monthly ($37)',
+      'core_annual': 'Core Annual ($399)',
+      'prime_monthly': 'Prime Monthly ($79)',
+      'prime_annual': 'Prime Annual ($799)',
+      'search_pack': 'Search Pack ($29)'
+    };
+    return planMap[planId] || planId;
+  };
+
+  const calculateCommission = (planId: string, amountPaid: number) => {
+    const commissionRate = 0.25; // 25%
+    return (amountPaid * commissionRate).toFixed(2);
+  };
+
+  const getPaymentDueDate = (subscriptionStart: string) => {
+    if (!subscriptionStart) return 'N/A';
+    const start = new Date(subscriptionStart);
+    const dueDate = new Date(start);
+    dueDate.setDate(dueDate.getDate() + 30); // 30 days after subscription starts
+    return dueDate.toLocaleDateString();
   };
 
   const approveCommission = async (commissionId: string) => {
@@ -137,10 +209,6 @@ export default function AdminAffiliatesPage() {
     }
   };
 
-  const filteredCommissions = commissions.filter(c => 
-    filter === 'all' || c.status === filter
-  );
-
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -182,7 +250,7 @@ export default function AdminAffiliatesPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Affiliate Management</h1>
-          <p className="text-gray-600">Manage affiliates, commissions, and payouts</p>
+          <p className="text-gray-600">Track signups, commissions, and manage payouts</p>
         </div>
 
         {/* Stats Overview */}
@@ -191,6 +259,11 @@ export default function AdminAffiliatesPage() {
             <div className="bg-white rounded-lg p-6 border border-gray-200">
               <div className="text-sm text-gray-600 mb-1">Total Affiliates</div>
               <div className="text-3xl font-bold text-gray-900">{stats.totalAffiliates}</div>
+            </div>
+            
+            <div className="bg-white rounded-lg p-6 border border-gray-200">
+              <div className="text-sm text-gray-600 mb-1">Total Signups</div>
+              <div className="text-3xl font-bold text-blue-600">{stats.totalConversions}</div>
             </div>
             
             <div className="bg-white rounded-lg p-6 border border-gray-200">
@@ -207,194 +280,299 @@ export default function AdminAffiliatesPage() {
               <div className="text-sm text-gray-600 mb-1">Paid</div>
               <div className="text-3xl font-bold text-green-600">${stats.totalPaid.toFixed(2)}</div>
             </div>
-            
-            <div className="bg-white rounded-lg p-6 border border-gray-200">
-              <div className="text-sm text-gray-600 mb-1">Total All Time</div>
-              <div className="text-3xl font-bold text-[#88D18A]">${stats.totalCommissions.toFixed(2)}</div>
-            </div>
           </div>
         )}
 
-        {/* Top Affiliates */}
+        {/* Tabs */}
         <div className="bg-white rounded-lg border border-gray-200 mb-8">
-          <div className="p-6 border-b border-gray-200">
-            <h2 className="text-xl font-bold text-gray-900">Top Affiliates</h2>
+          <div className="border-b border-gray-200">
+            <nav className="flex -mb-px">
+              <button
+                onClick={() => setActiveTab('overview')}
+                className={`px-6 py-4 text-sm font-semibold border-b-2 ${
+                  activeTab === 'overview'
+                    ? 'border-[#88D18A] text-[#88D18A]'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
+              >
+                Overview
+              </button>
+              <button
+                onClick={() => setActiveTab('signups')}
+                className={`px-6 py-4 text-sm font-semibold border-b-2 ${
+                  activeTab === 'signups'
+                    ? 'border-[#88D18A] text-[#88D18A]'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
+              >
+                All Signups ({conversions.length})
+              </button>
+              <button
+                onClick={() => setActiveTab('commissions')}
+                className={`px-6 py-4 text-sm font-semibold border-b-2 ${
+                  activeTab === 'commissions'
+                    ? 'border-[#88D18A] text-[#88D18A]'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
+              >
+                Commissions ({commissions.length})
+              </button>
+              <button
+                onClick={() => setActiveTab('payouts')}
+                className={`px-6 py-4 text-sm font-semibold border-b-2 ${
+                  activeTab === 'payouts'
+                    ? 'border-[#88D18A] text-[#88D18A]'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
+              >
+                Payouts
+              </button>
+            </nav>
           </div>
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Email</th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Code</th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Referrals</th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Paying</th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Earned</th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Pending</th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Paid</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200">
-                {affiliates.slice(0, 20).map((affiliate: any) => (
-                  <tr key={affiliate.user_id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 text-sm text-gray-900">{affiliate.profiles?.email || 'N/A'}</td>
-                    <td className="px-6 py-4 text-sm font-mono text-gray-700">{affiliate.affiliate_code}</td>
-                    <td className="px-6 py-4 text-sm text-gray-900">{affiliate.total_referrals}</td>
-                    <td className="px-6 py-4 text-sm text-gray-900">{affiliate.paying_referrals}</td>
-                    <td className="px-6 py-4 text-sm font-semibold text-[#88D18A]">
-                      ${(affiliate.total_commission_earned || 0).toFixed(2)}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-yellow-600">
-                      ${(affiliate.pending_commission || 0).toFixed(2)}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-green-600">
-                      ${(affiliate.paid_commission || 0).toFixed(2)}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
 
-        {/* Commission Transactions */}
-        <div className="bg-white rounded-lg border border-gray-200">
-          <div className="p-6 border-b border-gray-200 flex justify-between items-center">
-            <h2 className="text-xl font-bold text-gray-900">Recent Commissions</h2>
-            
-            {/* Filter */}
-            <div className="flex gap-2">
-              <button
-                onClick={() => setFilter('all')}
-                className={`px-3 py-1 rounded text-sm font-semibold ${filter === 'all' ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-600'}`}
-              >
-                All
-              </button>
-              <button
-                onClick={() => setFilter('pending')}
-                className={`px-3 py-1 rounded text-sm font-semibold ${filter === 'pending' ? 'bg-yellow-500 text-white' : 'bg-gray-100 text-gray-600'}`}
-              >
-                Pending
-              </button>
-              <button
-                onClick={() => setFilter('approved')}
-                className={`px-3 py-1 rounded text-sm font-semibold ${filter === 'approved' ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-600'}`}
-              >
-                Approved
-              </button>
-              <button
-                onClick={() => setFilter('paid')}
-                className={`px-3 py-1 rounded text-sm font-semibold ${filter === 'paid' ? 'bg-green-500 text-white' : 'bg-gray-100 text-gray-600'}`}
-              >
-                Paid
-              </button>
-            </div>
-          </div>
-          
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Date</th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Affiliate</th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Referred User</th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Type</th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Amount Paid</th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Commission</th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Status</th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200">
-                {filteredCommissions.length === 0 ? (
-                  <tr>
-                    <td colSpan={8} className="px-6 py-8 text-center text-gray-500">
-                      No commissions found
-                    </td>
-                  </tr>
-                ) : (
-                  filteredCommissions.map((commission: any) => (
-                    <tr key={commission.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 text-sm text-gray-600">
-                        {new Date(commission.created_at).toLocaleDateString()}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-gray-900">
-                        {commission.affiliate?.email || 'N/A'}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-gray-900">
-                        {commission.referred?.email || 'N/A'}
-                      </td>
-                      <td className="px-6 py-4 text-sm">
-                        <span className={`px-2 py-1 rounded text-xs font-semibold ${
-                          commission.transaction_type === 'subscription' 
-                            ? 'bg-blue-100 text-blue-800' 
-                            : 'bg-purple-100 text-purple-800'
-                        }`}>
-                          {commission.transaction_type}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 text-sm text-gray-900 font-semibold">
-                        ${parseFloat(commission.amount_paid).toFixed(2)}
-                      </td>
-                      <td className="px-6 py-4 text-sm font-bold text-[#88D18A]">
-                        ${parseFloat(commission.commission_amount).toFixed(2)}
-                      </td>
-                      <td className="px-6 py-4 text-sm">
-                        <span className={`px-2 py-1 rounded text-xs font-semibold ${
-                          commission.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                          commission.status === 'approved' ? 'bg-blue-100 text-blue-800' :
-                          commission.status === 'paid' ? 'bg-green-100 text-green-800' :
-                          'bg-gray-100 text-gray-800'
-                        }`}>
-                          {commission.status.toUpperCase()}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 text-sm">
-                        {commission.status === 'pending' && new Date(commission.pending_until) <= new Date() && (
-                          <button
-                            onClick={() => approveCommission(commission.id)}
-                            className="text-blue-600 hover:text-blue-800 font-semibold text-xs"
-                          >
-                            Approve
-                          </button>
-                        )}
-                        {commission.status === 'approved' && (
-                          <button
-                            onClick={() => {
-                              const ref = prompt('Enter payment reference (Stripe/PayPal ID):');
-                              if (ref) markAsPaid(commission.id, ref);
-                            }}
-                            className="text-green-600 hover:text-green-800 font-semibold text-xs"
-                          >
-                            Mark Paid
-                          </button>
-                        )}
-                        {commission.status === 'paid' && commission.payment_reference && (
-                          <span className="text-xs text-gray-500 font-mono">
-                            {commission.payment_reference.substring(0, 12)}...
-                          </span>
-                        )}
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
+          {/* Tab Content */}
+          <div className="p-6">
+            {activeTab === 'overview' && (
+              <div>
+                <h2 className="text-xl font-bold text-gray-900 mb-4">Top Affiliates</h2>
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Owner</th>
+                        <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Code</th>
+                        <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Referrals</th>
+                        <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Earned</th>
+                        <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Pending</th>
+                        <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Paid</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-200">
+                      {affiliates.slice(0, 20).map((affiliate: any) => (
+                        <tr key={affiliate.user_id} className="hover:bg-gray-50">
+                          <td className="px-6 py-4 text-sm text-gray-900">{affiliate.owner?.email || 'N/A'}</td>
+                          <td className="px-6 py-4 text-sm font-mono text-gray-700">{affiliate.affiliate_code}</td>
+                          <td className="px-6 py-4 text-sm text-gray-900">{affiliate.total_referrals}</td>
+                          <td className="px-6 py-4 text-sm font-semibold text-[#88D18A]">
+                            ${(affiliate.total_commission_earned || 0).toFixed(2)}
+                          </td>
+                          <td className="px-6 py-4 text-sm text-yellow-600">
+                            ${(affiliate.pending_commission || 0).toFixed(2)}
+                          </td>
+                          <td className="px-6 py-4 text-sm text-green-600">
+                            ${(affiliate.paid_commission || 0).toFixed(2)}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
 
-        {/* Bulk Actions Info */}
-        <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
-          <h3 className="text-lg font-bold text-gray-900 mb-2">Automated Commission Processing</h3>
-          <p className="text-sm text-gray-700 mb-3">
-            Commissions are automatically approved 30 days after the referred customer's subscription starts, 
-            provided the customer remains active. You can manually approve eligible commissions above.
-          </p>
-          <p className="text-sm text-gray-700">
-            <strong>Note:</strong> Run the auto-approval function via cron job: <code className="bg-gray-900 text-green-400 px-2 py-1 rounded text-xs">SELECT auto_approve_commissions();</code>
-          </p>
+            {activeTab === 'signups' && (
+              <div>
+                <h2 className="text-xl font-bold text-gray-900 mb-4">All Affiliate Signups</h2>
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Signup Date</th>
+                        <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Affiliate Code</th>
+                        <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Code Owner</th>
+                        <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Signed Up User</th>
+                        <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Plan Purchased</th>
+                        <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Commission</th>
+                        <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Payment Due</th>
+                        <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-200">
+                      {conversions.length === 0 ? (
+                        <tr>
+                          <td colSpan={8} className="px-6 py-8 text-center text-gray-500">
+                            No signups found
+                          </td>
+                        </tr>
+                      ) : (
+                        conversions.map((conv: any) => {
+                          // Find corresponding commission if exists
+                          const commission = commissions.find((c: any) => c.referred_user_id === conv.referred_user_id);
+                          const subscription = commission?.subscription?.[0];
+                          const planId = subscription?.plan_id || 'N/A';
+                          const amountPaid = commission?.amount_paid || 0;
+                          const commissionAmount = commission ? parseFloat(commission.commission_amount) : 0;
+                          const paymentDue = commission?.pending_until 
+                            ? new Date(commission.pending_until).toLocaleDateString()
+                            : subscription?.current_period_start 
+                              ? getPaymentDueDate(subscription.current_period_start)
+                              : 'N/A';
+
+                          return (
+                            <tr key={conv.id} className="hover:bg-gray-50">
+                              <td className="px-6 py-4 text-sm text-gray-600">
+                                {new Date(conv.signup_date || conv.created_at).toLocaleDateString()}
+                              </td>
+                              <td className="px-6 py-4 text-sm font-mono text-gray-700">{conv.affiliate_code}</td>
+                              <td className="px-6 py-4 text-sm text-gray-900">{conv.owner_email || 'N/A'}</td>
+                              <td className="px-6 py-4 text-sm text-gray-900">{conv.referred_user_email || 'N/A'}</td>
+                              <td className="px-6 py-4 text-sm">
+                                {planId !== 'N/A' ? getPlanName(planId) : 'Not purchased yet'}
+                              </td>
+                              <td className="px-6 py-4 text-sm font-bold text-[#88D18A]">
+                                {commissionAmount > 0 ? `$${commissionAmount.toFixed(2)}` : 'N/A'}
+                              </td>
+                              <td className="px-6 py-4 text-sm text-gray-600">{paymentDue}</td>
+                              <td className="px-6 py-4 text-sm">
+                                {commission ? (
+                                  <span className={`px-2 py-1 rounded text-xs font-semibold ${
+                                    commission.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                                    commission.status === 'approved' ? 'bg-blue-100 text-blue-800' :
+                                    commission.status === 'paid' ? 'bg-green-100 text-green-800' :
+                                    'bg-gray-100 text-gray-800'
+                                  }`}>
+                                    {commission.status.toUpperCase()}
+                                  </span>
+                                ) : (
+                                  <span className="px-2 py-1 rounded text-xs font-semibold bg-gray-100 text-gray-800">
+                                    NO PURCHASE
+                                  </span>
+                                )}
+                              </td>
+                            </tr>
+                          );
+                        })
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'commissions' && (
+              <div>
+                <h2 className="text-xl font-bold text-gray-900 mb-4">Commission Transactions</h2>
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Date</th>
+                        <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Affiliate</th>
+                        <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Referred User</th>
+                        <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Plan</th>
+                        <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Amount Paid</th>
+                        <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Commission</th>
+                        <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Payment Due</th>
+                        <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Status</th>
+                        <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-200">
+                      {commissions.length === 0 ? (
+                        <tr>
+                          <td colSpan={9} className="px-6 py-8 text-center text-gray-500">
+                            No commissions found
+                          </td>
+                        </tr>
+                      ) : (
+                        commissions.map((commission: any) => {
+                          const subscription = commission.subscription?.[0];
+                          const paymentDue = commission.pending_until 
+                            ? new Date(commission.pending_until).toLocaleDateString()
+                            : subscription?.current_period_start 
+                              ? getPaymentDueDate(subscription.current_period_start)
+                              : 'N/A';
+
+                          return (
+                            <tr key={commission.id} className="hover:bg-gray-50">
+                              <td className="px-6 py-4 text-sm text-gray-600">
+                                {new Date(commission.created_at).toLocaleDateString()}
+                              </td>
+                              <td className="px-6 py-4 text-sm text-gray-900">
+                                {commission.affiliate?.email || 'N/A'}
+                              </td>
+                              <td className="px-6 py-4 text-sm text-gray-900">
+                                {commission.referred?.email || 'N/A'}
+                              </td>
+                              <td className="px-6 py-4 text-sm">
+                                {getPlanName(commission.plan_id || 'N/A')}
+                              </td>
+                              <td className="px-6 py-4 text-sm text-gray-900 font-semibold">
+                                ${parseFloat(commission.amount_paid || 0).toFixed(2)}
+                              </td>
+                              <td className="px-6 py-4 text-sm font-bold text-[#88D18A]">
+                                ${parseFloat(commission.commission_amount || 0).toFixed(2)}
+                              </td>
+                              <td className="px-6 py-4 text-sm text-gray-600">{paymentDue}</td>
+                              <td className="px-6 py-4 text-sm">
+                                <span className={`px-2 py-1 rounded text-xs font-semibold ${
+                                  commission.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                                  commission.status === 'approved' ? 'bg-blue-100 text-blue-800' :
+                                  commission.status === 'paid' ? 'bg-green-100 text-green-800' :
+                                  'bg-gray-100 text-gray-800'
+                                }`}>
+                                  {commission.status.toUpperCase()}
+                                </span>
+                              </td>
+                              <td className="px-6 py-4 text-sm">
+                                {commission.status === 'pending' && new Date(commission.pending_until || 0) <= new Date() && (
+                                  <button
+                                    onClick={() => approveCommission(commission.id)}
+                                    className="text-blue-600 hover:text-blue-800 font-semibold text-xs"
+                                  >
+                                    Approve
+                                  </button>
+                                )}
+                                {commission.status === 'approved' && (
+                                  <button
+                                    onClick={() => {
+                                      const ref = prompt('Enter payment reference (Stripe/PayPal ID):');
+                                      if (ref) markAsPaid(commission.id, ref);
+                                    }}
+                                    className="text-green-600 hover:text-green-800 font-semibold text-xs"
+                                  >
+                                    Mark Paid
+                                  </button>
+                                )}
+                                {commission.status === 'paid' && commission.payment_reference && (
+                                  <span className="text-xs text-gray-500 font-mono">
+                                    {commission.payment_reference.substring(0, 12)}...
+                                  </span>
+                                )}
+                              </td>
+                            </tr>
+                          );
+                        })
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'payouts' && (
+              <div>
+                <h2 className="text-xl font-bold text-gray-900 mb-4">Payout Management</h2>
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+                  <h3 className="text-lg font-bold text-gray-900 mb-2">How to Pay Affiliates</h3>
+                  <ol className="list-decimal list-inside space-y-2 text-sm text-gray-700 mb-4">
+                    <li>Review approved commissions in the Commissions tab</li>
+                    <li>Process payment via Stripe Connect or PayPal (manual process)</li>
+                    <li>Mark commissions as "Paid" and enter the payment reference ID</li>
+                    <li>The system will automatically update affiliate totals</li>
+                  </ol>
+                  <p className="text-sm text-gray-600">
+                    <strong>Note:</strong> Commissions become payable 30 days after the referred customer's subscription starts, 
+                    assuming they remain active. You can manually approve eligible commissions.
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
+
+      <Footer />
     </div>
   );
 }
-

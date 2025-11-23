@@ -193,6 +193,19 @@ export async function GET(request: NextRequest) {
             });
             
             if (affiliateData) {
+                // Check if conversion already exists to prevent duplicates
+                const { data: existingConversion } = await supabaseAdmin
+                  .from('affiliate_conversions')
+                  .select('id')
+                  .eq('referred_user_id', data.user.id)
+                  .eq('affiliate_code', finalAffiliateRef)
+                  .maybeSingle();
+                
+                if (existingConversion) {
+                  console.log(`[auth/callback] ⚠️ Conversion already exists for user ${data.user.id} with affiliate ${finalAffiliateRef}, skipping`);
+                  break; // Exit early to prevent duplicate counting
+                }
+                
                 // Create affiliate conversion record
                 const { error: conversionError } = await supabaseAdmin
                   .from('affiliate_conversions')
@@ -200,55 +213,35 @@ export async function GET(request: NextRequest) {
                     affiliate_code: finalAffiliateRef,
                     referred_user_id: data.user.id,
                     converted_to_paid: false,
-                    bonus_awarded: false
+                    bonus_awarded: false,
+                    conversion_date: new Date().toISOString()
                   });
                 
                 if (!conversionError) {
-                  // Update total_referrals count - always use manual update for reliability
+                  // Update total_referrals count - ONLY ONCE per signup
                   console.log(`[auth/callback] Updating total_referrals for affiliate ${finalAffiliateRef}`);
                   
-                  // First, get current count
+                  // Get current count and increment by 1
                   const { data: currentData, error: fetchError } = await supabaseAdmin
                     .from('user_affiliates')
                     .select('total_referrals, user_id')
                     .eq('affiliate_code', finalAffiliateRef)
                     .single();
                   
-                  console.log(`[auth/callback] Current affiliate data before update:`, { 
-                    currentData, 
-                    fetchError: fetchError?.message,
-                    currentCount: currentData?.total_referrals 
-                  });
-                  
                   if (currentData) {
                     const newCount = (currentData.total_referrals || 0) + 1;
-                    const { data: updateData, error: updateError } = await supabaseAdmin
+                    const { error: updateError } = await supabaseAdmin
                       .from('user_affiliates')
                       .update({ total_referrals: newCount })
-                      .eq('affiliate_code', finalAffiliateRef)
-                      .select('total_referrals');
+                      .eq('affiliate_code', finalAffiliateRef);
                     
                     if (updateError) {
                       console.error('[auth/callback] Error updating total_referrals:', updateError);
                     } else {
-                      console.log(`[auth/callback] ✅ Successfully updated total_referrals from ${currentData.total_referrals || 0} to ${newCount} for affiliate ${finalAffiliateRef} (user_id: ${currentData.user_id})`);
-                      console.log(`[auth/callback] Verification - updated record:`, updateData);
+                      console.log(`[auth/callback] ✅ Successfully updated total_referrals from ${currentData.total_referrals || 0} to ${newCount} for affiliate ${finalAffiliateRef}`);
                     }
                   } else {
                     console.error('[auth/callback] ❌ Could not fetch current affiliate data for update. Fetch error:', fetchError);
-                  }
-                  
-                  // Also try RPC as backup (but don't rely on it)
-                  try {
-                    const { error: rpcError } = await supabaseAdmin.rpc('increment_affiliate_referrals', {
-                      affiliate_code_param: finalAffiliateRef
-                    });
-                    if (!rpcError) {
-                      console.log(`[auth/callback] RPC also succeeded for affiliate ${finalAffiliateRef}`);
-                    }
-                  } catch (rpcException) {
-                    // Ignore RPC errors, we already did manual update
-                    console.log(`[auth/callback] RPC failed (expected if function doesn't exist), but manual update should have worked`);
                   }
                   
                   console.log(`[auth/callback] ✅ Affiliate referral tracked: ${finalAffiliateRef} -> ${data.user.id}`);
