@@ -70,10 +70,11 @@ export default function AdminAffiliatesPage() {
         .order('created_at', { ascending: false });
 
       if (!conversionsError && conversionsData) {
-        // Fetch user details and affiliate owner details separately
+        // Fetch user details and affiliate owner details via API
         const enriched = await Promise.all(conversionsData.map(async (conv: any) => {
-          // Get referred user details
-          const { data: referredUser } = await supabase.auth.admin.getUserById(conv.referred_user_id);
+          // Get referred user details via API
+          const referredRes = await fetch(`/api/admin/user/${conv.referred_user_id}`);
+          const referredData = referredRes.ok ? await referredRes.json() : null;
           
           // Get affiliate owner
           const { data: affiliateData } = await supabase
@@ -84,15 +85,16 @@ export default function AdminAffiliatesPage() {
           
           let ownerEmail = 'N/A';
           if (affiliateData) {
-            const { data: ownerUser } = await supabase.auth.admin.getUserById(affiliateData.user_id);
-            ownerEmail = ownerUser?.user?.email || 'N/A';
+            const ownerRes = await fetch(`/api/admin/user/${affiliateData.user_id}`);
+            const ownerData = ownerRes.ok ? await ownerRes.json() : null;
+            ownerEmail = ownerData?.email || 'N/A';
           }
 
           return {
             ...conv,
-            referred_user_email: referredUser?.user?.email || 'N/A',
+            referred_user_email: referredData?.email || 'N/A',
             referred_user_id: conv.referred_user_id,
-            signup_date: referredUser?.user?.created_at || conv.created_at,
+            signup_date: referredData?.created_at || conv.created_at,
             owner_email: ownerEmail,
             owner_id: affiliateData?.user_id
           };
