@@ -100,14 +100,14 @@ export async function GET(request: NextRequest) {
     const { data, error } = await supabase.auth.exchangeCodeForSession(code);
     
     if (!error && data?.user) {
-      // Get affiliate ref from cookie FIRST, before any other operations
-      // This ensures we capture it even if the user was just created
-      const affiliateRef = cookieStore.get('affiliate_ref')?.value;
-      
-      // Also check URL params as fallback (in case cookie didn't persist)
+      // Get affiliate ref from multiple sources (cookie, URL params, or localStorage via client-side)
+      // Priority: URL params > Cookie > (localStorage would need client-side handling)
       const urlParams = new URL(request.url).searchParams;
       const refFromUrl = urlParams.get('ref') || urlParams.get('affiliate_ref');
-      const finalAffiliateRef = affiliateRef || refFromUrl;
+      const affiliateRef = cookieStore.get('affiliate_ref')?.value;
+      
+      // URL params take priority (most reliable through OAuth/magic link redirects)
+      const finalAffiliateRef = refFromUrl || affiliateRef;
       
       // Check if this is a new user (signup) by checking user creation time
       // A user is "new" if they were created in the last 5 seconds (just now)
