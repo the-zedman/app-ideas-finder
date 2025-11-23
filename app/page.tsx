@@ -280,8 +280,8 @@ export default function LandingTest() {
               </div>
             </div>
             
-            {/* Waitlist Section */}
-            <div className="border-t border-gray-200 pt-6 sm:pt-8">
+            {/* Waitlist Section - Hidden but kept for potential future use */}
+            <div className="hidden border-t border-gray-200 pt-6 sm:pt-8">
               <p className="text-sm sm:text-base text-gray-600 mb-4">
                 Be among the first to experience an easier way to find app ideas by joining our early access beta group that will be opening to developers, like you, very soon.
               </p>
