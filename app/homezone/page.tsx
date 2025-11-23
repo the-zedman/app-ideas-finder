@@ -793,8 +793,8 @@ export default function HomeZone() {
               </div>
             </div>
 
-            {/* Affiliate Code */}
-            <div className="bg-white rounded-lg p-6 border border-gray-200">
+            {/* Affiliate Code - Hidden but kept for potential future use */}
+            <div className="hidden bg-white rounded-lg p-6 border border-gray-200">
               <div className="flex items-center justify-between mb-3">
                 <label className="text-sm font-semibold text-gray-900">Your Affiliate Code</label>
                 <button
