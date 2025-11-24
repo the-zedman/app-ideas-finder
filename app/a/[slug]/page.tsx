@@ -178,7 +178,7 @@ export default async function SharedAnalysisPage({ params }: { params: { slug: s
             </div>
             <a
               href={ctaUrl}
-              className="hidden sm:inline-flex items-center gap-2 bg-gray-900 text-white px-4 py-2 rounded-full text-sm font-semibold"
+              className="hidden sm:inline-flex items-center gap-2 bg-gray-900 text-white px-4 py-2 rounded-full text-sm font-semibold hover:bg-gray-800 transition-colors"
             >
               Start The Generator →
             </a>
@@ -271,7 +271,7 @@ export default async function SharedAnalysisPage({ params }: { params: { slug: s
               </div>
 
               <div className="bg-gray-900 text-white rounded-2xl p-6 mb-8">
-                <h3 className="text-2xl font-black mb-3">Here&apos;s Your Blueprint</h3>
+                <h3 className="text-2xl font-black mb-3 text-[#FCD34D]">Here&apos;s Your Blueprint</h3>
                 <p className="text-gray-100 text-base">
                   This report dissects {analysis.app_name} across 13 sections—surfacing what users love, hate, and
                   desperately want—so you can ship a version that’s at least 1% better. Every insight is sourced
@@ -468,7 +468,7 @@ export default async function SharedAnalysisPage({ params }: { params: { slug: s
             <p className="inline-flex items-center gap-2 text-xs tracking-[0.3em] uppercase text-gray-400 mb-4">
               ⚡ YOUR COMPETITIVE EDGE STARTS HERE
             </p>
-            <h3 className="text-4xl font-black mb-4" style={{ letterSpacing: '-0.02em' }}>
+            <h3 className="text-4xl font-black mb-4 text-[#FDE68A]" style={{ letterSpacing: '-0.02em' }}>
               Turn Insights Into Your 1% Edge
             </h3>
             <p className="text-lg text-gray-200 max-w-3xl mx-auto mb-8">
