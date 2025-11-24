@@ -239,6 +239,13 @@ export default function AdminDashboard() {
               <div className="text-sm text-gray-600">Track signups, commissions, and manage payouts</div>
             </a>
             <a
+              href="/admin/shared-links"
+              className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow border-emerald-200"
+            >
+              <div className="text-lg font-semibold text-gray-900 mb-2">🔗 Shared App Links</div>
+              <div className="text-sm text-gray-600">Grab the latest public analysis link for any app</div>
+            </a>
+            <a
               href="/admin/deletions"
               className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow border-red-300"
             >
