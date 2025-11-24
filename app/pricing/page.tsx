@@ -173,10 +173,6 @@ export default function Pricing() {
                   <span className="text-[#88D18A] text-xl">✓</span>
                   <span className="text-gray-700">13-section detailed reports</span>
                 </li>
-                <li className="flex items-start gap-3">
-                  <span className="text-[#88D18A] text-xl">✓</span>
-                  <span className="text-gray-700">Auto-converts to Core plan</span>
-                </li>
               </ul>
 
               <div className="text-center">
@@ -428,7 +424,7 @@ export default function Pricing() {
           <div className="space-y-6">
             <div className="bg-gray-50 rounded-lg p-6">
               <h3 className="font-bold text-gray-900 mb-2">What happens after my trial ends?</h3>
-                  <p className="text-gray-700">Your trial automatically converts to the Core monthly plan ($37/month) after 3 days unless you cancel. You can cancel anytime during the trial period.</p>
+                  <p className="text-gray-700">After your 3-day trial ends, your access will expire. To continue using App Ideas Finder, you'll need to subscribe to a Core or Prime plan. You can cancel your trial anytime during the 3-day period.</p>
             </div>
 
             <div className="bg-gray-50 rounded-lg p-6">

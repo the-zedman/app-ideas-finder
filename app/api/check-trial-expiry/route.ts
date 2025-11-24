@@ -47,81 +47,19 @@ export async function POST(request: Request) {
       const now = new Date();
       
       if (now > trialEnd) {
-        console.log(`Trial expired for user ${user.id}, converting to Core Monthly`);
+        console.log(`Trial expired for user ${user.id}, marking as expired`);
         
-        // Only convert if we have Stripe set up and a customer ID
-        if (stripe && subscription.stripe_customer_id) {
-          try {
-            // Create Core Monthly subscription in Stripe
-            const stripeSubscription = await stripe.subscriptions.create({
-              customer: subscription.stripe_customer_id,
-              items: [{ price: process.env.STRIPE_PRICE_CORE_MONTHLY! }],
-              metadata: {
-                user_id: user.id,
-                plan_type: 'core_monthly',
-                converted_from_trial: 'true',
-              },
-            });
-            
-            // Update subscription in database
-            const periodStart = new Date((stripeSubscription as any).current_period_start * 1000);
-            const periodEnd = new Date((stripeSubscription as any).current_period_end * 1000);
-            
-            await supabaseAdmin
-              .from('user_subscriptions')
-              .update({
-                plan_id: 'core_monthly',
-                status: 'active',
-                stripe_subscription_id: stripeSubscription.id,
-                current_period_start: periodStart.toISOString(),
-                current_period_end: periodEnd.toISOString(),
-              })
-              .eq('user_id', user.id);
-            
-            // Update usage limits to Core plan (75 searches)
-            await supabaseAdmin
-              .from('monthly_usage')
-              .update({
-                searches_limit: 75,
-                searches_used: 0, // Reset for new month
-                period_start: periodStart.toISOString(),
-                period_end: periodEnd.toISOString(),
-              })
-              .eq('user_id', user.id);
-            
-            return NextResponse.json({ 
-              trialExpired: true, 
-              converted: true,
-              message: 'Trial expired and converted to Core Monthly'
-            });
-          } catch (error) {
-            console.error('Error converting trial:', error);
-            
-            // Mark as expired even if Stripe fails
-            await supabaseAdmin
-              .from('user_subscriptions')
-              .update({ status: 'expired' })
-              .eq('user_id', user.id);
-            
-            return NextResponse.json({ 
-              trialExpired: true, 
-              converted: false,
-              error: 'Failed to create subscription'
-            });
-          }
-        } else {
-          // Mark as expired if no Stripe setup
-          await supabaseAdmin
-            .from('user_subscriptions')
-            .update({ status: 'expired' })
-            .eq('user_id', user.id);
-          
-          return NextResponse.json({ 
-            trialExpired: true, 
-            converted: false,
-            message: 'Trial expired but Stripe not configured'
-          });
-        }
+        // Mark trial as expired - user must manually subscribe
+        await supabaseAdmin
+          .from('user_subscriptions')
+          .update({ status: 'expired' })
+          .eq('user_id', user.id);
+        
+        return NextResponse.json({ 
+          trialExpired: true, 
+          converted: false,
+          message: 'Trial expired - subscription required to continue'
+        });
       }
     }
     

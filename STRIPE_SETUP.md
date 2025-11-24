@@ -86,7 +86,7 @@ stripe listen --forward-to localhost:3000/api/webhooks/stripe
 
 ## Pricing Summary
 
-- **Trial**: $1 (3 days, 10 searches) → auto-converts to Core Monthly
+- **Trial**: $1 (3 days, 10 searches) → expires after 3 days, requires manual subscription
 - **Core Monthly**: $39/month (73 searches)
 - **Core Annual**: $399/year (73 searches, save $69)
 - **Prime Monthly**: $79/month (227 searches)

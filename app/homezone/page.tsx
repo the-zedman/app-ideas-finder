@@ -22,6 +22,7 @@ export default function HomeZone() {
   const [totalAnalysesCount, setTotalAnalysesCount] = useState(0);
   const [affiliateData, setAffiliateData] = useState<any>(null);
   const [isAffiliateExpanded, setIsAffiliateExpanded] = useState(false);
+  const [trialExpired, setTrialExpired] = useState(false);
   const [popularApps, setPopularApps] = useState<any[]>([
     { name: 'Instagram', id: '389801252', icon: '' },
     { name: 'Uber', id: '368677368', icon: '' },
@@ -60,8 +61,12 @@ export default function HomeZone() {
         const adminData = await adminResponse.json();
         setIsAdmin(adminData.isAdmin || false);
         
-        // Check if trial has expired and needs conversion
-        await fetch('/api/check-trial-expiry', { method: 'POST' });
+        // Check if trial has expired
+        const trialExpiryResponse = await fetch('/api/check-trial-expiry', { method: 'POST' });
+        const trialExpiryData = await trialExpiryResponse.json();
+        if (trialExpiryData.trialExpired) {
+          setTrialExpired(true);
+        }
         
         // Fetch usage data
         const usageResponse = await fetch('/api/subscription/usage');
@@ -382,6 +387,29 @@ export default function HomeZone() {
           </div>
         </div>
       </header>
+
+      {/* Trial Expired Banner */}
+      {trialExpired && (
+        <div className="bg-yellow-400 border-b-4 border-yellow-500">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <span className="text-2xl">⚠️</span>
+                <div>
+                  <p className="font-bold text-gray-900">Your trial has ended</p>
+                  <p className="text-sm text-gray-800">Subscribe to a Core or Prime plan to continue using App Ideas Finder.</p>
+                </div>
+              </div>
+              <a
+                href="/pricing"
+                className="bg-gray-900 hover:bg-gray-800 text-white px-6 py-2 rounded-lg font-semibold transition-colors"
+              >
+                View Plans →
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Main Content */}
       <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

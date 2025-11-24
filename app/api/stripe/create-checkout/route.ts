@@ -122,9 +122,56 @@ export async function POST(request: Request) {
     
     const { data: subscription } = await supabaseAdmin
       .from('user_subscriptions')
-      .select('stripe_customer_id')
+      .select('*')
       .eq('user_id', user.id)
       .maybeSingle();
+    
+    // Prevent trial purchase if user has ever had a trial
+    if (planType === 'trial') {
+      // Check if user has ever had a trial (any status: trial, expired, active, etc.)
+      if (subscription) {
+        // Check if they've ever had a trial by looking at plan_id or status history
+        // We'll check if they have any subscription record with plan_id 'trial' or status 'trial' or 'expired'
+        const { data: allSubscriptions } = await supabaseAdmin
+          .from('user_subscriptions')
+          .select('plan_id, status')
+          .eq('user_id', user.id);
+        
+        const hasHadTrial = allSubscriptions?.some((sub: any) => 
+          sub.plan_id === 'trial' || sub.status === 'trial' || sub.status === 'expired'
+        );
+        
+        if (hasHadTrial) {
+          return NextResponse.json({ 
+            error: 'Trial already used', 
+            details: 'You have already used your trial. Please subscribe to a Core or Prime plan to continue.' 
+          }, { status: 400 });
+        }
+      }
+    }
+    
+    // Prevent search pack purchase unless user has active Core or Prime subscription
+    if (planType === 'search_pack') {
+      if (!subscription) {
+        return NextResponse.json({ 
+          error: 'Subscription required', 
+          details: 'You must have an active Core or Prime subscription to purchase search packs.' 
+        }, { status: 400 });
+      }
+      
+      const activeStatuses = ['active', 'trial'];
+      const validPlans = ['core_monthly', 'core_annual', 'prime_monthly', 'prime_annual'];
+      
+      const hasActiveSubscription = activeStatuses.includes(subscription.status) && 
+                                     validPlans.includes(subscription.plan_id);
+      
+      if (!hasActiveSubscription) {
+        return NextResponse.json({ 
+          error: 'Active subscription required', 
+          details: 'You must have an active Core or Prime subscription to purchase search packs.' 
+        }, { status: 400 });
+      }
+    }
     
     let customerId = subscription?.stripe_customer_id;
     
