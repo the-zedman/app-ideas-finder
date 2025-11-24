@@ -156,7 +156,7 @@ export default async function SharedAnalysisPage({ params }: { params: { slug: s
     ? analysis.ratings_count.toLocaleString()
     : null;
 
-  const ctaUrl = '/signup?ref=share';
+  const ctaUrl = '/?ref=share';
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
