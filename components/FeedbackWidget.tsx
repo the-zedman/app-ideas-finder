@@ -20,9 +20,10 @@ export default function FeedbackWidget() {
 
   // List of public pages that don't require authentication
   const publicPages = ['/', '/login', '/signup', '/pricing', '/contact', '/about', '/privacy', '/terms'];
+  const isSharedAnalysisPage = pathname?.startsWith('/a/');
   
   // Hide feedback button on public pages or if user is not authenticated
-  if (loading || !user || publicPages.includes(pathname)) {
+  if (loading || !user || publicPages.includes(pathname) || isSharedAnalysisPage) {
     return null;
   }
 

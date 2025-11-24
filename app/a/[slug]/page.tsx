@@ -163,22 +163,22 @@ export default async function SharedAnalysisPage({ params }: { params: { slug: s
       <header className="border-b border-gray-200">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <div className="flex items-center gap-3">
+            <a href="/" className="flex items-center gap-3 group">
               <img
                 src="/App Ideas Finder - logo - 200x200.png"
                 alt="App Ideas Finder"
-                className="h-10 w-10 rounded-xl"
+                className="h-10 w-10 rounded-xl group-hover:scale-105 transition-transform"
               />
               <div>
-                <p className="text-sm font-semibold text-gray-900 uppercase tracking-[0.2em]">
+                <p className="text-sm font-semibold text-gray-900 uppercase tracking-[0.2em] group-hover:text-[#0c8e4b] transition-colors">
                   App Ideas Finder
                 </p>
-                <p className="text-xs text-gray-500">appideasfinder.com</p>
+                <p className="text-xs text-gray-500 group-hover:text-gray-700 transition-colors">appideasfinder.com</p>
               </div>
-            </div>
+            </a>
             <a
               href={ctaUrl}
-              className="hidden sm:inline-flex items-center gap-2 bg-gray-900 text-white px-4 py-2 rounded-full text-sm font-semibold hover:bg-gray-800 transition-colors"
+              className="hidden sm:inline-flex items-center gap-2 bg-gray-900 text-[#FCD34D] px-4 py-2 rounded-full text-sm font-semibold hover:bg-gray-800 transition-colors border border-[#FCD34D]/40"
             >
               Start The Generator →
             </a>
