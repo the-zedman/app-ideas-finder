@@ -166,7 +166,7 @@ export default function AdminWaitlistPage() {
           )}
           
           <p className="mt-3 text-xs text-gray-500">
-            Manually added users will have source marked as "admin-manual"
+            Users added manually will appear in the waitlist immediately
           </p>
         </div>
 

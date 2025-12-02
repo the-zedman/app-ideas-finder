@@ -61,8 +61,7 @@ export async function POST(request: Request) {
       .from('waitlist')
       .insert([{ 
         email: email.toLowerCase().trim(), 
-        unsubscribe_token: unsubscribeToken,
-        source: 'admin-manual'
+        unsubscribe_token: unsubscribeToken
       }])
       .select()
       .single();
