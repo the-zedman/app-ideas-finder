@@ -42,7 +42,7 @@ const parseMarkdownContent = (text: string): string[] => {
 
 export async function POST(request: Request) {
   try {
-    const { appMeta, rollupContent, analysisMetrics, affiliateCode, userEmail } = await request.json();
+    const { appMeta, rollupContent, analysisMetrics } = await request.json();
     
     const doc = new jsPDF('p', 'mm', 'a4');
     const pageWidth = doc.internal.pageSize.getWidth();
@@ -345,48 +345,6 @@ export async function POST(request: Request) {
         doc.text(`Estimated manual analysis time: ${analysisMetrics.manualTaskHours.toFixed(1)} hours`, 25, yPosition);
       }
     }
-    
-    // === AFFILIATE SECTION ===
-    doc.addPage();
-    addHeader();
-    
-    // Header
-    doc.setFillColor(136, 209, 138);
-    doc.roundedRect(20, yPosition, pageWidth - 40, 12, 2, 2, 'F');
-    
-    doc.setFontSize(16);
-    doc.setTextColor(255, 255, 255);
-    doc.setFont('helvetica', 'bold');
-    doc.text('💰 Earn With App Ideas Finder', 25, yPosition + 8);
-    
-    yPosition += 20;
-    
-    // Affiliate Details Box
-    doc.setFillColor(250, 250, 250);
-    doc.setDrawColor(136, 209, 138);
-    doc.roundedRect(20, yPosition, pageWidth - 40, 50, 3, 3, 'FD');
-    
-    yPosition += 10;
-    doc.setFontSize(12);
-    doc.setTextColor(40, 40, 40);
-    doc.setFont('helvetica', 'bold');
-    doc.text('Your Exclusive Affiliate Details:', 25, yPosition);
-    
-    yPosition += 10;
-    doc.setFontSize(11);
-    doc.setFont('helvetica', 'normal');
-    doc.setTextColor(60, 60, 60);
-    doc.text(`Affiliate Code: ${affiliateCode}`, 25, yPosition);
-    
-    yPosition += 8;
-    doc.text(`Affiliate URL: www.appideasfinder.com?ref=${affiliateCode}`, 25, yPosition);
-    
-    yPosition += 15;
-    doc.setFontSize(10);
-    doc.setTextColor(100, 100, 100);
-    const affiliateText = 'Share this link and earn commissions: $9.75-$199.75 USD per referral! Visit www.appideasfinder.com/affiliate for full details.';
-    const splitAffiliate = doc.splitTextToSize(affiliateText, pageWidth - 50);
-    doc.text(splitAffiliate, 25, yPosition);
     
     // Add header and footer to all pages
     const totalPages = doc.getNumberOfPages();
