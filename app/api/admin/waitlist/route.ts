@@ -2,44 +2,98 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { cookies } from 'next/headers';
 
-export async function GET() {
+// Helper to verify admin access
+async function verifyAdmin() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+  
+  const cookieStore = await cookies();
+  const allCookies = cookieStore.getAll();
+  const { createServerClient } = await import('@supabase/ssr');
+  const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
+    cookies: {
+      getAll() { return allCookies },
+      setAll() {},
+    },
+  });
+  
+  const { data: { user } } = await supabase.auth.getUser();
+  
+  if (!user) {
+    return { error: 'Not authenticated', status: 401 };
+  }
+  
+  const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey);
+  
+  const { data: adminData } = await supabaseAdmin
+    .from('admins')
+    .select('role')
+    .eq('user_id', user.id)
+    .maybeSingle();
+  
+  if (!adminData) {
+    return { error: 'Not authorized', status: 403 };
+  }
+  
+  return { supabaseAdmin, user };
+}
+
+// POST - Add manual entry to waitlist
+export async function POST(request: Request) {
   try {
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-    
-    // Get current user
-    const cookieStore = await cookies();
-    const allCookies = cookieStore.getAll();
-    const { createServerClient } = await import('@supabase/ssr');
-    const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
-      cookies: {
-        getAll() { return allCookies },
-        setAll() {},
-      },
-    });
-    
-    const { data: { user } } = await supabase.auth.getUser();
-    
-    if (!user) {
-      return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
+    const auth = await verifyAdmin();
+    if ('error' in auth) {
+      return NextResponse.json({ error: auth.error }, { status: auth.status });
     }
     
-    // Verify user is admin
-    const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey);
+    const { email } = await request.json();
     
-    const { data: adminData } = await supabaseAdmin
-      .from('admins')
-      .select('role')
-      .eq('user_id', user.id)
-      .maybeSingle();
+    if (!email || !email.includes('@')) {
+      return NextResponse.json({ error: 'Valid email is required' }, { status: 400 });
+    }
     
-    if (!adminData) {
-      return NextResponse.json({ error: 'Not authorized' }, { status: 403 });
+    // Generate unsubscribe token
+    const unsubscribeToken = crypto.randomUUID();
+    
+    // Insert into waitlist
+    const { data, error } = await auth.supabaseAdmin
+      .from('waitlist')
+      .insert([{ 
+        email: email.toLowerCase().trim(), 
+        unsubscribe_token: unsubscribeToken,
+        source: 'admin-manual'
+      }])
+      .select()
+      .single();
+    
+    if (error) {
+      if (error.code === '23505') {
+        return NextResponse.json({ error: 'Email already exists on waitlist' }, { status: 409 });
+      }
+      return NextResponse.json({ error: 'Failed to add to waitlist', message: error.message }, { status: 500 });
+    }
+    
+    return NextResponse.json({ success: true, data });
+    
+  } catch (error) {
+    console.error('Error adding to waitlist:', error);
+    return NextResponse.json({
+      error: 'Failed to add to waitlist',
+      message: error instanceof Error ? error.message : 'Unknown error'
+    }, { status: 500 });
+  }
+}
+
+export async function GET() {
+  try {
+    const auth = await verifyAdmin();
+    if ('error' in auth) {
+      return NextResponse.json({ error: auth.error }, { status: auth.status });
     }
     
     // Fetch all waitlist data
-    const { data: waitlistData, error } = await supabaseAdmin
+    const { data: waitlistData, error } = await auth.supabaseAdmin
       .from('waitlist')
       .select('*')
       .order('created_at', { ascending: false });

@@ -8,6 +8,9 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 export default function AdminWaitlistPage() {
   const [waitlistData, setWaitlistData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [manualEmail, setManualEmail] = useState('');
+  const [addingEmail, setAddingEmail] = useState(false);
+  const [addMessage, setAddMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   
   const router = useRouter();
   const supabase = createClient();
@@ -48,6 +51,36 @@ export default function AdminWaitlistPage() {
   const handleLogout = async () => {
     await supabase.auth.signOut();
     router.push('/');
+  };
+
+  const handleAddEmail = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!manualEmail.trim()) return;
+    
+    setAddingEmail(true);
+    setAddMessage(null);
+    
+    try {
+      const response = await fetch('/api/admin/waitlist', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: manualEmail.trim() }),
+      });
+      
+      const data = await response.json();
+      
+      if (response.ok) {
+        setAddMessage({ type: 'success', text: `Successfully added ${manualEmail} to waitlist!` });
+        setManualEmail('');
+        await fetchWaitlist(); // Refresh the data
+      } else {
+        setAddMessage({ type: 'error', text: data.error || 'Failed to add email' });
+      }
+    } catch (error) {
+      setAddMessage({ type: 'error', text: 'Failed to add email to waitlist' });
+    } finally {
+      setAddingEmail(false);
+    }
   };
 
   if (loading) {
@@ -101,6 +134,39 @@ export default function AdminWaitlistPage() {
           </a>
           <p className="mt-2 text-sm text-gray-600">
             See all waitlist users, their signup status, login activity, and search counts
+          </p>
+        </div>
+
+        {/* Manual Add to Waitlist */}
+        <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6 mb-8">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">➕ Add to Waitlist Manually</h2>
+          <form onSubmit={handleAddEmail} className="flex flex-col sm:flex-row gap-3">
+            <input
+              type="email"
+              value={manualEmail}
+              onChange={(e) => setManualEmail(e.target.value)}
+              placeholder="Enter email address"
+              required
+              disabled={addingEmail}
+              className="flex-1 px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-purple-500 text-gray-900 disabled:opacity-50"
+            />
+            <button
+              type="submit"
+              disabled={addingEmail || !manualEmail.trim()}
+              className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors disabled:opacity-50 whitespace-nowrap"
+            >
+              {addingEmail ? 'Adding...' : 'Add to Waitlist'}
+            </button>
+          </form>
+          
+          {addMessage && (
+            <div className={`mt-3 text-sm ${addMessage.type === 'success' ? 'text-green-600' : 'text-red-600'}`}>
+              {addMessage.text}
+            </div>
+          )}
+          
+          <p className="mt-3 text-xs text-gray-500">
+            Manually added users will have source marked as "admin-manual"
           </p>
         </div>
 
