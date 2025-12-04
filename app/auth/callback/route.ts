@@ -282,8 +282,8 @@ export async function GET(request: NextRequest) {
         nextPath ||
         DEFAULT_REDIRECT;
 
-      // For signups, check if user is on waitlist to determine redirect
-      // Waitlist users → /homezone, Normal users → /pricing
+      // For signups, check if user is on waitlist or VIP list to determine redirect
+      // Waitlist/VIP users → /homezone, Normal users → /pricing
       if ((type === 'signup' || isNewUser) && data?.user?.email) {
         const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
         if (serviceRoleKey) {
@@ -293,24 +293,33 @@ export async function GET(request: NextRequest) {
               serviceRoleKey
             );
             
+            const userEmailLower = data.user.email.toLowerCase();
+            
             // Check if user email is in waitlist
             const { data: waitlistEntry } = await supabaseAdmin
               .from('waitlist')
               .select('email')
-              .eq('email', data.user.email.toLowerCase())
-              .single();
+              .eq('email', userEmailLower)
+              .maybeSingle();
             
-            if (waitlistEntry) {
-              // Waitlist user → redirect to /homezone
+            // Check if user email is in VIP list
+            const { data: vipEntry } = await supabaseAdmin
+              .from('vip_users')
+              .select('email')
+              .eq('email', userEmailLower)
+              .maybeSingle();
+            
+            if (waitlistEntry || vipEntry) {
+              // Waitlist or VIP user → redirect to /homezone
               finalPath = '/homezone';
-              console.log(`[auth/callback] Waitlist user ${data.user.email} signing up, redirecting to /homezone`);
+              console.log(`[auth/callback] ${vipEntry ? 'VIP' : 'Waitlist'} user ${data.user.email} signing up, redirecting to /homezone`);
             } else {
               // Normal user → redirect to /pricing
               finalPath = '/pricing';
               console.log(`[auth/callback] Normal user ${data.user.email} signing up, redirecting to /pricing`);
             }
           } catch (error) {
-            console.error(`[auth/callback] Error checking waitlist for ${data.user.id}:`, error);
+            console.error(`[auth/callback] Error checking waitlist/VIP for ${data.user.id}:`, error);
             // On error, default to pricing for normal users
             finalPath = '/pricing';
           }
