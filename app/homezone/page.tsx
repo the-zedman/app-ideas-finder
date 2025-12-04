@@ -487,10 +487,10 @@ export default function HomeZone() {
 
         {/* Early Access / Bonus Searches (VIP or Waitlist) */}
         {(usageData?.vipBonusRemaining ?? usageData?.waitlistBonusRemaining ?? usageData?.bonusSearchesRemaining ?? 0) > 0 && (
-          <div className={`bg-gradient-to-r ${usageData?.isVip ? 'from-purple-500/10 to-indigo-500/10 border-purple-400/40' : 'from-[#88D18A]/10 to-[#6BC070]/10 border-[#88D18A]/40'} border rounded-2xl p-5 mb-8`}>
+          <div className={`bg-gradient-to-r ${usageData?.isVip ? 'from-amber-500/10 to-yellow-500/10 border-amber-400/40' : 'from-[#88D18A]/10 to-[#6BC070]/10 border-[#88D18A]/40'} border rounded-2xl p-5 mb-8`}>
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div>
-                <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full ${usageData?.isVip ? 'bg-purple-500/20 text-purple-900' : 'bg-[#88D18A]/20 text-[#256029]'} text-xs font-semibold mb-2`}>
+                <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full ${usageData?.isVip ? 'bg-amber-500/20 text-amber-900' : 'bg-[#88D18A]/20 text-[#256029]'} text-xs font-semibold mb-2`}>
                   <span>{usageData?.isVip ? '⭐ VIP Access' : '🎁 Early Access Bonus'}</span>
                   <span className="uppercase tracking-wide">{usageData?.isVip ? 'VIP' : 'WAITLIST'}</span>
                 </div>
@@ -507,8 +507,8 @@ export default function HomeZone() {
               </div>
               <div className="flex flex-col items-start sm:items-end gap-2">
                 <div className="text-xs uppercase tracking-wide text-gray-500">Your lifetime discount code</div>
-                <div className={`inline-flex items-center gap-2 bg-white border border-dashed ${usageData?.isVip ? 'border-purple-400' : 'border-[#88D18A]'} rounded-lg px-3 py-2`}>
-                  <code className={`font-mono text-sm font-bold ${usageData?.isVip ? 'text-purple-700' : 'text-[#256029]'}`}>
+                <div className={`inline-flex items-center gap-2 bg-white border border-dashed ${usageData?.isVip ? 'border-amber-400' : 'border-[#88D18A]'} rounded-lg px-3 py-2`}>
+                  <code className={`font-mono text-sm font-bold ${usageData?.isVip ? 'text-amber-700' : 'text-[#256029]'}`}>
                     {usageData?.isVip 
                       ? (usageData?.vipCouponCode || 'VIPTHANKYOU')
                       : (usageData?.waitlistCouponCode || WAITLIST_COUPON_CODE)
@@ -516,7 +516,7 @@ export default function HomeZone() {
                   </code>
                   <button
                     type="button"
-                    className={`text-xs font-semibold ${usageData?.isVip ? 'text-purple-700 hover:text-purple-900' : 'text-[#256029] hover:text-[#1b4420]'}`}
+                    className={`text-xs font-semibold ${usageData?.isVip ? 'text-amber-700 hover:text-amber-900' : 'text-[#256029] hover:text-[#1b4420]'}`}
                     onClick={() => {
                       const code = usageData?.isVip 
                         ? (usageData?.vipCouponCode || 'VIPTHANKYOU')
