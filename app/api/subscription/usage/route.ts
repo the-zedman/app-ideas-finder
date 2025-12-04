@@ -3,6 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 import { cookies } from 'next/headers';
 import { ensureWaitlistBonus } from '@/lib/waitlist-perk';
 import { WAITLIST_BONUS_AMOUNT, WAITLIST_COUPON_CODE } from '@/lib/waitlist';
+import { VIP_BONUS_AMOUNT, VIP_COUPON_CODE, VIP_BONUS_REASON } from '@/lib/vip';
 
 export async function GET() {
   try {
@@ -91,29 +92,47 @@ export async function GET() {
         b.bonus_type === 'fixed_searches' && b.reason === 'waitlist_75_free' && b.is_active
       ).reduce((sum: number, b: any) => sum + (b.bonus_value || 0), 0) || 0;
       
-      // For waitlist users, feedback bonuses add to the total limit
-      const totalWaitlistLimit = WAITLIST_BONUS_AMOUNT + feedbackBonusSearches;
+      // Calculate VIP bonus remaining
+      const vipBonusRemaining = bonuses?.filter((b: any) => 
+        b.bonus_type === 'fixed_searches' && b.reason === VIP_BONUS_REASON && b.is_active
+      ).reduce((sum: number, b: any) => sum + (b.bonus_value || 0), 0) || 0;
       
-      if (waitlistBonusRemaining > 0 || packSearches > 0 || feedbackBonusSearches > 0) {
-        // Calculate searches used for waitlist users: original amount - remaining amount
-        const waitlistSearchesUsed = WAITLIST_BONUS_AMOUNT - waitlistBonusRemaining;
+      // Determine if user is VIP or Waitlist (VIP takes precedence if both exist)
+      const isVip = vipBonusRemaining > 0;
+      const isWaitlist = waitlistBonusRemaining > 0;
+      const earlyAccessBonusRemaining = isVip ? vipBonusRemaining : waitlistBonusRemaining;
+      const earlyAccessBonusAmount = isVip ? VIP_BONUS_AMOUNT : WAITLIST_BONUS_AMOUNT;
+      
+      // For early access users, feedback bonuses add to the total limit
+      const totalEarlyAccessLimit = earlyAccessBonusAmount + feedbackBonusSearches;
+      
+      if (earlyAccessBonusRemaining > 0 || packSearches > 0 || feedbackBonusSearches > 0) {
+        // Calculate searches used: original amount - remaining amount
+        const earlyAccessSearchesUsed = earlyAccessBonusAmount - earlyAccessBonusRemaining;
         return NextResponse.json({
           hasSubscription: false,
-          planId: 'waitlist_bonus',
-          planName: 'Waitlist Early Access',
-          status: 'waitlist_bonus',
-          searchesUsed: waitlistSearchesUsed,
-          searchesLimit: totalWaitlistLimit, // Include feedback bonuses in limit
-          searchesRemaining: waitlistBonusRemaining + packSearches + feedbackBonusSearches,
+          planId: isVip ? 'vip_bonus' : 'waitlist_bonus',
+          planName: isVip ? 'VIP Early Access' : 'Waitlist Early Access',
+          status: isVip ? 'vip_bonus' : 'waitlist_bonus',
+          searchesUsed: earlyAccessSearchesUsed,
+          searchesLimit: totalEarlyAccessLimit, // Include feedback bonuses in limit
+          searchesRemaining: earlyAccessBonusRemaining + packSearches + feedbackBonusSearches,
           packSearches,
-          bonusSearchesRemaining: waitlistBonusRemaining,
+          bonusSearchesRemaining: earlyAccessBonusRemaining,
           feedbackBonusSearches, // Include feedback bonuses separately for display
           percentageBonus: 0,
           trialTimeRemaining: null,
           currentPeriodEnd: null,
-          waitlistCouponCode: WAITLIST_COUPON_CODE,
-          waitlistBonusAmount: WAITLIST_BONUS_AMOUNT,
-          canSearch: waitlistBonusRemaining + packSearches + feedbackBonusSearches > 0,
+          // Include both coupon codes for compatibility
+          waitlistCouponCode: isVip ? VIP_COUPON_CODE : WAITLIST_COUPON_CODE,
+          vipCouponCode: isVip ? VIP_COUPON_CODE : null,
+          waitlistBonusAmount: isWaitlist ? WAITLIST_BONUS_AMOUNT : null,
+          vipBonusAmount: isVip ? VIP_BONUS_AMOUNT : null,
+          // Separate tracking for display
+          waitlistBonusRemaining: waitlistBonusRemaining,
+          vipBonusRemaining: vipBonusRemaining,
+          isVip,
+          canSearch: earlyAccessBonusRemaining + packSearches + feedbackBonusSearches > 0,
         });
       }
 

@@ -211,6 +211,13 @@ export default function AdminDashboard() {
               <div className="text-sm text-gray-600">Manage early access waitlist</div>
             </a>
             <a
+              href="/admin/vip"
+              className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow border-purple-300"
+            >
+              <div className="text-lg font-semibold text-purple-900 mb-2">⭐ VIP Management</div>
+              <div className="text-sm text-purple-600">Add and manage VIP users</div>
+            </a>
+            <a
               href="/admin/coupons"
               className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow border-yellow-300"
             >

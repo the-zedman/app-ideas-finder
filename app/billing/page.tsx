@@ -130,6 +130,7 @@ function BillingContent() {
     const planNames: any = {
       trial: 'Trial',
       waitlist_bonus: 'Waitlist Early Access',
+      vip_bonus: 'VIP Early Access',
       core_monthly: 'Core (Monthly)',
       core_annual: 'Core (Annual)',
       prime_monthly: 'Prime (Monthly)',
@@ -163,11 +164,12 @@ function BillingContent() {
     );
   }
 
-  const currentPlan = subscription?.plan_id || (usage?.status === 'waitlist_bonus' ? 'waitlist_bonus' : 'trial');
+  const currentPlan = subscription?.plan_id || (usage?.status === 'vip_bonus' ? 'vip_bonus' : usage?.status === 'waitlist_bonus' ? 'waitlist_bonus' : 'trial');
   const isUnlimited = subscription?.status === 'free_unlimited';
   const isTrial = subscription?.status === 'trial';
   const isActive = subscription?.status === 'active';
   const isWaitlistUser = usage?.status === 'waitlist_bonus' || (usage?.bonusSearchesRemaining > 0 && !subscription);
+  const isVipUser = usage?.status === 'vip_bonus' || usage?.isVip;
 
   return (
     <div className="min-h-screen bg-gray-50">

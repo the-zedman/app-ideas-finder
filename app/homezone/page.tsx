@@ -485,17 +485,20 @@ export default function HomeZone() {
           </div>
         )}
 
-        {/* Early Access / Bonus Searches */}
-        {(usageData?.waitlistBonusRemaining ?? usageData?.bonusSearchesRemaining ?? 0) > 0 && (
-          <div className="bg-gradient-to-r from-[#88D18A]/10 to-[#6BC070]/10 border border-[#88D18A]/40 rounded-2xl p-5 mb-8">
+        {/* Early Access / Bonus Searches (VIP or Waitlist) */}
+        {(usageData?.vipBonusRemaining ?? usageData?.waitlistBonusRemaining ?? usageData?.bonusSearchesRemaining ?? 0) > 0 && (
+          <div className={`bg-gradient-to-r ${usageData?.isVip ? 'from-purple-500/10 to-indigo-500/10 border-purple-400/40' : 'from-[#88D18A]/10 to-[#6BC070]/10 border-[#88D18A]/40'} border rounded-2xl p-5 mb-8`}>
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div>
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#88D18A]/20 text-xs font-semibold text-[#256029] mb-2">
-                  <span>🎁 Early Access Bonus</span>
-                  <span className="uppercase tracking-wide">WAITLIST</span>
+                <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full ${usageData?.isVip ? 'bg-purple-500/20 text-purple-900' : 'bg-[#88D18A]/20 text-[#256029]'} text-xs font-semibold mb-2`}>
+                  <span>{usageData?.isVip ? '⭐ VIP Access' : '🎁 Early Access Bonus'}</span>
+                  <span className="uppercase tracking-wide">{usageData?.isVip ? 'VIP' : 'WAITLIST'}</span>
                 </div>
                 <h3 className="text-lg font-bold text-gray-900 mb-1">
-                  You have {usageData.waitlistBonusRemaining ?? usageData.bonusSearchesRemaining ?? 0} of {WAITLIST_BONUS_AMOUNT} waitlist bonus searches
+                  You have {usageData?.isVip 
+                    ? (usageData.vipBonusRemaining ?? usageData.bonusSearchesRemaining ?? 0) 
+                    : (usageData.waitlistBonusRemaining ?? usageData.bonusSearchesRemaining ?? 0)
+                  } of {usageData?.isVip ? (usageData.vipBonusAmount || 75) : WAITLIST_BONUS_AMOUNT} {usageData?.isVip ? 'VIP' : 'waitlist'} bonus searches
                 </h3>
                 <p className="text-sm text-gray-700">
                   These never expire and are used <span className="font-semibold">before</span> your monthly plan
@@ -504,16 +507,22 @@ export default function HomeZone() {
               </div>
               <div className="flex flex-col items-start sm:items-end gap-2">
                 <div className="text-xs uppercase tracking-wide text-gray-500">Your lifetime discount code</div>
-                <div className="inline-flex items-center gap-2 bg-white border border-dashed border-[#88D18A] rounded-lg px-3 py-2">
-                  <code className="font-mono text-sm font-bold text-[#256029]">
-                    {usageData?.waitlistCouponCode || WAITLIST_COUPON_CODE}
+                <div className={`inline-flex items-center gap-2 bg-white border border-dashed ${usageData?.isVip ? 'border-purple-400' : 'border-[#88D18A]'} rounded-lg px-3 py-2`}>
+                  <code className={`font-mono text-sm font-bold ${usageData?.isVip ? 'text-purple-700' : 'text-[#256029]'}`}>
+                    {usageData?.isVip 
+                      ? (usageData?.vipCouponCode || 'VIPTHANKYOU')
+                      : (usageData?.waitlistCouponCode || WAITLIST_COUPON_CODE)
+                    }
                   </code>
                   <button
                     type="button"
-                    className="text-xs font-semibold text-[#256029] hover:text-[#1b4420]"
+                    className={`text-xs font-semibold ${usageData?.isVip ? 'text-purple-700 hover:text-purple-900' : 'text-[#256029] hover:text-[#1b4420]'}`}
                     onClick={() => {
+                      const code = usageData?.isVip 
+                        ? (usageData?.vipCouponCode || 'VIPTHANKYOU')
+                        : (usageData?.waitlistCouponCode || WAITLIST_COUPON_CODE);
                       navigator.clipboard
-                        .writeText(usageData?.waitlistCouponCode || WAITLIST_COUPON_CODE)
+                        .writeText(code)
                         .catch(() => {
                           // ignore clipboard errors (e.g. not available)
                         });
