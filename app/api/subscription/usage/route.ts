@@ -148,20 +148,40 @@ export async function GET() {
     const baseLimit = usage?.searches_limit || subscription.subscription_plans?.searches_per_month || 0;
     const percentageBonusAmount = Math.floor((baseLimit * percentageBonus) / 100);
     
-    // Plan-based monthly limit includes feedback bonuses (they add to monthly quota)
-    // but does NOT include waitlist bonus or search packs
+    // Calculate VIP/waitlist bonus amounts (original and remaining)
+    const vipBonusRemaining = bonuses?.filter((b: any) => 
+      b.bonus_type === 'fixed_searches' && b.reason === VIP_BONUS_REASON && b.is_active
+    ).reduce((sum: number, b: any) => sum + (b.bonus_value || 0), 0) || 0;
+    
+    const waitlistBonusRemaining = bonuses?.filter((b: any) => 
+      b.bonus_type === 'fixed_searches' && b.reason === 'waitlist_75_free' && b.is_active
+    ).reduce((sum: number, b: any) => sum + (b.bonus_value || 0), 0) || 0;
+    
+    // Check if user ever had VIP or waitlist bonus (even if fully consumed)
+    const hadVipBonus = vipBonusRemaining > 0 || bonuses?.some((b: any) => b.reason === VIP_BONUS_REASON);
+    const hadWaitlistBonus = waitlistBonusRemaining > 0 || bonuses?.some((b: any) => b.reason === 'waitlist_75_free');
+    
+    // Calculate original bonus amount and how much was used
+    const originalBonusAmount = hadVipBonus ? VIP_BONUS_AMOUNT : (hadWaitlistBonus ? WAITLIST_BONUS_AMOUNT : 0);
+    const earlyAccessBonusRemaining = vipBonusRemaining + waitlistBonusRemaining;
+    const earlyAccessBonusUsed = originalBonusAmount > 0 ? Math.max(0, originalBonusAmount - earlyAccessBonusRemaining) : 0;
+    
+    // Plan-based monthly limit NOW includes early access bonus for display purposes
     const planSearchesLimit = subscription.status === 'free_unlimited' 
       ? -1 
-      : baseLimit + percentageBonusAmount + feedbackBonusSearches;
+      : baseLimit + percentageBonusAmount + feedbackBonusSearches + originalBonusAmount;
     
-    const searchesUsed = usage?.searches_used || 0;
+    // Searches used includes both monthly usage AND early access bonus consumed
+    const monthlyUsageSearches = usage?.searches_used || 0;
+    const searchesUsed = monthlyUsageSearches + earlyAccessBonusUsed;
+    
     const planSearchesRemaining = subscription.status === 'free_unlimited'
       ? -1
       : Math.max(0, planSearchesLimit - searchesUsed);
     
     const totalSearchesRemaining = subscription.status === 'free_unlimited'
       ? -1
-      : planSearchesRemaining + bonusSearchesRemaining + packSearches;
+      : planSearchesRemaining + packSearches;
     
     // Calculate trial time remaining
     let trialTimeRemaining = null;
@@ -184,21 +204,25 @@ export async function GET() {
       planName: subscription.subscription_plans?.name,
       status: subscription.status,
       searchesUsed,
-      // Plan-based monthly limit (excludes fixed bonus & packs)
+      // Total limit including plan + early access bonus
       searchesLimit: planSearchesLimit,
-      // Total remaining including plan, fixed bonuses and search packs
+      // Total remaining including plan and search packs
       searchesRemaining: totalSearchesRemaining,
       packSearches,
-      bonusSearchesRemaining,
+      bonusSearchesRemaining: earlyAccessBonusRemaining,
       percentageBonus,
       trialTimeRemaining,
       currentPeriodEnd: subscription.current_period_end,
-      waitlistCouponCode: bonusSearchesRemaining > 0 ? WAITLIST_COUPON_CODE : null,
-      waitlistBonusAmount: bonusSearchesRemaining > 0 ? WAITLIST_BONUS_AMOUNT : null,
-      // Separate waitlist bonus remaining for display (only waitlist bonuses, not feedback)
-      waitlistBonusRemaining: bonuses?.filter((b: any) => 
-        b.bonus_type === 'fixed_searches' && b.reason === 'waitlist_75_free' && b.is_active
-      ).reduce((sum: number, b: any) => sum + (b.bonus_value || 0), 0) || 0,
+      // Coupon codes
+      waitlistCouponCode: hadWaitlistBonus ? WAITLIST_COUPON_CODE : null,
+      vipCouponCode: hadVipBonus ? VIP_COUPON_CODE : null,
+      // Bonus tracking
+      waitlistBonusRemaining,
+      vipBonusRemaining,
+      waitlistBonusAmount: hadWaitlistBonus ? WAITLIST_BONUS_AMOUNT : null,
+      vipBonusAmount: hadVipBonus ? VIP_BONUS_AMOUNT : null,
+      isVip: hadVipBonus,
+      earlyAccessBonusUsed,
       canSearch: subscription.status === 'free_unlimited' || totalSearchesRemaining > 0
     });
     
