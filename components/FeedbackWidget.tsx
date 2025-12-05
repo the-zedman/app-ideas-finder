@@ -9,21 +9,40 @@ export default function FeedbackWidget() {
   const supabase = createClient();
   const pathname = usePathname();
   const [user, setUser] = useState<User | null>(null);
+  const [hasAccess, setHasAccess] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => {
+    const checkAccess = async () => {
+      const { data } = await supabase.auth.getUser();
       setUser(data.user);
+      
+      if (data.user) {
+        // Check if user has subscription or bonus access
+        try {
+          const response = await fetch('/api/subscription/usage');
+          if (response.ok) {
+            const usage = await response.json();
+            // User has access if they have a subscription OR can search (waitlist/VIP bonus)
+            setHasAccess(usage.hasSubscription || usage.canSearch);
+          }
+        } catch (error) {
+          console.error('Error checking access:', error);
+        }
+      }
+      
       setLoading(false);
-    });
+    };
+    
+    checkAccess();
   }, [supabase]);
 
   // List of public pages that don't require authentication
   const publicPages = ['/', '/login', '/signup', '/pricing', '/contact', '/about', '/privacy', '/terms'];
   const isSharedAnalysisPage = pathname?.startsWith('/a/');
   
-  // Hide feedback button on public pages or if user is not authenticated
-  if (loading || !user || publicPages.includes(pathname) || isSharedAnalysisPage) {
+  // Hide feedback button on public pages, if user is not authenticated, or if they don't have access
+  if (loading || !user || !hasAccess || publicPages.includes(pathname) || isSharedAnalysisPage) {
     return null;
   }
 
