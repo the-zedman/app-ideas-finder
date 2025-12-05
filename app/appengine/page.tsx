@@ -406,7 +406,7 @@ function AppEngineContent() {
     cost: number;
     timestamp: string;
   }>>([]);
-  const [grokApiKey, setGrokApiKey] = useState<string>('');
+  // grokApiKey removed - now handled server-side via /api/grok-proxy
   const [showRollups, setShowRollups] = useState(false);
   const [expandedRollup, setExpandedRollup] = useState<string | null>(null);
   const [rollupStatuses, setRollupStatuses] = useState<{[key: string]: string}>({});
@@ -460,27 +460,12 @@ function AppEngineContent() {
     getUser();
   }, [router, isDevelopmentBypass]);
 
-  useEffect(() => {
-    // Fetch the Grok API key from environment
-    const fetchApiKey = async () => {
-      try {
-        const response = await fetch('/api/grok-key');
-        if (response.ok) {
-          const data = await response.json();
-          setGrokApiKey(data.apiKey || '');
-        }
-      } catch (error) {
-        console.error('Error fetching API key:', error);
-      }
-    };
-
-    fetchApiKey();
-  }, []);
+  // API key fetching removed - now handled server-side via /api/grok-proxy
 
   // Auto-start analysis if app parameter is in URL
   useEffect(() => {
     const appParam = searchParams.get('app');
-    if (appParam && grokApiKey && !hasAutoStarted.current && !loading) {
+    if (appParam && !hasAutoStarted.current && !loading) {
       console.log('Auto-starting analysis for app ID:', appParam);
       hasAutoStarted.current = true;
       
@@ -499,7 +484,7 @@ function AppEngineContent() {
         }
       }, 500);
     }
-  }, [grokApiKey, searchParams, loading]);
+  }, [searchParams, loading]);
 
   // Handle clicking outside search results to close them
   useEffect(() => {
@@ -1052,34 +1037,29 @@ function AppEngineContent() {
     return all;
   };
 
-  // AI API function
-  const callAI = async (apiKey: string, messages: any[], provider: string = 'grok', model: string = 'grok-4-fast-reasoning', costAccumulator?: { value: number }) => {
-    const endpoint = 'https://api.x.ai/v1/chat/completions';
-    const body = {
-      model: model,
-      messages: messages,
-      temperature: 0.2,
-      max_tokens: 5000
-    };
-    const headers = {
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer ' + apiKey
-    };
-    
-    const response = await fetch(endpoint, {
+  // AI API function - now uses server-side proxy to protect API key
+  const callAI = async (messages: any[], model: string = 'grok-4-fast-reasoning', costAccumulator?: { value: number }) => {
+    const response = await fetch('/api/grok-proxy', {
       method: 'POST',
-      headers: headers,
-      body: JSON.stringify(body)
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        messages,
+        model,
+        temperature: 0.2,
+        max_tokens: 5000,
+      }),
     });
     
     if (!response.ok) {
-      const txt = await response.text();
-      throw new Error(`Grok error: ${response.status} ${txt}`);
+      const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+      throw new Error(`Grok error: ${response.status} ${errorData.error || 'Unknown error'}`);
     }
     
     const data = await response.json();
     
-    // Extract token usage for cost tracking
+    // Extract token usage for cost tracking (from proxy response)
     if (data.usage) {
       const inputTokens = data.usage.prompt_tokens || 0;
       const outputTokens = data.usage.completion_tokens || 0;
@@ -1126,7 +1106,8 @@ function AppEngineContent() {
       console.warn('No usage data in API response:', data);
     }
     
-    return data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
+    // Return content from proxy response
+    return data.content || '';
   };
 
   const updateCostTracking = (inputTokens: number, outputTokens: number, systemTokens: number = 0) => {
@@ -1766,11 +1747,6 @@ Base recommendations on competitive pricing data and actual user feedback about 
     
     console.log('startAnalysis called with input:', appInput, 'forceRefresh:', forceRefresh);
     
-    if (!grokApiKey) {
-      alert('Grok API key not available. Please check your environment configuration.');
-      return;
-    }
-    
     const appId = extractAppId(appInput || '');
     console.log('Extracted app ID:', appId);
     
@@ -1878,7 +1854,7 @@ Base recommendations on competitive pricing data and actual user feedback about 
 
       // Send all reviews in one request
       const messages = buildChunkPrompt(appMetaData, allText);
-      const raw = await callAI(grokApiKey, messages, 'grok', 'grok-4-fast-reasoning', costAccumulator);
+      const raw = await callAI(messages, 'grok-4-fast-reasoning', costAccumulator);
 
       // Parse the response exactly like HTML
       let summaryText = '';
@@ -1956,7 +1932,7 @@ Base recommendations on competitive pricing data and actual user feedback about 
       let keywordsArray: string[] = [];
       try {
         const keywordsMessages = buildKeywordsPrompt(appMetaData, finalParsed.likes);
-        const keywordsResponse = await callAI(grokApiKey, keywordsMessages, 'grok', 'grok-4-fast-reasoning', costAccumulator);
+        const keywordsResponse = await callAI(keywordsMessages, 'grok-4-fast-reasoning', costAccumulator);
         
         if (keywordsResponse && keywordsResponse.trim()) {
           keywordsArray = keywordsResponse.split(',').map((k: string) => k.trim()).filter((k: string) => k.length > 0);
@@ -1974,7 +1950,7 @@ Base recommendations on competitive pricing data and actual user feedback about 
       let definitelyIncludeFeatures: string[] = [];
       try {
         const definitelyIncludeMessages = buildDefinitelyIncludePrompt(appMetaData, finalParsed.likes);
-        const definitelyIncludeResponse = await callAI(grokApiKey, definitelyIncludeMessages, 'grok', 'grok-4-fast-reasoning', costAccumulator);
+        const definitelyIncludeResponse = await callAI(definitelyIncludeMessages, 'grok-4-fast-reasoning', costAccumulator);
         
         if (definitelyIncludeResponse && definitelyIncludeResponse.trim()) {
           // Parse the features from the text
@@ -1997,7 +1973,7 @@ Base recommendations on competitive pricing data and actual user feedback about 
       let backlogItems: any[] = [];
       try {
         const backlogMessages = buildBacklogPrompt(appMetaData, finalParsed.dislikes, finalParsed.likes);
-        const backlogResponse = await callAI(grokApiKey, backlogMessages, 'grok', 'grok-4-fast-reasoning', costAccumulator);
+        const backlogResponse = await callAI(backlogMessages, 'grok-4-fast-reasoning', costAccumulator);
         
         if (backlogResponse && backlogResponse.trim()) {
           // Parse the backlog items from the text
@@ -2027,7 +2003,7 @@ Base recommendations on competitive pricing data and actual user feedback about 
       try {
         const ratingsCount = appMetaData.userRatingCount || 0;
         const recommendationsMessages = buildRecommendationsPrompt(appMetaData, finalParsed.likes, finalParsed.dislikes, keywordsArray, definitelyIncludeFeatures, backlogItems, ratingsCount);
-        const recommendationsResponse = await callAI(grokApiKey, recommendationsMessages, 'grok', 'grok-4-fast-reasoning', costAccumulator);
+        const recommendationsResponse = await callAI(recommendationsMessages, 'grok-4-fast-reasoning', costAccumulator);
         
         if (recommendationsResponse && recommendationsResponse.trim()) {
           // Parse recommendations - they're already formatted with [PRIORITY] tags
@@ -2050,7 +2026,7 @@ Base recommendations on competitive pricing data and actual user feedback about 
       try {
         // Use the local variables that were just generated
         const appDescriptionMessages = buildAppDescriptionPrompt(appMetaData, definitelyIncludeFeatures, backlogItems, keywordsArray);
-        const appDescriptionResponse = await callAI(grokApiKey, appDescriptionMessages, 'grok', 'grok-4-fast-reasoning', costAccumulator);
+        const appDescriptionResponse = await callAI(appDescriptionMessages, 'grok-4-fast-reasoning', costAccumulator);
         
         if (appDescriptionResponse && appDescriptionResponse.trim()) {
           description = appDescriptionResponse.trim();
@@ -2067,7 +2043,7 @@ Base recommendations on competitive pricing data and actual user feedback about 
       try {
         // Use the local description variable that was just generated
         const appNameMessages = buildAppNamePrompt(appMetaData, definitelyIncludeFeatures, backlogItems, keywordsArray, description);
-        const appNameResponse = await callAI(grokApiKey, appNameMessages, 'grok', 'grok-4-fast-reasoning', costAccumulator);
+        const appNameResponse = await callAI(appNameMessages, 'grok-4-fast-reasoning', costAccumulator);
         
         if (appNameResponse && appNameResponse.trim()) {
           // Parse app names from the text
@@ -2087,7 +2063,7 @@ Base recommendations on competitive pricing data and actual user feedback about 
       try {
         // Use the local variables that were just generated, including recommendations
         const prpMessages = buildPRPPrompt(appMetaData, definitelyIncludeFeatures, backlogItems, keywordsArray, description, appNames, recommendationsArray);
-        const prpResponse = await callAI(grokApiKey, prpMessages, 'grok', 'grok-4-fast-reasoning', costAccumulator);
+        const prpResponse = await callAI(prpMessages, 'grok-4-fast-reasoning', costAccumulator);
         
         if (prpResponse && prpResponse.trim()) {
           prpContent = prpResponse.trim();
@@ -2116,7 +2092,7 @@ Base recommendations on competitive pricing data and actual user feedback about 
         // Use the local variables that were just generated
         const ratingsCount = appMetaData.userRatingCount || 0;
         const pricingMessages = buildPricingModelPrompt(appMetaData, definitelyIncludeFeatures, backlogItems, keywordsArray, description, appNames, similarApps, finalParsed.likes, finalParsed.dislikes, ratingsCount);
-        const pricingResponse = await callAI(grokApiKey, pricingMessages, 'grok', 'grok-4-fast-reasoning', costAccumulator);
+        const pricingResponse = await callAI(pricingMessages, 'grok-4-fast-reasoning', costAccumulator);
         
         if (pricingResponse && pricingResponse.trim()) {
           pricingContent = pricingResponse.trim();
@@ -2134,7 +2110,7 @@ Base recommendations on competitive pricing data and actual user feedback about 
         const ratingsCount = appMetaData.userRatingCount || 0;
         const reviewCount = reviews.length;
         const marketViabilityMessages = buildMarketViabilityPrompt(appMetaData, finalParsed.likes, finalParsed.dislikes, keywordsArray, definitelyIncludeFeatures, backlogItems, similarApps, ratingsCount, reviewCount);
-        const marketViabilityResponse = await callAI(grokApiKey, marketViabilityMessages, 'grok', 'grok-4-fast-reasoning', costAccumulator);
+        const marketViabilityResponse = await callAI(marketViabilityMessages, 'grok-4-fast-reasoning', costAccumulator);
         
         if (marketViabilityResponse && marketViabilityResponse.trim()) {
           marketViabilityContent = marketViabilityResponse.trim();
