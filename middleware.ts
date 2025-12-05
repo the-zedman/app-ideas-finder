@@ -41,7 +41,7 @@ export async function middleware(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
 
   // Protected routes (require subscription)
-  const protectedRoutes = ['/homezone', '/profile', '/appengine', '/analyses', '/billing']
+  const protectedRoutes = ['/homezone', '/profile', '/appengine', '/analyses', '/billing', '/feedback']
   const authRoutes = ['/login', '/signup']
   const adminRoutes = ['/admin']
   const publicRoutes = ['/pricing', '/onboarding', '/', '/contact', '/terms-of-service', '/privacy-policy', '/affiliate']

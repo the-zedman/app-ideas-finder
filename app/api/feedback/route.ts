@@ -3,12 +3,13 @@ import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { createClient } from '@supabase/supabase-js';
 import { sendAdminAlert } from '@/lib/email';
+import { hasActiveSubscription } from '@/lib/check-subscription';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 
-async function requireUser() {
+async function requireUserWithAccess() {
   const cookieStore = await cookies();
   const allCookies = cookieStore.getAll();
   const { createServerClient } = await import('@supabase/ssr');
@@ -28,6 +29,12 @@ async function requireUser() {
 
   if (!user) {
     return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
+  }
+
+  // Check if user has active subscription or bonus access
+  const hasAccess = await hasActiveSubscription(user.id, supabaseUrl, serviceRoleKey, user.email);
+  if (!hasAccess) {
+    return NextResponse.json({ error: 'No active subscription or access' }, { status: 403 });
   }
 
   const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey);
@@ -83,7 +90,7 @@ async function grantFeedbackBonus(supabaseAdmin: ReturnType<typeof createClient>
 
 export async function POST(request: Request) {
   try {
-    const context = await requireUser();
+    const context = await requireUserWithAccess();
     if (context instanceof NextResponse) return context;
 
     const { user, supabaseAdmin } = context;

@@ -40,6 +40,27 @@ export default function FeedbackPage() {
         return;
       }
       
+      // Check if user has subscription/waitlist/VIP access
+      try {
+        const usageResponse = await fetch('/api/subscription/usage');
+        if (usageResponse.ok) {
+          const usage = await usageResponse.json();
+          if (!usage.hasSubscription && !usage.canSearch) {
+            // User doesn't have access - redirect to pricing
+            window.location.href = '/pricing';
+            return;
+          }
+        } else {
+          // API error - redirect to pricing to be safe
+          window.location.href = '/pricing';
+          return;
+        }
+      } catch (error) {
+        console.error('Error checking access:', error);
+        window.location.href = '/pricing';
+        return;
+      }
+      
       setUser(currentUser);
       
       // Fetch profile
