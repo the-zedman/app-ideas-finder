@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
 import FeedbackWidget from "@/components/FeedbackWidget";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -112,6 +113,7 @@ export default function RootLayout({
       <body className={`${inter.variable} antialiased`}>
         <GoogleAnalytics />
         <FeedbackWidget />
+        <SpeedInsights />
         {children}
       </body>
     </html>
