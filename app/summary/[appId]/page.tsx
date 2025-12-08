@@ -164,7 +164,7 @@ export default function SummaryPage() {
           
           if (response.ok) {
             const data = await response.json();
-            const summary = data.choices?.[0]?.message?.content || null;
+            const summary = data.content || null;
             addLog(`Got summary for ${section.key}: ${summary?.substring(0, 50)}...`);
             setSummaries(prev => ({ ...prev, [section.key]: summary }));
           } else {
@@ -212,7 +212,7 @@ Key recommendations: ${analysis.recommendations?.slice(0, 3).join('; ')}
         
         if (response.ok) {
           const data = await response.json();
-          const summary = data.choices?.[0]?.message?.content || null;
+          const summary = data.content || null;
           addLog(`Overall insight: ${summary}`);
           setSummaries(prev => ({ ...prev, overall: summary }));
         } else {
