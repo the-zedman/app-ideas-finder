@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase-client';
 import CryptoJS from 'crypto-js';
 import html2canvas from 'html2canvas';
+import confetti from 'canvas-confetti';
 import Footer from '@/components/Footer';
 
 // Types
@@ -417,6 +418,7 @@ function AppEngineContent() {
   const [shouldAutoStart, setShouldAutoStart] = useState(false);
   const [cachedResult, setCachedResult] = useState<any>(null);
   const [showCacheNotice, setShowCacheNotice] = useState(false);
+  const [hasShownConfetti, setHasShownConfetti] = useState(false);
   
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -461,6 +463,50 @@ function AppEngineContent() {
   }, [router, isDevelopmentBypass]);
 
   // API key fetching removed - now handled server-side via /api/grok-proxy
+
+  // Trigger confetti when analysis completes
+  useEffect(() => {
+    if (showRollups && rollupStatuses['savings'] === 'DONE' && !hasShownConfetti) {
+      setHasShownConfetti(true);
+      
+      // Fire confetti from both sides
+      const duration = 3000;
+      const end = Date.now() + duration;
+      
+      const colors = ['#88D18A', '#6BC070', '#FFD700', '#FF6B6B', '#4ECDC4', '#A855F7'];
+      
+      (function frame() {
+        confetti({
+          particleCount: 3,
+          angle: 60,
+          spread: 55,
+          origin: { x: 0, y: 0.7 },
+          colors: colors
+        });
+        confetti({
+          particleCount: 3,
+          angle: 120,
+          spread: 55,
+          origin: { x: 1, y: 0.7 },
+          colors: colors
+        });
+
+        if (Date.now() < end) {
+          requestAnimationFrame(frame);
+        }
+      }());
+      
+      // Also fire a center burst
+      setTimeout(() => {
+        confetti({
+          particleCount: 100,
+          spread: 70,
+          origin: { y: 0.6 },
+          colors: colors
+        });
+      }, 500);
+    }
+  }, [showRollups, rollupStatuses, hasShownConfetti]);
 
   // Auto-start analysis if app parameter is in URL
   useEffect(() => {
@@ -1785,6 +1831,7 @@ Base recommendations on competitive pricing data and actual user feedback about 
     setExpandedRollup(null);
     setShowCacheNotice(false);
     setCachedResult(null);
+    setHasShownConfetti(false);
     
     // Track total cost locally (not relying on state)
     const costAccumulator = { value: 0 };
