@@ -406,7 +406,7 @@ export default function Pricing() {
                     <div className="text-sm text-gray-500 text-center mt-1">USD - one-time payment</div>
                     <div className="text-xs text-gray-400 text-center mt-1">$1.00 per search</div>
                   </div>
-                  <Link href="//" className="px-8 py-3 bg-[#88D18A] hover:bg-[#88D18A]/90 text-white font-semibold rounded-lg transition-colors whitespace-nowrap">
+                  <Link href="/" className="px-8 py-3 bg-[#88D18A] hover:bg-[#88D18A]/90 text-white font-semibold rounded-lg transition-colors whitespace-nowrap">
                     Purchase Search Pack
                   </Link>
                 </div>
@@ -468,7 +468,7 @@ export default function Pricing() {
           <p className="text-base sm:text-lg lg:text-xl text-white/90 mb-6 sm:mb-8 px-4">
             Join the family of developers using App Ideas Finder to build better apps
           </p>
-          <Link href="//" className="inline-block bg-white hover:bg-gray-100 text-[#88D18A] font-semibold py-3 px-8 rounded-lg transition-colors text-lg">
+          <Link href="/" className="inline-block bg-white hover:bg-gray-100 text-[#88D18A] font-semibold py-3 px-8 rounded-lg transition-colors text-lg">
             Start Your Free Trial
           </Link>
         </div>

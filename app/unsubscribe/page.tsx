@@ -128,9 +128,21 @@ function UnsubscribeContent() {
         <div style={{ 
           marginTop: '40px', 
           paddingTop: '20px', 
-          borderTop: '1px solid #eee' 
+          borderTop: '1px solid #eee',
+          textAlign: 'center'
         }}>
-          <p style={{ color: '#999', fontSize: '12px', margin: 0 }}>
+          <a 
+            href="/" 
+            style={{ 
+              color: '#88D18A', 
+              textDecoration: 'none',
+              fontSize: '14px',
+              fontWeight: '500'
+            }}
+          >
+            ← Back to App Ideas Finder
+          </a>
+          <p style={{ color: '#999', fontSize: '12px', margin: '12px 0 0 0' }}>
             © 2025 App Ideas Finder. All rights reserved.
           </p>
         </div>

@@ -556,8 +556,8 @@ Key recommendations: ${analysis.recommendations?.slice(0, 3).join('; ')}
         <div className="max-w-3xl mx-auto flex justify-between items-center">
           <p className="text-xs text-gray-400">© {new Date().getFullYear()} App Ideas Finder</p>
           <div className="flex gap-4">
-            <a href="/privacy" className="text-xs text-gray-400 hover:text-gray-600">Privacy</a>
-            <a href="/terms" className="text-xs text-gray-400 hover:text-gray-600">Terms</a>
+            <a href="/privacy-policy" className="text-xs text-gray-400 hover:text-gray-600">Privacy</a>
+            <a href="/terms-of-service" className="text-xs text-gray-400 hover:text-gray-600">Terms</a>
           </div>
         </div>
       </footer>

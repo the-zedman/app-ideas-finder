@@ -3,6 +3,7 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
+import Link from 'next/link';
 import { createClient } from '@/lib/supabase-client';
 
 function LoginContent() {
@@ -96,12 +97,12 @@ function LoginContent() {
       {/* Header */}
       <header className="px-4 py-4 border-b border-grey/30">
         <div className="max-w-md mx-auto flex items-center justify-between">
-          <button
-            onClick={() => router.push('/')}
+          <Link
+            href="/"
             className="text-[#88D18A] font-medium active:scale-95 transition-transform"
           >
             ← Back to Home
-          </button>
+          </Link>
           <div className="flex items-center gap-2">
             <Image
               src="/App Ideas Finder - logo - 200x200.png"
@@ -225,12 +226,12 @@ function LoginContent() {
           <div className="text-center mt-6">
             <p className="text-[#3D405B]/70">
               Don't have an account?{' '}
-              <button
-                onClick={() => router.push('/signup')}
+              <Link
+                href="/signup"
                 className="text-[#88D18A] font-medium hover:underline"
               >
                 Sign up
-              </button>
+              </Link>
             </p>
           </div>
         </div>
