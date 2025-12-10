@@ -17,7 +17,7 @@ export const metadata: Metadata = {
     default: 'App Ideas Finder - AI-Powered App Analysis & Competitive Intelligence',
     template: '%s | App Ideas Finder'
   },
-  description: 'Discover your competitive edge. Analyze any iOS app, uncover what users want, and find what competitors miss. AI-powered insights from hundreds of reviews in seconds.',
+  description: 'Analyze any iOS app in seconds. Discover what users love and hate, find competitor gaps, and get AI-powered insights from real reviews.',
   keywords: [
     'app ideas',
     'app analysis',
@@ -48,7 +48,7 @@ export const metadata: Metadata = {
     url: 'https://www.appideasfinder.com',
     siteName: 'App Ideas Finder',
     title: 'App Ideas Finder - AI-Powered App Analysis & Competitive Intelligence',
-    description: 'Discover your competitive edge. Analyze any iOS app, uncover what users want, and find what competitors miss. AI-powered insights from hundreds of reviews in seconds.',
+    description: 'Analyze any iOS app in seconds. Discover what users love and hate, find competitor gaps, and get AI-powered insights from real reviews.',
     images: [
       {
         url: '/og-image.png?v=2',
