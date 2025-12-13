@@ -67,8 +67,8 @@ export default function TermsOfService() {
             </p>
             <ul className="list-disc pl-6 space-y-2 text-gray-700">
               <li><strong>Trial:</strong> 3-day trial with 10 searches for $1</li>
-              <li><strong>Core:</strong> 73 searches per month for $37/month or $399/year</li>
-              <li><strong>Prime:</strong> 227 searches per month for $79/month or $799/year</li>
+              <li><strong>Core:</strong> 25 searches per month for $12.50/month or $100/year</li>
+              <li><strong>Prime:</strong> 100 searches per month for $25/month or $200/year</li>
               <li><strong>Search Packs:</strong> Additional 29-search packs available for purchase</li>
             </ul>
 

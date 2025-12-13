@@ -325,26 +325,26 @@ function BillingContent() {
             <div className="bg-white rounded-2xl p-6 border-2 border-gray-200 hover:border-[#88D18A] transition-all">
               {billingInterval === 'annual' && (
                 <div className="bg-green-50 text-green-700 text-sm font-semibold px-3 py-1 rounded-full inline-block mb-4">
-                  Save $69/year
+                  Save $50/year
                 </div>
               )}
               
               <div className="text-center mb-4">
                 <h3 className="text-2xl font-bold text-gray-900 mb-2">Core</h3>
                 <div className="text-4xl font-bold text-gray-900 mb-2">
-                  ${billingInterval === 'monthly' ? '37' : '399'}
+                  ${billingInterval === 'monthly' ? '12.50' : '100'}
                 </div>
                 <div className="text-gray-600">per {billingInterval === 'monthly' ? 'month' : 'year'}</div>
-                <div className="text-sm text-gray-500 mt-2">73 searches/month</div>
+                <div className="text-sm text-gray-500 mt-2">25 searches/month</div>
                 <div className="text-xs text-gray-400 mt-1">
-                  ${billingInterval === 'monthly' ? '0.51' : '0.46'} per search
+                  ${billingInterval === 'monthly' ? '0.50' : '0.33'} per search
                 </div>
               </div>
               
               <ul className="space-y-3 mb-6">
                 <li className="flex items-start gap-2">
                   <span className="text-green-500 font-bold">✓</span>
-                  <span className="text-gray-700">73 app analyses per month</span>
+                  <span className="text-gray-700">25 app analyses per month</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-green-500 font-bold">✓</span>
@@ -387,26 +387,26 @@ function BillingContent() {
               
               {billingInterval === 'annual' && (
                 <div className="bg-green-50 text-green-700 text-sm font-semibold px-3 py-1 rounded-full inline-block mb-4">
-                  Save $149/year
+                  Save $100/year
                 </div>
               )}
               
               <div className="text-center mb-4">
                 <h3 className="text-2xl font-bold text-gray-900 mb-2">Prime</h3>
                 <div className="text-4xl font-bold text-gray-900 mb-2">
-                  ${billingInterval === 'monthly' ? '79' : '799'}
+                  ${billingInterval === 'monthly' ? '25' : '200'}
                 </div>
                 <div className="text-gray-600">per {billingInterval === 'monthly' ? 'month' : 'year'}</div>
-                <div className="text-sm text-gray-500 mt-2">227 searches/month</div>
+                <div className="text-sm text-gray-500 mt-2">100 searches/month</div>
                 <div className="text-xs text-gray-400 mt-1">
-                  ${billingInterval === 'monthly' ? '0.35' : '0.29'} per search
+                  ${billingInterval === 'monthly' ? '0.25' : '0.17'} per search
                 </div>
               </div>
               
               <ul className="space-y-3 mb-6">
                 <li className="flex items-start gap-2">
                   <span className="text-green-500 font-bold">✓</span>
-                  <span className="text-gray-700">227 app analyses per month</span>
+                  <span className="text-gray-700">100 app analyses per month</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-green-500 font-bold">✓</span>

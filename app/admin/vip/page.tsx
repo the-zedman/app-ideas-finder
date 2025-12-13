@@ -216,7 +216,7 @@ export default function AdminVipPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
             <div className="flex items-start gap-2">
               <span className="text-purple-600">✓</span>
-              <span className="text-gray-700">75 Free Searches ($39 value)</span>
+              <span className="text-gray-700">75 Free Searches ($37.50 value)</span>
             </div>
             <div className="flex items-start gap-2">
               <span className="text-purple-600">✓</span>

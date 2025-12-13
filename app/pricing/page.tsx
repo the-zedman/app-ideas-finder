@@ -193,22 +193,22 @@ export default function Pricing() {
                 <p className="text-gray-600 mb-4">For regular users</p>
                 <div className="mb-4">
                   <span className="text-4xl font-bold text-gray-900">
-                    ${billingCycle === 'monthly' ? '37' : '399'}
+                    ${billingCycle === 'monthly' ? '12.50' : '100'}
                   </span>
                   <span className="text-gray-600">
                     {' USD' + (billingCycle === 'monthly' ? ' / month' : ' / year')}
                   </span>
                 </div>
                 <p className="text-sm text-gray-500">
-                  {billingCycle === 'annual' && 'Save $69/year'}
-                  {billingCycle === 'monthly' && 'Or $399/year (save $69)'}
+                  {billingCycle === 'annual' && 'Save $50/year'}
+                  {billingCycle === 'monthly' && 'Or $100/year (save $50)'}
                 </p>
               </div>
               
               <ul className="space-y-4 mb-8">
                 <li className="flex items-start gap-3">
                   <span className="text-[#88D18A] text-xl">✓</span>
-                  <span className="text-gray-700"><strong>73 searches</strong> per month</span>
+                  <span className="text-gray-700"><strong>25 searches</strong> per month</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="text-[#88D18A] text-xl">✓</span>
@@ -226,7 +226,7 @@ export default function Pricing() {
 
               <div className="text-center">
                 <p className="text-xs text-gray-500 mb-4">
-                  ${billingCycle === 'monthly' ? '0.51' : '0.44'} per search
+                  ${billingCycle === 'monthly' ? '0.50' : '0.33'} per search
                 </p>
                 <button 
                   onClick={() => handleCheckout(billingCycle === 'monthly' ? 'core_monthly' : 'core_annual')}
@@ -252,22 +252,22 @@ export default function Pricing() {
                 <p className="text-gray-600 mb-4">For power users</p>
                 <div className="mb-4">
                   <span className="text-4xl font-bold text-gray-900">
-                    ${billingCycle === 'monthly' ? '79' : '799'}
+                    ${billingCycle === 'monthly' ? '25' : '200'}
                   </span>
                   <span className="text-gray-600">
                     {' USD' + (billingCycle === 'monthly' ? ' / month' : ' / year')}
                   </span>
                 </div>
                 <p className="text-sm text-gray-500">
-                  {billingCycle === 'annual' && 'Save $149/year'}
-                  {billingCycle === 'monthly' && 'Or $799/year (save $149)'}
+                  {billingCycle === 'annual' && 'Save $100/year'}
+                  {billingCycle === 'monthly' && 'Or $200/year (save $100)'}
                 </p>
               </div>
               
               <ul className="space-y-4 mb-8">
                 <li className="flex items-start gap-3">
                   <span className="text-[#88D18A] text-xl">✓</span>
-                  <span className="text-gray-700"><strong>227 searches</strong> per month</span>
+                  <span className="text-gray-700"><strong>100 searches</strong> per month</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="text-[#88D18A] text-xl">✓</span>
@@ -293,7 +293,7 @@ export default function Pricing() {
 
               <div className="text-center">
                 <p className="text-xs text-gray-500 mb-4">
-                  ${billingCycle === 'monthly' ? '0.35' : '0.30'} per search
+                  ${billingCycle === 'monthly' ? '0.25' : '0.17'} per search
                 </p>
                 <button 
                   onClick={() => handleCheckout(billingCycle === 'monthly' ? 'prime_monthly' : 'prime_annual')}

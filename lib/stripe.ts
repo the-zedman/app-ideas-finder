@@ -11,10 +11,10 @@ export const stripe = process.env.STRIPE_SECRET_KEY
 // Stripe Price IDs - these will be created in Stripe Dashboard
 export const STRIPE_PRICES = {
   TRIAL: process.env.STRIPE_PRICE_TRIAL || '', // $1 one-time
-  CORE_MONTHLY: process.env.STRIPE_PRICE_CORE_MONTHLY || '', // $37/month
-  CORE_ANNUAL: process.env.STRIPE_PRICE_CORE_ANNUAL || '', // $399/year
-  PRIME_MONTHLY: process.env.STRIPE_PRICE_PRIME_MONTHLY || '', // $79/month
-  PRIME_ANNUAL: process.env.STRIPE_PRICE_PRIME_ANNUAL || '', // $799/year
+  CORE_MONTHLY: process.env.STRIPE_PRICE_CORE_MONTHLY || '', // $12.50/month
+  CORE_ANNUAL: process.env.STRIPE_PRICE_CORE_ANNUAL || '', // $100/year
+  PRIME_MONTHLY: process.env.STRIPE_PRICE_PRIME_MONTHLY || '', // $25/month
+  PRIME_ANNUAL: process.env.STRIPE_PRICE_PRIME_ANNUAL || '', // $200/year
   SEARCH_PACK: process.env.STRIPE_PRICE_SEARCH_PACK || '', // Search pack pricing (to be determined)
 };
 
@@ -29,32 +29,32 @@ export const PLAN_DETAILS = {
   },
   core_monthly: {
     name: 'Core (Monthly)',
-    searches: 73,
-    price: 37.00,
+    searches: 25,
+    price: 12.50,
     interval: 'month',
     priceId: STRIPE_PRICES.CORE_MONTHLY,
   },
   core_annual: {
     name: 'Core (Annual)',
-    searches: 73,
-    price: 399.00,
+    searches: 25,
+    price: 100.00,
     interval: 'year',
-    savings: 69,
+    savings: 50,
     priceId: STRIPE_PRICES.CORE_ANNUAL,
   },
   prime_monthly: {
     name: 'Prime (Monthly)',
-    searches: 227,
-    price: 79.00,
+    searches: 100,
+    price: 25.00,
     interval: 'month',
     priceId: STRIPE_PRICES.PRIME_MONTHLY,
   },
   prime_annual: {
     name: 'Prime (Annual)',
-    searches: 227,
-    price: 799.00,
+    searches: 100,
+    price: 200.00,
     interval: 'year',
-    savings: 149,
+    savings: 100,
     priceId: STRIPE_PRICES.PRIME_ANNUAL,
   },
   search_pack: {
