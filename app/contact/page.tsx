@@ -143,11 +143,6 @@ export default function Contact() {
                   </Link>
                 </li>
                 <li>
-                  <Link href="/affiliate" className="hover:text-[#88D18A]">
-                    Affiliate Program
-                  </Link>
-                </li>
-                <li>
                   <Link href="/privacy-policy" className="hover:text-[#88D18A]">
                     Privacy Policy
                   </Link>
@@ -279,7 +274,6 @@ export default function Contact() {
               <h3 className="font-bold text-white mb-4">Company</h3>
               <ul className="space-y-2 text-sm">
                 <li><a href="/pricing" className="hover:text-white">Pricing</a></li>
-                <li><a href="/affiliate" className="hover:text-white">Affiliate Program</a></li>
                 <li><a href="/terms-of-service" className="hover:text-white">Terms of Service</a></li>
                 <li><a href="/privacy-policy" className="hover:text-white">Privacy Policy</a></li>
                 <li><a href="/contact" className="hover:text-white">Contact</a></li>
