@@ -60,16 +60,7 @@ CREATE TABLE IF NOT EXISTS public.monthly_usage (
   UNIQUE(user_id, period_start)
 );
 
--- Search packs (extra searches purchased)
-CREATE TABLE IF NOT EXISTS public.search_packs (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
-  searches_purchased INTEGER NOT NULL,
-  searches_remaining INTEGER NOT NULL,
-  price_paid DECIMAL(10,2),
-  purchased_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  expires_at TIMESTAMP WITH TIME ZONE -- NULL means never expires
-);
+-- Search packs removed - no longer offered
 
 -- Bonuses awarded to users
 CREATE TABLE IF NOT EXISTS public.user_bonuses (
@@ -134,7 +125,6 @@ CREATE TABLE IF NOT EXISTS public.affiliate_conversions (
 -- Enable RLS
 ALTER TABLE public.user_subscriptions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.monthly_usage ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.search_packs ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.user_bonuses ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.user_affiliates ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.affiliate_conversions ENABLE ROW LEVEL SECURITY;
@@ -144,9 +134,6 @@ CREATE POLICY "Users view own subscription" ON public.user_subscriptions
   FOR SELECT USING (auth.uid() = user_id);
 
 CREATE POLICY "Users view own usage" ON public.monthly_usage
-  FOR SELECT USING (auth.uid() = user_id);
-
-CREATE POLICY "Users view own packs" ON public.search_packs
   FOR SELECT USING (auth.uid() = user_id);
 
 CREATE POLICY "Users view own bonuses" ON public.user_bonuses
@@ -188,7 +175,6 @@ CREATE INDEX idx_user_subscriptions_user_id ON public.user_subscriptions(user_id
 CREATE INDEX idx_user_subscriptions_status ON public.user_subscriptions(status);
 CREATE INDEX idx_monthly_usage_user_id ON public.monthly_usage(user_id);
 CREATE INDEX idx_monthly_usage_period ON public.monthly_usage(period_start, period_end);
-CREATE INDEX idx_search_packs_user_id ON public.search_packs(user_id);
 CREATE INDEX idx_user_bonuses_user_id ON public.user_bonuses(user_id);
 CREATE INDEX idx_affiliate_code ON public.user_affiliates(affiliate_code);
 

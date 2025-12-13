@@ -184,41 +184,7 @@ export async function POST() {
       }
     }
 
-    // 2) Consume Search Pack credits next (never-expiring paid packs)
-    const { data: packRow, error: packError } = await supabaseAdmin
-      .from('search_packs')
-      .select('*')
-      .eq('user_id', user.id)
-      .gt('searches_remaining', 0)
-      .order('purchased_at', { ascending: true })
-      .limit(1)
-      .maybeSingle();
-
-    if (packError) {
-      console.error('Error fetching search packs:', packError);
-    } else if (packRow) {
-      const newRemaining = (packRow.searches_remaining || 0) - 1;
-
-      const { error: updatePackError } = await supabaseAdmin
-        .from('search_packs')
-        .update({ searches_remaining: newRemaining })
-        .eq('id', packRow.id);
-
-      if (updatePackError) {
-        console.error('Error updating search pack:', updatePackError);
-        return NextResponse.json(
-          { error: 'Failed to consume search pack', message: updatePackError.message },
-          { status: 500 }
-        );
-      }
-
-      return NextResponse.json({
-        success: true,
-        source: 'search_pack',
-      });
-    }
-
-    // 3) Fall back to monthly plan quota
+    // 2) Fall back to monthly plan quota
     const { error } = await supabaseAdmin
       .from('monthly_usage')
       .update({ searches_used: usage.searches_used + 1 })

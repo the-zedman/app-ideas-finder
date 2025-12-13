@@ -69,7 +69,6 @@ export default function TermsOfService() {
               <li><strong>Trial:</strong> 3-day trial with 10 searches for $1</li>
               <li><strong>Core:</strong> 25 searches per month for $12.50/month or $100/year</li>
               <li><strong>Prime:</strong> 100 searches per month for $25/month or $200/year</li>
-              <li><strong>Search Packs:</strong> Additional 29-search packs available for purchase</li>
             </ul>
 
             <h3 className="text-xl font-semibold text-gray-900 mb-3 mt-6">4.2 Billing and Payment</h3>

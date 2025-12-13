@@ -49,15 +49,6 @@ export async function GET() {
       .gte('period_end', now.toISOString())
       .single();
     
-    // Get search packs (unused searches)
-    const { data: packs } = await supabaseAdmin
-      .from('search_packs')
-      .select('searches_remaining')
-      .eq('user_id', user.id)
-      .gt('searches_remaining', 0);
-    
-    const packSearches = packs?.reduce((sum, pack) => sum + pack.searches_remaining, 0) || 0;
-    
     // Get active bonuses
     const { data: bonuses } = await supabaseAdmin
       .from('user_bonuses')
@@ -106,7 +97,7 @@ export async function GET() {
       // For early access users, feedback bonuses add to the total limit
       const totalEarlyAccessLimit = earlyAccessBonusAmount + feedbackBonusSearches;
       
-      if (earlyAccessBonusRemaining > 0 || packSearches > 0 || feedbackBonusSearches > 0) {
+      if (earlyAccessBonusRemaining > 0 || feedbackBonusSearches > 0) {
         // Calculate searches used: original amount - remaining amount
         const earlyAccessSearchesUsed = earlyAccessBonusAmount - earlyAccessBonusRemaining;
         return NextResponse.json({
@@ -116,8 +107,7 @@ export async function GET() {
           status: isVip ? 'vip_bonus' : 'waitlist_bonus',
           searchesUsed: earlyAccessSearchesUsed,
           searchesLimit: totalEarlyAccessLimit, // Include feedback bonuses in limit
-          searchesRemaining: earlyAccessBonusRemaining + packSearches + feedbackBonusSearches,
-          packSearches,
+          searchesRemaining: earlyAccessBonusRemaining + feedbackBonusSearches,
           bonusSearchesRemaining: earlyAccessBonusRemaining,
           feedbackBonusSearches, // Include feedback bonuses separately for display
           percentageBonus: 0,
@@ -132,7 +122,7 @@ export async function GET() {
           waitlistBonusRemaining: waitlistBonusRemaining,
           vipBonusRemaining: vipBonusRemaining,
           isVip,
-          canSearch: earlyAccessBonusRemaining + packSearches + feedbackBonusSearches > 0,
+          canSearch: earlyAccessBonusRemaining + feedbackBonusSearches > 0,
         });
       }
 
@@ -181,7 +171,7 @@ export async function GET() {
     
     const totalSearchesRemaining = subscription.status === 'free_unlimited'
       ? -1
-      : planSearchesRemaining + packSearches;
+      : planSearchesRemaining;
     
     // Calculate trial time remaining
     let trialTimeRemaining = null;
@@ -206,9 +196,8 @@ export async function GET() {
       searchesUsed,
       // Total limit including plan + early access bonus
       searchesLimit: planSearchesLimit,
-      // Total remaining including plan and search packs
+      // Total remaining including plan
       searchesRemaining: totalSearchesRemaining,
-      packSearches,
       bonusSearchesRemaining: earlyAccessBonusRemaining,
       percentageBonus,
       trialTimeRemaining,

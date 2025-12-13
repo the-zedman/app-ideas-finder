@@ -168,7 +168,6 @@ export async function DELETE(
       { table: 'user_analyses', column: 'user_id' },
       { table: 'monthly_usage', column: 'user_id' },
       { table: 'user_bonuses', column: 'user_id' },
-      { table: 'search_packs', column: 'user_id' },
       { table: 'user_subscriptions', column: 'user_id' },
       { table: 'profiles', column: 'id' },
       { table: 'admins', column: 'user_id' },

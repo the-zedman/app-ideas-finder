@@ -391,7 +391,7 @@ export default function HomeZone() {
                   onClick={() => router.push('/billing')}
                   className="bg-[#88D18A] text-white px-6 py-2 rounded-lg font-semibold hover:bg-[#88D18A]/90 transition-colors"
                 >
-                  Upgrade Plan or Buy Search Pack
+                  Upgrade Plan
                 </button>
               </div>
             ) : searchesRemaining <= 5 ? (

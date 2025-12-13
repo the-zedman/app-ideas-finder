@@ -308,58 +308,6 @@ export default function Pricing() {
         </div>
       </section>
 
-      {/* Search Packs - Only show for users with active subscriptions */}
-      {hasActiveSubscription === true && (
-        <section className="py-8 sm:py-12 bg-gray-50">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="mb-6 text-center sm:text-left">
-              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Need More Searches?</h2>
-              <p className="text-sm sm:text-base text-gray-600">Purchase additional searches that never expire and work with any plan.</p>
-            </div>
-
-            <div className="bg-white rounded-2xl p-8 border border-gray-200 shadow-sm">
-              <div className="flex flex-col md:flex-row items-center justify-between gap-8">
-                <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="text-4xl">📦</div>
-                    <div>
-                      <h3 className="text-2xl font-bold text-gray-900">Search Pack</h3>
-                      <p className="text-gray-600">One-time purchase, never expires</p>
-                    </div>
-                  </div>
-                  
-                  <ul className="space-y-2">
-                    <li className="flex items-center gap-2 text-gray-700">
-                      <span className="text-[#88D18A] font-bold">✓</span>
-                      <span>29 additional searches</span>
-                    </li>
-                    <li className="flex items-center gap-2 text-gray-700">
-                      <span className="text-[#88D18A] font-bold">✓</span>
-                      <span>No expiration date - use anytime</span>
-                    </li>
-                    <li className="flex items-center gap-2 text-gray-700">
-                      <span className="text-[#88D18A] font-bold">✓</span>
-                      <span>Compatible with all subscription plans</span>
-                    </li>
-                  </ul>
-                </div>
-                
-                <div className="flex flex-col items-center gap-4">
-                  <div>
-                    <div className="text-5xl font-bold text-gray-900">$29</div>
-                    <div className="text-sm text-gray-500 text-center mt-1">USD - one-time payment</div>
-                    <div className="text-xs text-gray-400 text-center mt-1">$1.00 per search</div>
-                  </div>
-                  <Link href="/" className="px-8 py-3 bg-[#88D18A] hover:bg-[#88D18A]/90 text-white font-semibold rounded-lg transition-colors whitespace-nowrap">
-                    Purchase Search Pack
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-      )}
-
       {/* FAQ Section */}
       <section className="py-8 sm:py-12 lg:py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -373,7 +321,7 @@ export default function Pricing() {
 
             <div className="bg-gray-50 rounded-lg p-6">
               <h3 className="font-bold text-gray-900 mb-2">Do unused searches roll over?</h3>
-              <p className="text-gray-700">Monthly subscription searches reset at the start of each billing cycle and don't roll over. However, Search Pack purchases never expire and roll over indefinitely.</p>
+              <p className="text-gray-700">Monthly subscription searches reset at the start of each billing cycle and don't roll over.</p>
             </div>
 
             <div className="bg-gray-50 rounded-lg p-6">

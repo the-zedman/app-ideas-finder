@@ -15,7 +15,6 @@ export const STRIPE_PRICES = {
   CORE_ANNUAL: process.env.STRIPE_PRICE_CORE_ANNUAL || '', // $100/year
   PRIME_MONTHLY: process.env.STRIPE_PRICE_PRIME_MONTHLY || '', // $25/month
   PRIME_ANNUAL: process.env.STRIPE_PRICE_PRIME_ANNUAL || '', // $200/year
-  SEARCH_PACK: process.env.STRIPE_PRICE_SEARCH_PACK || '', // Search pack pricing (to be determined)
 };
 
 // Plan details
@@ -56,12 +55,6 @@ export const PLAN_DETAILS = {
     interval: 'year',
     savings: 100,
     priceId: STRIPE_PRICES.PRIME_ANNUAL,
-  },
-  search_pack: {
-    name: 'Search Pack',
-    searches: 29,
-    price: 29.00, // Suggested pricing
-    priceId: STRIPE_PRICES.SEARCH_PACK,
   },
 };
 

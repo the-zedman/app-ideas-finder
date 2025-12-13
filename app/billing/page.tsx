@@ -443,56 +443,6 @@ function BillingContent() {
           </div>
         </div>
 
-        {/* Search Pack Add-on */}
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Need More Searches?</h2>
-          <p className="text-gray-600 mb-6">Purchase additional searches that never expire and work with any plan.</p>
-          
-          <div className="bg-white rounded-2xl p-8 border border-gray-200 shadow-sm">
-            <div className="flex flex-col md:flex-row items-center justify-between gap-8">
-              <div className="flex-1">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="text-4xl">📦</div>
-                  <div>
-                    <h3 className="text-2xl font-bold text-gray-900">Search Pack</h3>
-                    <p className="text-gray-600">One-time purchase, never expires</p>
-                  </div>
-                </div>
-                
-                <ul className="space-y-2 mb-4">
-                  <li className="flex items-center gap-2 text-gray-700">
-                    <span className="text-green-500 font-bold">✓</span>
-                    <span>29 additional searches</span>
-                  </li>
-                  <li className="flex items-center gap-2 text-gray-700">
-                    <span className="text-green-500 font-bold">✓</span>
-                    <span>No expiration date - use anytime</span>
-                  </li>
-                  <li className="flex items-center gap-2 text-gray-700">
-                    <span className="text-green-500 font-bold">✓</span>
-                    <span>Compatible with all subscription plans</span>
-                  </li>
-                </ul>
-              </div>
-              
-              <div className="flex flex-col items-center gap-4">
-                <div>
-                  <div className="text-5xl font-bold text-gray-900">$29</div>
-                  <div className="text-sm text-gray-500 text-center mt-1">one-time payment</div>
-                  <div className="text-xs text-gray-400 text-center mt-1">$1.00 per search</div>
-                </div>
-                <button
-                  onClick={() => handleCheckout('search_pack', '')} // Server will look up the price ID
-                  disabled={processingCheckout}
-                  className="px-8 py-3 bg-[#88D18A] hover:bg-[#88D18A]/90 text-white font-semibold rounded-lg transition-colors disabled:opacity-50 whitespace-nowrap"
-                >
-                  {processingCheckout ? 'Processing...' : 'Purchase Search Pack'}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
         {/* Cancel Subscription */}
         {isActive && !isUnlimited && (
           <div className="bg-white rounded-2xl p-6 border border-gray-200">

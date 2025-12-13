@@ -34,7 +34,6 @@ export async function POST(request: Request) {
       'core_annual': process.env.STRIPE_PRICE_CORE_ANNUAL || '',
       'prime_monthly': process.env.STRIPE_PRICE_PRIME_MONTHLY || '',
       'prime_annual': process.env.STRIPE_PRICE_PRIME_ANNUAL || '',
-      'search_pack': process.env.STRIPE_PRICE_SEARCH_PACK || '',
     };
     
     // Use client-provided priceId if available, otherwise look up by plan type
@@ -150,29 +149,6 @@ export async function POST(request: Request) {
       }
     }
     
-    // Prevent search pack purchase unless user has active Core or Prime subscription
-    if (planType === 'search_pack') {
-      if (!subscription) {
-        return NextResponse.json({ 
-          error: 'Subscription required', 
-          details: 'You must have an active Core or Prime subscription to purchase search packs.' 
-        }, { status: 400 });
-      }
-      
-      const activeStatuses = ['active', 'trial'];
-      const validPlans = ['core_monthly', 'core_annual', 'prime_monthly', 'prime_annual'];
-      
-      const hasActiveSubscription = activeStatuses.includes(subscription.status) && 
-                                     validPlans.includes(subscription.plan_id);
-      
-      if (!hasActiveSubscription) {
-        return NextResponse.json({ 
-          error: 'Active subscription required', 
-          details: 'You must have an active Core or Prime subscription to purchase search packs.' 
-        }, { status: 400 });
-      }
-    }
-    
     let customerId = subscription?.stripe_customer_id;
     
     // Create customer if doesn't exist
@@ -208,7 +184,7 @@ export async function POST(request: Request) {
     }
     
     // Determine if this is a subscription or one-time payment
-    const isSubscription = planType !== 'trial' && planType !== 'search_pack';
+    const isSubscription = planType !== 'trial';
     
     // Create checkout session
     console.log(`Creating checkout session for plan type: ${planType}, price ID: ${priceId.substring(0, 12)}...`);
