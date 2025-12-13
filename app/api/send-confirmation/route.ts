@@ -200,27 +200,6 @@ export async function POST(request: NextRequest) {
                           <!-- Footer -->
                           <tr>
                             <td style="text-align: center; padding: 30px 20px;" class="mobile-padding">
-                              <p style="color: #666; font-size: 14px; margin: 0 0 20px 0;" class="mobile-text">
-                                Please consider joining our community of innovative developers here ...
-                              </p>
-                              
-                              <!-- Social Media Links -->
-                              <table cellpadding="0" cellspacing="0" border="0" align="center" style="margin: 20px auto;">
-                                <tr>
-                                  <td style="padding: 0 10px;">
-                                    <a href="https://x.com/appideasfinder" style="display: inline-block; background-color: #000000; color: #ffffff; padding: 10px 20px; text-decoration: none; border-radius: 4px; font-size: 14px; font-weight: bold;" class="mobile-button">
-                                      𝕏 Follow us on X
-                                    </a>
-                                  </td>
-                                  <td style="padding: 0 10px;">
-                                    <a href="https://discord.gg/nK2fNbe7" style="display: inline-block; background-color: #f78937; color: #ffffff; padding: 10px 20px; text-decoration: none; border-radius: 4px; font-size: 14px; font-weight: bold;" class="mobile-button">
-                                      <img src="https://www.appideasfinder.com/discord-white-logo.png" alt="Discord" width="20" height="20" style="display: inline-block; vertical-align: middle; margin-right: 8px; border: 0; outline: none; max-width: 20px; height: auto;">
-                                      Join us on Discord
-                                    </a>
-                                  </td>
-                                </tr>
-                              </table>
-                              
                               <!-- Privacy Message -->
                               <div style="text-align: center; margin-top: 30px;">
                                 <span style="color: #888; font-size: 11px;">🔒 We respect your privacy. No spam, ever.</span>

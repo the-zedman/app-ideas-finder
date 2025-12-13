@@ -37,29 +37,6 @@ export default function EmailPreview() {
                 {/* Footer */}
                 <tr>
                   <td style={{ textAlign: 'center', padding: '30px 20px' }}>
-                    <p style={{ color: '#666', fontSize: '14px', margin: '0 0 20px 0' }}>
-                      Please consider joining our community of innovative developers here ...
-                    </p>
-                    
-                    {/* Social Media Links */}
-                    <table cellPadding="0" cellSpacing="0" border={0} align="center" style={{ margin: '20px auto' }}>
-                      <tbody>
-                        <tr>
-                          <td style={{ padding: '0 10px' }}>
-                            <a href="https://x.com/appideasfinder" style={{ display: 'inline-block', backgroundColor: '#000000', color: '#ffffff', padding: '10px 20px', textDecoration: 'none', borderRadius: '4px', fontSize: '14px', fontWeight: 'bold' }}>
-                              𝕏 Follow us on X
-                            </a>
-                          </td>
-                          <td style={{ padding: '0 10px' }}>
-                            <a href="https://discord.gg/nK2fNbe7" style={{ display: 'inline-block', backgroundColor: '#f78937', color: '#ffffff', padding: '10px 20px', textDecoration: 'none', borderRadius: '4px', fontSize: '14px', fontWeight: 'bold' }}>
-                              <img src="/discord-white-logo.png" alt="Discord" width="20" height="20" style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: '8px' }} />
-                              Join us on Discord
-                            </a>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                    
                     {/* Privacy Message */}
                     <div style={{ textAlign: 'center', marginTop: '30px' }}>
                       <span style={{ color: '#888', fontSize: '11px' }}>🔒 We respect your privacy. No spam, ever.</span>

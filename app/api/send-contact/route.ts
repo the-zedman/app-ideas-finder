@@ -246,26 +246,6 @@ ${message}
                                 </tr>
                               </table>
                               
-                              <!-- Social Media Links -->
-                              <p style="color: #666; font-size: 14px; margin: 20px 0;" class="mobile-text">
-                                Join our community:
-                              </p>
-                              <table cellpadding="0" cellspacing="0" border="0" align="center" style="margin: 20px auto;">
-                                <tr>
-                                  <td style="padding: 0 10px;">
-                                    <a href="https://x.com/appideasfinder" style="display: inline-block; background-color: #000000; color: #ffffff; padding: 10px 20px; text-decoration: none; border-radius: 4px; font-size: 14px; font-weight: bold;" class="mobile-button">
-                                      𝕏 Follow us on X
-                                    </a>
-                                  </td>
-                                  <td style="padding: 0 10px;">
-                                    <a href="https://discord.gg/nK2fNbe7" style="display: inline-block; background-color: #f78937; color: #ffffff; padding: 10px 20px; text-decoration: none; border-radius: 4px; font-size: 14px; font-weight: bold;" class="mobile-button">
-                                      <img src="https://www.appideasfinder.com/discord-white-logo.png" alt="Discord" width="20" height="20" style="display: inline-block; vertical-align: middle; margin-right: 8px; border: 0; outline: none; max-width: 20px; height: auto;">
-                                      Join us on Discord
-                                    </a>
-                                  </td>
-                                </tr>
-                              </table>
-                              
                               <!-- Footer -->
                               <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
                                 <p style="color: #999; font-size: 12px; margin: 0 0 10px 0;">
