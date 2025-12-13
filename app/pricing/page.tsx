@@ -146,46 +146,8 @@ export default function Pricing() {
       {/* Pricing Cards */}
       <section className="py-6 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
             
-            {/* Trial Plan */}
-            <div className="bg-white border-2 border-gray-200 rounded-2xl p-8 hover:shadow-lg transition-shadow">
-              <div className="text-center mb-6">
-                <h3 className="text-2xl font-bold text-gray-900 mb-2">Trial</h3>
-                <p className="text-gray-600 mb-4">Perfect for trying out</p>
-                <div className="mb-4">
-                  <span className="text-4xl font-bold text-gray-900">$1</span>
-                  <span className="text-gray-600"> USD / 3 days</span>
-                </div>
-                <p className="text-sm text-gray-500">One-time payment</p>
-              </div>
-              
-              <ul className="space-y-4 mb-8">
-                <li className="flex items-start gap-3">
-                  <span className="text-[#88D18A] text-xl">✓</span>
-                  <span className="text-gray-700"><strong>10 searches</strong> during trial period</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <span className="text-[#88D18A] text-xl">✓</span>
-                  <span className="text-gray-700">Full AI-powered analysis</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <span className="text-[#88D18A] text-xl">✓</span>
-                  <span className="text-gray-700">13-section detailed reports</span>
-                </li>
-              </ul>
-
-              <div className="text-center">
-                <button 
-                  onClick={() => handleCheckout('trial')}
-                  disabled={processingCheckout}
-                  className={purchaseButtonClasses}
-                >
-                  {getButtonLabel('Start Trial for $1')}
-                </button>
-              </div>
-            </div>
-
             {/* Core Plan */}
             <div className="bg-white border-2 border-gray-200 rounded-2xl p-8 hover:shadow-lg transition-shadow">
               <div className="text-center mb-6">
@@ -314,10 +276,6 @@ export default function Pricing() {
           <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 text-center mb-8 sm:mb-12">Frequently Asked Questions</h2>
           
           <div className="space-y-6">
-            <div className="bg-gray-50 rounded-lg p-6">
-              <h3 className="font-bold text-gray-900 mb-2">What happens after my trial ends?</h3>
-                  <p className="text-gray-700">After your 3-day trial ends, your access will expire. To continue using App Ideas Finder, you'll need to subscribe to a Core or Prime plan. You can cancel your trial anytime during the 3-day period.</p>
-            </div>
 
             <div className="bg-gray-50 rounded-lg p-6">
               <h3 className="font-bold text-gray-900 mb-2">Do unused searches roll over?</h3>
@@ -350,7 +308,7 @@ export default function Pricing() {
             Join the family of developers using App Ideas Finder to build better apps
           </p>
           <Link href="/" className="inline-block bg-white hover:bg-gray-100 text-[#88D18A] font-semibold py-3 px-8 rounded-lg transition-colors text-lg">
-            Start Your Free Trial
+            Get Started
           </Link>
         </div>
       </section>

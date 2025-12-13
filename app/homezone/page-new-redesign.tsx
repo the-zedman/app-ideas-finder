@@ -231,12 +231,7 @@ export default function HomeZone() {
                   🔍 Searches This Month
                 </h3>
                 <p className="text-sm text-gray-600">
-                  {usageData?.planName || 'Trial'} Plan
-                  {usageData?.status === 'trial' && usageData?.trialTimeRemaining && (
-                    <span className="ml-2 text-[#E07A5F] font-semibold">
-                      • {usageData.trialTimeRemaining.days}d {usageData.trialTimeRemaining.hours}h {usageData.trialTimeRemaining.minutes}m left
-                    </span>
-                  )}
+                  {usageData?.planName || 'No Plan'} Plan
                 </p>
               </div>
               <div className="text-right">

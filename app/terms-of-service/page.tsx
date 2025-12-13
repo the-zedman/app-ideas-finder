@@ -66,7 +66,6 @@ export default function TermsOfService() {
               We offer the following subscription plans:
             </p>
             <ul className="list-disc pl-6 space-y-2 text-gray-700">
-              <li><strong>Trial:</strong> 3-day trial with 10 searches for $1</li>
               <li><strong>Core:</strong> 25 searches per month for $12.50/month or $100/year</li>
               <li><strong>Prime:</strong> 100 searches per month for $25/month or $200/year</li>
             </ul>
@@ -74,7 +73,6 @@ export default function TermsOfService() {
             <h3 className="text-xl font-semibold text-gray-900 mb-3 mt-6">4.2 Billing and Payment</h3>
             <ul className="list-disc pl-6 space-y-2 text-gray-700">
               <li>All fees are charged upfront and are non-refundable except as required by law</li>
-              <li>Trial subscriptions automatically convert to Core monthly subscriptions after 3 days unless cancelled</li>
               <li>Monthly subscriptions renew automatically unless cancelled before the renewal date</li>
               <li>Unused searches do not roll over to the next month (except Search Pack purchases)</li>
               <li>Search Pack purchases roll over indefinitely until used</li>

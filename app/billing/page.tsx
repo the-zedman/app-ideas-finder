@@ -20,7 +20,7 @@ function BillingContent() {
   const supabase = createClient();
 
   useEffect(() => {
-    setIsOnboarding(searchParams.get('onboarding') === 'true' && searchParams.get('trial') === 'true');
+    setIsOnboarding(searchParams.get('onboarding') === 'true');
   }, [searchParams]);
 
   useEffect(() => {
@@ -128,7 +128,6 @@ function BillingContent() {
 
   const getPlanDisplayName = (planId: string) => {
     const planNames: any = {
-      trial: 'Trial',
       waitlist_bonus: 'Waitlist Early Access',
       vip_bonus: 'VIP',
       core_monthly: 'Core (Monthly)',
@@ -142,7 +141,6 @@ function BillingContent() {
 
   const getStatusBadge = (status: string) => {
     const badges: any = {
-      trial: { bg: 'bg-yellow-100', text: 'text-yellow-800', label: 'Trial' },
       active: { bg: 'bg-green-100', text: 'text-green-800', label: 'Active' },
       cancelled: { bg: 'bg-red-100', text: 'text-red-800', label: 'Cancelled' },
       expired: { bg: 'bg-gray-100', text: 'text-gray-800', label: 'Expired' },
@@ -164,9 +162,8 @@ function BillingContent() {
     );
   }
 
-  const currentPlan = subscription?.plan_id || (usage?.status === 'vip_bonus' ? 'vip_bonus' : usage?.status === 'waitlist_bonus' ? 'waitlist_bonus' : 'trial');
+  const currentPlan = subscription?.plan_id || (usage?.status === 'vip_bonus' ? 'vip_bonus' : usage?.status === 'waitlist_bonus' ? 'waitlist_bonus' : null);
   const isUnlimited = subscription?.status === 'free_unlimited';
-  const isTrial = subscription?.status === 'trial';
   const isActive = subscription?.status === 'active';
   const isWaitlistUser = usage?.status === 'waitlist_bonus' || (usage?.bonusSearchesRemaining > 0 && !subscription);
   const isVipUser = usage?.status === 'vip_bonus' || usage?.isVip;
@@ -213,28 +210,6 @@ function BillingContent() {
           </div>
         )}
 
-        {/* Onboarding Trial Prompt - Only for non-waitlist/non-VIP users */}
-        {isOnboarding && !subscription && !isWaitlistUser && !isVipUser && (
-          <div className="bg-gradient-to-r from-[#88D18A] to-[#6BC070] rounded-2xl p-8 mb-8 text-white">
-            <div className="text-center">
-              <h2 className="text-3xl font-bold mb-4">🎉 Welcome! Start Your 3-Day Trial</h2>
-              <p className="text-lg mb-6 opacity-90">
-                You've seen what's possible. Now analyze your own apps with a 3-day trial for just $1.
-              </p>
-              <p className="text-sm mb-6 opacity-75">
-                Get 10 free searches • Full access to all features • Cancel anytime
-              </p>
-              <button
-                onClick={() => handleCheckout('trial', '')}
-                disabled={processingCheckout}
-                className="bg-white text-[#88D18A] px-8 py-4 rounded-lg font-bold text-lg hover:bg-gray-100 transition-colors disabled:opacity-50"
-              >
-                {processingCheckout ? 'Processing...' : 'Start Trial for $1 →'}
-              </button>
-            </div>
-          </div>
-        )}
-        
         {/* Current Subscription Card */}
         <div className="bg-white rounded-2xl p-8 mb-8 border border-gray-200 shadow-sm">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">Current Subscription</h2>
@@ -269,20 +244,13 @@ function BillingContent() {
             
             <div>
               <div className="text-sm text-gray-600 mb-2">
-                {isTrial ? 'Trial Ends' : 'Next Billing Date'}
+                Next Billing Date
               </div>
               <div className="text-xl font-bold text-gray-900">
-                {isTrial && subscription?.trial_end_date
-                  ? new Date(subscription.trial_end_date).toLocaleDateString()
-                  : subscription?.current_period_end 
-                    ? new Date(subscription.current_period_end).toLocaleDateString()
-                    : 'N/A'}
+                {subscription?.current_period_end 
+                  ? new Date(subscription.current_period_end).toLocaleDateString()
+                  : 'N/A'}
               </div>
-              {isTrial && subscription?.trial_end_date && (
-                <div className="mt-2 text-sm text-yellow-600 font-medium">
-                  {Math.ceil((new Date(subscription.trial_end_date).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))} days remaining
-                </div>
-              )}
             </div>
           </div>
         </div>

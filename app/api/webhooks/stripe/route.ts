@@ -53,67 +53,8 @@ export async function POST(request: Request) {
         const couponCode = session.total_details?.amount_discount ? 'Applied' : 'None';
         const discountAmount = session.total_details?.amount_discount ? (session.total_details.amount_discount / 100) : 0;
         
-        // Handle different payment types
-        if (planType === 'trial') {
-          // Trial payment completed - activate trial
-          const trialEndDate = new Date();
-          trialEndDate.setDate(trialEndDate.getDate() + 3);
-          const trialStart = new Date();
-          
-          // Upsert subscription (create if doesn't exist, update if it does)
-          // Since auto-trial trigger is disabled, we need to create the record
-          await supabase
-            .from('user_subscriptions')
-            .upsert({
-              user_id: userId,
-              plan_id: 'trial',
-              status: 'trial',
-              trial_start_date: trialStart.toISOString(),
-              trial_end_date: trialEndDate.toISOString(),
-              current_period_start: trialStart.toISOString(),
-              current_period_end: trialEndDate.toISOString(),
-              stripe_customer_id: session.customer as string || null,
-              stripe_subscription_id: session.subscription as string || null,
-            }, {
-              onConflict: 'user_id'
-            });
-          
-          // Upsert usage record (create if doesn't exist, update if it does)
-          await supabase
-            .from('monthly_usage')
-            .upsert({
-              user_id: userId,
-              period_start: trialStart.toISOString(),
-              period_end: trialEndDate.toISOString(),
-              searches_used: 0,
-              searches_limit: 10,
-            }, {
-              onConflict: 'user_id,period_start'
-            });
-          
-          
-          // Send admin notification email
-          try {
-            const html = `
-              <h2>🎉 New Trial Purchase</h2>
-              <p><strong>User Email:</strong> ${userEmail}</p>
-              <p><strong>User ID:</strong> ${userId}</p>
-              <p><strong>Plan:</strong> Trial (3 days)</p>
-              <p><strong>Amount Paid:</strong> ${currency} $${amountPaid.toFixed(2)}</p>
-              <p><strong>Coupon:</strong> ${couponCode}${discountAmount > 0 ? ` (Discount: ${currency} $${discountAmount.toFixed(2)})` : ''}</p>
-              <p><strong>Stripe Customer ID:</strong> ${session.customer || 'N/A'}</p>
-              <p><strong>Stripe Subscription ID:</strong> ${session.subscription || 'N/A'}</p>
-              <p><strong>Trial Start:</strong> ${trialStart.toLocaleString()}</p>
-              <p><strong>Trial End:</strong> ${trialEndDate.toLocaleString()}</p>
-              <p><strong>Time:</strong> ${new Date().toLocaleString()}</p>
-            `;
-            const text = `New Trial Purchase\n\nUser: ${userEmail}\nUser ID: ${userId}\nPlan: Trial\nAmount: ${currency} $${amountPaid.toFixed(2)}\nCoupon: ${couponCode}${discountAmount > 0 ? ` (Discount: ${currency} $${discountAmount.toFixed(2)})` : ''}\nStripe Customer: ${session.customer || 'N/A'}\nTrial Period: ${trialStart.toLocaleString()} to ${trialEndDate.toLocaleString()}`;
-            await sendAdminAlert(`[New Trial Purchase] ${userEmail} - ${currency} $${amountPaid.toFixed(2)}`, html, text);
-          } catch (emailError) {
-            console.error('Error sending trial purchase notification:', emailError);
-          }
-            
-        } else if (session.subscription) {
+        // Handle subscription payments
+        if (session.subscription) {
           // Subscription created via checkout - handle it immediately
           // This ensures subscriptions with coupons (100% discount) are still processed
           console.log(`Subscription created via checkout for user ${userId}, subscription: ${session.subscription}`);
@@ -144,8 +85,7 @@ export async function POST(request: Request) {
               searchesLimit = 225;
             }
             
-            const status = stripeSubscription.status === 'active' ? 'active' : 
-                          stripeSubscription.status === 'trialing' ? 'trial' : 
+            const status = (stripeSubscription.status === 'active' || stripeSubscription.status === 'trialing') ? 'active' : 
                           stripeSubscription.status === 'canceled' ? 'cancelled' : 'expired';
             
             // Upsert user subscription
@@ -293,8 +233,7 @@ export async function POST(request: Request) {
           searchesLimit = 100;
         }
         
-        const status = subscription.status === 'active' ? 'active' : 
-                      subscription.status === 'trialing' ? 'trial' : 
+        const status = (subscription.status === 'active' || subscription.status === 'trialing') ? 'active' : 
                       subscription.status === 'canceled' ? 'cancelled' : 'expired';
         
         // Upsert user subscription (create if doesn't exist, update if it does)

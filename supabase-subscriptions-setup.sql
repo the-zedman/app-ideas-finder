@@ -13,7 +13,6 @@ CREATE TABLE IF NOT EXISTS public.subscription_plans (
 
 -- Insert default plans
 INSERT INTO public.subscription_plans (id, name, searches_per_month, price_monthly, price_annual) VALUES
-  ('trial', 'Trial', 10, 1.00, NULL),
   ('core_monthly', 'Core (Monthly)', 25, 12.50, NULL),
   ('core_annual', 'Core (Annual)', 25, NULL, 100.00),
   ('prime_monthly', 'Prime (Monthly)', 100, 25.00, NULL),
@@ -26,11 +25,7 @@ CREATE TABLE IF NOT EXISTS public.user_subscriptions (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE UNIQUE,
   plan_id TEXT REFERENCES public.subscription_plans(id),
-  status TEXT NOT NULL CHECK (status IN ('trial', 'active', 'cancelled', 'expired', 'free_unlimited')),
-  
-  -- Trial tracking
-  trial_start_date TIMESTAMP WITH TIME ZONE,
-  trial_end_date TIMESTAMP WITH TIME ZONE,
+  status TEXT NOT NULL CHECK (status IN ('active', 'cancelled', 'expired', 'free_unlimited')),
   
   -- Subscription tracking
   current_period_start TIMESTAMP WITH TIME ZONE,

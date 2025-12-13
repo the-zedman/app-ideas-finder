@@ -127,7 +127,7 @@ export default function OnboardingPage() {
 
   const handleViewPreview = async (previewId: string) => {
     if (previewCount >= 2) {
-      alert('You\'ve viewed 2 previews. Ready to generate your own? Start your trial!');
+      alert('You\'ve viewed 2 previews. Ready to generate your own? Sign up to get started!');
       handleStartTrial();
       return;
     }

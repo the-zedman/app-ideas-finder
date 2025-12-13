@@ -173,21 +173,6 @@ export async function GET() {
       ? -1
       : planSearchesRemaining;
     
-    // Calculate trial time remaining
-    let trialTimeRemaining = null;
-    if (subscription.status === 'trial' && subscription.trial_end_date) {
-      const trialEnd = new Date(subscription.trial_end_date);
-      const timeLeft = trialEnd.getTime() - now.getTime();
-      if (timeLeft > 0) {
-        trialTimeRemaining = {
-          days: Math.floor(timeLeft / (1000 * 60 * 60 * 24)),
-          hours: Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
-          minutes: Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60)),
-          totalSeconds: Math.floor(timeLeft / 1000)
-        };
-      }
-    }
-    
     return NextResponse.json({
       hasSubscription: true,
       planId: subscription.plan_id,
@@ -200,7 +185,6 @@ export async function GET() {
       searchesRemaining: totalSearchesRemaining,
       bonusSearchesRemaining: earlyAccessBonusRemaining,
       percentageBonus,
-      trialTimeRemaining,
       currentPeriodEnd: subscription.current_period_end,
       // Coupon codes
       waitlistCouponCode: hadWaitlistBonus ? WAITLIST_COUPON_CODE : null,

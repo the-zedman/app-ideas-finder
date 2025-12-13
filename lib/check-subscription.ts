@@ -4,7 +4,7 @@ import { WAITLIST_BONUS_REASON } from './waitlist';
 import { VIP_BONUS_REASON } from './vip';
 
 /**
- * Check if a user has an active subscription (trial, active, or free_unlimited)
+ * Check if a user has an active subscription (active or free_unlimited)
  * Also checks for waitlist and VIP bonuses
  * Returns null if user has no subscription or subscription is expired/cancelled
  */
@@ -36,7 +36,7 @@ export async function hasActiveSubscription(
   // If there's a subscription, check if it's active
   if (subscription && !error) {
     console.log(`[check-subscription] Found subscription for ${userId}: status=${subscription.status}, plan=${subscription.plan_id}`);
-    const activeStatuses = ['trial', 'active', 'free_unlimited'];
+    const activeStatuses = ['active', 'free_unlimited'];
     if (activeStatuses.includes(subscription.status)) {
       console.log(`[check-subscription] User ${userId} has active subscription: ${subscription.status}`);
       return true;

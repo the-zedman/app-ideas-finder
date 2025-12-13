@@ -10,7 +10,6 @@ export const stripe = process.env.STRIPE_SECRET_KEY
 
 // Stripe Price IDs - these will be created in Stripe Dashboard
 export const STRIPE_PRICES = {
-  TRIAL: process.env.STRIPE_PRICE_TRIAL || '', // $1 one-time
   CORE_MONTHLY: process.env.STRIPE_PRICE_CORE_MONTHLY || '', // $12.50/month
   CORE_ANNUAL: process.env.STRIPE_PRICE_CORE_ANNUAL || '', // $100/year
   PRIME_MONTHLY: process.env.STRIPE_PRICE_PRIME_MONTHLY || '', // $25/month
@@ -19,13 +18,6 @@ export const STRIPE_PRICES = {
 
 // Plan details
 export const PLAN_DETAILS = {
-  trial: {
-    name: 'Trial',
-    searches: 10,
-    duration: 3, // days
-    price: 1.00,
-    priceId: STRIPE_PRICES.TRIAL,
-  },
   core_monthly: {
     name: 'Core (Monthly)',
     searches: 25,

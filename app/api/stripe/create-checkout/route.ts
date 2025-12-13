@@ -29,7 +29,6 @@ export async function POST(request: Request) {
     
     // Map plan type to price ID from environment variables
     const priceIdMap: { [key: string]: string } = {
-      'trial': process.env.STRIPE_PRICE_TRIAL || '',
       'core_monthly': process.env.STRIPE_PRICE_CORE_MONTHLY || '',
       'core_annual': process.env.STRIPE_PRICE_CORE_ANNUAL || '',
       'prime_monthly': process.env.STRIPE_PRICE_PRIME_MONTHLY || '',
@@ -125,30 +124,6 @@ export async function POST(request: Request) {
       .eq('user_id', user.id)
       .maybeSingle();
     
-    // Prevent trial purchase if user has ever had a trial
-    if (planType === 'trial') {
-      // Check if user has ever had a trial (any status: trial, expired, active, etc.)
-      if (subscription) {
-        // Check if they've ever had a trial by looking at plan_id or status history
-        // We'll check if they have any subscription record with plan_id 'trial' or status 'trial' or 'expired'
-        const { data: allSubscriptions } = await supabaseAdmin
-          .from('user_subscriptions')
-          .select('plan_id, status')
-          .eq('user_id', user.id);
-        
-        const hasHadTrial = allSubscriptions?.some((sub: any) => 
-          sub.plan_id === 'trial' || sub.status === 'trial' || sub.status === 'expired'
-        );
-        
-        if (hasHadTrial) {
-          return NextResponse.json({ 
-            error: 'Trial already used', 
-            details: 'You have already used your trial. Please subscribe to a Core or Prime plan to continue.' 
-          }, { status: 400 });
-        }
-      }
-    }
-    
     let customerId = subscription?.stripe_customer_id;
     
     // Create customer if doesn't exist
@@ -183,8 +158,8 @@ export async function POST(request: Request) {
       }
     }
     
-    // Determine if this is a subscription or one-time payment
-    const isSubscription = planType !== 'trial';
+    // All plans are subscriptions
+    const isSubscription = true;
     
     // Create checkout session
     console.log(`Creating checkout session for plan type: ${planType}, price ID: ${priceId.substring(0, 12)}...`);
@@ -210,7 +185,7 @@ export async function POST(request: Request) {
       },
     };
     
-    // For subscriptions, add trial period if applicable and set metadata
+    // For subscriptions, set metadata
     if (isSubscription) {
       sessionConfig.subscription_data = {
         metadata: {
@@ -218,9 +193,6 @@ export async function POST(request: Request) {
           plan_type: planType,
         },
       };
-      if (planType === 'trial') {
-        sessionConfig.subscription_data.trial_period_days = 3;
-      }
     }
     
     console.log('Checkout session config:', JSON.stringify(sessionConfig, null, 2));
