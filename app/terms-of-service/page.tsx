@@ -163,87 +163,42 @@ export default function TermsOfService() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">11. Affiliate Program</h2>
-            <p className="text-gray-700 leading-relaxed mb-4">
-              All users are automatically enrolled in our affiliate program and receive a unique affiliate code and link. Terms include:
-            </p>
-            
-            <h3 className="text-xl font-semibold text-gray-900 mb-3 mt-6">11.1 Commission Structure</h3>
-            <ul className="list-disc pl-6 space-y-2 text-gray-700 mb-4">
-              <li><strong>Commission Rate:</strong> 25% of the first payment from referred customers</li>
-              <li><strong>Eligible Transactions:</strong>
-                <ul className="list-disc pl-6 space-y-1 mt-2">
-                  <li>Monthly subscriptions (Core: $9.75, Prime: $19.75)</li>
-                  <li>Annual subscriptions (Core: $99.75, Prime: $199.75)</li>
-                  <li>Search Pack purchases ($7.25 per pack)</li>
-                </ul>
-              </li>
-              <li><strong>Payment Timeline:</strong>
-                <ul className="list-disc pl-6 space-y-1 mt-2">
-                  <li>Subscriptions: Paid within 7 days after referred customer completes their first 30 days</li>
-                  <li>Search Packs: Paid within 7 days of purchase</li>
-                </ul>
-              </li>
-              <li><strong>Payment Methods:</strong> Commissions paid via Stripe or PayPal</li>
-            </ul>
-
-            <h3 className="text-xl font-semibold text-gray-900 mb-3 mt-6">11.2 Commission Eligibility</h3>
-            <ul className="list-disc pl-6 space-y-2 text-gray-700 mb-4">
-              <li>Referred customer must remain active through their entire first 30 days</li>
-              <li>If referred customer cancels or requests refund within 30 days, no commission is paid</li>
-              <li>Commissions are one-time per customer (not recurring)</li>
-              <li>Self-referrals are not eligible for commission</li>
-              <li>Referred customer must be a new customer (not an existing user with a new account)</li>
-            </ul>
-
-            <h3 className="text-xl font-semibold text-gray-900 mb-3 mt-6">11.3 Program Rules</h3>
-            <ul className="list-disc pl-6 space-y-2 text-gray-700">
-              <li>We reserve the right to void commissions obtained through fraudulent means</li>
-              <li>Prohibited activities include: spam, fake accounts, stolen credit cards, misleading claims</li>
-              <li>We may withhold payment pending investigation of suspicious activity</li>
-              <li>Affiliate accounts may be terminated for violations</li>
-              <li>Affiliate program terms and commission rates may be modified at any time</li>
-              <li>We reserve the right to terminate the affiliate program at any time</li>
-            </ul>
-          </section>
-
-          <section>
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">12. Modifications to Terms</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">11. Modifications to Terms</h2>
             <p className="text-gray-700 leading-relaxed">
               We reserve the right to modify these Terms at any time. We will notify you of material changes via email or through the Service. Continued use of the Service after changes constitutes acceptance of the modified Terms.
             </p>
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">13. Modifications to Service</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">12. Modifications to Service</h2>
             <p className="text-gray-700 leading-relaxed">
               We reserve the right to modify, suspend, or discontinue any part of the Service at any time without notice. We are not liable for any modification, suspension, or discontinuation of the Service.
             </p>
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">14. Governing Law</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">13. Governing Law</h2>
             <p className="text-gray-700 leading-relaxed">
               These Terms shall be governed by and construed in accordance with the laws of the jurisdiction in which App Ideas Finder operates, without regard to conflict of law provisions.
             </p>
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">15. Dispute Resolution</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">14. Dispute Resolution</h2>
             <p className="text-gray-700 leading-relaxed">
               Any disputes arising from these Terms or the Service shall be resolved through binding arbitration in accordance with applicable arbitration rules, except where prohibited by law.
             </p>
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">16. Severability</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">15. Severability</h2>
             <p className="text-gray-700 leading-relaxed">
               If any provision of these Terms is found to be unenforceable, the remaining provisions will remain in full force and effect.
             </p>
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">17. Contact Information</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">16. Contact Information</h2>
             <p className="text-gray-700 leading-relaxed">
               If you have any questions about these Terms, please contact us at:
             </p>
