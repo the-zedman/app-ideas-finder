@@ -80,10 +80,10 @@ WHERE schemaname = 'public'
 SELECT 
   'Constraint Check' as check_type,
   CASE 
-    WHEN constraint_definition LIKE '%affiliate_reward%' THEN '❌ FAIL: affiliate_reward still in constraint'
+    WHEN check_clause LIKE '%affiliate_reward%' THEN '❌ FAIL: affiliate_reward still in constraint'
     ELSE '✅ PASS: affiliate_reward removed from constraint'
   END as result,
-  constraint_definition as details
+  check_clause as details
 FROM information_schema.table_constraints tc
 JOIN information_schema.check_constraints cc 
   ON tc.constraint_name = cc.constraint_name
