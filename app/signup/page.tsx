@@ -15,32 +15,6 @@ function SignupContent() {
   
   const supabase = createClient();
   const redirectTo = searchParams.get('redirectTo') || '/homezone';
-  
-  // Get affiliate ref from URL or cookie and store it
-  useEffect(() => {
-    const refFromUrl = searchParams.get('ref');
-    const refFromCookie = typeof document !== 'undefined' ? 
-      document.cookie.split('; ').find(row => row.startsWith('affiliate_ref='))?.split('=')[1] : null;
-    const refFromLocalStorage = typeof window !== 'undefined' ? localStorage.getItem('affiliate_ref') : null;
-    const affiliateRef = refFromUrl || refFromCookie || refFromLocalStorage;
-    
-    console.log('[signup] Affiliate ref check:', { 
-      refFromUrl, 
-      refFromCookie, 
-      refFromLocalStorage, 
-      finalRef: affiliateRef 
-    });
-    
-    if (affiliateRef && typeof window !== 'undefined') {
-      // Store in localStorage as backup (works in private browsing)
-      localStorage.setItem('affiliate_ref', affiliateRef);
-      // Also set cookie if not already set
-      if (!refFromCookie) {
-        document.cookie = `affiliate_ref=${affiliateRef}; path=/; max-age=${30 * 24 * 60 * 60}; SameSite=Lax`;
-      }
-      console.log('[signup] Stored affiliate ref:', affiliateRef);
-    }
-  }, [searchParams]);
 
   useEffect(() => {
     const error = searchParams.get('error');
@@ -55,32 +29,15 @@ function SignupContent() {
     setLoading(true);
     setMessage('');
 
-    // Get affiliate ref from localStorage or cookie
-    const affiliateRef = typeof window !== 'undefined' ? 
-      (localStorage.getItem('affiliate_ref') || 
-       document.cookie.split('; ').find(row => row.startsWith('affiliate_ref='))?.split('=')[1]) : null;
-    
-    console.log('[signup] Magic link - affiliate ref:', affiliateRef);
-    
-    // Include affiliate ref in the callback URL
-    const callbackUrl = affiliateRef 
-      ? `${window.location.origin}/auth/callback?next=${encodeURIComponent(redirectTo)}&ref=${encodeURIComponent(affiliateRef)}`
-      : `${window.location.origin}/auth/callback?next=${encodeURIComponent(redirectTo)}`;
-    
-    console.log('[signup] Magic link callback URL:', callbackUrl);
-    console.log('[signup] Full callback URL length:', callbackUrl.length);
+    const callbackUrl = `${window.location.origin}/auth/callback?next=${encodeURIComponent(redirectTo)}`;
 
     try {
       const { data, error } = await supabase.auth.signInWithOtp({
         email,
         options: {
           emailRedirectTo: callbackUrl,
-          // Also store ref in data/metadata as backup
-          data: affiliateRef ? { affiliate_ref: affiliateRef } : undefined,
         },
       });
-      
-      console.log('[signup] Magic link sent, response:', { data, error: error?.message });
 
       if (error) {
         setMessage(error.message);
@@ -101,16 +58,7 @@ function SignupContent() {
     setLoading(true);
     setMessage('');
 
-    // Get affiliate ref from localStorage or cookie
-    const affiliateRef = typeof window !== 'undefined' ? 
-      (localStorage.getItem('affiliate_ref') || 
-       document.cookie.split('; ').find(row => row.startsWith('affiliate_ref='))?.split('=')[1]) : null;
-    
-    // Include affiliate ref in the callback URL
-    const encodedNext = encodeURIComponent(redirectTo);
-    const callbackUrl = affiliateRef
-      ? `${window.location.origin}/auth/callback?next=${encodedNext}&ref=${encodeURIComponent(affiliateRef)}`
-      : `${window.location.origin}/auth/callback?next=${encodedNext}`;
+    const callbackUrl = `${window.location.origin}/auth/callback?next=${encodeURIComponent(redirectTo)}`;
 
     try {
       const { error } = await supabase.auth.signInWithOAuth({

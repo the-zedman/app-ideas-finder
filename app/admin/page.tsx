@@ -238,7 +238,6 @@ export default function AdminDashboard() {
               <div className="text-lg font-semibold text-indigo-900 mb-2">📧 Email Tool</div>
               <div className="text-sm text-gray-600">Draft and send emails to users, subscribers, or waitlist</div>
             </a>
-{/* Affiliate Management - Hidden until program is live */}
             <a
               href="/admin/shared-links"
               className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow border-emerald-200"

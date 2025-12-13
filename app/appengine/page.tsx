@@ -2916,13 +2916,6 @@ Base recommendations on competitive pricing data and actual user feedback about 
                     <button
                       onClick={async () => {
                         try {
-                          // Get affiliate data
-                          const { data: affiliateInfo } = await supabase
-                            .from('user_affiliates')
-                            .select('affiliate_code')
-                            .eq('user_id', user?.id)
-                            .single();
-                          
                           const response = await fetch('/api/generate-pdf', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
@@ -2930,9 +2923,7 @@ Base recommendations on competitive pricing data and actual user feedback about 
                               appMeta,
                               rollupContent,
                               analysisMetrics,
-                              costTracking,
-                              affiliateCode: affiliateInfo?.affiliate_code || 'SIGNUP',
-                              userEmail: user?.email
+                              costTracking
                             })
                           });
                           

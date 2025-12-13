@@ -279,9 +279,7 @@ export default function AnalysesHistory() {
                                     analysisMetrics: {
                                       reviewCount: analysis.review_count || 0,
                                       analysisTimeSeconds: analysis.analysis_time_seconds || 0
-                                    },
-                                    affiliateCode: 'SIGNUP',
-                                    userEmail: user?.email
+                                    }
                                   })
                                 });
                                 

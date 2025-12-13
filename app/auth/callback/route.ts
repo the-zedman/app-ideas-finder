@@ -100,176 +100,21 @@ export async function GET(request: NextRequest) {
     const { data, error } = await supabase.auth.exchangeCodeForSession(code);
     
     if (!error && data?.user) {
-      // Get affiliate ref from multiple sources
-      // Priority: URL params > User metadata > Cookie
-      const urlParams = new URL(request.url).searchParams;
-      const refFromUrl = urlParams.get('ref') || urlParams.get('affiliate_ref');
-      const affiliateRef = cookieStore.get('affiliate_ref')?.value;
-      const refFromMetadata = data.user?.user_metadata?.affiliate_ref;
-      
-      // URL params take priority (most reliable through OAuth/magic link redirects)
-      // Then check user metadata (stored when magic link was requested)
-      // Finally check cookie
-      const finalAffiliateRef = refFromUrl || refFromMetadata || affiliateRef;
-      
-      console.log(`[auth/callback] Affiliate ref sources:`, {
-        refFromUrl,
-        refFromMetadata,
-        affiliateRef,
-        finalAffiliateRef
-      });
-      
-      // Check if this is a new user (signup) by checking:
-      // 1. type === 'signup'
-      // 2. User was created recently (within last 60 seconds)
-      // 3. No existing affiliate_conversions record for this user
+      // Check if this is a new user (signup)
       const userCreatedAt = new Date(data.user.created_at);
       const now = new Date();
       const secondsSinceCreation = (now.getTime() - userCreatedAt.getTime()) / 1000;
       const isRecentlyCreated = secondsSinceCreation < 60;
-      
-      // Check if affiliate conversion already exists for this user
-      const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-      let existingConversion = null;
-      if (serviceRoleKey) {
-        try {
-          const supabaseAdmin = createClient(
-            process.env.NEXT_PUBLIC_SUPABASE_URL!,
-            serviceRoleKey
-          );
-          const { data: conversionData } = await supabaseAdmin
-            .from('affiliate_conversions')
-            .select('id')
-            .eq('referred_user_id', data.user.id)
-            .maybeSingle();
-          existingConversion = conversionData;
-        } catch (err) {
-          console.error('[auth/callback] Error checking existing conversion:', err);
-        }
-      }
-      
-      const isNewUser = type === 'signup' || (isRecentlyCreated && !existingConversion);
-      
-      // Also check if we should process affiliate even if user wasn't just created
-      // This handles cases where magic link was clicked later
-      const shouldProcessAffiliate = finalAffiliateRef && !existingConversion && data?.user;
-      
-      console.log(`[auth/callback] User check:`, {
-        userId: data.user.id,
-        type,
-        secondsSinceCreation,
-        isRecentlyCreated,
-        existingConversion: !!existingConversion,
-        isNewUser,
-        shouldProcessAffiliate,
-        finalAffiliateRef: finalAffiliateRef || 'none'
-      });
-      
-      // Handle affiliate referral tracking for new signups
-      // Process if: (1) it's a new user signup, OR (2) we have affiliate ref and no existing conversion
-      if (shouldProcessAffiliate) {
-        console.log(`[auth/callback] ✅ Processing affiliate referral: ${finalAffiliateRef} for user ${data.user.id} (isNewUser: ${isNewUser}, type: ${type})`);
-        
-        if (serviceRoleKey) {
-          // Process affiliate referral
-          try {
-            const supabaseAdmin = createClient(
-              process.env.NEXT_PUBLIC_SUPABASE_URL!,
-              serviceRoleKey
-            );
-            
-            // Verify the affiliate code exists
-            const { data: affiliateData, error: affiliateCheckError } = await supabaseAdmin
-              .from('user_affiliates')
-              .select('user_id, affiliate_code, total_referrals')
-              .eq('affiliate_code', finalAffiliateRef)
-              .single();
-            
-            console.log(`[auth/callback] Affiliate code check:`, { 
-              affiliateRef: finalAffiliateRef, 
-              found: !!affiliateData, 
-              currentTotalReferrals: affiliateData?.total_referrals,
-              error: affiliateCheckError?.message 
-            });
-            
-            if (affiliateData) {
-                // Check if conversion already exists to prevent duplicates
-                const { data: existingConversion } = await supabaseAdmin
-                  .from('affiliate_conversions')
-                  .select('id')
-                  .eq('referred_user_id', data.user.id)
-                  .eq('affiliate_code', finalAffiliateRef)
-                  .maybeSingle();
-                
-                if (existingConversion) {
-                  console.log(`[auth/callback] ⚠️ Conversion already exists for user ${data.user.id} with affiliate ${finalAffiliateRef}, skipping`);
-                  // Skip creating duplicate conversion - continue to next part of code
-                } else {
-                
-                // Create affiliate conversion record
-                const { error: conversionError } = await supabaseAdmin
-                  .from('affiliate_conversions')
-                  .insert({
-                    affiliate_code: finalAffiliateRef,
-                    referred_user_id: data.user.id,
-                    converted_to_paid: false,
-                    bonus_awarded: false,
-                    conversion_date: new Date().toISOString()
-                  });
-                
-                if (!conversionError) {
-                  // Update total_referrals count - ONLY ONCE per signup
-                  console.log(`[auth/callback] Updating total_referrals for affiliate ${finalAffiliateRef}`);
-                  
-                  // Get current count and increment by 1
-                  const { data: currentData, error: fetchError } = await supabaseAdmin
-                    .from('user_affiliates')
-                    .select('total_referrals, user_id')
-                    .eq('affiliate_code', finalAffiliateRef)
-                    .single();
-                  
-                  if (currentData) {
-                    const newCount = (currentData.total_referrals || 0) + 1;
-                    const { error: updateError } = await supabaseAdmin
-                      .from('user_affiliates')
-                      .update({ total_referrals: newCount })
-                      .eq('affiliate_code', finalAffiliateRef);
-                    
-                    if (updateError) {
-                      console.error('[auth/callback] Error updating total_referrals:', updateError);
-                    } else {
-                      console.log(`[auth/callback] ✅ Successfully updated total_referrals from ${currentData.total_referrals || 0} to ${newCount} for affiliate ${finalAffiliateRef}`);
-                    }
-                  } else {
-                    console.error('[auth/callback] ❌ Could not fetch current affiliate data for update. Fetch error:', fetchError);
-                  }
-                  
-                  console.log(`[auth/callback] ✅ Affiliate referral tracked: ${finalAffiliateRef} -> ${data.user.id}`);
-                } else {
-                  console.error('[auth/callback] ❌ Error creating affiliate conversion:', conversionError);
-                }
-                }
-              } else {
-                console.warn(`[auth/callback] Invalid affiliate code: ${finalAffiliateRef}`);
-              }
-            } catch (affiliateError) {
-              console.error('[auth/callback] Error processing affiliate referral:', affiliateError);
-            }
-          }
-          
-          // Clear the affiliate cookie after processing
-          cookieStore.delete('affiliate_ref');
-        }
+      const isNewUser = type === 'signup' || isRecentlyCreated;
       
       if (data.user.email) {
         const email = data.user.email;
-        const text = `New signup: ${email}\nUser ID: ${data.user.id}\nSigned up at: ${new Date().toISOString()}${finalAffiliateRef ? `\nReferred by: ${finalAffiliateRef}` : ''}`;
+        const text = `New signup: ${email}\nUser ID: ${data.user.id}\nSigned up at: ${new Date().toISOString()}`;
         const html = `
           <h2>🎉 New Signup</h2>
           <p><strong>Email:</strong> ${email}</p>
           <p><strong>User ID:</strong> ${data.user.id}</p>
           <p><strong>Time:</strong> ${new Date().toLocaleString()}</p>
-            ${finalAffiliateRef ? `<p><strong>Referred by affiliate code:</strong> ${finalAffiliateRef}</p>` : ''}
         `;
         sendAdminAlert(`[New Signup] ${email}`, html, text).catch((err) =>
           console.error('Failed to send signup alert:', err)
@@ -369,8 +214,6 @@ export async function GET(request: NextRequest) {
 
       try {
         response.cookies.delete('pending_signup_redirect');
-        // Also clear affiliate_ref cookie after processing
-        response.cookies.delete('affiliate_ref');
       } catch (err) {
         console.warn('Failed to clear cookies', err);
       }

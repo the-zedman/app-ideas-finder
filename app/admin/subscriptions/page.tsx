@@ -333,7 +333,6 @@ export default function AdminSubscriptionsPage() {
                 <select name="bonusType" required className="w-full px-4 py-2 border border-gray-300 rounded-lg">
                   <option value="fixed_searches">Fixed Searches</option>
                   <option value="percentage_increase">Percentage Increase</option>
-                  <option value="affiliate_reward">Affiliate Reward</option>
                 </select>
               </div>
               
