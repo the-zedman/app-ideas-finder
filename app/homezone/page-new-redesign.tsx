@@ -264,7 +264,7 @@ export default function HomeZone() {
               <div className="bg-red-50 border border-red-200 rounded-lg p-4">
                 <p className="text-red-800 font-medium mb-2">⚠️ You've used all your searches this month</p>
                 <button className="bg-[#E07A5F] text-white px-6 py-2 rounded-lg font-semibold hover:bg-[#E07A5F]/90">
-                  Upgrade Plan or Buy Search Pack
+                  Upgrade Plan
                 </button>
               </div>
             ) : searchesRemaining <= 2 ? (

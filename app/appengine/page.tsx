@@ -1817,7 +1817,7 @@ Base recommendations on competitive pricing data and actual user feedback about 
       const usageData = await usageResponse.json();
       
       if (!usageData.canSearch) {
-        alert('You have reached your monthly search limit. Please upgrade your plan or purchase a Search Pack to continue.');
+        alert('You have reached your monthly search limit. Please upgrade your plan to continue.');
         return;
       }
     } catch (error) {
