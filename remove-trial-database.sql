@@ -1,8 +1,11 @@
 -- Remove trial plan from database
 -- Run this in Supabase SQL Editor to clean up trial-related structures
 
--- Step 1: Delete trial plan from subscription_plans
-DELETE FROM public.subscription_plans WHERE id = 'trial';
+-- Step 1: Update plan_id for users who had trial plan FIRST (before deleting the plan)
+-- Convert to core_monthly as default
+UPDATE public.user_subscriptions
+SET plan_id = 'core_monthly'
+WHERE plan_id = 'trial';
 
 -- Step 2: Update existing trial subscriptions to active (or cancelled if expired)
 -- Convert active trial subscriptions to active status
@@ -18,11 +21,8 @@ WHERE status = 'trial'
   AND trial_end_date IS NOT NULL 
   AND trial_end_date <= NOW();
 
--- Step 3: Update plan_id for users who had trial plan
--- Convert to core_monthly as default
-UPDATE public.user_subscriptions
-SET plan_id = 'core_monthly'
-WHERE plan_id = 'trial';
+-- Step 3: Now we can safely delete trial plan from subscription_plans
+DELETE FROM public.subscription_plans WHERE id = 'trial';
 
 -- Step 4: Remove 'trial' from status constraint
 -- First, drop the existing constraint
