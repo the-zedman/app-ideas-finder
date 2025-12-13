@@ -277,20 +277,20 @@ export async function POST(request: Request) {
         // Determine plan type from price ID
         const priceId = subscription.items.data[0]?.price.id;
         let planId = 'core_monthly';
-        let searchesLimit = 75;
+        let searchesLimit = 25;
         
         if (priceId === process.env.STRIPE_PRICE_CORE_MONTHLY) {
           planId = 'core_monthly';
-          searchesLimit = 75;
+          searchesLimit = 25;
         } else if (priceId === process.env.STRIPE_PRICE_CORE_ANNUAL) {
           planId = 'core_annual';
-          searchesLimit = 75;
+          searchesLimit = 25;
         } else if (priceId === process.env.STRIPE_PRICE_PRIME_MONTHLY) {
           planId = 'prime_monthly';
-          searchesLimit = 225;
+          searchesLimit = 100;
         } else if (priceId === process.env.STRIPE_PRICE_PRIME_ANNUAL) {
           planId = 'prime_annual';
-          searchesLimit = 225;
+          searchesLimit = 100;
         }
         
         const status = subscription.status === 'active' ? 'active' : 
