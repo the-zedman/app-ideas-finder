@@ -268,6 +268,13 @@ export default function AdminDashboard() {
               <div className="text-lg font-semibold text-gray-900 mb-2">⚡ System Health</div>
               <div className="text-sm text-gray-600">Monitor system status</div>
             </a>
+            <a
+              href="/admin/indexnow"
+              className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow border-teal-300"
+            >
+              <div className="text-lg font-semibold text-teal-900 mb-2">🔍 IndexNow</div>
+              <div className="text-sm text-gray-600">Submit sitemap URLs to search engines</div>
+            </a>
           </div>
         </div>
 
