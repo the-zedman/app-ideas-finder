@@ -99,7 +99,7 @@ export default function IndexNowPage() {
   }
 
   const getStatusColor = (statusCode: number) => {
-    if (statusCode === 200) return 'text-green-600 bg-green-50 border-green-200';
+    if (statusCode === 200 || statusCode === 202) return 'text-green-600 bg-green-50 border-green-200';
     if (statusCode >= 400 && statusCode < 500) return 'text-red-600 bg-red-50 border-red-200';
     if (statusCode === 429) return 'text-yellow-600 bg-yellow-50 border-yellow-200';
     return 'text-gray-600 bg-gray-50 border-gray-200';
@@ -216,6 +216,10 @@ export default function IndexNowPage() {
               <div className="flex items-start gap-2">
                 <span className="font-mono font-semibold text-green-600">200</span>
                 <span className="text-gray-600">OK - URLs submitted successfully</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <span className="font-mono font-semibold text-green-600">202</span>
+                <span className="text-gray-600">Accepted - URLs accepted for processing</span>
               </div>
               <div className="flex items-start gap-2">
                 <span className="font-mono font-semibold text-red-600">400</span>

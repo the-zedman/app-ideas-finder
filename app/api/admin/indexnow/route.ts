@@ -90,6 +90,10 @@ export async function POST() {
         statusText = 'OK';
         message = 'URLs submitted successfully';
         break;
+      case 202:
+        statusText = 'Accepted';
+        message = 'URLs accepted for processing';
+        break;
       case 400:
         statusText = 'Bad Request';
         message = 'Invalid format';
@@ -127,7 +131,7 @@ export async function POST() {
     }
 
     return NextResponse.json({
-      success: statusCode === 200,
+      success: statusCode === 200 || statusCode === 202,
       statusCode,
       statusText,
       message,
