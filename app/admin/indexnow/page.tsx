@@ -36,9 +36,12 @@ export default function IndexNowPage() {
           return;
         }
         
+        const role = data.role || 'admin';
         const adminStatus = {
           isAdmin: data.isAdmin,
-          role: data.role || 'admin',
+          role: role as 'super_admin' | 'admin' | 'support',
+          isSuperAdmin: role === 'super_admin',
+          isSupport: role === 'support',
         };
         
         setAdminCheck(adminStatus);
