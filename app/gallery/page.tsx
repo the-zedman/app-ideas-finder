@@ -75,6 +75,38 @@ export default function GalleryPage() {
           </p>
         </div>
 
+        {/* Call-to-Action Banner */}
+        <div className="bg-gradient-to-r from-[#88D18A] to-[#6bc070] rounded-2xl p-8 sm:p-12 mb-12 sm:mb-16 text-center shadow-lg">
+          <div className="max-w-3xl mx-auto">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-4">
+              Get Your App Featured Here
+            </h2>
+            <p className="text-lg sm:text-xl text-white/95 mb-6 leading-relaxed">
+              Join App Ideas Finder and get your app featured in our showcase with a valuable DOFOLLOW backlink. 
+              Build your app with AI-powered insights from real user feedback and competitive analysis, then showcase it to thousands of potential users.
+            </p>
+            <Link
+              href="/onboarding"
+              className="inline-flex items-center gap-2 bg-white text-[#88D18A] font-bold px-8 py-4 rounded-lg hover:bg-gray-50 transition-colors text-lg shadow-lg"
+            >
+              Sign Up Now
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M13 7l5 5m0 0l-5 5m5-5H6"
+                />
+              </svg>
+            </Link>
+          </div>
+        </div>
+
         {/* Gallery Grid */}
         {loading ? (
           <div className="flex justify-center items-center py-20">
