@@ -102,24 +102,24 @@ export default function GalleryPage() {
                 className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-300 flex flex-col"
               >
                 {/* Screenshot */}
-                <div className="relative w-full h-48 bg-gray-100 overflow-hidden flex items-center justify-center">
+                <div className="relative w-full bg-gray-100 overflow-hidden">
                   {item.screenshot_url ? (
                     <img
                       src={item.screenshot_url}
                       alt={`${item.app_name} screenshot`}
-                      className="w-1/2 h-1/2 object-contain"
+                      className="w-full h-auto object-cover"
                       onError={(e) => {
                         // Fallback if image fails to load
                         const target = e.target as HTMLImageElement;
                         target.style.display = 'none';
                         const parent = target.parentElement;
                         if (parent) {
-                          parent.innerHTML = '<div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200"><div class="text-gray-400 text-4xl">📱</div></div>';
+                          parent.innerHTML = '<div class="w-full aspect-[16/9] flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200"><div class="text-gray-400 text-4xl">📱</div></div>';
                         }
                       }}
                     />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200">
+                    <div className="w-full aspect-[16/9] flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200">
                       <div className="text-gray-400 text-4xl">📱</div>
                     </div>
                   )}
@@ -157,7 +157,7 @@ export default function GalleryPage() {
                   </div>
 
                   {/* Description */}
-                  <p className="text-gray-600 mb-6 flex-1 whitespace-pre-wrap">
+                  <p className="text-sm sm:text-base text-gray-600 mb-6 flex-1 whitespace-pre-wrap">
                     {item.description}
                   </p>
 
