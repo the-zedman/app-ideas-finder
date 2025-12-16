@@ -199,7 +199,7 @@ export default function AdminGalleryPage() {
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center gap-4">
               <a href="/admin" className="text-xl font-bold text-gray-900 hover:text-gray-700">
-                🎨 Gallery Management
+                🎨 App Showcase Management
               </a>
             </div>
             <div className="flex items-center gap-4">
@@ -217,9 +217,9 @@ export default function AdminGalleryPage() {
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8 flex justify-between items-center">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-3">Gallery Management</h1>
+            <h1 className="text-3xl font-bold text-gray-900 mb-3">App Showcase Management</h1>
             <p className="text-gray-600 max-w-2xl">
-              Manage apps showcased in the public gallery. Add, edit, or remove apps created using App Ideas Finder.
+              Manage apps showcased in the public App Showcase. Add, edit, or remove apps created using App Ideas Finder.
             </p>
           </div>
           <button
@@ -327,7 +327,7 @@ export default function AdminGalleryPage() {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6 border-b border-gray-200">
-              <h2 className="text-2xl font-bold text-gray-900">Add Gallery Item</h2>
+              <h2 className="text-2xl font-bold text-gray-900">Add Showcase Item</h2>
             </div>
             <form onSubmit={handleSubmit} className="p-6">
               <div className="space-y-4">
@@ -340,7 +340,7 @@ export default function AdminGalleryPage() {
                     required
                     value={formData.app_name}
                     onChange={(e) => setFormData({ ...formData, app_name: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#88D18A] focus:border-transparent"
+                    className="w-full px-4 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#88D18A] focus:border-transparent"
                   />
                 </div>
                 <div>
@@ -352,7 +352,7 @@ export default function AdminGalleryPage() {
                     required
                     value={formData.app_url}
                     onChange={(e) => setFormData({ ...formData, app_url: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#88D18A] focus:border-transparent"
+                    className="w-full px-4 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#88D18A] focus:border-transparent"
                     placeholder="https://example.com"
                   />
                 </div>
@@ -364,7 +364,7 @@ export default function AdminGalleryPage() {
                     type="url"
                     value={formData.app_icon_url}
                     onChange={(e) => setFormData({ ...formData, app_icon_url: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#88D18A] focus:border-transparent"
+                    className="w-full px-4 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#88D18A] focus:border-transparent"
                     placeholder="https://example.com/icon.png"
                   />
                 </div>
@@ -376,7 +376,7 @@ export default function AdminGalleryPage() {
                     type="url"
                     value={formData.screenshot_url}
                     onChange={(e) => setFormData({ ...formData, screenshot_url: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#88D18A] focus:border-transparent"
+                    className="w-full px-4 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#88D18A] focus:border-transparent"
                     placeholder="https://example.com/screenshot.png"
                   />
                 </div>
@@ -389,7 +389,7 @@ export default function AdminGalleryPage() {
                     rows={4}
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#88D18A] focus:border-transparent"
+                    className="w-full px-4 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#88D18A] focus:border-transparent"
                     placeholder="Describe the app and what makes it special..."
                   />
                 </div>
@@ -399,7 +399,7 @@ export default function AdminGalleryPage() {
                       type="checkbox"
                       checked={formData.is_featured}
                       onChange={(e) => setFormData({ ...formData, is_featured: e.target.checked })}
-                      className="w-4 h-4 text-[#88D18A] border-gray-300 rounded focus:ring-[#88D18A]"
+                      className="w-4 h-4 text-[#88D18A] border-gray-300 rounded focus:ring-[#88D18A] bg-white"
                     />
                     <span className="text-sm font-medium text-gray-700">Featured</span>
                   </label>
@@ -411,7 +411,7 @@ export default function AdminGalleryPage() {
                       type="number"
                       value={formData.display_order}
                       onChange={(e) => setFormData({ ...formData, display_order: parseInt(e.target.value) || 0 })}
-                      className="w-24 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#88D18A] focus:border-transparent"
+                      className="w-24 px-4 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#88D18A] focus:border-transparent"
                     />
                   </div>
                 </div>
@@ -443,7 +443,7 @@ export default function AdminGalleryPage() {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6 border-b border-gray-200">
-              <h2 className="text-2xl font-bold text-gray-900">Edit Gallery Item</h2>
+              <h2 className="text-2xl font-bold text-gray-900">Edit Showcase Item</h2>
             </div>
             <form onSubmit={handleSubmit} className="p-6">
               <div className="space-y-4">
@@ -456,7 +456,7 @@ export default function AdminGalleryPage() {
                     required
                     value={formData.app_name}
                     onChange={(e) => setFormData({ ...formData, app_name: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#88D18A] focus:border-transparent"
+                    className="w-full px-4 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#88D18A] focus:border-transparent"
                   />
                 </div>
                 <div>
@@ -468,7 +468,7 @@ export default function AdminGalleryPage() {
                     required
                     value={formData.app_url}
                     onChange={(e) => setFormData({ ...formData, app_url: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#88D18A] focus:border-transparent"
+                    className="w-full px-4 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#88D18A] focus:border-transparent"
                     placeholder="https://example.com"
                   />
                 </div>
@@ -480,7 +480,7 @@ export default function AdminGalleryPage() {
                     type="url"
                     value={formData.app_icon_url}
                     onChange={(e) => setFormData({ ...formData, app_icon_url: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#88D18A] focus:border-transparent"
+                    className="w-full px-4 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#88D18A] focus:border-transparent"
                     placeholder="https://example.com/icon.png"
                   />
                 </div>
@@ -492,7 +492,7 @@ export default function AdminGalleryPage() {
                     type="url"
                     value={formData.screenshot_url}
                     onChange={(e) => setFormData({ ...formData, screenshot_url: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#88D18A] focus:border-transparent"
+                    className="w-full px-4 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#88D18A] focus:border-transparent"
                     placeholder="https://example.com/screenshot.png"
                   />
                 </div>
@@ -505,7 +505,7 @@ export default function AdminGalleryPage() {
                     rows={4}
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#88D18A] focus:border-transparent"
+                    className="w-full px-4 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#88D18A] focus:border-transparent"
                     placeholder="Describe the app and what makes it special..."
                   />
                 </div>
@@ -515,7 +515,7 @@ export default function AdminGalleryPage() {
                       type="checkbox"
                       checked={formData.is_featured}
                       onChange={(e) => setFormData({ ...formData, is_featured: e.target.checked })}
-                      className="w-4 h-4 text-[#88D18A] border-gray-300 rounded focus:ring-[#88D18A]"
+                      className="w-4 h-4 text-[#88D18A] border-gray-300 rounded focus:ring-[#88D18A] bg-white"
                     />
                     <span className="text-sm font-medium text-gray-700">Featured</span>
                   </label>
@@ -527,7 +527,7 @@ export default function AdminGalleryPage() {
                       type="number"
                       value={formData.display_order}
                       onChange={(e) => setFormData({ ...formData, display_order: parseInt(e.target.value) || 0 })}
-                      className="w-24 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#88D18A] focus:border-transparent"
+                      className="w-24 px-4 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#88D18A] focus:border-transparent"
                     />
                   </div>
                 </div>
