@@ -44,7 +44,7 @@ export async function middleware(request: NextRequest) {
   const protectedRoutes = ['/homezone', '/profile', '/appengine', '/analyses', '/billing', '/feedback']
   const authRoutes = ['/login', '/signup']
   const adminRoutes = ['/admin']
-  const publicRoutes = ['/pricing', '/onboarding', '/', '/contact', '/terms-of-service', '/privacy-policy']
+  const publicRoutes = ['/pricing', '/onboarding', '/', '/contact', '/terms-of-service', '/privacy-policy', '/gallery']
   
   const isProtectedRoute = protectedRoutes.some(route => 
     request.nextUrl.pathname.startsWith(route)
