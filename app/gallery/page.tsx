@@ -102,7 +102,7 @@ export default function GalleryPage() {
                 className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-300 flex flex-col"
               >
                 {/* Screenshot */}
-                <div className="relative w-full aspect-[16/9] bg-gray-100 overflow-hidden flex items-center justify-center">
+                <div className="relative w-full h-48 bg-gray-100 overflow-hidden flex items-center justify-center">
                   {item.screenshot_url ? (
                     <img
                       src={item.screenshot_url}
