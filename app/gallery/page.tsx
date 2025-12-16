@@ -65,46 +65,22 @@ export default function GalleryPage() {
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
         {/* Hero Section */}
-        <div className="text-center mb-12 sm:mb-16">
+        <div className="text-center mb-8 sm:mb-12">
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 mb-4">
             App Showcase
           </h1>
-          <p className="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto">
+          <p className="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto mb-4">
             Discover amazing apps created by developers using App Ideas Finder. 
             Each app was built with insights from real user feedback and competitive analysis.
           </p>
-        </div>
-
-        {/* Call-to-Action Banner */}
-        <div className="bg-gradient-to-r from-[#88D18A] to-[#6bc070] rounded-2xl p-8 sm:p-12 mb-12 sm:mb-16 text-center shadow-lg">
-          <div className="max-w-3xl mx-auto">
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-4">
-              Get Your App Featured Here
-            </h2>
-            <p className="text-lg sm:text-xl text-white/95 mb-6 leading-relaxed">
-              Join App Ideas Finder and get your app featured in our showcase with a valuable DOFOLLOW backlink. 
-              Build your app with AI-powered insights from real user feedback and competitive analysis, then showcase it to thousands of potential users.
-            </p>
-            <Link
-              href="/onboarding"
-              className="inline-flex items-center gap-2 bg-white text-[#88D18A] font-bold px-8 py-4 rounded-lg hover:bg-gray-50 transition-colors text-lg shadow-lg"
-            >
-              Sign Up Now
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M13 7l5 5m0 0l-5 5m5-5H6"
-                />
-              </svg>
+          {/* Subtle Call-to-Action */}
+          <p className="text-sm sm:text-base text-gray-500 max-w-2xl mx-auto">
+            Want to feature your app here with a DOFOLLOW backlink?{' '}
+            <Link href="/onboarding" className="text-[#88D18A] hover:text-[#6bc070] font-semibold underline">
+              Join App Ideas Finder
             </Link>
-          </div>
+            {' '}to get started.
+          </p>
         </div>
 
         {/* Gallery Grid */}
