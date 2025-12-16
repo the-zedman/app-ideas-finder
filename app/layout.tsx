@@ -92,7 +92,7 @@ export const metadata: Metadata = {
     canonical: '/',
   },
   verification: {
-    google: 'YOUR_GOOGLE_VERIFICATION_CODE', // Add when you get it from Google Search Console
+    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || undefined,
   },
 };
 
@@ -111,6 +111,9 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="apple-mobile-web-app-title" content="App Ideas Finder" />
         <meta name="mobile-web-app-capable" content="yes" />
+        {process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION && (
+          <meta name="google-site-verification" content={process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION} />
+        )}
         <script src="https://analytics.ahrefs.com/analytics.js" data-key="DoJjtOGOv5wvDAPtNehvqw" async></script>
       </head>
       <body className={`${inter.variable} antialiased`}>
