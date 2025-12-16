@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import Footer from '@/components/Footer';
 
 type GalleryItem = {
@@ -86,7 +85,7 @@ export default function GalleryPage() {
             <p className="text-gray-600 text-lg">No apps in the gallery yet. Check back soon!</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
             {items.map((item) => (
               <div
                 key={item.id}
@@ -95,12 +94,19 @@ export default function GalleryPage() {
                 {/* Screenshot */}
                 <div className="relative w-full aspect-[16/9] bg-gray-100 overflow-hidden">
                   {item.screenshot_url ? (
-                    <Image
+                    <img
                       src={item.screenshot_url}
                       alt={`${item.app_name} screenshot`}
-                      fill
-                      className="object-cover"
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        // Fallback if image fails to load
+                        const target = e.target as HTMLImageElement;
+                        target.style.display = 'none';
+                        const parent = target.parentElement;
+                        if (parent) {
+                          parent.innerHTML = '<div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200"><div class="text-gray-400 text-4xl">📱</div></div>';
+                        }
+                      }}
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200">
@@ -118,6 +124,15 @@ export default function GalleryPage() {
                         src={item.app_icon_url}
                         alt={item.app_name}
                         className="w-16 h-16 rounded-xl border border-gray-200 flex-shrink-0"
+                        onError={(e) => {
+                          // Fallback if icon fails to load
+                          const target = e.target as HTMLImageElement;
+                          target.style.display = 'none';
+                          const parent = target.parentElement;
+                          if (parent) {
+                            parent.innerHTML = '<div class="w-16 h-16 rounded-xl bg-gray-100 flex items-center justify-center flex-shrink-0"><span class="text-2xl">📱</span></div>';
+                          }
+                        }}
                       />
                     ) : (
                       <div className="w-16 h-16 rounded-xl bg-gray-100 flex items-center justify-center flex-shrink-0">
@@ -125,14 +140,14 @@ export default function GalleryPage() {
                       </div>
                     )}
                     <div className="flex-1 min-w-0">
-                      <h3 className="text-xl font-bold text-gray-900 mb-1 line-clamp-2">
+                      <h3 className="text-xl font-bold text-gray-900 mb-1">
                         {item.app_name}
                       </h3>
                     </div>
                   </div>
 
                   {/* Description */}
-                  <p className="text-gray-600 mb-6 line-clamp-3 flex-1">
+                  <p className="text-gray-600 mb-6 flex-1 whitespace-pre-wrap">
                     {item.description}
                   </p>
 
