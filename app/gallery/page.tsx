@@ -75,7 +75,9 @@ export default function GalleryPage() {
           </p>
           {/* Subtle Call-to-Action */}
           <p className="text-sm sm:text-base text-gray-500 max-w-2xl mx-auto">
-            Want to feature your app here with a DOFOLLOW backlink?{' '}
+            Want to feature your app here with a DOFOLLOW backlink?
+          </p>
+          <p className="text-sm sm:text-base text-gray-500 max-w-2xl mx-auto">
             <Link href="/onboarding" className="text-[#88D18A] hover:text-[#6bc070] font-semibold underline">
               Join App Ideas Finder
             </Link>
@@ -100,12 +102,12 @@ export default function GalleryPage() {
                 className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-300 flex flex-col"
               >
                 {/* Screenshot */}
-                <div className="relative w-full aspect-[16/9] bg-gray-100 overflow-hidden">
+                <div className="relative w-full aspect-[16/9] bg-gray-100 overflow-hidden flex items-center justify-center">
                   {item.screenshot_url ? (
                     <img
                       src={item.screenshot_url}
                       alt={`${item.app_name} screenshot`}
-                      className="w-full h-full object-cover"
+                      className="w-1/2 h-1/2 object-contain"
                       onError={(e) => {
                         // Fallback if image fails to load
                         const target = e.target as HTMLImageElement;
