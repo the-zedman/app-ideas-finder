@@ -17,12 +17,15 @@ export default function Footer() {
           {/* Badges Section */}
           <div className="flex flex-col items-start md:items-end">
             <h3 className="font-bold text-white mb-4">Featured On</h3>
-            <div className="flex flex-wrap gap-4">
+            <div className="flex flex-wrap gap-4 items-center">
               <a href="https://huzzler.so/products/J8grXvhghC/app-ideas-finder?utm_source=huzzler_product_website&utm_medium=badge&utm_campaign=badge" target="_blank" rel="noopener noreferrer" className="hover:opacity-80 transition-opacity">
                 <img alt="Featured on Huzzler" src="https://huzzler.so/assets/images/embeddable-badges/featured.png" className="h-12" />
               </a>
               <a href="https://indiewait.com/waitlist/app-ideas-finder" target="_blank" rel="noopener noreferrer" className="hover:opacity-80 transition-opacity">
                 <img alt="Featured on IndieWait" src="/featured-on-indiewait.png" className="h-12" />
+              </a>
+              <a href="https://www.microsaasexamples.com/" target="_blank" rel="noopener noreferrer" className="text-sm text-gray-300 hover:text-white transition-colors">
+                Featured On Micro SaaS Examples
               </a>
             </div>
           </div>
