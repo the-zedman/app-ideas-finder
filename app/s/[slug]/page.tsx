@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import Footer from '@/components/Footer';
+import CopyButton from '@/components/CopyButton';
 import { createAdminClient } from '@/lib/supabase-admin';
 
 type BacklogItem = { priority?: string; content: string };
@@ -340,6 +341,7 @@ export default async function SharedStartupAnalysisPage({ params }: { params: { 
               {analysis.prp && (
                 <SectionCard title="9. PRP (Product Requirements Prompt)">
                   <div className="bg-gray-50 rounded-lg p-4">
+                    <CopyButton text={analysis.prp} />
                     <MarkdownRenderer content={analysis.prp} />
                   </div>
                 </SectionCard>
@@ -371,26 +373,6 @@ export default async function SharedStartupAnalysisPage({ params }: { params: { 
                 <SectionCard title="12. Market Viability & Business Case">
                   <div className="bg-gray-50 rounded-lg p-4">
                     <MarkdownRenderer content={analysis.market_viability} />
-                  </div>
-                </SectionCard>
-              )}
-
-              {(analysis.analysis_time_seconds || analysis.api_cost) && (
-                <SectionCard title="13. Time & Money Saved">
-                  <div className="space-y-2 text-gray-700">
-                    {analysis.analysis_time_seconds && (
-                      <p>
-                        AI generated this report in{' '}
-                        <span className="font-semibold">
-                          {Math.round(analysis.analysis_time_seconds)} seconds
-                        </span>{' '}
-                        versus the {Math.round((analysis.analysis_time_seconds || 0) * 3600 / 60)}+ hours a manual analyst would spend researching.
-                      </p>
-                    )}
-                    <p>
-                      Business analysts typically spend days researching market opportunities, competitors, pricing, and viability. This
-                      analysis compresses all of that into minutes so you can move faster.
-                    </p>
                   </div>
                 </SectionCard>
               )}

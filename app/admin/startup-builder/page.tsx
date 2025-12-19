@@ -86,7 +86,7 @@ export default function StartupBuilderPage() {
 
   // Trigger confetti when analysis completes
   useEffect(() => {
-    if (showRollups && rollupStatuses['savings'] === 'DONE' && !hasShownConfetti) {
+    if (showRollups && rollupStatuses['viability'] === 'DONE' && !hasShownConfetti) {
       confetti({
         particleCount: 100,
         spread: 70,
@@ -650,7 +650,7 @@ Base your analysis on the business idea, competitive landscape, and category tre
     });
     
     // Initialize rollup statuses
-    const sections = ['likes', 'dislikes', 'keywords', 'definitely', 'backlog', 'recommendations', 'description', 'names', 'prp', 'competitors', 'pricing', 'viability', 'savings'];
+    const sections = ['likes', 'dislikes', 'keywords', 'definitely', 'backlog', 'recommendations', 'description', 'names', 'prp', 'competitors', 'pricing', 'viability'];
     const initialStatuses: {[key: string]: string} = {};
     sections.forEach(section => {
       initialStatuses[section] = 'RESEARCH UNDERWAY';
@@ -943,9 +943,6 @@ Base your analysis on the business idea, competitive landscape, and category tre
         manualTaskHours: totalManualTaskHours
       }));
       
-      setTimeout(() => {
-        setRollupStatuses(prev => ({ ...prev, savings: 'DONE' }));
-      }, 500);
       
       setStatus('Done.');
       
@@ -1094,6 +1091,28 @@ Base your analysis on the business idea, competitive landscape, and category tre
         </div>
         {isExpanded && displayContent && (
           <div className="mt-4 pt-4 border-t border-gray-200">
+            {sectionKey === 'prp' && typeof displayContent === 'string' && (
+              <div className="mb-3 flex justify-end">
+                <button
+                  onClick={async (e) => {
+                    e.stopPropagation();
+                    try {
+                      await navigator.clipboard.writeText(displayContent);
+                      alert('PRP copied to clipboard!');
+                    } catch (err) {
+                      console.error('Failed to copy:', err);
+                      alert('Failed to copy to clipboard');
+                    }
+                  }}
+                  className="px-3 py-1.5 text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors flex items-center gap-2"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                  </svg>
+                  Copy to Clipboard
+                </button>
+              </div>
+            )}
             {Array.isArray(displayContent) ? (
               <ul className="space-y-2">
                 {displayContent.map((item: any, idx: number) => {
@@ -1322,13 +1341,6 @@ Base your analysis on the business idea, competitive landscape, and category tre
               icon="📊"
               content={rollupContent.viability}
               status={rollupStatuses.viability}
-            />
-            <RollupSection
-              sectionKey="savings"
-              title="13. Time & Money Saved"
-              icon="⏱️"
-              content={`AI generated this analysis in ${Math.round(analysisMetrics.analysisTimeSeconds)} seconds versus the ${Math.round(analysisMetrics.manualTaskHours)} hours a manual analyst would spend.`}
-              status={rollupStatuses.savings}
             />
           </div>
         )}
