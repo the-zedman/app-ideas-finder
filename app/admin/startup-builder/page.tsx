@@ -948,7 +948,7 @@ Base your analysis on the business idea, competitive landscape, and category tre
       
       const finalApiCost = costAccumulator.value;
       
-      // Save analysis to database
+      // Save analysis to database via API route
       try {
         if (!user) {
           console.error('No user found, cannot save analysis');
@@ -959,13 +959,14 @@ Base your analysis on the business idea, competitive landscape, and category tre
         console.log('Saving startup analysis with cost:', finalApiCost.toFixed(6));
         console.log('User ID:', user.id);
         
-        // Generate share_slug (let database handle it via default, or generate client-side)
-        const { data: savedData, error: saveError } = await supabase
-          .from('startup_analyses')
-          .insert({
+        const response = await fetch('/api/admin/startup-analyses', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
             business_name: businessName || null,
             business_idea: businessIdea,
-            created_by: user.id,
             likes: finalParsed.likes,
             dislikes: finalParsed.dislikes,
             recommendations: recommendationsArray,
@@ -981,19 +982,18 @@ Base your analysis on the business idea, competitive landscape, and category tre
             analysis_time_seconds: analysisTimeSeconds,
             api_cost: finalApiCost
           })
-          .select('id, share_slug')
-          .single();
-        
-        if (saveError) {
-          console.error('Error saving startup analysis:', saveError);
-          console.error('Error details:', JSON.stringify(saveError, null, 2));
-          console.error('Error code:', saveError.code);
-          console.error('Error hint:', saveError.hint);
-          alert(`Error saving analysis: ${saveError.message || 'Unknown error'}. Check console for details.`);
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+          console.error('Error saving startup analysis:', result);
+          console.error('Error details:', JSON.stringify(result, null, 2));
+          alert(`Error saving analysis: ${result.message || 'Unknown error'}. ${result.hint ? `Hint: ${result.hint}` : ''} Check console for details.`);
         } else {
           console.log('✅ Startup analysis saved to database with cost:', finalApiCost);
-          console.log('Saved analysis ID:', savedData?.id);
-          console.log('Share slug:', savedData?.share_slug);
+          console.log('Saved analysis ID:', result.analysis?.id);
+          console.log('Share slug:', result.analysis?.share_slug);
           setStatus('Analysis complete and saved! You can view it in the history page.');
         }
       } catch (saveError) {
