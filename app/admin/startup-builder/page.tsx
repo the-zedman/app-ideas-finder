@@ -950,42 +950,55 @@ Base your analysis on the business idea, competitive landscape, and category tre
       
       // Save analysis to database
       try {
-        if (user) {
-          console.log('Saving startup analysis with cost:', finalApiCost.toFixed(6));
-          
-          // Generate share_slug (let database handle it via default, or generate client-side)
-          const { error: saveError } = await supabase
-            .from('startup_analyses')
-            .insert({
-              business_name: businessName || null,
-              business_idea: businessIdea,
-              created_by: user.id,
-              likes: finalParsed.likes,
-              dislikes: finalParsed.dislikes,
-              recommendations: recommendationsArray,
-              keywords: keywordsArray,
-              definitely_include: definitelyIncludeFeatures,
-              backlog: backlogItems,
-              description: description,
-              app_names: appNames,
-              prp: prpContent,
-              competitors: competitors ? [competitors] : null,
-              pricing_model: pricingContent,
-              market_viability: marketViabilityContent,
-              analysis_time_seconds: analysisTimeSeconds,
-              api_cost: finalApiCost
-            })
-            .select('id, share_slug')
-            .single();
-          
-          if (saveError) {
-            console.error('Error saving startup analysis:', saveError);
-          } else {
-            console.log('✅ Startup analysis saved to database with cost:', finalApiCost);
-          }
+        if (!user) {
+          console.error('No user found, cannot save analysis');
+          alert('Error: You must be logged in to save analyses. Please refresh the page and try again.');
+          return;
+        }
+
+        console.log('Saving startup analysis with cost:', finalApiCost.toFixed(6));
+        console.log('User ID:', user.id);
+        
+        // Generate share_slug (let database handle it via default, or generate client-side)
+        const { data: savedData, error: saveError } = await supabase
+          .from('startup_analyses')
+          .insert({
+            business_name: businessName || null,
+            business_idea: businessIdea,
+            created_by: user.id,
+            likes: finalParsed.likes,
+            dislikes: finalParsed.dislikes,
+            recommendations: recommendationsArray,
+            keywords: keywordsArray,
+            definitely_include: definitelyIncludeFeatures,
+            backlog: backlogItems,
+            description: description,
+            app_names: appNames,
+            prp: prpContent,
+            competitors: competitors ? [competitors] : null,
+            pricing_model: pricingContent,
+            market_viability: marketViabilityContent,
+            analysis_time_seconds: analysisTimeSeconds,
+            api_cost: finalApiCost
+          })
+          .select('id, share_slug')
+          .single();
+        
+        if (saveError) {
+          console.error('Error saving startup analysis:', saveError);
+          console.error('Error details:', JSON.stringify(saveError, null, 2));
+          console.error('Error code:', saveError.code);
+          console.error('Error hint:', saveError.hint);
+          alert(`Error saving analysis: ${saveError.message || 'Unknown error'}. Check console for details.`);
+        } else {
+          console.log('✅ Startup analysis saved to database with cost:', finalApiCost);
+          console.log('Saved analysis ID:', savedData?.id);
+          console.log('Share slug:', savedData?.share_slug);
+          setStatus('Analysis complete and saved! You can view it in the history page.');
         }
       } catch (saveError) {
         console.error('Failed to save startup analysis:', saveError);
+        alert(`Failed to save analysis: ${saveError instanceof Error ? saveError.message : 'Unknown error'}`);
       }
       
     } catch (error) {
