@@ -1,0 +1,417 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { createClient } from '@/lib/supabase-client';
+import Footer from '@/components/Footer';
+import type { AdminCheck } from '@/lib/is-admin';
+
+type StartupAnalysis = {
+  id: string;
+  business_name: string | null;
+  business_idea: string;
+  created_by: string | null;
+  likes: string[] | null;
+  dislikes: string[] | null;
+  recommendations: string[] | null;
+  keywords: string[] | null;
+  definitely_include: string[] | null;
+  backlog: any[] | null;
+  description: string | null;
+  app_names: string[] | null;
+  prp: string | null;
+  competitors: any | null;
+  pricing_model: string | null;
+  market_viability: string | null;
+  analysis_time_seconds: number | null;
+  api_cost: number | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export default function StartupBuilderHistoryPage() {
+  const router = useRouter();
+  const supabase = createClient();
+
+  const [adminCheck, setAdminCheck] = useState<AdminCheck | null>(null);
+  const [analyses, setAnalyses] = useState<StartupAnalysis[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedAnalysis, setSelectedAnalysis] = useState<StartupAnalysis | null>(null);
+  const [showDetails, setShowDetails] = useState(false);
+
+  useEffect(() => {
+    const init = async () => {
+      const {
+        data: { user }
+      } = await supabase.auth.getUser();
+
+      if (!user) {
+        router.push('/login');
+        return;
+      }
+
+      const response = await fetch('/api/check-admin');
+      const data = await response.json();
+
+      if (!data.isAdmin) {
+        router.push('/homezone');
+        return;
+      }
+
+      const adminStatus: AdminCheck = {
+        isAdmin: data.isAdmin,
+        role: data.role,
+        isSuperAdmin: data.role === 'super_admin',
+        isSupport: data.role === 'support'
+      };
+
+      setAdminCheck(adminStatus);
+      await fetchAnalyses();
+      setLoading(false);
+    };
+
+    init();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const fetchAnalyses = async () => {
+    try {
+      const response = await fetch('/api/admin/startup-analyses');
+      if (!response.ok) {
+        console.error('Failed to fetch startup analyses');
+        return;
+      }
+
+      const data = await response.json();
+      setAnalyses(data.analyses || []);
+    } catch (error) {
+      console.error('Error loading startup analyses', error);
+    }
+  };
+
+  const handleViewDetails = (analysis: StartupAnalysis) => {
+    setSelectedAnalysis(analysis);
+    setShowDetails(true);
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this analysis?')) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/admin/startup-analyses/${id}`, {
+        method: 'DELETE'
+      });
+
+      if (response.ok) {
+        await fetchAnalyses();
+      } else {
+        const data = await response.json();
+        alert(`Failed to delete: ${data.error || 'Unknown error'}`);
+      }
+    } catch (error) {
+      console.error('Error deleting analysis', error);
+      alert('Failed to delete analysis');
+    }
+  };
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    router.push('/');
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-gray-600 text-xl">Loading...</div>
+      </div>
+    );
+  }
+
+  if (!adminCheck?.isAdmin) {
+    return null;
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50 flex flex-col">
+      <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <div className="flex items-center gap-4">
+              <a href="/admin/startup-builder" className="text-xl font-bold text-gray-900 hover:text-gray-700">
+                📋 Startup Builder History
+              </a>
+            </div>
+            <div className="flex items-center gap-4">
+              <a href="/admin/startup-builder" className="text-gray-600 hover:text-gray-900">
+                New Analysis
+              </a>
+              <a href="/admin" className="text-gray-600 hover:text-gray-900">
+                Back to Dashboard
+              </a>
+              <button onClick={handleLogout} className="text-red-600 hover:text-red-700">
+                Sign Out
+              </button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-3">Startup Builder History</h1>
+          <p className="text-gray-600 max-w-2xl">
+            View and manage all business idea analyses. Click on any analysis to view full details.
+          </p>
+        </div>
+
+        {analyses.length === 0 ? (
+          <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-12 text-center">
+            <p className="text-gray-600 text-lg">No analyses yet. Create your first analysis in Startup Builder.</p>
+            <a href="/admin/startup-builder" className="mt-4 inline-block text-[#88D18A] hover:text-[#6bc070] font-semibold">
+              Go to Startup Builder →
+            </a>
+          </div>
+        ) : (
+          <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gray-50 border-b border-gray-200">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Business Name
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Business Idea Preview
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Created
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Cost
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {analyses.map((analysis) => (
+                    <tr key={analysis.id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4">
+                        <div className="text-sm font-semibold text-gray-900">
+                          {analysis.business_name || 'Unnamed Business'}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="text-sm text-gray-600 line-clamp-2 max-w-md">
+                          {analysis.business_idea.substring(0, 150)}...
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-500">
+                        {new Date(analysis.created_at).toLocaleDateString()} <br />
+                        <span className="text-xs text-gray-400">
+                          {new Date(analysis.created_at).toLocaleTimeString()}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-700">
+                        ${analysis.api_cost?.toFixed(6) || '0.000000'}
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => handleViewDetails(analysis)}
+                            className="px-4 py-2 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 transition-colors text-sm"
+                          >
+                            View
+                          </button>
+                          <button
+                            onClick={() => handleDelete(analysis.id)}
+                            className="px-4 py-2 rounded-lg bg-red-600 text-white font-semibold hover:bg-red-700 transition-colors text-sm"
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+      </main>
+
+      {/* Details Modal */}
+      {showDetails && selectedAnalysis && (
+        <div 
+          className="fixed inset-0 flex items-center justify-center z-50 p-4"
+          style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
+          onClick={() => setShowDetails(false)}
+        >
+          <div 
+            className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto"
+            style={{ backgroundColor: '#ffffff' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="p-6 border-b border-gray-200" style={{ backgroundColor: '#ffffff' }}>
+              <div className="flex justify-between items-center">
+                <h2 className="text-2xl font-bold text-gray-900">
+                  {selectedAnalysis.business_name || 'Unnamed Business'}
+                </h2>
+                <button
+                  onClick={() => setShowDetails(false)}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              <p className="text-sm text-gray-500 mt-2">
+                Created: {new Date(selectedAnalysis.created_at).toLocaleString()}
+              </p>
+            </div>
+            <div className="p-6 space-y-6" style={{ backgroundColor: '#ffffff' }}>
+              <div>
+                <h3 className="text-lg font-bold text-gray-900 mb-2">Business Idea</h3>
+                <p className="text-gray-700 whitespace-pre-wrap">{selectedAnalysis.business_idea}</p>
+              </div>
+
+              {selectedAnalysis.likes && selectedAnalysis.likes.length > 0 && (
+                <div>
+                  <h3 className="text-lg font-bold text-gray-900 mb-2">1. What Customers Would Value</h3>
+                  <ul className="list-disc list-inside space-y-1 text-gray-700">
+                    {selectedAnalysis.likes.map((like, idx) => (
+                      <li key={idx}>{like}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {selectedAnalysis.dislikes && selectedAnalysis.dislikes.length > 0 && (
+                <div>
+                  <h3 className="text-lg font-bold text-gray-900 mb-2">2. Potential Customer Concerns</h3>
+                  <ul className="list-disc list-inside space-y-1 text-gray-700">
+                    {selectedAnalysis.dislikes.map((dislike, idx) => (
+                      <li key={idx}>{dislike}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {selectedAnalysis.keywords && selectedAnalysis.keywords.length > 0 && (
+                <div>
+                  <h3 className="text-lg font-bold text-gray-900 mb-2">3. Suggested Keywords</h3>
+                  <p className="text-gray-700">{selectedAnalysis.keywords.join(', ')}</p>
+                </div>
+              )}
+
+              {selectedAnalysis.definitely_include && selectedAnalysis.definitely_include.length > 0 && (
+                <div>
+                  <h3 className="text-lg font-bold text-gray-900 mb-2">4. Core Features to Include</h3>
+                  <ul className="list-disc list-inside space-y-1 text-gray-700">
+                    {selectedAnalysis.definitely_include.map((feature, idx) => (
+                      <li key={idx}>{feature}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {selectedAnalysis.backlog && selectedAnalysis.backlog.length > 0 && (
+                <div>
+                  <h3 className="text-lg font-bold text-gray-900 mb-2">5. Additional Features</h3>
+                  <ul className="list-disc list-inside space-y-1 text-gray-700">
+                    {selectedAnalysis.backlog.map((item, idx) => (
+                      <li key={idx}>
+                        {typeof item === 'object' && item.priority ? (
+                          <span><strong>[{item.priority}]</strong> {item.content}</span>
+                        ) : (
+                          <span>{typeof item === 'string' ? item : JSON.stringify(item)}</span>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {selectedAnalysis.recommendations && selectedAnalysis.recommendations.length > 0 && (
+                <div>
+                  <h3 className="text-lg font-bold text-gray-900 mb-2">6. Strategic Recommendations</h3>
+                  <ul className="list-disc list-inside space-y-1 text-gray-700">
+                    {selectedAnalysis.recommendations.map((rec, idx) => (
+                      <li key={idx}>{rec}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {selectedAnalysis.description && (
+                <div>
+                  <h3 className="text-lg font-bold text-gray-900 mb-2">7. Suggested Product Description</h3>
+                  <p className="text-gray-700 whitespace-pre-wrap">{selectedAnalysis.description}</p>
+                </div>
+              )}
+
+              {selectedAnalysis.app_names && selectedAnalysis.app_names.length > 0 && (
+                <div>
+                  <h3 className="text-lg font-bold text-gray-900 mb-2">8. Suggested Business Names</h3>
+                  <p className="text-gray-700">{selectedAnalysis.app_names.join(', ')}</p>
+                </div>
+              )}
+
+              {selectedAnalysis.prp && (
+                <div>
+                  <h3 className="text-lg font-bold text-gray-900 mb-2">9. PRP (Product Requirements Prompt)</h3>
+                  <p className="text-gray-700 whitespace-pre-wrap">{selectedAnalysis.prp}</p>
+                </div>
+              )}
+
+              {selectedAnalysis.competitors && (
+                <div>
+                  <h3 className="text-lg font-bold text-gray-900 mb-2">10. Competitors</h3>
+                  <p className="text-gray-700 whitespace-pre-wrap">
+                    {typeof selectedAnalysis.competitors === 'string' 
+                      ? selectedAnalysis.competitors 
+                      : Array.isArray(selectedAnalysis.competitors) 
+                        ? selectedAnalysis.competitors.join('\n')
+                        : JSON.stringify(selectedAnalysis.competitors)}
+                  </p>
+                </div>
+              )}
+
+              {selectedAnalysis.pricing_model && (
+                <div>
+                  <h3 className="text-lg font-bold text-gray-900 mb-2">11. Pricing Strategy & Revenue Projections</h3>
+                  <p className="text-gray-700 whitespace-pre-wrap">{selectedAnalysis.pricing_model}</p>
+                </div>
+              )}
+
+              {selectedAnalysis.market_viability && (
+                <div>
+                  <h3 className="text-lg font-bold text-gray-900 mb-2">12. Market Viability & Business Opportunity</h3>
+                  <p className="text-gray-700 whitespace-pre-wrap">{selectedAnalysis.market_viability}</p>
+                </div>
+              )}
+
+              <div>
+                <h3 className="text-lg font-bold text-gray-900 mb-2">13. Analysis Metrics</h3>
+                <div className="grid grid-cols-2 gap-4 text-gray-700">
+                  <div>
+                    <strong>Analysis Time:</strong> {selectedAnalysis.analysis_time_seconds ? `${Math.round(selectedAnalysis.analysis_time_seconds)}s` : 'N/A'}
+                  </div>
+                  <div>
+                    <strong>API Cost:</strong> ${selectedAnalysis.api_cost?.toFixed(6) || '0.000000'}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <Footer />
+    </div>
+  );
+}

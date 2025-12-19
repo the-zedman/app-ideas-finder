@@ -253,6 +253,13 @@ export default function AdminDashboard() {
               <div className="text-sm text-gray-600">Manage apps showcased in the public App Showcase</div>
             </a>
             <a
+              href="/admin/startup-builder"
+              className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow border-blue-300"
+            >
+              <div className="text-lg font-semibold text-blue-900 mb-2">🚀 Startup Builder</div>
+              <div className="text-sm text-gray-600">Analyze business ideas and generate comprehensive 13-section analysis</div>
+            </a>
+            <a
               href="/admin/deletions"
               className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow border-red-300"
             >
