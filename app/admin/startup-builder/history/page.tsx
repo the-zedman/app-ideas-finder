@@ -119,9 +119,69 @@ export default function StartupBuilderHistoryPage() {
     }
   };
 
+  const handleShare = (slug: string) => {
+    if (typeof window === 'undefined') return;
+    const shareUrl = `${window.location.origin}/s/${slug}`;
+    window.open(shareUrl, '_blank', 'noopener');
+  };
+
+  const handleCopy = async (slug: string) => {
+    if (typeof window === 'undefined' || !navigator?.clipboard) {
+      alert('Copy not supported in this environment');
+      return;
+    }
+    const shareUrl = `${window.location.origin}/s/${slug}`;
+    await navigator.clipboard.writeText(shareUrl);
+    alert('Link copied to clipboard');
+  };
+
   const handleLogout = async () => {
     await supabase.auth.signOut();
     router.push('/');
+  };
+
+  // Markdown renderer
+  const MarkdownRenderer = ({ content }: { content: string }) => (
+    <ReactMarkdown
+      remarkPlugins={[remarkGfm]}
+      components={{
+        p: ({ children }) => <p className="text-gray-700 mb-3">{children}</p>,
+        strong: ({ children }) => <strong className="font-semibold text-gray-900">{children}</strong>,
+        h1: ({ children }) => <h1 className="text-2xl font-bold text-gray-900 mb-3 mt-4">{children}</h1>,
+        h2: ({ children }) => <h2 className="text-xl font-bold text-gray-900 mb-2 mt-3">{children}</h2>,
+        h3: ({ children }) => <h3 className="text-lg font-bold text-gray-900 mb-2 mt-3">{children}</h3>,
+        h4: ({ children }) => <h4 className="text-base font-bold text-gray-900 mb-2 mt-2">{children}</h4>,
+        ul: ({ children }) => <ul className="list-disc pl-5 mb-3 text-gray-700">{children}</ul>,
+        ol: ({ children }) => <ol className="list-decimal pl-5 mb-3 text-gray-700">{children}</ol>,
+        li: ({ children }) => <li className="mb-1">{children}</li>,
+        a: ({ children, href }) => (
+          <a href={href} target="_blank" rel="noopener noreferrer" className="text-[#88D18A] underline">
+            {children}
+          </a>
+        )
+      }}
+    >
+      {content}
+    </ReactMarkdown>
+  );
+
+  // Helper to get priority color
+  const getPriorityColor = (priority: string) => {
+    const upper = priority.toUpperCase();
+    if (upper === 'CRITICAL') return 'text-red-700 bg-red-100';
+    if (upper === 'HIGH') return 'text-orange-700 bg-orange-100';
+    if (upper === 'MEDIUM') return 'text-yellow-700 bg-yellow-100';
+    if (upper === 'LOW') return 'text-blue-700 bg-blue-100';
+    return 'text-gray-700 bg-gray-100';
+  };
+
+  // Helper to extract priority from recommendation string
+  const extractPriority = (text: string): { priority: string | null; content: string } => {
+    const match = text.match(/^\[(CRITICAL|HIGH|MEDIUM|LOW)\]\s*(.+)$/);
+    if (match) {
+      return { priority: match[1], content: match[2] };
+    }
+    return { priority: null, content: text };
   };
 
   if (loading) {

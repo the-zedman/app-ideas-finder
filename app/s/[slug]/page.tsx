@@ -30,6 +30,7 @@ type StartupAnalysisRecord = {
 
 export const revalidate = 0;
 export const dynamic = 'force-dynamic';
+export const dynamicParams = true;
 
 const supabaseAdmin = createAdminClient();
 
