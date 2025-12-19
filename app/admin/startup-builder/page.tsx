@@ -959,37 +959,46 @@ Base your analysis on the business idea, competitive landscape, and category tre
         console.log('Saving startup analysis with cost:', finalApiCost.toFixed(6));
         console.log('User ID:', user.id);
         
+        const payload = {
+          business_name: businessName || null,
+          business_idea: businessIdea,
+          likes: finalParsed.likes,
+          dislikes: finalParsed.dislikes,
+          recommendations: recommendationsArray,
+          keywords: keywordsArray,
+          definitely_include: definitelyIncludeFeatures,
+          backlog: backlogItems,
+          description: description,
+          app_names: appNames,
+          prp: prpContent,
+          competitors: competitors ? [competitors] : null,
+          pricing_model: pricingContent,
+          market_viability: marketViabilityContent,
+          analysis_time_seconds: analysisTimeSeconds,
+          api_cost: finalApiCost
+        };
+
+        console.log('Payload keys:', Object.keys(payload));
+        console.log('Payload size:', JSON.stringify(payload).length, 'bytes');
+        
         const response = await fetch('/api/admin/startup-analyses', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({
-            business_name: businessName || null,
-            business_idea: businessIdea,
-            likes: finalParsed.likes,
-            dislikes: finalParsed.dislikes,
-            recommendations: recommendationsArray,
-            keywords: keywordsArray,
-            definitely_include: definitelyIncludeFeatures,
-            backlog: backlogItems,
-            description: description,
-            app_names: appNames,
-            prp: prpContent,
-            competitors: competitors ? [competitors] : null,
-            pricing_model: pricingContent,
-            market_viability: marketViabilityContent,
-            analysis_time_seconds: analysisTimeSeconds,
-            api_cost: finalApiCost
-          })
+          body: JSON.stringify(payload)
         });
 
+        console.log('Response status:', response.status);
+        console.log('Response ok:', response.ok);
+
         const result = await response.json();
+        console.log('Response result:', result);
 
         if (!response.ok) {
           console.error('Error saving startup analysis:', result);
           console.error('Error details:', JSON.stringify(result, null, 2));
-          alert(`Error saving analysis: ${result.message || 'Unknown error'}. ${result.hint ? `Hint: ${result.hint}` : ''} Check console for details.`);
+          alert(`Error saving analysis: ${result.message || 'Unknown error'}. ${result.hint ? `Hint: ${result.hint}` : ''} ${result.details ? `Details: ${result.details}` : ''} Check console for details.`);
         } else {
           console.log('✅ Startup analysis saved to database with cost:', finalApiCost);
           console.log('Saved analysis ID:', result.analysis?.id);
