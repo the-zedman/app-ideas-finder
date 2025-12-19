@@ -252,7 +252,7 @@ export default function StartupBuilderHistoryPage() {
                       Created
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Share
+                      Actions
                     </th>
                   </tr>
                 </thead>
@@ -276,24 +276,38 @@ export default function StartupBuilderHistoryPage() {
                         </span>
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-900">
-                        {analysis.share_slug ? (
-                          <div className="flex gap-2">
-                            <button
-                              onClick={() => handleShare(analysis.share_slug!)}
-                              className="px-4 py-2 rounded-lg bg-emerald-600 text-white font-semibold hover:bg-emerald-700 transition-colors"
-                            >
-                              View Link
-                            </button>
-                            <button
-                              onClick={() => handleCopy(analysis.share_slug!)}
-                              className="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors"
-                            >
-                              Copy
-                            </button>
-                          </div>
-                        ) : (
-                          <span className="text-gray-400 text-xs">No share link</span>
-                        )}
+                        <div className="flex gap-2 flex-wrap">
+                          <button
+                            onClick={() => handleViewDetails(analysis)}
+                            className="px-4 py-2 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 transition-colors text-sm"
+                          >
+                            View
+                          </button>
+                          {analysis.share_slug ? (
+                            <>
+                              <button
+                                onClick={() => handleShare(analysis.share_slug!)}
+                                className="px-4 py-2 rounded-lg bg-emerald-600 text-white font-semibold hover:bg-emerald-700 transition-colors text-sm"
+                              >
+                                View Link
+                              </button>
+                              <button
+                                onClick={() => handleCopy(analysis.share_slug!)}
+                                className="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors text-sm"
+                              >
+                                Copy
+                              </button>
+                            </>
+                          ) : (
+                            <span className="text-gray-400 text-xs px-4 py-2 flex items-center">No share link</span>
+                          )}
+                          <button
+                            onClick={() => handleDelete(analysis.id)}
+                            className="px-4 py-2 rounded-lg bg-red-600 text-white font-semibold hover:bg-red-700 transition-colors text-sm"
+                          >
+                            Delete
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -524,17 +538,6 @@ export default function StartupBuilderHistoryPage() {
                 </div>
               )}
 
-              <div>
-                <h3 className="text-lg font-bold text-gray-900 mb-2">13. Analysis Metrics</h3>
-                <div className="grid grid-cols-2 gap-4 text-gray-700">
-                  <div>
-                    <strong>Analysis Time:</strong> {selectedAnalysis.analysis_time_seconds ? `${Math.round(selectedAnalysis.analysis_time_seconds)}s` : 'N/A'}
-                  </div>
-                  <div>
-                    <strong>API Cost:</strong> ${selectedAnalysis.api_cost?.toFixed(6) || '0.000000'}
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
         </div>

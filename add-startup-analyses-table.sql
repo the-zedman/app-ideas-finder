@@ -97,6 +97,11 @@ $$;
 ALTER TABLE public.startup_analyses
   ALTER COLUMN share_slug SET DEFAULT public.generate_startup_share_slug();
 
+-- Backfill existing rows without a slug
+UPDATE public.startup_analyses
+SET share_slug = public.generate_startup_share_slug()
+WHERE share_slug IS NULL;
+
 -- Create function to update updated_at timestamp
 CREATE OR REPLACE FUNCTION public.update_startup_analyses_updated_at()
 RETURNS TRIGGER AS $$
