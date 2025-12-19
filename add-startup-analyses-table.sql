@@ -36,6 +36,12 @@ CREATE POLICY "Admins can view all startup analyses" ON public.startup_analyses
     auth.uid() IN (SELECT user_id FROM public.admins)
   );
 
+-- Public can view startup analyses by share_slug (for public sharing)
+CREATE POLICY "Public can view shared startup analyses" ON public.startup_analyses
+  FOR SELECT USING (
+    share_slug IS NOT NULL
+  );
+
 -- Only admins can insert startup analyses
 CREATE POLICY "Admins can insert startup analyses" ON public.startup_analyses
   FOR INSERT WITH CHECK (

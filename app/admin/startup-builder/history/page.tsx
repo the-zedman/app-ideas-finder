@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase-client';
 import Footer from '@/components/Footer';
 import type { AdminCheck } from '@/lib/is-admin';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 type StartupAnalysis = {
   id: string;
@@ -120,50 +122,6 @@ export default function StartupBuilderHistoryPage() {
   const handleLogout = async () => {
     await supabase.auth.signOut();
     router.push('/');
-  };
-
-  // Markdown renderer
-  const MarkdownRenderer = ({ content }: { content: string }) => (
-    <ReactMarkdown
-      remarkPlugins={[remarkGfm]}
-      components={{
-        p: ({ children }) => <p className="text-gray-700 mb-3">{children}</p>,
-        strong: ({ children }) => <strong className="font-semibold text-gray-900">{children}</strong>,
-        h1: ({ children }) => <h1 className="text-2xl font-bold text-gray-900 mb-3 mt-4">{children}</h1>,
-        h2: ({ children }) => <h2 className="text-xl font-bold text-gray-900 mb-2 mt-3">{children}</h2>,
-        h3: ({ children }) => <h3 className="text-lg font-bold text-gray-900 mb-2 mt-3">{children}</h3>,
-        h4: ({ children }) => <h4 className="text-base font-bold text-gray-900 mb-2 mt-2">{children}</h4>,
-        ul: ({ children }) => <ul className="list-disc pl-5 mb-3 text-gray-700">{children}</ul>,
-        ol: ({ children }) => <ol className="list-decimal pl-5 mb-3 text-gray-700">{children}</ol>,
-        li: ({ children }) => <li className="mb-1">{children}</li>,
-        a: ({ children, href }) => (
-          <a href={href} target="_blank" rel="noopener noreferrer" className="text-[#88D18A] underline">
-            {children}
-          </a>
-        )
-      }}
-    >
-      {content}
-    </ReactMarkdown>
-  );
-
-  // Helper to get priority color
-  const getPriorityColor = (priority: string) => {
-    const upper = priority.toUpperCase();
-    if (upper === 'CRITICAL') return 'text-red-700 bg-red-100';
-    if (upper === 'HIGH') return 'text-orange-700 bg-orange-100';
-    if (upper === 'MEDIUM') return 'text-yellow-700 bg-yellow-100';
-    if (upper === 'LOW') return 'text-blue-700 bg-blue-100';
-    return 'text-gray-700 bg-gray-100';
-  };
-
-  // Helper to extract priority from recommendation string
-  const extractPriority = (text: string): { priority: string | null; content: string } => {
-    const match = text.match(/^\[(CRITICAL|HIGH|MEDIUM|LOW)\]\s*(.+)$/);
-    if (match) {
-      return { priority: match[1], content: match[2] };
-    }
-    return { priority: null, content: text };
   };
 
   if (loading) {
@@ -343,9 +301,11 @@ export default function StartupBuilderHistoryPage() {
               {selectedAnalysis.likes && selectedAnalysis.likes.length > 0 && (
                 <div>
                   <h3 className="text-lg font-bold text-gray-900 mb-2">1. What Customers Would Value</h3>
-                  <ul className="list-disc list-inside space-y-1 text-gray-700">
+                  <ul className="space-y-2 text-gray-700">
                     {selectedAnalysis.likes.map((like, idx) => (
-                      <li key={idx}>{like}</li>
+                      <li key={idx}>
+                        <MarkdownRenderer content={like} />
+                      </li>
                     ))}
                   </ul>
                 </div>
@@ -354,9 +314,11 @@ export default function StartupBuilderHistoryPage() {
               {selectedAnalysis.dislikes && selectedAnalysis.dislikes.length > 0 && (
                 <div>
                   <h3 className="text-lg font-bold text-gray-900 mb-2">2. Potential Customer Concerns</h3>
-                  <ul className="list-disc list-inside space-y-1 text-gray-700">
+                  <ul className="space-y-2 text-gray-700">
                     {selectedAnalysis.dislikes.map((dislike, idx) => (
-                      <li key={idx}>{dislike}</li>
+                      <li key={idx}>
+                        <MarkdownRenderer content={dislike} />
+                      </li>
                     ))}
                   </ul>
                 </div>
@@ -372,9 +334,11 @@ export default function StartupBuilderHistoryPage() {
               {selectedAnalysis.definitely_include && selectedAnalysis.definitely_include.length > 0 && (
                 <div>
                   <h3 className="text-lg font-bold text-gray-900 mb-2">4. Core Features to Include</h3>
-                  <ul className="list-disc list-inside space-y-1 text-gray-700">
+                  <ul className="space-y-2 text-gray-700">
                     {selectedAnalysis.definitely_include.map((feature, idx) => (
-                      <li key={idx}>{feature}</li>
+                      <li key={idx}>
+                        <MarkdownRenderer content={feature} />
+                      </li>
                     ))}
                   </ul>
                 </div>
@@ -383,16 +347,25 @@ export default function StartupBuilderHistoryPage() {
               {selectedAnalysis.backlog && selectedAnalysis.backlog.length > 0 && (
                 <div>
                   <h3 className="text-lg font-bold text-gray-900 mb-2">5. Additional Features</h3>
-                  <ul className="list-disc list-inside space-y-1 text-gray-700">
-                    {selectedAnalysis.backlog.map((item, idx) => (
-                      <li key={idx}>
-                        {typeof item === 'object' && item.priority ? (
-                          <span><strong>[{item.priority}]</strong> {item.content}</span>
-                        ) : (
-                          <span>{typeof item === 'string' ? item : JSON.stringify(item)}</span>
-                        )}
-                      </li>
-                    ))}
+                  <ul className="space-y-2 text-gray-700">
+                    {selectedAnalysis.backlog.map((item, idx) => {
+                      if (typeof item === 'object' && item.priority) {
+                        const priorityColor = getPriorityColor(item.priority);
+                        return (
+                          <li key={idx}>
+                            <span className={`px-2 py-1 rounded text-xs font-semibold mr-2 ${priorityColor}`}>
+                              [{item.priority}]
+                            </span>
+                            <MarkdownRenderer content={item.content} />
+                          </li>
+                        );
+                      }
+                      return (
+                        <li key={idx}>
+                          <MarkdownRenderer content={typeof item === 'string' ? item : JSON.stringify(item)} />
+                        </li>
+                      );
+                    })}
                   </ul>
                 </div>
               )}
@@ -400,10 +373,26 @@ export default function StartupBuilderHistoryPage() {
               {selectedAnalysis.recommendations && selectedAnalysis.recommendations.length > 0 && (
                 <div>
                   <h3 className="text-lg font-bold text-gray-900 mb-2">6. Strategic Recommendations</h3>
-                  <ul className="list-disc list-inside space-y-1 text-gray-700">
-                    {selectedAnalysis.recommendations.map((rec, idx) => (
-                      <li key={idx}>{rec}</li>
-                    ))}
+                  <ul className="space-y-2 text-gray-700">
+                    {selectedAnalysis.recommendations.map((rec, idx) => {
+                      const { priority, content } = extractPriority(rec);
+                      if (priority) {
+                        const priorityColor = getPriorityColor(priority);
+                        return (
+                          <li key={idx}>
+                            <span className={`px-2 py-1 rounded text-xs font-semibold mr-2 ${priorityColor}`}>
+                              [{priority}]
+                            </span>
+                            <MarkdownRenderer content={content} />
+                          </li>
+                        );
+                      }
+                      return (
+                        <li key={idx}>
+                          <MarkdownRenderer content={rec} />
+                        </li>
+                      );
+                    })}
                   </ul>
                 </div>
               )}
@@ -411,7 +400,7 @@ export default function StartupBuilderHistoryPage() {
               {selectedAnalysis.description && (
                 <div>
                   <h3 className="text-lg font-bold text-gray-900 mb-2">7. Suggested Product Description</h3>
-                  <p className="text-gray-700 whitespace-pre-wrap">{selectedAnalysis.description}</p>
+                  <MarkdownRenderer content={selectedAnalysis.description} />
                 </div>
               )}
 
@@ -425,34 +414,34 @@ export default function StartupBuilderHistoryPage() {
               {selectedAnalysis.prp && (
                 <div>
                   <h3 className="text-lg font-bold text-gray-900 mb-2">9. PRP (Product Requirements Prompt)</h3>
-                  <p className="text-gray-700 whitespace-pre-wrap">{selectedAnalysis.prp}</p>
+                  <MarkdownRenderer content={selectedAnalysis.prp} />
                 </div>
               )}
 
               {selectedAnalysis.competitors && (
                 <div>
                   <h3 className="text-lg font-bold text-gray-900 mb-2">10. Competitors</h3>
-                  <p className="text-gray-700 whitespace-pre-wrap">
-                    {typeof selectedAnalysis.competitors === 'string' 
+                  <MarkdownRenderer content={
+                    typeof selectedAnalysis.competitors === 'string' 
                       ? selectedAnalysis.competitors 
                       : Array.isArray(selectedAnalysis.competitors) 
                         ? selectedAnalysis.competitors.join('\n')
-                        : JSON.stringify(selectedAnalysis.competitors)}
-                  </p>
+                        : JSON.stringify(selectedAnalysis.competitors)
+                  } />
                 </div>
               )}
 
               {selectedAnalysis.pricing_model && (
                 <div>
                   <h3 className="text-lg font-bold text-gray-900 mb-2">11. Pricing Strategy & Revenue Projections</h3>
-                  <p className="text-gray-700 whitespace-pre-wrap">{selectedAnalysis.pricing_model}</p>
+                  <MarkdownRenderer content={selectedAnalysis.pricing_model} />
                 </div>
               )}
 
               {selectedAnalysis.market_viability && (
                 <div>
                   <h3 className="text-lg font-bold text-gray-900 mb-2">12. Market Viability & Business Opportunity</h3>
-                  <p className="text-gray-700 whitespace-pre-wrap">{selectedAnalysis.market_viability}</p>
+                  <MarkdownRenderer content={selectedAnalysis.market_viability} />
                 </div>
               )}
 
