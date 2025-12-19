@@ -11,6 +11,7 @@ type StartupAnalysis = {
   business_name: string | null;
   business_idea: string;
   created_by: string | null;
+  share_slug: string | null;
   likes: string[] | null;
   dislikes: string[] | null;
   recommendations: string[] | null;
@@ -121,6 +122,50 @@ export default function StartupBuilderHistoryPage() {
     router.push('/');
   };
 
+  // Markdown renderer
+  const MarkdownRenderer = ({ content }: { content: string }) => (
+    <ReactMarkdown
+      remarkPlugins={[remarkGfm]}
+      components={{
+        p: ({ children }) => <p className="text-gray-700 mb-3">{children}</p>,
+        strong: ({ children }) => <strong className="font-semibold text-gray-900">{children}</strong>,
+        h1: ({ children }) => <h1 className="text-2xl font-bold text-gray-900 mb-3 mt-4">{children}</h1>,
+        h2: ({ children }) => <h2 className="text-xl font-bold text-gray-900 mb-2 mt-3">{children}</h2>,
+        h3: ({ children }) => <h3 className="text-lg font-bold text-gray-900 mb-2 mt-3">{children}</h3>,
+        h4: ({ children }) => <h4 className="text-base font-bold text-gray-900 mb-2 mt-2">{children}</h4>,
+        ul: ({ children }) => <ul className="list-disc pl-5 mb-3 text-gray-700">{children}</ul>,
+        ol: ({ children }) => <ol className="list-decimal pl-5 mb-3 text-gray-700">{children}</ol>,
+        li: ({ children }) => <li className="mb-1">{children}</li>,
+        a: ({ children, href }) => (
+          <a href={href} target="_blank" rel="noopener noreferrer" className="text-[#88D18A] underline">
+            {children}
+          </a>
+        )
+      }}
+    >
+      {content}
+    </ReactMarkdown>
+  );
+
+  // Helper to get priority color
+  const getPriorityColor = (priority: string) => {
+    const upper = priority.toUpperCase();
+    if (upper === 'CRITICAL') return 'text-red-700 bg-red-100';
+    if (upper === 'HIGH') return 'text-orange-700 bg-orange-100';
+    if (upper === 'MEDIUM') return 'text-yellow-700 bg-yellow-100';
+    if (upper === 'LOW') return 'text-blue-700 bg-blue-100';
+    return 'text-gray-700 bg-gray-100';
+  };
+
+  // Helper to extract priority from recommendation string
+  const extractPriority = (text: string): { priority: string | null; content: string } => {
+    const match = text.match(/^\[(CRITICAL|HIGH|MEDIUM|LOW)\]\s*(.+)$/);
+    if (match) {
+      return { priority: match[1], content: match[2] };
+    }
+    return { priority: null, content: text };
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -189,23 +234,20 @@ export default function StartupBuilderHistoryPage() {
                       Created
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Cost
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Actions
+                      Share
                     </th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
                   {analyses.map((analysis) => (
                     <tr key={analysis.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4">
+                      <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm font-semibold text-gray-900">
                           {analysis.business_name || 'Unnamed Business'}
                         </div>
                       </td>
                       <td className="px-6 py-4">
-                        <div className="text-sm text-gray-600 line-clamp-2 max-w-md">
+                        <div className="text-sm text-gray-600 line-clamp-1 max-w-md">
                           {analysis.business_idea.substring(0, 150)}...
                         </div>
                       </td>
@@ -215,24 +257,25 @@ export default function StartupBuilderHistoryPage() {
                           {new Date(analysis.created_at).toLocaleTimeString()}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-700">
-                        ${analysis.api_cost?.toFixed(6) || '0.000000'}
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex gap-2">
-                          <button
-                            onClick={() => handleViewDetails(analysis)}
-                            className="px-4 py-2 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 transition-colors text-sm"
-                          >
-                            View
-                          </button>
-                          <button
-                            onClick={() => handleDelete(analysis.id)}
-                            className="px-4 py-2 rounded-lg bg-red-600 text-white font-semibold hover:bg-red-700 transition-colors text-sm"
-                          >
-                            Delete
-                          </button>
-                        </div>
+                      <td className="px-6 py-4 text-sm text-gray-900">
+                        {analysis.share_slug ? (
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => handleShare(analysis.share_slug!)}
+                              className="px-4 py-2 rounded-lg bg-emerald-600 text-white font-semibold hover:bg-emerald-700 transition-colors"
+                            >
+                              View Link
+                            </button>
+                            <button
+                              onClick={() => handleCopy(analysis.share_slug!)}
+                              className="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors"
+                            >
+                              Copy
+                            </button>
+                          </div>
+                        ) : (
+                          <span className="text-gray-400 text-xs">No share link</span>
+                        )}
                       </td>
                     </tr>
                   ))}
@@ -269,9 +312,27 @@ export default function StartupBuilderHistoryPage() {
                   </svg>
                 </button>
               </div>
-              <p className="text-sm text-gray-500 mt-2">
-                Created: {new Date(selectedAnalysis.created_at).toLocaleString()}
-              </p>
+              <div className="flex justify-between items-center mt-2">
+                <p className="text-sm text-gray-500">
+                  Created: {new Date(selectedAnalysis.created_at).toLocaleString()}
+                </p>
+                {selectedAnalysis.share_slug && (
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => handleShare(selectedAnalysis.share_slug!)}
+                      className="px-4 py-2 rounded-lg bg-emerald-600 text-white font-semibold hover:bg-emerald-700 transition-colors text-sm"
+                    >
+                      View Public Link
+                    </button>
+                    <button
+                      onClick={() => handleCopy(selectedAnalysis.share_slug!)}
+                      className="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors text-sm"
+                    >
+                      Copy Link
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
             <div className="p-6 space-y-6" style={{ backgroundColor: '#ffffff' }}>
               <div>

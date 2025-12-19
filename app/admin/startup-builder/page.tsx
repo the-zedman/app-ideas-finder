@@ -6,6 +6,8 @@ import { createClient } from '@/lib/supabase-client';
 import Footer from '@/components/Footer';
 import type { AdminCheck } from '@/lib/is-admin';
 import confetti from 'canvas-confetti';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 // Types
 interface ParsedResults {
@@ -954,6 +956,7 @@ Base your analysis on the business idea, competitive landscape, and category tre
         if (user) {
           console.log('Saving startup analysis with cost:', finalApiCost.toFixed(6));
           
+          // Generate share_slug (let database handle it via default, or generate client-side)
           const { error: saveError } = await supabase
             .from('startup_analyses')
             .insert({
@@ -974,7 +977,9 @@ Base your analysis on the business idea, competitive landscape, and category tre
               market_viability: marketViabilityContent,
               analysis_time_seconds: analysisTimeSeconds,
               api_cost: finalApiCost
-            });
+            })
+            .select('id, share_slug')
+            .single();
           
           if (saveError) {
             console.error('Error saving startup analysis:', saveError);
@@ -998,6 +1003,50 @@ Base your analysis on the business idea, competitive landscape, and category tre
   const handleLogout = async () => {
     await supabase.auth.signOut();
     router.push('/');
+  };
+
+  // Markdown renderer component
+  const MarkdownRenderer = ({ content }: { content: string }) => (
+    <ReactMarkdown
+      remarkPlugins={[remarkGfm]}
+      components={{
+        p: ({ children }) => <p className="text-gray-700 mb-3">{children}</p>,
+        strong: ({ children }) => <strong className="font-semibold text-gray-900">{children}</strong>,
+        h1: ({ children }) => <h1 className="text-2xl font-bold text-gray-900 mb-3 mt-4">{children}</h1>,
+        h2: ({ children }) => <h2 className="text-xl font-bold text-gray-900 mb-2 mt-3">{children}</h2>,
+        h3: ({ children }) => <h3 className="text-lg font-bold text-gray-900 mb-2 mt-3">{children}</h3>,
+        h4: ({ children }) => <h4 className="text-base font-bold text-gray-900 mb-2 mt-2">{children}</h4>,
+        ul: ({ children }) => <ul className="list-disc pl-5 mb-3 text-gray-700">{children}</ul>,
+        ol: ({ children }) => <ol className="list-decimal pl-5 mb-3 text-gray-700">{children}</ol>,
+        li: ({ children }) => <li className="mb-1">{children}</li>,
+        a: ({ children, href }) => (
+          <a href={href} target="_blank" rel="noopener noreferrer" className="text-[#88D18A] underline">
+            {children}
+          </a>
+        )
+      }}
+    >
+      {content}
+    </ReactMarkdown>
+  );
+
+  // Helper to get priority color
+  const getPriorityColor = (priority: string) => {
+    const upper = priority.toUpperCase();
+    if (upper === 'CRITICAL') return 'text-red-700 bg-red-100';
+    if (upper === 'HIGH') return 'text-orange-700 bg-orange-100';
+    if (upper === 'MEDIUM') return 'text-yellow-700 bg-yellow-100';
+    if (upper === 'LOW') return 'text-blue-700 bg-blue-100';
+    return 'text-gray-700 bg-gray-100';
+  };
+
+  // Helper to extract priority from recommendation string
+  const extractPriority = (text: string): { priority: string | null; content: string } => {
+    const match = text.match(/^\[(CRITICAL|HIGH|MEDIUM|LOW)\]\s*(.+)$/);
+    if (match) {
+      return { priority: match[1], content: match[2] };
+    }
+    return { priority: null, content: text };
   };
 
   // Rollup component (reused from app engine)
@@ -1047,20 +1096,50 @@ Base your analysis on the business idea, competitive landscape, and category tre
           <div className="mt-4 pt-4 border-t border-gray-200">
             {Array.isArray(displayContent) ? (
               <ul className="space-y-2">
-                {displayContent.map((item: any, idx: number) => (
-                  <li key={idx} className="text-gray-700">
-                    {typeof item === 'object' && item.priority ? (
-                      <div>
-                        <span className="font-semibold">[{item.priority}]</span> {item.content}
-                      </div>
-                    ) : (
-                      <div>• {typeof item === 'string' ? item : JSON.stringify(item)}</div>
-                    )}
-                  </li>
-                ))}
+                {displayContent.map((item: any, idx: number) => {
+                  // Handle backlog items with priority
+                  if (typeof item === 'object' && item.priority) {
+                    const priorityColor = getPriorityColor(item.priority);
+                    return (
+                      <li key={idx} className="text-gray-700">
+                        <span className={`px-2 py-1 rounded text-xs font-semibold mr-2 ${priorityColor}`}>
+                          [{item.priority}]
+                        </span>
+                        <MarkdownRenderer content={item.content} />
+                      </li>
+                    );
+                  }
+                  // Handle recommendations with priority tags
+                  if (typeof item === 'string') {
+                    const { priority, content: itemContent } = extractPriority(item);
+                    if (priority) {
+                      const priorityColor = getPriorityColor(priority);
+                      return (
+                        <li key={idx} className="text-gray-700">
+                          <span className={`px-2 py-1 rounded text-xs font-semibold mr-2 ${priorityColor}`}>
+                            [{priority}]
+                          </span>
+                          <MarkdownRenderer content={itemContent} />
+                        </li>
+                      );
+                    }
+                    return (
+                      <li key={idx} className="text-gray-700">
+                        <MarkdownRenderer content={item} />
+                      </li>
+                    );
+                  }
+                  return (
+                    <li key={idx} className="text-gray-700">
+                      • {JSON.stringify(item)}
+                    </li>
+                  );
+                })}
               </ul>
             ) : (
-              <div className="text-gray-700 whitespace-pre-wrap">{displayContent}</div>
+              <div className="text-gray-700">
+                <MarkdownRenderer content={displayContent} />
+              </div>
             )}
           </div>
         )}
