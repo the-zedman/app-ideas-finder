@@ -162,6 +162,7 @@ export async function POST(request: Request) {
     const isSubscription = true;
     
     // Create checkout session
+    // Note: Uses default Stripe domain (checkout.stripe.com) - no custom domain configured
     console.log(`Creating checkout session for plan type: ${planType}, price ID: ${priceId.substring(0, 12)}...`);
     
     // All successful purchases redirect to dashboard

@@ -1,6 +1,10 @@
 import Stripe from 'stripe';
 
 // Initialize Stripe with the secret key (only if available)
+// Note: Using default Stripe domains:
+// - Checkout: checkout.stripe.com
+// - Customer Portal: billing.stripe.com
+// - Payment Links: buy.stripe.com
 export const stripe = process.env.STRIPE_SECRET_KEY 
   ? new Stripe(process.env.STRIPE_SECRET_KEY, {
       apiVersion: '2025-10-29.clover',
