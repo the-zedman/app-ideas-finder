@@ -41,12 +41,13 @@ export async function middleware(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
 
   // MAINTENANCE MODE: Block all public access, allow only authenticated admins
-  // Skip maintenance check for maintenance page itself and static assets
+  // Skip maintenance check for maintenance page itself, auth pages (so admins can log in), and static assets
   const isMaintenancePage = request.nextUrl.pathname === '/maintenance'
+  const isAuthPage = request.nextUrl.pathname === '/login' || request.nextUrl.pathname === '/signup'
   const isStaticAsset = request.nextUrl.pathname.startsWith('/_next/') || 
                        request.nextUrl.pathname.match(/\.(ico|png|jpg|jpeg|svg|gif|webp|css|js|woff|woff2|ttf|eot)$/i)
   
-  if (!isMaintenancePage && !isStaticAsset) {
+  if (!isMaintenancePage && !isAuthPage && !isStaticAsset) {
     // Check if user is an admin
     let isAdmin = false
     if (user) {
