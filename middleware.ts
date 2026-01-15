@@ -40,6 +40,53 @@ export async function middleware(request: NextRequest) {
   // Refresh session if expired
   const { data: { user } } = await supabase.auth.getUser()
 
+  // MAINTENANCE MODE: Block all public access, allow only authenticated admins
+  // Skip maintenance check for maintenance page itself and static assets
+  const isMaintenancePage = request.nextUrl.pathname === '/maintenance'
+  const isStaticAsset = request.nextUrl.pathname.startsWith('/_next/') || 
+                       request.nextUrl.pathname.match(/\.(ico|png|jpg|jpeg|svg|gif|webp|css|js|woff|woff2|ttf|eot)$/i)
+  
+  if (!isMaintenancePage && !isStaticAsset) {
+    // Check if user is an admin
+    let isAdmin = false
+    if (user) {
+      const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+      if (serviceRoleKey) {
+        try {
+          const { createClient } = await import('@supabase/supabase-js')
+          const supabaseAdmin = createClient(
+            process.env.NEXT_PUBLIC_SUPABASE_URL!,
+            serviceRoleKey,
+            {
+              auth: {
+                autoRefreshToken: false,
+                persistSession: false
+              }
+            }
+          )
+          
+          const { data: adminData } = await supabaseAdmin
+            .from('admins')
+            .select('role')
+            .eq('user_id', user.id)
+            .maybeSingle()
+          
+          isAdmin = !!adminData
+        } catch (error) {
+          console.error('[middleware] Error checking admin status:', error)
+        }
+      }
+    }
+
+    // Allow access only for admins or in development bypass mode
+    if (!isAdmin && !isDevelopmentBypass) {
+      // Redirect all non-admin requests to maintenance page
+      const maintenanceUrl = request.nextUrl.clone()
+      maintenanceUrl.pathname = '/maintenance'
+      return NextResponse.redirect(maintenanceUrl)
+    }
+  }
+
   // Protected routes (require subscription)
   const protectedRoutes = ['/homezone', '/profile', '/appengine', '/analyses', '/billing', '/feedback']
   const authRoutes = ['/login', '/signup']
@@ -94,37 +141,54 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // Redirect authenticated users away from auth routes
+  // Redirect authenticated users away from auth routes (but allow if they're not admin - they'll be redirected to maintenance)
   if (isAuthRoute && user) {
+    // Check if user is admin first
     const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+    let isAdmin = false
+    
     if (serviceRoleKey) {
       try {
-        console.log(`[middleware] Checking subscription for user ${user.id} on auth route ${request.nextUrl.pathname}`);
+        const { createClient } = await import('@supabase/supabase-js')
+        const supabaseAdmin = createClient(
+          process.env.NEXT_PUBLIC_SUPABASE_URL!,
+          serviceRoleKey,
+          {
+            auth: {
+              autoRefreshToken: false,
+              persistSession: false
+            }
+          }
+        )
+        
+        const { data: adminData } = await supabaseAdmin
+          .from('admins')
+          .select('role')
+          .eq('user_id', user.id)
+          .maybeSingle()
+        
+        isAdmin = !!adminData
+      } catch (error) {
+        console.error(`[middleware] Error checking admin status:`, error)
+      }
+    }
+    
+    // Only redirect admins away from auth pages (non-admins will be blocked by maintenance mode above)
+    if (isAdmin) {
+      try {
         const hasSubscription = await hasActiveSubscription(
           user.id,
           process.env.NEXT_PUBLIC_SUPABASE_URL!,
-          serviceRoleKey,
+          serviceRoleKey!,
           user.email
         )
         
-        console.log(`[middleware] Subscription check result for ${user.id}: ${hasSubscription}`);
         const redirectUrl = request.nextUrl.clone()
-        // Always redirect authenticated users to homezone (let the page handle subscription UI)
         redirectUrl.pathname = '/homezone'
         return NextResponse.redirect(redirectUrl)
       } catch (error) {
-        console.error(`[middleware] Error checking subscription for ${user.id}:`, error);
-        // On error, redirect to pricing to be safe
-        const redirectUrl = request.nextUrl.clone()
-        redirectUrl.pathname = '/pricing'
-        return NextResponse.redirect(redirectUrl)
+        console.error(`[middleware] Error checking subscription for ${user.id}:`, error)
       }
-    } else {
-      console.error('[middleware] No service role key available, redirecting to pricing');
-      // Fallback to pricing if we can't check subscription
-      const redirectUrl = request.nextUrl.clone()
-      redirectUrl.pathname = '/pricing'
-      return NextResponse.redirect(redirectUrl)
     }
   }
 
