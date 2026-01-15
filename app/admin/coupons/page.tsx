@@ -43,7 +43,7 @@ export default function AdminCouponsPage() {
       try {
         const res = await fetch('/api/check-admin');
         if (!res.ok) {
-          router.push('/login');
+          router.push('/aif');
           return;
         }
         const data = await res.json();

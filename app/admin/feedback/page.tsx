@@ -76,7 +76,7 @@ export default function AdminFeedbackPage() {
         // Check admin access
         const adminRes = await fetch('/api/check-admin');
         if (!adminRes.ok) {
-          router.push('/login');
+          router.push('/aif');
           return;
         }
         const adminData = await adminRes.json();

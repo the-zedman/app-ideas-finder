@@ -55,7 +55,7 @@ export default function StartupBuilderPage() {
       } = await supabase.auth.getUser();
 
       if (!currentUser) {
-        router.push('/login');
+        router.push('/aif');
         return;
       }
 

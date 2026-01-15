@@ -41,13 +41,66 @@ export async function middleware(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
 
   // MAINTENANCE MODE: Block all public access, allow only authenticated admins
-  // Skip maintenance check for maintenance page itself, auth pages (so admins can log in), and static assets
+  // Block /signup completely - no one can sign up
+  if (request.nextUrl.pathname === '/signup') {
+    const maintenanceUrl = request.nextUrl.clone()
+    maintenanceUrl.pathname = '/maintenance'
+    return NextResponse.redirect(maintenanceUrl)
+  }
+
+  // Block all public API routes (except admin APIs and webhooks which have their own security)
+  const isApiRoute = request.nextUrl.pathname.startsWith('/api/')
+  const isAdminApi = request.nextUrl.pathname.startsWith('/api/admin/')
+  const isWebhookRoute = request.nextUrl.pathname.startsWith('/api/webhooks/')
+  
+  if (isApiRoute && !isAdminApi && !isWebhookRoute) {
+    // Check if user is admin for API routes
+    let isAdmin = false
+    if (user) {
+      const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+      if (serviceRoleKey) {
+        try {
+          const { createClient } = await import('@supabase/supabase-js')
+          const supabaseAdmin = createClient(
+            process.env.NEXT_PUBLIC_SUPABASE_URL!,
+            serviceRoleKey,
+            {
+              auth: {
+                autoRefreshToken: false,
+                persistSession: false
+              }
+            }
+          )
+          
+          const { data: adminData } = await supabaseAdmin
+            .from('admins')
+            .select('role')
+            .eq('user_id', user.id)
+            .maybeSingle()
+          
+          isAdmin = !!adminData
+        } catch (error) {
+          console.error('[middleware] Error checking admin status for API:', error)
+        }
+      }
+    }
+
+    // Block all public APIs for non-admins
+    if (!isAdmin && !isDevelopmentBypass) {
+      return NextResponse.json(
+        { error: 'Access denied', message: 'This API is not publicly available' },
+        { status: 403 }
+      )
+    }
+  }
+
+  // Skip maintenance check for maintenance page itself, admin login page (/aif), and static assets
   const isMaintenancePage = request.nextUrl.pathname === '/maintenance'
-  const isAuthPage = request.nextUrl.pathname === '/login' || request.nextUrl.pathname === '/signup'
+  const isAdminLoginPage = request.nextUrl.pathname === '/aif'
   const isStaticAsset = request.nextUrl.pathname.startsWith('/_next/') || 
                        request.nextUrl.pathname.match(/\.(ico|png|jpg|jpeg|svg|gif|webp|css|js|woff|woff2|ttf|eot)$/i)
   
-  if (!isMaintenancePage && !isAuthPage && !isStaticAsset) {
+  if (!isMaintenancePage && !isAdminLoginPage && !isStaticAsset) {
     // Check if user is an admin
     let isAdmin = false
     if (user) {
@@ -90,7 +143,7 @@ export async function middleware(request: NextRequest) {
 
   // Protected routes (require subscription)
   const protectedRoutes = ['/homezone', '/profile', '/appengine', '/analyses', '/billing', '/feedback']
-  const authRoutes = ['/login', '/signup']
+  const authRoutes = ['/aif'] // Changed from /login to /aif
   const adminRoutes = ['/admin']
   const publicRoutes = ['/pricing', '/onboarding', '/', '/contact', '/terms-of-service', '/privacy-policy', '/gallery']
   
@@ -113,10 +166,10 @@ export async function middleware(request: NextRequest) {
     return supabaseResponse
   }
 
-  // Redirect to login if accessing protected route without authentication
+  // Redirect to admin login (/aif) if accessing protected route without authentication
   if (isProtectedRoute && !user) {
     const redirectUrl = request.nextUrl.clone()
-    redirectUrl.pathname = '/login'
+    redirectUrl.pathname = '/aif'
     redirectUrl.searchParams.set('redirectTo', request.nextUrl.pathname)
     return NextResponse.redirect(redirectUrl)
   }
@@ -142,7 +195,7 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // Redirect authenticated users away from auth routes (but allow if they're not admin - they'll be redirected to maintenance)
+  // Redirect authenticated admins away from auth routes (non-admins blocked by maintenance mode above)
   if (isAuthRoute && user) {
     // Check if user is admin first
     const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
@@ -196,9 +249,9 @@ export async function middleware(request: NextRequest) {
   // Check admin access for admin routes
   if (isAdminRoute && !isDevelopmentBypass) {
     if (!user) {
-      // Not logged in - redirect to login
+      // Not logged in - redirect to admin login (/aif)
       const redirectUrl = request.nextUrl.clone()
-      redirectUrl.pathname = '/login'
+      redirectUrl.pathname = '/aif'
       redirectUrl.searchParams.set('redirectTo', request.nextUrl.pathname)
       return NextResponse.redirect(redirectUrl)
     }

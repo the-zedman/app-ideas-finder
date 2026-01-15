@@ -35,7 +35,7 @@ export default function AdminSharedLinksPage() {
       } = await supabase.auth.getUser();
 
       if (!user) {
-        router.push('/login');
+        router.push('/aif');
         return;
       }
 
