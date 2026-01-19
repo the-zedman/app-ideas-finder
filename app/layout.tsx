@@ -1,10 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import GoogleAnalytics from "@/components/GoogleAnalytics";
-import FeedbackWidget from "@/components/FeedbackWidget";
-import { SpeedInsights } from "@vercel/speed-insights/next";
-import { Analytics } from "@vercel/analytics/next";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -12,88 +8,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://www.appideasfinder.com'),
-  title: {
-    default: 'App Ideas Finder - AI-Powered App Analysis & Competitive Intelligence',
-    template: '%s | App Ideas Finder'
-  },
-  description: 'Analyze any iOS app in seconds. Discover what users love and hate, find competitor gaps, and get AI-powered insights from real reviews.',
-  keywords: [
-    'app ideas',
-    'app analysis',
-    'competitive intelligence',
-    'app development',
-    'iOS app analysis',
-    'app store research',
-    'competitor analysis',
-    'user feedback analysis',
-    'app market research',
-    'mobile app ideas',
-    'app feature ideas',
-    'product development',
-    'startup ideas',
-    'app reviews analysis'
-  ],
-  authors: [{ name: 'App Ideas Finder' }],
-  creator: 'App Ideas Finder',
-  publisher: 'App Ideas Finder',
-  formatDetection: {
-    email: false,
-    address: false,
-    telephone: false,
-  },
-  openGraph: {
-    type: 'website',
-    locale: 'en_US',
-    url: 'https://www.appideasfinder.com',
-    siteName: 'App Ideas Finder',
-    title: 'App Ideas Finder - AI-Powered App Analysis & Competitive Intelligence',
-    description: 'Analyze any iOS app in seconds. Discover what users love and hate, find competitor gaps, and get AI-powered insights from real reviews.',
-    images: [
-      {
-        url: '/og-image.png?v=2',
-        width: 1200,
-        height: 630,
-        alt: 'App Ideas Finder - Find Your 1% Edge',
-      },
-    ],
-  },
-  twitter: {
-    card: 'summary_large_image',
-    site: '@appideasfinder',
-    creator: '@appideasfinder',
-    title: 'App Ideas Finder - AI-Powered App Analysis & Competitive Intelligence',
-    description: 'Discover your competitive edge. Analyze any iOS app, uncover what users want, and find what competitors miss.',
-    images: ['/og-image.png?v=2'],
-  },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      'max-video-preview': -1,
-      'max-image-preview': 'large',
-      'max-snippet': -1,
-    },
-  },
-  icons: {
-    icon: [
-      { url: '/favicon.ico' },
-      { url: '/favicon.svg', type: 'image/svg+xml' },
-      { url: '/favicon-96x96.png', sizes: '96x96', type: 'image/png' },
-    ],
-    apple: [
-      { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
-    ],
-  },
-  manifest: '/site.webmanifest',
-  alternates: {
-    canonical: '/',
-  },
-  verification: {
-    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || undefined,
-  },
+  title: 'App Ideas Finder',
+  description: 'Discover your next app idea by analyzing real user feedback from the App Store.',
 };
 
 export default function RootLayout({
@@ -103,24 +19,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <head>
-        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-        <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png" />
-        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-        <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        <meta name="apple-mobile-web-app-title" content="App Ideas Finder" />
-        <meta name="mobile-web-app-capable" content="yes" />
-        {process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION && (
-          <meta name="google-site-verification" content={process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION} />
-        )}
-        <script src="https://analytics.ahrefs.com/analytics.js" data-key="DoJjtOGOv5wvDAPtNehvqw" async></script>
-      </head>
       <body className={`${inter.variable} antialiased`}>
-        <GoogleAnalytics />
-        <FeedbackWidget />
-        <SpeedInsights />
-        <Analytics />
         {children}
       </body>
     </html>
